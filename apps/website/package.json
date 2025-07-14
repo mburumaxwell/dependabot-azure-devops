@@ -23,7 +23,7 @@
     "fumadocs-core": "15.6.1",
     "fumadocs-mdx": "11.6.10",
     "paklo": "workspace:*",
-    "sharp": "0.34.2",
+    "sharp": "0.34.3",
     "zod": "3.25.74"
   },
   "devDependencies": {
