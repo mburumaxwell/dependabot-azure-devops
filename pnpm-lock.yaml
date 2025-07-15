@@ -154,8 +154,8 @@ importers:
         specifier: 2.1.0
         version: 2.1.0
       zod:
-        specifier: 3.25.74
-        version: 3.25.74
+        specifier: 4.0.5
+        version: 4.0.5
     devDependencies:
       '@types/js-yaml':
         specifier: 4.0.9
@@ -194,8 +194,8 @@ importers:
         specifier: 7.7.2
         version: 7.7.2
       zod:
-        specifier: 3.25.74
-        version: 3.25.74
+        specifier: 4.0.5
+        version: 4.0.5
     devDependencies:
       '@types/js-yaml':
         specifier: 4.0.9
@@ -4920,9 +4920,6 @@ packages:
   zip-stream@1.2.0:
     resolution: {integrity: sha512-2olrDUuPM4NvRIgGPhvrp84f7/HmWR6RiQrgwFF2VctmnssFiogtYL3DcA8Vl2bsSmju79sVXe38TsII7JleUg==}
     engines: {node: '>= 0.10.0'}
-
-  zod@3.25.74:
-    resolution: {integrity: sha512-J8poo92VuhKjNknViHRAIuuN6li/EwFbAC8OedzI8uxpEPGiXHGQu9wemIAioIpqgfB4SySaJhdk0mH5Y4ICBg==}
 
   zod@4.0.5:
     resolution: {integrity: sha512-/5UuuRPStvHXu7RS+gmvRf4NXrNxpSllGwDnCBcJZtQsKrviYXm54yDGV2KYNLT5kq0lHGcl7lqWJLgSaG+tgA==}
@@ -10234,8 +10231,6 @@ snapshots:
       compress-commons: 1.2.2
       lodash: 4.17.21
       readable-stream: 2.3.8
-
-  zod@3.25.74: {}
 
   zod@4.0.5: {}
 
