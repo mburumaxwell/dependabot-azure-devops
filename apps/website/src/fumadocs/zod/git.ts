@@ -1,7 +1,7 @@
 import { execSync, type ExecException } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { basename, dirname } from 'node:path';
-import { custom } from 'zod';
+import { custom } from 'zod/v4';
 import type { GitFileInfo } from './types';
 
 // inspired by Docusaurus at:

@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import { copyFile, mkdir, readFile } from 'node:fs/promises';
 import { basename, extname, join, relative, resolve } from 'node:path';
 import sharp, { type FormatEnum } from 'sharp';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { ImageFormats, type ImageData, type ImageFormat } from './types';
 

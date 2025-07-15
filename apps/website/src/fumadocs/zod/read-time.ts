@@ -1,5 +1,5 @@
 import readingTime, { type Options, type ReadTimeResults } from 'reading-time';
-import { custom } from 'zod';
+import { custom } from 'zod/v4';
 
 export type ReadingTimeParams = Options;
 

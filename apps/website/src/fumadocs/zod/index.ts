@@ -1,20 +1,13 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import { git } from './git';
 import { image } from './image';
-import { type IsoDateParams, isodate } from './isodate';
 import { readtime } from './read-time';
 
 const mod = {
   ...z,
-  isodate,
   readtime,
   image,
   git,
-
-  coerce: {
-    ...z.coerce,
-    isodate: (params?: IsoDateParams) => isodate({ coerce: true, ...params }),
-  },
 };
 
 export type * from './types';

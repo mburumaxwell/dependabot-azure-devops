@@ -19,12 +19,12 @@
     "next": "15.4.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "fumadocs-ui": "15.6.1",
-    "fumadocs-core": "15.6.1",
-    "fumadocs-mdx": "11.6.10",
+    "fumadocs-core": "15.6.3",
+    "fumadocs-mdx": "11.6.11",
+    "fumadocs-ui": "15.6.3",
     "paklo": "workspace:*",
     "sharp": "0.34.3",
-    "zod": "3.25.74"
+    "zod": "4.0.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.1.11",
