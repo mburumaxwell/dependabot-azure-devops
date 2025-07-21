@@ -12,14 +12,24 @@
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4" PrivateAssets="All" />
     <PackageReference Include="MartinCostello.Logging.XUnit.v3" Version="0.6.0" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="9.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.7" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.1" PrivateAssets="All" />
     <PackageReference Include="xunit.v3" Version="2.0.3" />
   </ItemGroup>
 
   <ItemGroup>
+
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.7" />
+
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="9.0.7" />
+
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.7" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
+
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="9.0.7" />
     <ProjectReference Include="..\Tingle.Dependabot\Tingle.Dependabot.csproj" />
   </ItemGroup>
 
