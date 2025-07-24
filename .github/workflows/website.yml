@@ -67,15 +67,15 @@ jobs:
             ${{ runner.os }}-next-website
 
       - name: Build
-        run: pnpm dlx turbo build
+        run: pnpm turbo build
         working-directory: '${{ github.workspace }}/apps/website'
 
       - name: Lint
-        run: pnpm dlx turbo lint
+        run: pnpm turbo lint
         working-directory: '${{ github.workspace }}/apps/website'
 
       - name: Test
-        run: pnpm dlx turbo test
+        run: pnpm turbo test
         working-directory: '${{ github.workspace }}/apps/website'
 
       # https://github.com/Azure/static-web-apps/issues/1059#issuecomment-1638817705
