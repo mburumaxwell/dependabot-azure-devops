@@ -1,5 +1,11 @@
 # paklo
 
+## 0.4.1
+
+### Patch Changes
+
+- 0be3fba: Update default experiments as of 04 August 2025
+
 ## 0.4.0
 
 ### Minor Changes
