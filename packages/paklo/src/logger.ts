@@ -1,4 +1,4 @@
-import { pino, type DestinationStream, type Logger, type LoggerOptions } from 'pino';
+import pino, { type DestinationStream, type Logger, type LoggerOptions } from 'pino';
 import { PinoPretty } from 'pino-pretty';
 
 import { environment } from '@/environment';
