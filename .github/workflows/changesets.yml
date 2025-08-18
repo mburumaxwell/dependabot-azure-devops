@@ -30,6 +30,8 @@ jobs:
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY_RELEASER }}
           permission-contents: write
           permission-pull-requests: write
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.repository.name }}
 
       - name: Checkout
         uses: actions/checkout@v4
