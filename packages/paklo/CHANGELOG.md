@@ -1,5 +1,15 @@
 # paklo
 
+## 0.5.0
+
+### Minor Changes
+
+- bda2624: Added basic run command to CLI
+
+### Patch Changes
+
+- e4ce93e: Generate job token and set in ENV for future use
+
 ## 0.4.1
 
 ### Patch Changes

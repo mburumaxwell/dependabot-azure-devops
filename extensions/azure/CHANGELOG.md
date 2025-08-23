@@ -1,5 +1,18 @@
 # extension-azure-devops
 
+## 2.56.0
+
+### Minor Changes
+
+- e4ce93e: Generate job token and set in ENV for future use
+- 45eb3e3: `dependabotCliApiListeningPort` should be treated as an integer/number
+
+### Patch Changes
+
+- Updated dependencies [bda2624]
+- Updated dependencies [e4ce93e]
+  - paklo@0.5.0
+
 ## 2.55.1
 
 ### Patch Changes
