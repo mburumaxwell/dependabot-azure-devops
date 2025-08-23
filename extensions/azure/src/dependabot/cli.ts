@@ -29,7 +29,7 @@ export type DependabotCliOptions = {
   timeoutDurationMinutes?: number;
   flamegraph?: boolean;
   apiUrl?: string;
-  apiListeningPort?: string;
+  apiListeningPort?: number;
 };
 
 /**
@@ -148,7 +148,7 @@ export class DependabotCli {
           DEPENDABOT_JOB_TOKEN: jobToken,
           LOCAL_GITHUB_ACCESS_TOKEN: options?.gitHubAccessToken, // avoid rate-limiting when pulling images from GitHub container registries
           LOCAL_AZURE_ACCESS_TOKEN: options?.azureDevOpsAccessToken, // technically not needed since we already supply this in our 'git_source' registry, but included for consistency
-          FAKE_API_PORT: options?.apiListeningPort, // used to pin PORT of the Dependabot CLI api back-channel
+          FAKE_API_PORT: options?.apiListeningPort?.toString(), // used to pin PORT of the Dependabot CLI api back-channel
         };
         const dependabotTool = tool(dependabotPath).arg(dependabotArguments);
         const dependabotResultCode = await dependabotTool.execAsync({

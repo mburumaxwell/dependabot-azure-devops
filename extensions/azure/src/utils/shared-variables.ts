@@ -51,7 +51,7 @@ export interface ISharedVariables {
   /** The apiUrl argument of the dependabot update command */
   dependabotCliApiUrl?: string;
   /** The listening port of the dependabot update command */
-  dependabotCliApiListeningPort?: string;
+  dependabotCliApiListeningPort?: number;
   /** The dependabot-updater docker image to use for updates. e.g. ghcr.io/dependabot/dependabot-updater-{ecosystem}:latest */
   dependabotUpdaterImage?: string;
 
@@ -139,7 +139,9 @@ export default function getSharedVariables(): ISharedVariables {
 
   const dependabotCliPackage: string | undefined = tl.getInput('dependabotCliPackage');
   const dependabotCliApiUrl: string | undefined = tl.getInput('dependabotCliApiUrl', false);
-  const dependabotCliApiListeningPort: string | undefined = tl.getInput('dependabotCliApiListeningPort', false);
+  const dependabotCliApiListeningPortStr: string | undefined = tl.getInput('dependabotCliApiListeningPort', false);
+  const dependabotCliApiListeningPort: number | undefined =
+    (dependabotCliApiListeningPortStr ?? '').length > 0 ? Number(dependabotCliApiListeningPortStr) : undefined;
   const dependabotUpdaterImage: string | undefined = tl.getInput('dependabotUpdaterImage');
 
   const proxyCertPath: string | undefined = tl.getInput('proxyCertPath');

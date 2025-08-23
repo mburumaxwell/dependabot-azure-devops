@@ -218,7 +218,7 @@
     },
     {
       "name": "dependabotCliApiListeningPort",
-      "type": "string",
+      "type": "int",
       "groupName": "advanced",
       "label": "Dependabot CLI listening port",
       "required": false,
