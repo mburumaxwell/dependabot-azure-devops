@@ -64,8 +64,11 @@
   },
   "homepage": "https://github.com/mburumaxwell/dependabot-azure-devops#readme",
   "dependencies": {
+    "@hono/node-server": "1.19.0",
+    "@hono/zod-validator": "0.7.2",
     "axios": "1.11.0",
     "commander": "14.0.0",
+    "hono": "4.8.10",
     "js-yaml": "4.1.0",
     "pino": "9.9.0",
     "pino-pretty": "13.1.1",

@@ -175,12 +175,21 @@ importers:
 
   packages/paklo:
     dependencies:
+      '@hono/node-server':
+        specifier: 1.19.0
+        version: 1.19.0(hono@4.8.10)
+      '@hono/zod-validator':
+        specifier: 0.7.2
+        version: 0.7.2(hono@4.8.10)(zod@4.0.17)
       axios:
         specifier: 1.11.0
         version: 1.11.0
       commander:
         specifier: 14.0.0
         version: 14.0.0
+      hono:
+        specifier: 4.8.10
+        version: 4.8.10
       js-yaml:
         specifier: 4.1.0
         version: 4.1.0
@@ -493,6 +502,18 @@ packages:
 
   '@formatjs/intl-localematcher@0.6.1':
     resolution: {integrity: sha512-ePEgLgVCqi2BBFnTMWPfIghu6FkbZnnBVhO2sSxvLfrdFw7wCHAHiDoM2h4NRgjbaY7+B7HgOLZGkK187pZTZg==}
+
+  '@hono/node-server@1.19.0':
+    resolution: {integrity: sha512-1k8/8OHf5VIymJEcJyVksFpT+AQ5euY0VA5hUkCnlKpD4mr8FSbvXaHblxeTTEr90OaqWzAkQaqD80qHZQKxBA==}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      hono: ^4
+
+  '@hono/zod-validator@0.7.2':
+    resolution: {integrity: sha512-ub5eL/NeZ4eLZawu78JpW/J+dugDAYhwqUIdp9KYScI6PZECij4Hx4UsrthlEUutqDDhPwRI0MscUfNkvn/mqQ==}
+    peerDependencies:
+      hono: '>=3.9.0'
+      zod: ^3.25.0 || ^4.0.0
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -2755,6 +2776,10 @@ packages:
 
   help-me@5.0.0:
     resolution: {integrity: sha512-7xgomUX6ADmcYzFik0HzAxh/73YlKR9bmFzf51CZwR+b6YtzU2m0u49hQCqV6SvlqIqsaxovfwdvbnsw3b/zpg==}
+
+  hono@4.8.10:
+    resolution: {integrity: sha512-DRMYbR3aFk6YET1FCSAFbgF2cWYTz5j0YAFYPECx9fmrbKBDAYnWU+YCgRTpOaatxMYN6e68U/2IG39zRP4W/A==}
+    engines: {node: '>=16.9.0'}
 
   html-void-elements@3.0.0:
     resolution: {integrity: sha512-bEqo66MRXsUGxWHV5IP0PUiAWwoEjba4VCzg0LjFJBpchPaTfyfCKTG6bc5F8ucKec3q5y6qOdGyYTSBEvhCrg==}
@@ -5036,6 +5061,15 @@ snapshots:
   '@formatjs/intl-localematcher@0.6.1':
     dependencies:
       tslib: 2.8.1
+
+  '@hono/node-server@1.19.0(hono@4.8.10)':
+    dependencies:
+      hono: 4.8.10
+
+  '@hono/zod-validator@0.7.2(hono@4.8.10)(zod@4.0.17)':
+    dependencies:
+      hono: 4.8.10
+      zod: 4.0.17
 
   '@humanfs/core@0.19.1': {}
 
@@ -7504,6 +7538,8 @@ snapshots:
       '@types/hast': 3.0.4
 
   help-me@5.0.0: {}
+
+  hono@4.8.10: {}
 
   html-void-elements@3.0.0: {}
 

@@ -85,15 +85,19 @@ updates:
         patterns:
           - 'fumadocs-*'
           - '@fumadocs/*'
+      hono:
+        patterns:
+          - '@hono/*'
+          - 'hono'
+      js-yaml:
+        patterns:
+          - '@types/js-yaml'
+          - 'js-yaml'
       next:
         patterns:
           - '@next/*'
           - 'next'
           - 'eslint-config-next'
-      js-yaml:
-        patterns:
-          - '@types/js-yaml'
-          - 'js-yaml'
       pino:
         patterns:
           - 'pino'

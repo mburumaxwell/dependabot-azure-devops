@@ -11,9 +11,12 @@ import { extractUrlParts } from '@/azure';
 import {
   DEFAULT_EXPERIMENTS,
   DependabotJobBuilder,
+  LocalDependabotServer,
+  makeRandomJobToken,
   parseDependabotConfig,
   POSSIBLE_CONFIG_FILE_PATHS,
   type DependabotOperation,
+  type LocalDependabotServerAppOptions,
 } from '@/dependabot';
 import { logger } from '../logger';
 import { handlerOptions, type HandlerOptions } from './base';
@@ -28,12 +31,13 @@ const schema = z.object({
   forListDependencies: z.boolean(),
   pullRequestId: z.coerce.string().optional(),
   outDir: z.string(),
+  port: z.coerce.number().min(1).max(65535),
 });
 type Options = z.infer<typeof schema>;
 
 async function handler({ options, error }: HandlerOptions<Options>) {
   let { organisationUrl, file: configPath } = options;
-  const { githubToken, gitToken, project, repository, forListDependencies, pullRequestId, outDir } = options;
+  const { githubToken, gitToken, project, repository, forListDependencies, pullRequestId, outDir, port } = options;
 
   // extract url parts
   if (!organisationUrl.endsWith('/')) organisationUrl = `${organisationUrl}/`; // without trailing slash the extraction fails
@@ -84,6 +88,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
   // create output directory if it does not exist
   if (!existsSync(outDir)) await mkdir(outDir, { recursive: true });
 
+  const jobToken = makeRandomJobToken();
   const updates = config.updates;
   for (const update of updates) {
     const updateId = updates.indexOf(update).toString();
@@ -133,7 +138,24 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     const outputPath = join(outDir, `${operation.job.id}.yaml`);
     await writeFile(outputPath, contents);
 
+    const serverOptions: LocalDependabotServerAppOptions = {
+      apiKey: jobToken,
+      async handle(type, data) {
+        // TODO: actually do something useful here
+        logger.info(`Received operation of type ${type} with data: ${JSON.stringify(data)}`);
+        return true;
+      },
+    };
+    const server = new LocalDependabotServer(serverOptions);
+    server.start(port);
+
+    // delay for 10 seconds
+    await new Promise((resolve) => setTimeout(resolve, 10 * 1000));
+
+    server.stop();
+
     // TODO: run the docker container(s) using logic from dependabot-action
+
     error('This has not been implemented yet. Sorry');
     return;
   }
@@ -162,6 +184,7 @@ export const command = new Command('run')
     'Identifier of pull request to update. If not specified, a job that updates everything is generated.',
   )
   .option('--out-dir', 'Output directory. If not specified, defaults to "dependabot-jobs".', 'dependabot-jobs')
+  .option('--port <PORT>', 'Port to run the API server on.', '3000')
   .action(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async (...args: any[]) =>

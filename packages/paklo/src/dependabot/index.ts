@@ -6,4 +6,5 @@ export * from './job-builder';
 export * from './placeholder';
 export * from './proxy';
 export * from './scenario';
+export * from './server';
 export * from './update';
