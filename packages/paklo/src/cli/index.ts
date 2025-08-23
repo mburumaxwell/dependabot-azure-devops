@@ -6,7 +6,7 @@ import { generate, run, validate } from './commands';
 
 const root = new Command();
 
-root.name('paklo').description('CLI too for running E2E dependabot updates locally.');
+root.name('paklo').description('CLI tool for running E2E dependabot updates locally.');
 root.usage();
 root.version(packageJson.version, '--version');
 root.addCommand(validate);

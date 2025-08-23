@@ -20,7 +20,7 @@ export const DependabotInputSchema = z.object({
 });
 export type DependabotInput = z.infer<typeof DependabotInputSchema>;
 
-export const DependabotOutputTypeSchema = z.enum([
+export const DependabotOperationTypeSchema = z.enum([
   'create_pull_request',
   'update_pull_request',
   'close_pull_request',
@@ -32,7 +32,7 @@ export const DependabotOutputTypeSchema = z.enum([
   'record_ecosystem_meta',
   'increment_metric',
 ]);
-export type DependabotOutputType = z.infer<typeof DependabotOutputTypeSchema>;
+export type DependabotOperationType = z.infer<typeof DependabotOperationTypeSchema>;
 
 export const DependabotOutputSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('create_pull_request'), expect: z.object({ data: DependabotCreatePullRequestSchema }) }),
