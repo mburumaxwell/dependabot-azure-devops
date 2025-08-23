@@ -144,6 +144,7 @@ describe('abandonPullRequestsWhereSourceRefIsDeleted', () => {
 
 describe('performDependabotUpdatesAsync', () => {
   let taskInputs: ISharedVariables;
+  let jobToken: string;
   let dependabotConfig: DependabotConfig;
   let dependabotCli: DependabotCli;
   let dependabotCliUpdateOptions: DependabotCliOptions;
@@ -152,6 +153,7 @@ describe('performDependabotUpdatesAsync', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     taskInputs = { url: {} } as ISharedVariables;
+    jobToken = 'random-token';
     dependabotConfig = {
       updates: [
         {
@@ -174,6 +176,7 @@ describe('performDependabotUpdatesAsync', () => {
   it('should perform "update all" job successfully', async () => {
     const updateResult = await performDependabotUpdatesAsync(
       taskInputs,
+      jobToken,
       dependabotConfig,
       dependabotConfig.updates,
       dependabotCli,
@@ -212,6 +215,7 @@ describe('performDependabotUpdatesAsync', () => {
 
     const updateResult = await performDependabotUpdatesAsync(
       taskInputs,
+      jobToken,
       dependabotConfig,
       dependabotConfig.updates,
       dependabotCli,
@@ -235,6 +239,7 @@ describe('performDependabotUpdatesAsync', () => {
 
     const updateResult = await performDependabotUpdatesAsync(
       taskInputs,
+      jobToken,
       dependabotConfig,
       dependabotConfig.updates,
       dependabotCli,
@@ -272,6 +277,7 @@ describe('performDependabotUpdatesAsync', () => {
 
     const updateResult = await performDependabotUpdatesAsync(
       taskInputs,
+      jobToken,
       dependabotConfig,
       dependabotConfig.updates,
       dependabotCli,
@@ -293,6 +299,7 @@ describe('performDependabotUpdatesAsync', () => {
 
     const updateResult = await performDependabotUpdatesAsync(
       taskInputs,
+      jobToken,
       dependabotConfig,
       dependabotConfig.updates,
       dependabotCli,
@@ -315,6 +322,7 @@ describe('performDependabotUpdatesAsync', () => {
 
     const updateResult = await performDependabotUpdatesAsync(
       taskInputs,
+      jobToken,
       dependabotConfig,
       dependabotConfig.updates,
       dependabotCli,
@@ -334,6 +342,7 @@ describe('performDependabotUpdatesAsync', () => {
 
     const updateResult = await performDependabotUpdatesAsync(
       taskInputs,
+      jobToken,
       dependabotConfig,
       dependabotConfig.updates,
       dependabotCli,
@@ -353,6 +362,7 @@ describe('performDependabotUpdatesAsync', () => {
 
     const updateResult = await performDependabotUpdatesAsync(
       taskInputs,
+      jobToken,
       dependabotConfig,
       dependabotConfig.updates,
       dependabotCli,
@@ -372,6 +382,7 @@ describe('performDependabotUpdatesAsync', () => {
 
     const updateResult = await performDependabotUpdatesAsync(
       taskInputs,
+      jobToken,
       dependabotConfig,
       dependabotConfig.updates,
       dependabotCli,

@@ -111,6 +111,7 @@ async function run() {
       taskInputs.debug,
     );
 
+    const jobToken = makeRandomJobToken();
     const dependabotCliUpdateOptions: DependabotCliOptions = {
       sourceProvider: 'azure',
       azureDevOpsAccessToken: taskInputs.systemAccessToken,
@@ -163,6 +164,7 @@ async function run() {
       prs,
     } = await performDependabotUpdatesAsync(
       taskInputs,
+      jobToken,
       dependabotConfig,
       dependabotUpdatesToPerform,
       dependabotCli,
@@ -240,6 +242,7 @@ export async function abandonPullRequestsWhereSourceRefIsDeleted(
 /**
  * Performs the Dependabot updates.
  * @param taskInputs The shared task inputs.
+ * @param jobToken The job token to use for authenticating with the Dependabot API server.
  * @param dependabotConfig The parsed Dependabot configuration.
  * @param dependabotUpdates The updates to perform.
  * @param dependabotCli The Dependabot CLI instance.
@@ -249,13 +252,13 @@ export async function abandonPullRequestsWhereSourceRefIsDeleted(
  */
 export async function performDependabotUpdatesAsync(
   taskInputs: ISharedVariables,
+  jobToken: string,
   dependabotConfig: DependabotConfig,
   dependabotUpdates: DependabotUpdate[],
   dependabotCli: DependabotCli,
   dependabotCliUpdateOptions: DependabotCliOptions,
   existingPullRequests: IPullRequestProperties[],
 ): Promise<{ result: TaskResult; message: string; prs: number[] }> {
-  const jobToken = makeRandomJobToken();
   const successfulOperations: DependabotOperationResult[] = [];
   const failedOperations: DependabotOperationResult[] = [];
   for (const update of dependabotUpdates) {
