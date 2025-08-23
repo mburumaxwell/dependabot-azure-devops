@@ -31,13 +31,15 @@ const schema = z.object({
   forListDependencies: z.boolean(),
   pullRequestId: z.coerce.string().optional(),
   outDir: z.string(),
+  generateOnly: z.boolean(),
   port: z.coerce.number().min(1).max(65535),
 });
 type Options = z.infer<typeof schema>;
 
 async function handler({ options, error }: HandlerOptions<Options>) {
   let { organisationUrl, file: configPath } = options;
-  const { githubToken, gitToken, project, repository, forListDependencies, pullRequestId, outDir, port } = options;
+  const { githubToken, gitToken, project, repository, forListDependencies, pullRequestId, outDir, generateOnly, port } =
+    options;
 
   // extract url parts
   if (!organisationUrl.endsWith('/')) organisationUrl = `${organisationUrl}/`; // without trailing slash the extraction fails
@@ -89,6 +91,20 @@ async function handler({ options, error }: HandlerOptions<Options>) {
   if (!existsSync(outDir)) await mkdir(outDir, { recursive: true });
 
   const jobToken = makeRandomJobToken();
+  let server: LocalDependabotServer | undefined = undefined;
+  if (!generateOnly) {
+    const serverOptions: LocalDependabotServerAppOptions = {
+      apiKey: jobToken,
+      async handle(type, data) {
+        // TODO: actually do something useful here
+        logger.info(`Received operation of type ${type} with data: ${JSON.stringify(data)}`);
+        return true;
+      },
+    };
+    server = new LocalDependabotServer(serverOptions);
+    server.start(port);
+  }
+
   const updates = config.updates;
   for (const update of updates) {
     const updateId = updates.indexOf(update).toString();
@@ -138,27 +154,16 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     const outputPath = join(outDir, `${operation.job.id}.yaml`);
     await writeFile(outputPath, contents);
 
-    const serverOptions: LocalDependabotServerAppOptions = {
-      apiKey: jobToken,
-      async handle(type, data) {
-        // TODO: actually do something useful here
-        logger.info(`Received operation of type ${type} with data: ${JSON.stringify(data)}`);
-        return true;
-      },
-    };
-    const server = new LocalDependabotServer(serverOptions);
-    server.start(port);
-
-    // delay for 10 seconds
-    await new Promise((resolve) => setTimeout(resolve, 10 * 1000));
-
-    server.stop();
+    // if we only wanted to generate the files, continue to the next one
+    if (generateOnly) continue;
 
     // TODO: run the docker container(s) using logic from dependabot-action
+    await new Promise((resolve) => setTimeout(resolve, 10 * 1000));
 
-    error('This has not been implemented yet. Sorry');
-    return;
+    // return;
   }
+
+  server?.stop();
 }
 
 export const command = new Command('run')
@@ -184,6 +189,7 @@ export const command = new Command('run')
     'Identifier of pull request to update. If not specified, a job that updates everything is generated.',
   )
   .option('--out-dir', 'Output directory. If not specified, defaults to "dependabot-jobs".', 'dependabot-jobs')
+  .option('--generate-only', 'Whether to only generate the job files without running it.', false)
   .option('--port <PORT>', 'Port to run the API server on.', '3000')
   .action(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
