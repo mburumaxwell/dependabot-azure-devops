@@ -1,52 +1,47 @@
 import { Command } from 'commander';
-import { existsSync } from 'node:fs';
-import { readFile } from 'node:fs/promises';
 import { z } from 'zod/v4';
 
-import { POSSIBLE_CONFIG_FILE_PATHS, parseDependabotConfig } from '@/dependabot';
+import { extractUrlParts, getDependabotConfig } from '@/azure';
+import { type DependabotConfig } from '@/dependabot';
 import { logger } from '../logger';
 import { handlerOptions, type HandlerOptions } from './base';
 
 const schema = z.object({
-  file: z.string().optional(),
+  organisationUrl: z.string(),
+  project: z.string(),
+  repository: z.string(),
+  gitToken: z.string(),
 });
 type Options = z.infer<typeof schema>;
 
 async function handler({ options, error }: HandlerOptions<Options>) {
-  let { file: configPath } = options;
+  let { organisationUrl } = options;
+  const { gitToken, project, repository } = options;
 
-  // if we have no file, attempt to check against known paths
-  if (!configPath) {
-    logger.trace('file not specified searching under known possible paths');
-    for (const fp of POSSIBLE_CONFIG_FILE_PATHS) {
-      if (existsSync(fp)) {
-        configPath = fp;
-        break;
-      }
-    }
+  // extract url parts
+  if (!organisationUrl.endsWith('/')) organisationUrl = `${organisationUrl}/`; // without trailing slash the extraction fails
+  const url = extractUrlParts({ organisationUrl, project, repository });
 
-    // if we still have no path, throw an exception
-    if (!configPath) {
-      error(`Configuration file not found at possible locations:\n${POSSIBLE_CONFIG_FILE_PATHS.join(',\n')}`);
-      return;
-    }
-  }
-
-  // if the file does not exist, there is nothing to do
-  if (!existsSync(configPath)) {
-    error(`Configuration file '${configPath}' does not exist`);
-    return;
-  }
-
-  // load the file contents and validate
-  logger.info(`Validating file at ${configPath}`);
-  const configContents = await readFile(configPath, 'utf-8');
+  // prepare to find variables by asking user for input
   const variables = new Set<string>();
   function variableFinder(name: string) {
     variables.add(name);
     return undefined;
   }
-  const config = await parseDependabotConfig({ configContents, configPath, variableFinder });
+  // Parse dependabot configuration file
+  let config: DependabotConfig;
+  try {
+    config = await getDependabotConfig({
+      url,
+      token: gitToken,
+      rootDir: process.cwd(),
+      variableFinder: variableFinder,
+    });
+  } catch (e) {
+    error((e as Error).message);
+    return;
+  }
+
   logger.info(
     `Configuration file valid: ${config.updates.length} update(s) and ${config.registries?.length ?? 'no'} registries.`,
   );
@@ -59,8 +54,26 @@ async function handler({ options, error }: HandlerOptions<Options>) {
 
 export const command = new Command('validate')
   .description('Validate a dependabot configuration file.')
-  .option(
-    '-f, --file <FILE>',
-    'Configuration file to validate.\nIf not specified, the command will search for one in the current directory.',
+  .argument(
+    '<organisation-url>',
+    'URL of the organisation e.g. https://dev.azure.com/my-org or https://my-org.visualstudio.com or http://my-org.com:8443/tfs',
   )
-  .action(async (input, command) => await handler(await handlerOptions({ schema, input, command })));
+  .argument('<project>', 'Name or ID of the project')
+  .argument('<repository>', 'Name or ID of the repository')
+  .requiredOption('--git-token <GIT-TOKEN>', 'Token to use for authenticating access to the git repository.')
+  .action(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async (...args: any[]) =>
+      await handler(
+        await handlerOptions({
+          schema,
+          input: {
+            organisationUrl: args[0],
+            project: args[1],
+            repository: args[2],
+            ...args[3],
+          },
+          command: args.at(-1),
+        }),
+      ),
+  );

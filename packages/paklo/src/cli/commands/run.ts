@@ -1,20 +1,18 @@
 import { Command } from 'commander';
 import * as yaml from 'js-yaml';
 import { existsSync } from 'node:fs';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { stdin, stdout } from 'node:process';
 import readline from 'node:readline/promises';
 import { z } from 'zod/v4';
 
-import { extractUrlParts } from '@/azure';
+import { extractUrlParts, getDependabotConfig } from '@/azure';
 import {
   DEFAULT_EXPERIMENTS,
   DependabotJobBuilder,
   LocalDependabotServer,
   makeRandomJobToken,
-  parseDependabotConfig,
-  POSSIBLE_CONFIG_FILE_PATHS,
   type DependabotOperation,
   type LocalDependabotServerAppOptions,
 } from '@/dependabot';
@@ -25,8 +23,7 @@ const schema = z.object({
   organisationUrl: z.string(),
   project: z.string(),
   repository: z.string(),
-  file: z.string().optional(),
-  gitToken: z.string().optional(),
+  gitToken: z.string(),
   githubToken: z.string().optional(),
   forListDependencies: z.boolean(),
   pullRequestId: z.coerce.string().optional(),
@@ -37,7 +34,7 @@ const schema = z.object({
 type Options = z.infer<typeof schema>;
 
 async function handler({ options, error }: HandlerOptions<Options>) {
-  let { organisationUrl, file: configPath } = options;
+  let { organisationUrl } = options;
   const { githubToken, gitToken, project, repository, forListDependencies, pullRequestId, outDir, generateOnly, port } =
     options;
 
@@ -45,33 +42,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
   if (!organisationUrl.endsWith('/')) organisationUrl = `${organisationUrl}/`; // without trailing slash the extraction fails
   const url = extractUrlParts({ organisationUrl, project, repository });
 
-  // TODO: change this to pull from REST API!
-  // if we have no file, attempt to check against known paths
-  if (!configPath) {
-    logger.trace('file not specified searching under known possible paths');
-    for (const fp of POSSIBLE_CONFIG_FILE_PATHS) {
-      if (existsSync(fp)) {
-        configPath = fp;
-        break;
-      }
-    }
-
-    // if we still have no path, throw an exception
-    if (!configPath) {
-      error(`Configuration file not found at possible locations:\n${POSSIBLE_CONFIG_FILE_PATHS.join(',\n')}`);
-      return;
-    }
-  }
-
-  // if the file does not exist, there is nothing to do
-  if (!existsSync(configPath)) {
-    error(`Configuration file '${configPath}' does not exist`);
-    return;
-  }
-
-  // load the file contents and parse
-  logger.info(`Using config file at ${configPath}`);
-  const configContents = await readFile(configPath, 'utf-8');
+  // prepare to find variables by asking user for input
   const variables = new Map<string, string>();
   const rl = readline.createInterface({ input: stdin, output: stdout });
   async function variableFinder(name: string) {
@@ -81,7 +52,14 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     variables.set(name, value);
     return value;
   }
-  const config = await parseDependabotConfig({ configContents, configPath, variableFinder });
+
+  // Parse dependabot configuration file
+  const config = await getDependabotConfig({
+    url,
+    token: gitToken,
+    rootDir: process.cwd(),
+    variableFinder: variableFinder,
+  });
   rl.close();
   logger.info(
     `Configuration file valid: ${config.updates.length} update(s) and ${config.registries?.length ?? 'no'} registries.`,
@@ -174,11 +152,7 @@ export const command = new Command('run')
   )
   .argument('<project>', 'Name or ID of the project')
   .argument('<repository>', 'Name or ID of the repository')
-  .option('--git-token <GIT-TOKEN>', 'Token to use for authenticating access to the git repository.')
-  .option(
-    '-f, --file <FILE>',
-    'Configuration file to validate.\nIf not specified, the command will search for one in the current directory.',
-  )
+  .requiredOption('--git-token <GIT-TOKEN>', 'Token to use for authenticating access to the git repository.')
   .option(
     '--github-token <GITHUB-TOKEN>',
     'GitHub token to use for authentication. If not specified, you may get rate limited.',

@@ -1,7 +1,17 @@
-import { debug, error, setResult, setVariable, TaskResult, warning, which } from 'azure-pipelines-task-lib/task';
+import {
+  debug,
+  error,
+  getVariable,
+  setResult,
+  setVariable,
+  TaskResult,
+  warning,
+  which,
+} from 'azure-pipelines-task-lib/task';
 import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 
+import { getDependabotConfig } from 'paklo/azure';
 import {
   DependabotJobBuilder,
   makeRandomJobToken,
@@ -22,7 +32,6 @@ import { AzureDevOpsWebApiClient } from './azure-devops/client';
 import { normalizeBranchName, section, setSecrets } from './azure-devops/formatting';
 import { DEVOPS_PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME, type IPullRequestProperties } from './azure-devops/models';
 import { DependabotCli, type DependabotCliOptions } from './dependabot/cli';
-import { getDependabotConfig } from './dependabot/get-config';
 import { DependabotOutputProcessor, parsePullRequestProperties } from './dependabot/output-processor';
 import parseTaskInputConfiguration, { type ISharedVariables } from './utils/shared-variables';
 
@@ -57,8 +66,13 @@ async function run() {
       );
     }
 
-    // Parse dependabot.yaml configuration file
-    const dependabotConfig = await getDependabotConfig(taskInputs);
+    // Parse dependabot configuration file
+    const dependabotConfig = await getDependabotConfig({
+      url: taskInputs.url,
+      token: taskInputs.systemAccessToken,
+      rootDir: getVariable('Build.SourcesDirectory')!,
+      variableFinder: getVariable,
+    });
     if (!dependabotConfig) {
       throw new Error('Failed to parse dependabot.yaml configuration file from the target repository');
     }
