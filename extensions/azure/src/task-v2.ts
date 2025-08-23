@@ -4,6 +4,7 @@ import { readFile } from 'fs/promises';
 
 import {
   DependabotJobBuilder,
+  makeRandomJobToken,
   mapPackageEcosystemToPackageManager,
   type DependabotConfig,
   type DependabotOperationResult,
@@ -254,6 +255,7 @@ export async function performDependabotUpdatesAsync(
   dependabotCliUpdateOptions: DependabotCliOptions,
   existingPullRequests: IPullRequestProperties[],
 ): Promise<{ result: TaskResult; message: string; prs: number[] }> {
+  const jobToken = makeRandomJobToken();
   const successfulOperations: DependabotOperationResult[] = [];
   const failedOperations: DependabotOperationResult[] = [];
   for (const update of dependabotUpdates) {
@@ -289,7 +291,7 @@ export async function performDependabotUpdatesAsync(
       const job = builder.forDependenciesList({
         id: `discover-${updateId}-${update['package-ecosystem']}-dependency-list`,
       });
-      const outputs = await dependabotCli.update(job, dependabotCliUpdateOptions);
+      const outputs = await dependabotCli.update(jobToken, job, dependabotCliUpdateOptions);
 
       // Get the list of vulnerabilities that apply to the discovered dependencies
       section(`Dependency vulnerability check`);
@@ -355,7 +357,7 @@ export async function performDependabotUpdatesAsync(
           existingPullRequests: existingPullRequestDependenciesForPackageManager,
           securityVulnerabilities,
         });
-        const outputs = await dependabotCli.update(job, dependabotCliUpdateOptions);
+        const outputs = await dependabotCli.update(jobToken, job, dependabotCliUpdateOptions);
         successfulOperations.push(...(outputs?.filter((u) => u.success) || []));
         failedOperations.push(...(outputs?.filter((u) => !u.success) || []));
       } else {
@@ -378,7 +380,7 @@ export async function performDependabotUpdatesAsync(
             pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
             securityVulnerabilities,
           });
-          const outputs = await dependabotCli.update(job, dependabotCliUpdateOptions);
+          const outputs = await dependabotCli.update(jobToken, job, dependabotCliUpdateOptions);
           successfulOperations.push(...(outputs?.filter((u) => u.success) || []));
           failedOperations.push(...(outputs?.filter((u) => !u.success) || []));
         }

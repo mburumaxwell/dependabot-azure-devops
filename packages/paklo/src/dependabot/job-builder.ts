@@ -438,3 +438,7 @@ export function makeCredentialsMetadata(credentials: DependabotCredential[]): De
     Object.fromEntries(Object.entries(cred).filter(([key]) => !sensitive.includes(key))),
   );
 }
+
+export function makeRandomJobToken() {
+  return [...Array(30)].map(() => Math.random().toString(36)[2]).join('');
+}
