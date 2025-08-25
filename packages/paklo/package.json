@@ -69,7 +69,7 @@
     "axios": "1.11.0",
     "azure-devops-node-api": "15.1.1",
     "commander": "14.0.0",
-    "hono": "4.8.10",
+    "hono": "4.9.4",
     "js-yaml": "4.1.0",
     "pino": "9.9.0",
     "pino-pretty": "13.1.1",
