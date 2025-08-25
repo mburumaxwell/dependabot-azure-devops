@@ -8,8 +8,6 @@ import {
   type IdentityRefWithVote,
 } from 'azure-devops-node-api/interfaces/GitInterfaces';
 import { debug, error, warning } from 'azure-pipelines-task-lib/task';
-import { type IHttpClientResponse } from 'typed-rest-client/Interfaces';
-import { normalizeBranchName, normalizeFilePath } from './formatting';
 import {
   HttpRequestError,
   type IAbandonPullRequest,
@@ -17,7 +15,9 @@ import {
   type ICreatePullRequest,
   type IPullRequestProperties,
   type IUpdatePullRequest,
-} from './models';
+} from 'paklo/azure';
+import { type IHttpClientResponse } from 'typed-rest-client/Interfaces';
+import { normalizeBranchName, normalizeFilePath } from './utils';
 
 /**
  * Wrapper for DevOps WebApi client with helper methods for easier management of dependabot pull requests

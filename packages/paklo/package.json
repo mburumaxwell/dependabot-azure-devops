@@ -67,6 +67,7 @@
     "@hono/node-server": "1.19.0",
     "@hono/zod-validator": "0.7.2",
     "axios": "1.11.0",
+    "azure-devops-node-api": "15.1.1",
     "commander": "14.0.0",
     "hono": "4.8.10",
     "js-yaml": "4.1.0",

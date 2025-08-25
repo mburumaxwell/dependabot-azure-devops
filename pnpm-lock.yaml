@@ -184,6 +184,9 @@ importers:
       axios:
         specifier: 1.11.0
         version: 1.11.0
+      azure-devops-node-api:
+        specifier: 15.1.1
+        version: 15.1.1
       commander:
         specifier: 14.0.0
         version: 14.0.0

@@ -11,7 +11,11 @@ import {
 import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 
-import { getDependabotConfig } from 'paklo/azure';
+import {
+  DEVOPS_PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
+  getDependabotConfig,
+  type IPullRequestProperties,
+} from 'paklo/azure';
 import {
   DependabotJobBuilder,
   makeRandomJobToken,
@@ -30,7 +34,6 @@ import {
 } from 'paklo/github';
 import { AzureDevOpsWebApiClient } from './azure-devops/client';
 import { normalizeBranchName, section, setSecrets } from './azure-devops/formatting';
-import { DEVOPS_PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME, type IPullRequestProperties } from './azure-devops/models';
 import { DependabotCli, type DependabotCliOptions } from './dependabot/cli';
 import { DependabotOutputProcessor, parsePullRequestProperties } from './dependabot/output-processor';
 import parseTaskInputConfiguration, { type ISharedVariables } from './utils/shared-variables';

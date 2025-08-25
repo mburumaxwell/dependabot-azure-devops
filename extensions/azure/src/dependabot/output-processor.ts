@@ -1,6 +1,12 @@
 import { GitPullRequestMergeStrategy, VersionControlChangeType } from 'azure-devops-node-api/interfaces/GitInterfaces';
 import { debug, error, warning } from 'azure-pipelines-task-lib/task';
 import {
+  DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
+  DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
+  type IFileChange,
+  type IPullRequestProperties,
+} from 'paklo/azure';
+import {
   DependabotExistingGroupPRSchema,
   DependabotExistingPRSchema,
   getBranchNameForUpdate,
@@ -16,12 +22,6 @@ import {
 import * as path from 'path';
 import { type AzureDevOpsWebApiClient } from '../azure-devops/client';
 import { section } from '../azure-devops/formatting';
-import {
-  DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
-  DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
-  type IFileChange,
-  type IPullRequestProperties,
-} from '../azure-devops/models';
 import { type ISharedVariables } from '../utils/shared-variables';
 
 export type DependabotOutputProcessorResult = {
