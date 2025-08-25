@@ -21,6 +21,7 @@ import {
   DependabotUpdatePullRequestSchema,
 } from './update';
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type HandlerFunc = (type: DependabotOperationType, data: any) => Promise<boolean>;
 export type LocalDependabotServerAppOptions = {
   apiKey?: string;
