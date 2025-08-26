@@ -85,7 +85,7 @@ export async function getDependabotConfig({
             logger.trace(`No configuration file at '${requestUrl}'`);
             continue;
           } else if (responseStatusCode === 401) {
-            throw new Error(`No access token has been provided to access '${requestUrl}'`);
+            throw new Error(`No or invalid access token has been provided to access '${requestUrl}'`);
           } else if (responseStatusCode === 403) {
             throw new Error(`The access token provided does not have permissions to access '${requestUrl}'`);
           }
