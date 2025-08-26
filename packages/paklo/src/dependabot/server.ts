@@ -52,7 +52,11 @@ export type LocalDependabotServerAppOptions = {
  * @param params - The parameters for creating the API server application.
  * @returns The created API server application.
  */
-export function createApiServerApp({ basePath = `/api/update_jobs`, apiKey, handle }: LocalDependabotServerAppOptions): Hono {
+export function createApiServerApp({
+  basePath = `/api/update_jobs`,
+  apiKey,
+  handle,
+}: LocalDependabotServerAppOptions): Hono {
   // Setup app with base path and middleware
   const app = new Hono().basePath(basePath);
   app.use(loggerMiddleware((str) => logger.debug(str))); // logger must be earliest

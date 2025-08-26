@@ -1,4 +1,2 @@
-import { command as run } from './run';
-import { command as validate } from './validate';
-
-export { run, validate };
+export { command as run } from './run';
+export { command as validate } from './validate';
