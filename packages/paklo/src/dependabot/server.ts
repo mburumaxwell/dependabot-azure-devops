@@ -24,7 +24,19 @@ import {
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type HandlerFunc = (type: DependabotOperationType, data: any) => Promise<boolean>;
 export type LocalDependabotServerAppOptions = {
+  /**
+   * Base path for the endpoints.
+   * @default `/api/update_jobs`
+   */
+  basePath?: string;
+
+  /**
+   * Optional API key for protecting the endpoints
+   * Do not specify this if you are using the dependabot CLI as it does not support API keys.
+   */
   apiKey?: string;
+
+  /** Handler function for processing the operations */
   handle: HandlerFunc;
 };
 
@@ -37,12 +49,12 @@ export type LocalDependabotServerAppOptions = {
  * `http://<host>:<port>/api/update_jobs/:id` where `<host>` and `<port>` are the host and port
  *
  * These endpoints are protected using the provided API key.
- * @param param0 - The parameters for creating the API server application.
+ * @param params - The parameters for creating the API server application.
  * @returns The created API server application.
  */
-export function createApiServerApp({ apiKey, handle }: LocalDependabotServerAppOptions): Hono {
+export function createApiServerApp({ basePath = `/api/update_jobs`, apiKey, handle }: LocalDependabotServerAppOptions): Hono {
   // Setup app with base path and middleware
-  const app = new Hono().basePath(`/api/update_jobs`);
+  const app = new Hono().basePath(basePath);
   app.use(loggerMiddleware((str) => logger.debug(str))); // logger must be earliest
   // TODO: apiKey should not be optional once we move away from dependabot CLI
   if (apiKey) app.use('/*', bearerAuth({ token: apiKey }));
