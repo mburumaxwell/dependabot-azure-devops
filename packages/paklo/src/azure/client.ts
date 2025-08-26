@@ -8,6 +8,7 @@ import {
   type IdentityRefWithVote,
 } from 'azure-devops-node-api/interfaces/GitInterfaces';
 import { debug, error, warning } from 'azure-pipelines-task-lib/task';
+import { type IHttpClientResponse } from 'typed-rest-client/Interfaces';
 import {
   HttpRequestError,
   type IAbandonPullRequest,
@@ -15,8 +16,7 @@ import {
   type ICreatePullRequest,
   type IPullRequestProperties,
   type IUpdatePullRequest,
-} from 'paklo/azure';
-import { type IHttpClientResponse } from 'typed-rest-client/Interfaces';
+} from './models';
 import { normalizeBranchName, normalizeFilePath } from './utils';
 
 /**

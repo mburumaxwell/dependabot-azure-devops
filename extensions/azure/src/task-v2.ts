@@ -12,8 +12,10 @@ import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 
 import {
+  AzureDevOpsWebApiClient,
   DEVOPS_PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
   getDependabotConfig,
+  normalizeBranchName,
   type IPullRequestProperties,
 } from 'paklo/azure';
 import {
@@ -32,8 +34,7 @@ import {
   type Package,
   type SecurityVulnerability,
 } from 'paklo/github';
-import { AzureDevOpsWebApiClient } from './azure-devops/client';
-import { normalizeBranchName, section, setSecrets } from './azure-devops/formatting';
+import { section, setSecrets } from './azure-devops/formatting';
 import { DependabotCli, type DependabotCliOptions } from './dependabot/cli';
 import { DependabotOutputProcessor, parsePullRequestProperties } from './dependabot/output-processor';
 import parseTaskInputConfiguration, { type ISharedVariables } from './utils/shared-variables';

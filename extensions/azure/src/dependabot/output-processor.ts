@@ -3,6 +3,7 @@ import { debug, error, warning } from 'azure-pipelines-task-lib/task';
 import {
   DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
   DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
+  type AzureDevOpsWebApiClient,
   type IFileChange,
   type IPullRequestProperties,
 } from 'paklo/azure';
@@ -20,7 +21,6 @@ import {
   type DependabotUpdatePullRequest,
 } from 'paklo/dependabot';
 import * as path from 'path';
-import { type AzureDevOpsWebApiClient } from '../azure-devops/client';
 import { section } from '../azure-devops/formatting';
 import { type ISharedVariables } from '../utils/shared-variables';
 

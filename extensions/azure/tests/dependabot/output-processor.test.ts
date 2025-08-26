@@ -2,18 +2,19 @@ import { error, warning } from 'azure-pipelines-task-lib/task';
 import { type DependabotOperation } from 'paklo/dependabot';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AzureDevOpsWebApiClient } from '../../src/azure-devops/client';
 import {
+  AzureDevOpsWebApiClient,
   DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
   DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
   type IPullRequestProperties,
-} from '../../src/azure-devops/models';
+} from 'paklo/azure';
 import { DependabotOutputProcessor } from '../../src/dependabot/output-processor';
 import { type ISharedVariables } from '../../src/utils/shared-variables';
 
-vi.mock('../../src/azure-devops/client');
-vi.mock('../../src/utils/shared-variables');
 vi.mock('azure-pipelines-task-lib/task');
+vi.mock('paklo/azure');
+// vi.mock('./mockable-azure-devops-client');
+vi.mock('../../src/utils/shared-variables');
 
 describe('DependabotOutputProcessor', () => {
   let processor: DependabotOutputProcessor;

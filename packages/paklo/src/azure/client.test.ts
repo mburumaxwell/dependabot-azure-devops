@@ -3,12 +3,8 @@ import { type IncomingMessage } from 'http';
 import { type IHttpClientResponse } from 'typed-rest-client/Interfaces';
 import { beforeEach, describe, expect, it, vi, type MockedFunction } from 'vitest';
 
-import {
-  AzureDevOpsWebApiClient,
-  isErrorTemporaryFailure,
-  sendRestApiRequestWithRetry,
-} from '../../src/azure-devops/client';
-import { HttpRequestError, type ICreatePullRequest } from '../../src/azure-devops/models';
+import { AzureDevOpsWebApiClient, isErrorTemporaryFailure, sendRestApiRequestWithRetry } from './client';
+import { HttpRequestError, type ICreatePullRequest } from './models';
 
 vi.mock('azure-devops-node-api');
 vi.mock('azure-pipelines-task-lib/task');

@@ -1,23 +1,23 @@
 import { TaskResult } from 'azure-pipelines-task-lib';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { type DependabotConfig, type DependabotOperationResult } from 'paklo/dependabot';
-import { GitHubGraphClient } from 'paklo/github';
-import { AzureDevOpsWebApiClient } from '../src/azure-devops/client';
 import {
+  AzureDevOpsWebApiClient,
   DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
   DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
   DEVOPS_PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
   type IPullRequestProperties,
-} from '../src/azure-devops/models';
+} from 'paklo/azure';
+import { type DependabotConfig, type DependabotOperationResult } from 'paklo/dependabot';
+import { GitHubGraphClient } from 'paklo/github';
 import { DependabotCli, type DependabotCliOptions } from '../src/dependabot/cli';
 import { abandonPullRequestsWhereSourceRefIsDeleted, performDependabotUpdatesAsync } from '../src/task-v2';
 import { type ISharedVariables } from '../src/utils/shared-variables';
 
-vi.mock('../src/azure-devops/client');
+vi.mock('paklo/github');
+vi.mock('./mockable-azure-devops-client');
 vi.mock('../src/dependabot/cli');
 vi.mock('../src/dependabot/job-builder');
-vi.mock('paklo/github');
 
 describe('abandonPullRequestsWhereSourceRefIsDeleted', () => {
   let taskInputs: ISharedVariables;
