@@ -21,7 +21,7 @@
   "demands": [],
   "version": {
     "Major": 2,
-    "Minor": 56,
+    "Minor": 57,
     "Patch": 0
   },
   "instanceNameFormat": "Dependabot update",
