@@ -1,5 +1,20 @@
 # extension-azure-devops
 
+## 2.57.0
+
+### Minor Changes
+
+- f622323: Move azure devops client logic to shared package
+
+### Patch Changes
+
+- 020075a: Move fetching of dependabot config to shared package
+- Updated dependencies [93b046c]
+- Updated dependencies [fe8db3f]
+- Updated dependencies [020075a]
+- Updated dependencies [f622323]
+  - paklo@0.6.0
+
 ## 2.56.0
 
 ### Minor Changes

@@ -1,5 +1,17 @@
 # paklo
 
+## 0.6.0
+
+### Minor Changes
+
+- 93b046c: Merge generate CLI command into run with a new `-generate-only` option
+- fe8db3f: Add hono server to handle requests from API
+- f622323: Move azure devops client logic to shared package
+
+### Patch Changes
+
+- 020075a: Move fetching of dependabot config to shared package
+
 ## 0.5.0
 
 ### Minor Changes
