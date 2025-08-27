@@ -92,13 +92,13 @@ async function run() {
     // Initialise the DevOps API clients
     // There are two clients; one for authoring pull requests and one for auto-approving pull requests (if configured)
     const devOpsPrAuthorClient = new AzureDevOpsWebApiClient(
-      taskInputs.url.url.toString(),
+      taskInputs.url,
       taskInputs.systemAccessToken,
       taskInputs.debug,
     );
     const devOpsPrApproverClient = taskInputs.autoApprove
       ? new AzureDevOpsWebApiClient(
-          taskInputs.url.url.toString(),
+          taskInputs.url,
           taskInputs.autoApproveUserToken || taskInputs.systemAccessToken,
           taskInputs.debug,
         )

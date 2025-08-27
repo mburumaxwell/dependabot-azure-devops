@@ -5,17 +5,22 @@ import { beforeEach, describe, expect, it, vi, type MockedFunction } from 'vites
 
 import { AzureDevOpsWebApiClient, isErrorTemporaryFailure, sendRestApiRequestWithRetry } from './client';
 import { HttpRequestError, type ICreatePullRequest } from './models';
+import { extractUrlParts } from './url-parts';
 
 vi.mock('azure-devops-node-api');
 vi.mock('azure-pipelines-task-lib/task');
 
 describe('AzureDevOpsWebApiClient', () => {
-  const organisationApiUrl = 'https://dev.azure.com/mock-organization';
+  const url = extractUrlParts({
+    organisationUrl: 'https://dev.azure.com/mock-organization',
+    project: 'project',
+    repository: 'repository',
+  });
   const accessToken = 'mock-access-token';
   let client: AzureDevOpsWebApiClient;
 
   beforeEach(() => {
-    client = new AzureDevOpsWebApiClient(organisationApiUrl, accessToken);
+    client = new AzureDevOpsWebApiClient(url, accessToken);
     vi.clearAllMocks();
   });
 

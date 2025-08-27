@@ -17,6 +17,7 @@ import {
   type IPullRequestProperties,
   type IUpdatePullRequest,
 } from './models';
+import { type AzureDevOpsUrl } from './url-parts';
 import { normalizeBranchName, normalizeFilePath } from './utils';
 
 /**
@@ -33,7 +34,8 @@ export class AzureDevOpsWebApiClient {
 
   public static API_VERSION = '5.0'; // this is the same version used by dependabot-core
 
-  constructor(organisationApiUrl: string, accessToken: string, debug: boolean = false) {
+  constructor(url: AzureDevOpsUrl, accessToken: string, debug: boolean = false) {
+    const organisationApiUrl = url.url.toString();
     this.organisationApiUrl = organisationApiUrl.replace(/\/$/, ''); // trim trailing slash
     this.identityApiUrl = getIdentityApiUrl(organisationApiUrl).replace(/\/$/, ''); // trim trailing slash
     this.connection = new WebApi(organisationApiUrl, getPersonalAccessTokenHandler(accessToken, true));
