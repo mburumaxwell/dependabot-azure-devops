@@ -7,8 +7,9 @@ import {
   PullRequestStatus,
   type IdentityRefWithVote,
 } from 'azure-devops-node-api/interfaces/GitInterfaces';
-import { debug, error, warning } from 'azure-pipelines-task-lib/task';
 import { type IHttpClientResponse } from 'typed-rest-client/Interfaces';
+
+import { logger } from './logger';
 import {
   HttpRequestError,
   type IAbandonPullRequest,
@@ -74,7 +75,7 @@ export class AzureDevOpsWebApiClient {
       this.resolvedUserIds[userNameEmailOrGroupName] = identities.value[0]?.id;
       return this.resolvedUserIds[userNameEmailOrGroupName];
     } catch (e) {
-      error(`Failed to resolve user id: ${e}`);
+      logger.error(`Failed to resolve user id: ${e}`);
       console.debug(e); // Dump the error stack trace to help with debugging
       return undefined;
     }
@@ -96,7 +97,7 @@ export class AzureDevOpsWebApiClient {
 
       return normalizeBranchName(repo.defaultBranch);
     } catch (e) {
-      error(`Failed to get default branch for '${project}/${repository}': ${e}`);
+      logger.error(`Failed to get default branch for '${project}/${repository}': ${e}`);
       console.debug(e); // Dump the error stack trace to help with debugging
       return undefined;
     }
@@ -120,7 +121,7 @@ export class AzureDevOpsWebApiClient {
 
       return refs.value?.map((r: { name?: string }) => normalizeBranchName(r.name)) || [];
     } catch (e) {
-      error(`Failed to list branch names for '${project}/${repository}': ${e}`);
+      logger.error(`Failed to list branch names for '${project}/${repository}': ${e}`);
       console.debug(e); // Dump the error stack trace to help with debugging
       return undefined;
     }
@@ -169,7 +170,7 @@ export class AzureDevOpsWebApiClient {
         }),
       );
     } catch (e) {
-      error(`Failed to list active pull request properties: ${e}`);
+      logger.error(`Failed to list active pull request properties: ${e}`);
       console.debug(e); // Dump the error stack trace to help with debugging
       return [];
     }
@@ -199,7 +200,7 @@ export class AzureDevOpsWebApiClient {
               id: identityId,
             });
           } else {
-            warning(`Unable to resolve assignee identity '${assignee}'`);
+            logger.warn(`Unable to resolve assignee identity '${assignee}'`);
           }
         }
       }
@@ -308,7 +309,7 @@ export class AzureDevOpsWebApiClient {
       console.info(` - Pull request was created successfully.`);
       return pullRequest.pullRequestId;
     } catch (e) {
-      error(`Failed to create pull request: ${e}`);
+      logger.error(`Failed to create pull request: ${e}`);
       console.debug(e); // Dump the error stack trace to help with debugging
       return null;
     }
@@ -433,7 +434,7 @@ export class AzureDevOpsWebApiClient {
       console.info(` - Pull request was updated successfully.`);
       return true;
     } catch (e) {
-      error(`Failed to update pull request: ${e}`);
+      logger.error(`Failed to update pull request: ${e}`);
       console.debug(e); // Dump the error stack trace to help with debugging
       return false;
     }
@@ -474,7 +475,7 @@ export class AzureDevOpsWebApiClient {
       console.info(` - Pull request was approved successfully.`);
       return true;
     } catch (e) {
-      error(`Failed to approve pull request: ${e}`);
+      logger.error(`Failed to approve pull request: ${e}`);
       console.debug(e); // Dump the error stack trace to help with debugging
       return false;
     }
@@ -551,7 +552,7 @@ export class AzureDevOpsWebApiClient {
       console.info(` - Pull request was abandoned successfully.`);
       return true;
     } catch (e) {
-      error(`Failed to abandon pull request: ${e}`);
+      logger.error(`Failed to abandon pull request: ${e}`);
       console.debug(e); // Dump the error stack trace to help with debugging
       return false;
     }
@@ -678,11 +679,11 @@ export async function sendRestApiRequestWithRetry(
   let body: string | undefined;
   try {
     // Send the request, ready the response
-    if (isDebug) debug(`🌎 🠊 [${method}] ${url}`);
+    if (isDebug) logger.debug(`🌎 🠊 [${method}] ${url}`);
     const response = await requestAsync();
     body = await response.readBody();
     const { statusCode, statusMessage } = response.message;
-    if (isDebug) debug(`🌎 🠈 [${statusCode}] ${statusMessage}`);
+    if (isDebug) logger.debug(`🌎 🠈 [${statusCode}] ${statusMessage}`);
 
     // Check that the request was successful
     if (statusCode && (statusCode < 200 || statusCode > 299)) {
@@ -695,8 +696,8 @@ export async function sendRestApiRequestWithRetry(
     const err = e as Error;
     // Retry the request if the error is a temporary failure
     if (retryCount > 1 && isErrorTemporaryFailure(err)) {
-      warning(err.message);
-      if (isDebug) debug(`⏳ Retrying request in ${retryDelay}ms...`);
+      logger.warn(err.message);
+      if (isDebug) logger.debug(`⏳ Retrying request in ${retryDelay}ms...`);
       await new Promise((resolve) => setTimeout(resolve, retryDelay));
       return sendRestApiRequestWithRetry(method, url, payload, requestAsync, isDebug, retryCount - 1, retryDelay);
     }
@@ -704,10 +705,10 @@ export async function sendRestApiRequestWithRetry(
     // In debug mode, log the error, request, and response for debugging
     if (isDebug) {
       if (payload) {
-        debug(`REQUEST: ${JSON.stringify(payload)}`);
+        logger.debug(`REQUEST: ${JSON.stringify(payload)}`);
       }
       if (body) {
-        debug(`RESPONSE: ${body}`);
+        logger.debug(`RESPONSE: ${body}`);
       }
     }
 

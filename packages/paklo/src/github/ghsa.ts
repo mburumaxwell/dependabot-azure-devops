@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as semver from 'semver';
 import { z } from 'zod/v4';
 
-import { warning } from 'azure-pipelines-task-lib/task';
+import { logger } from './logger';
 
 // we use nullish() because it does optional() and allows the value to be set to null
 
@@ -241,7 +241,7 @@ export class GitHubGraphClient {
             results.push(...batchResults.flat());
           }
         } catch (error) {
-          warning(`Request batch [${i}-${i + batchSize}] failed; The data may be incomplete. ${error}`);
+          logger.warn(`Request batch [${i}-${i + batchSize}] failed; The data may be incomplete. ${error}`);
         }
       }
     }

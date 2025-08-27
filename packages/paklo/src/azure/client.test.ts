@@ -8,7 +8,6 @@ import { HttpRequestError, type ICreatePullRequest } from './models';
 import { extractUrlParts } from './url-parts';
 
 vi.mock('azure-devops-node-api');
-vi.mock('azure-pipelines-task-lib/task');
 
 describe('AzureDevOpsWebApiClient', () => {
   const url = extractUrlParts({
