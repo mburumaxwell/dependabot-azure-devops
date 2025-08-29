@@ -1,5 +1,15 @@
 # paklo
 
+## 0.7.0
+
+### Minor Changes
+
+- 81eed7e: Replicate output processor functionality into a local server bridging Azure DevOps and dependabot
+
+### Patch Changes
+
+- 48ed65e: Remove logging using `azure-pipelines-task-lib` in shared package
+
 ## 0.6.0
 
 ### Minor Changes
