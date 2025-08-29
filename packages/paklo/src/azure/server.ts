@@ -1,5 +1,15 @@
+import {
+  getBranchNameForUpdate,
+  LocalDependabotServer,
+  type DependabotRequest,
+  type DependabotRequestHandleResult,
+  type LocalDependabotServerOptions,
+} from '@/dependabot';
 import { GitPullRequestMergeStrategy } from 'azure-devops-node-api/interfaces/GitInterfaces';
-import { debug, error, warning } from 'azure-pipelines-task-lib/task';
+import { type AzureDevOpsWebApiClient } from './client';
+import { logger } from './logger';
+import { type IPullRequestProperties } from './models';
+import type { AzureDevOpsUrl } from './url-parts';
 import {
   buildPullRequestProperties,
   getPullRequestChangedFilesForOutputData,
@@ -8,77 +18,68 @@ import {
   getPullRequestDescription,
   getPullRequestForDependencyNames,
   parsePullRequestProperties,
-  type AzureDevOpsWebApiClient,
-  type IPullRequestProperties,
-} from 'paklo/azure';
-import {
-  DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
-  DEPENDABOT_DEFAULT_AUTHOR_NAME,
-  getBranchNameForUpdate,
-  type DependabotOperation,
-  type DependabotOutput,
-} from 'paklo/dependabot';
-import { section } from '../azure-devops/formatting';
-import { type ISharedVariables } from '../utils/shared-variables';
+} from './utils';
 
-export type DependabotOutputProcessorResult = {
-  success: boolean;
-  pr?: number;
+export type AzureLocalDependabotServerOptions = LocalDependabotServerOptions & {
+  url: AzureDevOpsUrl;
+  authorClient: AzureDevOpsWebApiClient;
+  autoApprove: boolean;
+  approverClient?: AzureDevOpsWebApiClient;
+  setAutoComplete: boolean;
+  mergeStrategy?: string;
+  autoCompleteIgnoreConfigIds: number[];
+  existingBranchNames: string[] | undefined;
+  existingPullRequests: IPullRequestProperties[];
 };
 
-/**
- * Processes dependabot update outputs using the DevOps API
- */
-export class DependabotOutputProcessor {
-  private readonly prAuthorClient: AzureDevOpsWebApiClient;
-  private readonly prApproverClient: AzureDevOpsWebApiClient | undefined;
-  private readonly existingBranchNames: string[] | undefined;
-  private readonly existingPullRequests: IPullRequestProperties[];
-  private readonly createdPullRequestIds: number[];
-  private readonly taskInputs: ISharedVariables;
-  private readonly debug: boolean;
+export class AzureLocalDependabotServer extends LocalDependabotServer {
+  private readonly projectUrl: AzureLocalDependabotServerOptions['url'];
+  private readonly authorClient: AzureLocalDependabotServerOptions['authorClient'];
+  private readonly autoApprove: AzureLocalDependabotServerOptions['autoApprove'];
+  private readonly approverClient: AzureLocalDependabotServerOptions['approverClient'];
+  private readonly setAutoComplete: AzureLocalDependabotServerOptions['setAutoComplete'];
+  private readonly mergeStrategy: AzureLocalDependabotServerOptions['mergeStrategy'];
+  private readonly autoCompleteIgnoreConfigIds: AzureLocalDependabotServerOptions['autoCompleteIgnoreConfigIds'];
+  private readonly existingBranchNames: AzureLocalDependabotServerOptions['existingBranchNames'];
+  private readonly existingPullRequests: AzureLocalDependabotServerOptions['existingPullRequests'];
 
-  constructor(
-    taskInputs: ISharedVariables,
-    prAuthorClient: AzureDevOpsWebApiClient,
-    prApproverClient: AzureDevOpsWebApiClient | undefined,
-    existingBranchNames: string[] | undefined,
-    existingPullRequests: IPullRequestProperties[],
-    debug: boolean = false,
-  ) {
-    this.taskInputs = taskInputs;
-    this.prAuthorClient = prAuthorClient;
-    this.prApproverClient = prApproverClient;
-    this.existingBranchNames = existingBranchNames;
-    this.existingPullRequests = existingPullRequests;
-    this.createdPullRequestIds = [];
-    this.debug = debug;
+  constructor(options: AzureLocalDependabotServerOptions) {
+    super(options);
+
+    this.projectUrl = options.url;
+    this.authorClient = options.authorClient;
+    this.autoApprove = options.autoApprove;
+    this.approverClient = options.approverClient;
+    this.setAutoComplete = options.setAutoComplete;
+    this.mergeStrategy = options.mergeStrategy;
+    this.autoCompleteIgnoreConfigIds = options.autoCompleteIgnoreConfigIds;
+    this.existingBranchNames = options.existingBranchNames;
+    this.existingPullRequests = options.existingPullRequests;
   }
 
-  /**
-   * Process the appropriate DevOps API actions for the supplied dependabot update output
-   * @param output A scenario output
-   */
-  public async process(
-    operation: DependabotOperation,
-    output: DependabotOutput,
-  ): Promise<DependabotOutputProcessorResult> {
-    const { project, repository } = this.taskInputs.url;
-    const packageManager = operation.job?.['package-manager'];
-
-    const type = output.type;
-    section(`Processing '${type}'`);
-    if (this.debug) {
-      debug(JSON.stringify(output.expect.data));
+  protected async handle(id: string, request: DependabotRequest): Promise<DependabotRequestHandleResult> {
+    const { type, data } = request;
+    const operation = this.getJob(id);
+    if (!operation) {
+      logger.error(`No job found for ID '${id}', cannot process request of type '${type}'`);
+      return { success: false };
     }
+    const { ['package-manager']: packageManager } = operation.job;
+    logger.info(`Processing '${type}' for job ID '${id}'`);
+    if (this.debug) {
+      logger.debug(JSON.stringify(data));
+    }
+
+    const { project, repository } = this.projectUrl;
+
     switch (type) {
       // Documentation on the 'data' model for each output type can be found here:
       // See: https://github.com/dependabot/cli/blob/main/internal/model/update.go
 
       case 'create_pull_request': {
-        const title = output.expect.data['pr-title'];
-        if (this.taskInputs.dryRun) {
-          warning(`Skipping pull request creation of '${title}' as 'dryRun' is set to 'true'`);
+        const title = data['pr-title'];
+        if (this.dryRun) {
+          logger.warn(`Skipping pull request creation of '${title}' as 'dryRun' is set to 'true'`);
           return { success: true };
         }
 
@@ -97,16 +98,16 @@ export class DependabotOutputProcessor {
           openPullRequestsLimit > 0 && openPullRequestsCount >= openPullRequestsLimit;
 
         if (hasReachedOpenPullRequestLimit) {
-          warning(
+          logger.warn(
             `Skipping pull request creation of '${title}' as the open pull requests limit (${openPullRequestsLimit}) has been reached`,
           );
           return { success: true };
         }
 
-        const changedFiles = getPullRequestChangedFilesForOutputData(output.expect.data);
-        const dependencies = getPullRequestDependenciesPropertyValueForOutputData(output.expect.data);
+        const changedFiles = getPullRequestChangedFilesForOutputData(data);
+        const dependencies = getPullRequestDependenciesPropertyValueForOutputData(data);
         const targetBranch =
-          operation.update['target-branch'] || (await this.prAuthorClient.getDefaultBranch(project, repository));
+          operation.update['target-branch'] || (await this.authorClient.getDefaultBranch(project, repository));
         const sourceBranch = getBranchNameForUpdate(
           operation.update['package-ecosystem'],
           targetBranch,
@@ -120,46 +121,39 @@ export class DependabotOutputProcessor {
         // Check if the source branch already exists or conflicts with an existing branch
         const existingBranch = this.existingBranchNames?.find((branch) => sourceBranch == branch) || [];
         if (existingBranch.length) {
-          error(
+          logger.error(
             `Unable to create pull request '${title}' as source branch '${sourceBranch}' already exists; Delete the existing branch and try again.`,
           );
           return { success: false };
         }
         const conflictingBranches = this.existingBranchNames?.filter((branch) => sourceBranch.startsWith(branch)) || [];
         if (conflictingBranches.length) {
-          error(
+          logger.error(
             `Unable to create pull request '${title}' as source branch '${sourceBranch}' would conflict with existing branch(es) '${conflictingBranches.join(', ')}'; Delete the conflicting branch(es) and try again.`,
           );
           return { success: false };
         }
 
         // Create a new pull request
-        const newPullRequestId = await this.prAuthorClient.createPullRequest({
+        const newPullRequestId = await this.authorClient.createPullRequest({
           project: project,
           repository: repository,
           source: {
-            commit: output.expect.data['base-commit-sha'] || operation.job.source.commit!,
+            commit: data['base-commit-sha'] || operation.job.source.commit!,
             branch: sourceBranch,
           },
           target: {
             branch: targetBranch!,
           },
-          author: {
-            email: this.taskInputs.authorEmail || DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
-            name: this.taskInputs.authorName || DEPENDABOT_DEFAULT_AUTHOR_NAME,
-          },
+          author: this.author,
           title: title,
-          description: getPullRequestDescription(
-            packageManager,
-            output.expect.data['pr-body'],
-            output.expect.data.dependencies,
-          ),
-          commitMessage: output.expect.data['commit-message'],
-          autoComplete: this.taskInputs.setAutoComplete
+          description: getPullRequestDescription(packageManager, data['pr-body'], data.dependencies),
+          commitMessage: data['commit-message'],
+          autoComplete: this.setAutoComplete
             ? {
-                ignorePolicyConfigIds: this.taskInputs.autoCompleteIgnoreConfigIds,
+                ignorePolicyConfigIds: this.autoCompleteIgnoreConfigIds,
                 mergeStrategy: (() => {
-                  switch (this.taskInputs.mergeStrategy) {
+                  switch (this.mergeStrategy) {
                     case 'noFastForward':
                       return GitPullRequestMergeStrategy.NoFastForward;
                     case 'squash':
@@ -182,8 +176,8 @@ export class DependabotOutputProcessor {
         });
 
         // Auto-approve the pull request, if required
-        if (this.taskInputs.autoApprove && this.prApproverClient && newPullRequestId) {
-          await this.prApproverClient.approvePullRequest({
+        if (this.autoApprove && this.approverClient && newPullRequestId) {
+          await this.approverClient.approvePullRequest({
             project: project,
             repository: repository,
             pullRequestId: newPullRequestId,
@@ -200,8 +194,8 @@ export class DependabotOutputProcessor {
       }
 
       case 'update_pull_request': {
-        if (this.taskInputs.dryRun) {
-          warning(`Skipping pull request update as 'dryRun' is set to 'true'`);
+        if (this.dryRun) {
+          logger.warn(`Skipping pull request update as 'dryRun' is set to 'true'`);
           return { success: true };
         }
 
@@ -209,34 +203,31 @@ export class DependabotOutputProcessor {
         const pullRequestToUpdate = getPullRequestForDependencyNames(
           this.existingPullRequests,
           packageManager,
-          output.expect.data['dependency-names'],
+          data['dependency-names'],
         );
         if (!pullRequestToUpdate) {
-          error(
-            `Could not find pull request to update for package manager '${packageManager}' with dependencies '${output.expect.data['dependency-names'].join(', ')}'`,
+          logger.error(
+            `Could not find pull request to update for package manager '${packageManager}' with dependencies '${data['dependency-names'].join(', ')}'`,
           );
           return { success: false };
         }
 
         // Update the pull request
-        const pullRequestWasUpdated = await this.prAuthorClient.updatePullRequest({
+        const pullRequestWasUpdated = await this.authorClient.updatePullRequest({
           project: project,
           repository: repository,
           pullRequestId: pullRequestToUpdate.id,
-          commit: output.expect.data['base-commit-sha'] || operation.job.source.commit!,
-          author: {
-            email: this.taskInputs.authorEmail || DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
-            name: this.taskInputs.authorName || DEPENDABOT_DEFAULT_AUTHOR_NAME,
-          },
-          changes: getPullRequestChangedFilesForOutputData(output.expect.data),
+          commit: data['base-commit-sha'] || operation.job.source.commit!,
+          author: this.author,
+          changes: getPullRequestChangedFilesForOutputData(data),
           skipIfDraft: true,
-          skipIfCommitsFromAuthorsOtherThan: this.taskInputs.authorEmail || DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
+          skipIfCommitsFromAuthorsOtherThan: this.author.email,
           skipIfNotBehindTargetBranch: true,
         });
 
         // Re-approve the pull request, if required
-        if (this.taskInputs.autoApprove && this.prApproverClient && pullRequestWasUpdated) {
-          await this.prApproverClient.approvePullRequest({
+        if (this.autoApprove && this.approverClient && pullRequestWasUpdated) {
+          await this.approverClient.approvePullRequest({
             project: project,
             repository: repository,
             pullRequestId: pullRequestToUpdate.id,
@@ -247,8 +238,8 @@ export class DependabotOutputProcessor {
       }
 
       case 'close_pull_request': {
-        if (this.taskInputs.dryRun) {
-          warning(`Skipping pull request closure as 'dryRun' is set to 'true'`);
+        if (this.dryRun) {
+          logger.warn(`Skipping pull request closure as 'dryRun' is set to 'true'`);
           return { success: true };
         }
 
@@ -256,11 +247,11 @@ export class DependabotOutputProcessor {
         const pullRequestToClose = getPullRequestForDependencyNames(
           this.existingPullRequests,
           packageManager,
-          output.expect.data['dependency-names'],
+          data['dependency-names'],
         );
         if (!pullRequestToClose) {
-          error(
-            `Could not find pull request to close for package manager '${packageManager}' with dependencies '${output.expect.data['dependency-names'].join(', ')}'`,
+          logger.error(
+            `Could not find pull request to close for package manager '${packageManager}' with dependencies '${data['dependency-names'].join(', ')}'`,
           );
           return { success: false };
         }
@@ -269,50 +260,41 @@ export class DependabotOutputProcessor {
         //       How do we detect this? Do we need to?
 
         // Close the pull request
-        const success = await this.prAuthorClient.abandonPullRequest({
+        const success = await this.authorClient.abandonPullRequest({
           project: project,
           repository: repository,
           pullRequestId: pullRequestToClose.id,
-          comment: getPullRequestCloseReasonForOutputData(output.expect.data),
+          comment: getPullRequestCloseReasonForOutputData(data),
           deleteSourceBranch: true,
         });
         return { success, pr: pullRequestToClose.id };
       }
 
       case 'update_dependency_list':
-        // No action required
-        return { success: true };
+        return { success: true }; // No action required
 
       case 'mark_as_processed':
-        // No action required
         return { success: true };
 
       case 'record_ecosystem_versions':
-        // No action required
         return { success: true };
 
       case 'record_ecosystem_meta':
-        // No action required
         return { success: true };
 
       case 'record_update_job_error':
-        error(
-          `Update job error: ${output.expect.data['error-type']} ${JSON.stringify(output.expect.data['error-details'])}`,
-        );
+        logger.error(`Update job error: ${data['error-type']} ${JSON.stringify(data['error-details'])}`);
         return { success: false };
 
       case 'record_update_job_unknown_error':
-        error(
-          `Update job unknown error: ${output.expect.data['error-type']}, ${JSON.stringify(output.expect.data['error-details'])}`,
-        );
+        logger.error(`Update job unknown error: ${data['error-type']}, ${JSON.stringify(data['error-details'])}`);
         return { success: false };
 
       case 'increment_metric':
-        // No action required
         return { success: true };
 
       default:
-        warning(`Unknown dependabot output type '${type}', ignoring...`);
+        logger.warn(`Unknown dependabot output type '${type}', ignoring...`);
         return { success: true };
     }
   }

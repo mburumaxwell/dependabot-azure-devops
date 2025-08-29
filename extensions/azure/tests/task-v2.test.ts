@@ -2,10 +2,10 @@ import { TaskResult } from 'azure-pipelines-task-lib';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
-  AzureDevOpsWebApiClient,
   DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
   DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
   DEVOPS_PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
+  extractUrlParts,
   type IPullRequestProperties,
 } from 'paklo/azure';
 import { type DependabotConfig, type DependabotOperationResult } from 'paklo/dependabot';
@@ -13,9 +13,11 @@ import { GitHubGraphClient } from 'paklo/github';
 import { DependabotCli, type DependabotCliOptions } from '../src/dependabot/cli';
 import { abandonPullRequestsWhereSourceRefIsDeleted, performDependabotUpdatesAsync } from '../src/task-v2';
 import { type ISharedVariables } from '../src/utils/shared-variables';
+import { AzureDevOpsWebApiClient } from './mockable';
 
 vi.mock('paklo/github');
-vi.mock('./mockable-azure-devops-client');
+// vi.mock('paklo/azure');
+vi.mock('./mockable');
 vi.mock('../src/dependabot/cli');
 vi.mock('../src/dependabot/job-builder');
 
@@ -28,10 +30,14 @@ describe('abandonPullRequestsWhereSourceRefIsDeleted', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     taskInputs = {
-      url: {},
+      url: extractUrlParts({
+        organisationUrl: 'https://dev.azure.com/test-org/',
+        project: 'test-project',
+        repository: 'test-repo',
+      }),
       dryRun: false,
     } as ISharedVariables;
-    devOpsPrAuthorClient = new AzureDevOpsWebApiClient('https://dev.azure.com/test-org', 'fake-token', true);
+    devOpsPrAuthorClient = new AzureDevOpsWebApiClient(taskInputs.url, 'fake-token', true);
     devOpsPrAuthorClient.abandonPullRequest = vi.fn().mockResolvedValue(true);
     existingBranchNames = [];
     existingPullRequests = [
@@ -56,7 +62,9 @@ describe('abandonPullRequestsWhereSourceRefIsDeleted', () => {
     );
 
     expect(devOpsPrAuthorClient.abandonPullRequest).toHaveBeenCalledWith({
+      project: 'test-project',
       pullRequestId: 1,
+      repository: 'test-repo',
       comment:
         'It might be a good idea to add an ' +
         '[`ignore` condition](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#ignore--) ' +
@@ -210,7 +218,7 @@ describe('performDependabotUpdatesAsync', () => {
       ],
     });
 
-    const tsDependabotOutputProcessor = await import('../src/dependabot/output-processor');
+    const tsDependabotOutputProcessor = await import('paklo/azure');
     vi.spyOn(tsDependabotOutputProcessor, 'parsePullRequestProperties').mockReturnValue('npm_and_yarn' as never);
 
     const updateResult = await performDependabotUpdatesAsync(

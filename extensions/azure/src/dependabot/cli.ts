@@ -115,7 +115,7 @@ export class DependabotCli {
         }
         dependabotArguments.push(
           '--updater-image',
-          options.updaterImage.replace(/\{ecosystem\}/i, operation.config['package-ecosystem']),
+          options.updaterImage.replace(/\{ecosystem\}/i, operation.update['package-ecosystem']),
         );
       }
       if (options?.timeoutDurationMinutes) {

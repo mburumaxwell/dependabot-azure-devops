@@ -6,7 +6,7 @@
   "private": true,
   "license": "AGPL-3.0-later",
   "bin": {
-    "paklo": "./dist/cli.js"
+    "paklo": "./dist/cli.cjs"
   },
   "exports": {
     "./azure": {
@@ -47,7 +47,7 @@
     "lint": "eslint .",
     "test": "vitest",
     "clean": "rimraf .turbo dist",
-    "cli": "node dist/cli.js"
+    "cli": "node dist/cli.cjs"
   },
   "repository": {
     "type": "git",

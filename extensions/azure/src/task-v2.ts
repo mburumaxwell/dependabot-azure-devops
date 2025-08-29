@@ -16,6 +16,7 @@ import {
   DEVOPS_PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
   getDependabotConfig,
   normalizeBranchName,
+  parsePullRequestProperties,
   type IPullRequestProperties,
 } from 'paklo/azure';
 import {
@@ -36,7 +37,7 @@ import {
 } from 'paklo/github';
 import { section, setSecrets } from './azure-devops/formatting';
 import { DependabotCli, type DependabotCliOptions } from './dependabot/cli';
-import { DependabotOutputProcessor, parsePullRequestProperties } from './dependabot/output-processor';
+import { DependabotOutputProcessor } from './dependabot/output-processor';
 import parseTaskInputConfiguration, { type ISharedVariables } from './utils/shared-variables';
 
 async function run() {

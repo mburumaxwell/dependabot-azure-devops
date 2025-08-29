@@ -1,6 +1,8 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
+  // TODO: stop producing cjs when we stop using azure-devops-node-api which uses dynamic requires
+  // azure-devops-node-api should be replaced with simple fetch calls (not axios)
   format: ['esm', 'cjs'],
   target: 'node22',
   platform: 'node',

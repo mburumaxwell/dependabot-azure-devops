@@ -1,3 +1,4 @@
+export * from './author';
 export * from './branch-name';
 export * from './config';
 export * from './experiments';

@@ -3,17 +3,18 @@ import { type DependabotOperation } from 'paklo/dependabot';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
-  AzureDevOpsWebApiClient,
   DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
   DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
+  extractUrlParts,
   type IPullRequestProperties,
 } from 'paklo/azure';
 import { DependabotOutputProcessor } from '../../src/dependabot/output-processor';
 import { type ISharedVariables } from '../../src/utils/shared-variables';
+import { AzureDevOpsWebApiClient } from '../mockable';
 
 vi.mock('azure-pipelines-task-lib/task');
-vi.mock('paklo/azure');
-// vi.mock('./mockable-azure-devops-client');
+// vi.mock('paklo/azure');
+vi.mock('../mockable');
 vi.mock('../../src/utils/shared-variables');
 
 describe('DependabotOutputProcessor', () => {
@@ -26,10 +27,14 @@ describe('DependabotOutputProcessor', () => {
 
   beforeEach(() => {
     taskInputs = {
-      url: {},
+      url: extractUrlParts({
+        organisationUrl: 'http://localhost:8081/',
+        project: 'testproject',
+        repository: 'test-repo',
+      }),
     } as ISharedVariables;
-    prAuthorClient = new AzureDevOpsWebApiClient('http://localhost:8081', 'token1', true);
-    prApproverClient = new AzureDevOpsWebApiClient('http://localhost:8081', 'token1', true);
+    prAuthorClient = new AzureDevOpsWebApiClient(taskInputs.url, 'token1', true);
+    prApproverClient = new AzureDevOpsWebApiClient(taskInputs.url, 'token1', true);
     existingBranchNames = [];
     existingPullRequests = [];
     processor = new DependabotOutputProcessor(
@@ -60,7 +65,7 @@ describe('DependabotOutputProcessor', () => {
           'credentials-metadata': [],
         },
         credentials: [],
-        config: {
+        update: {
           'package-ecosystem': 'npm',
         },
       };
@@ -103,7 +108,7 @@ describe('DependabotOutputProcessor', () => {
 
     it('should skip processing "create_pull_request" if open pull request limit is reached', async () => {
       const packageManager = 'nuget';
-      update.config['open-pull-requests-limit'] = 1;
+      update.update['open-pull-requests-limit'] = 1;
       update.job['package-manager'] = packageManager;
       existingPullRequests.push({
         id: 1,

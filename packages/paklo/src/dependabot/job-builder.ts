@@ -31,7 +31,7 @@ export type DependabotSourceInfo = {
 };
 
 /** Represents a single Dependabot operation */
-export type DependabotOperation = DependabotInput & { config: DependabotUpdate };
+export type DependabotOperation = DependabotInput & { update: DependabotUpdate };
 
 /** Represents the output of a Dependabot CLI update operation */
 export type DependabotOperationResult = {
@@ -97,7 +97,7 @@ export class DependabotJobBuilder {
    */
   public forDependenciesList({ id }: { id: string }): DependabotOperation {
     return {
-      config: this.update,
+      update: this.update,
       job: {
         'id': id,
         'package-manager': this.packageManager,
@@ -151,7 +151,7 @@ export class DependabotJobBuilder {
     }
 
     return {
-      config: this.update,
+      update: this.update,
       job: {
         'id': id,
         'package-manager': this.packageManager,
