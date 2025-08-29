@@ -1,5 +1,17 @@
 # extension-azure-devops
 
+## 2.58.0
+
+### Minor Changes
+
+- 81eed7e: Replicate output processor functionality into a local server bridging Azure DevOps and dependabot
+
+### Patch Changes
+
+- Updated dependencies [48ed65e]
+- Updated dependencies [81eed7e]
+  - paklo@0.7.0
+
 ## 2.57.0
 
 ### Minor Changes
