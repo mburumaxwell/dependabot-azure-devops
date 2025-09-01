@@ -442,7 +442,7 @@ export function makeCredentialsMetadata(credentials: DependabotCredential[]): De
 export function makeRandomJobId(): number {
   const array = new Uint32Array(1);
   crypto.getRandomValues(array);
-  return array[0]! % 1000000000; // Limit to 9 digits to match GitHub's job IDs
+  return array[0]! % 10000000000; // Limit to 10 digits to match GitHub's job IDs
 }
 
 export function makeRandomJobToken() {
