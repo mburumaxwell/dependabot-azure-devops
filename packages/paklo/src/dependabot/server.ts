@@ -58,7 +58,7 @@ export type DependabotRequest = z.infer<typeof DependabotRequestSchema>;
  * @param request - The dependabot request to handle.
  * @returns A promise that resolves to the result of handling the request.
  */
-type HandlerFunc = (id: string, request: DependabotRequest) => Promise<DependabotRequestHandleResult>;
+type HandlerFunc = (id: number, request: DependabotRequest) => Promise<DependabotRequestHandleResult>;
 
 export type CreateApiServerAppOptions = {
   /**
@@ -109,13 +109,19 @@ export function createApiServerApp({ basePath = `/api/update_jobs`, apiKey, hand
   // - POST request to /increment_metric
 
   function operation<T extends ZodType>(type: DependabotOperationType, schema: T, method?: string) {
-    app.on(method || 'post', `/:id/${type}`, zValidator('json', z.object({ data: schema })), async (context) => {
-      const id = context.req.param('id');
-      const { data } = context.req.valid('json') as { data: z.infer<typeof schema> };
-      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      const success = await handle(id, { type, data: data as any });
-      return context.body(null, success ? 200 : 400);
-    });
+    app.on(
+      method || 'post',
+      `/:id/${type}`,
+      zValidator('param', z.object({ id: z.coerce.number() })),
+      zValidator('json', z.object({ data: schema })),
+      async (context) => {
+        const { id } = context.req.valid('param');
+        const { data } = context.req.valid('json') as { data: z.infer<typeof schema> };
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        const success = await handle(id, { type, data: data as any });
+        return context.body(null, success ? 200 : 400);
+      },
+    );
   }
 
   operation('create_pull_request', DependabotCreatePullRequestSchema);
@@ -203,5 +209,5 @@ export abstract class LocalDependabotServer {
    * @param request - The dependabot request to handle.
    * @returns A promise that resolves to the result of handling the request.
    */
-  protected abstract handle(id: string, request: DependabotRequest): Promise<DependabotRequestHandleResult>;
+  protected abstract handle(id: number, request: DependabotRequest): Promise<DependabotRequestHandleResult>;
 }

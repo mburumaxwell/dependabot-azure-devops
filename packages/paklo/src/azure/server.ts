@@ -57,7 +57,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
     this.existingPullRequests = options.existingPullRequests;
   }
 
-  protected async handle(id: string, request: DependabotRequest): Promise<DependabotRequestHandleResult> {
+  protected async handle(id: number, request: DependabotRequest): Promise<DependabotRequestHandleResult> {
     const { type, data } = request;
     const operation = this.getJob(id);
     if (!operation) {
