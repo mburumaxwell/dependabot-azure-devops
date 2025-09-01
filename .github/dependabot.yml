@@ -77,6 +77,10 @@ updates:
       time: '02:00'
     open-pull-requests-limit: 10
     groups:
+      dockerode:
+        patterns:
+          - '@types/dockerode'
+          - 'dockerode'
       eslint:
         patterns:
           - '@eslint/*'
@@ -98,6 +102,10 @@ updates:
           - '@next/*'
           - 'next'
           - 'eslint-config-next'
+      node-forge:
+        patterns:
+          - '@types/node-forge'
+          - 'node-forge'
       pino:
         patterns:
           - 'pino'
@@ -128,7 +136,17 @@ updates:
           - 'tailwind-merge'
           - '@tailwindcss/*'
           - 'prettier-plugin-tailwindcss'
+      tar-stream:
+        patterns:
+          - '@types/tar-stream'
+          - 'tar-stream'
       turbo:
         patterns:
           - 'eslint-plugin-turbo'
           - 'turbo'
+
+  - package-ecosystem: 'gitsubmodule'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      time: '02:00'

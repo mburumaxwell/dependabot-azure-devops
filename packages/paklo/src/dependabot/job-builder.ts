@@ -11,6 +11,7 @@ import {
 import {
   type DependabotAllowed,
   type DependabotCondition,
+  type DependabotCredential,
   type DependabotExistingGroupPR,
   type DependabotExistingPR,
   type DependabotExperiments,
@@ -20,7 +21,6 @@ import {
   type DependabotSource,
   type DependabotSourceProvider,
 } from './job';
-import { type DependabotCredential } from './proxy';
 import { type DependabotInput, type DependabotOutput } from './scenario';
 
 export type DependabotSourceInfo = {

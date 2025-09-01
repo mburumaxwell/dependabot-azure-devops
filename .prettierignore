@@ -4,6 +4,9 @@ package.json
 package-lock.json
 pnpm-lock.yaml
 
+# git submodules
+dependabot-action
+
 # outputs
 bin
 obj

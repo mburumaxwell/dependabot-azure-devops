@@ -20,9 +20,15 @@ import {
   DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
   DEPENDABOT_DEFAULT_AUTHOR_NAME,
   DependabotJobBuilder,
+  getJobParameters,
+  ImageService,
   makeRandomJobToken,
   mapPackageEcosystemToPackageManager,
+  PROXY_IMAGE_NAME,
+  Updater,
+  updaterImageName,
   type DependabotOperation,
+  type MetricReporter,
 } from '@/dependabot';
 import { type SecurityVulnerability } from '@/github';
 import { logger } from '../logger';
@@ -35,7 +41,6 @@ const schema = z.object({
   repository: z.string(),
   gitToken: z.string(),
   githubToken: z.string().optional(),
-  forListDependencies: z.boolean(),
   pullRequestId: z.coerce.string().optional(),
   outDir: z.string(),
   generateOnly: z.boolean(),
@@ -59,7 +64,6 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     gitToken,
     project,
     repository,
-    forListDependencies,
     pullRequestId,
     outDir,
     generateOnly,
@@ -139,9 +143,6 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     server.start(port);
   }
 
-  // create output directory if it does not exist
-  if (!existsSync(outDir)) await mkdir(outDir, { recursive: true });
-
   const updates = config.updates;
   for (const update of updates) {
     const updateId = updates.indexOf(update).toString();
@@ -163,6 +164,8 @@ async function handler({ options, error }: HandlerOptions<Options>) {
       debug: false,
     });
 
+    let operation: DependabotOperation | undefined = undefined;
+
     // If this is a security-only update (i.e. 'open-pull-requests-limit: 0'), then we first need to discover the dependencies
     // that need updating and check each one for vulnerabilities. This is because Dependabot requires the list of vulnerable dependencies
     // to be supplied in the job definition of security-only update job, it will not automatically discover them like a versioned update does.
@@ -171,6 +174,9 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     let dependencyNamesToUpdate: string[] = [];
     const securityUpdatesOnly = update['open-pull-requests-limit'] === 0;
     if (securityUpdatesOnly) {
+      operation = builder.forDependenciesList({
+        id: `discover-${updateId}-${update['package-ecosystem']}-dependency-list`,
+      });
       // TODO: handle this
       securityVulnerabilities = [];
       dependencyNamesToUpdate = [];
@@ -178,46 +184,95 @@ async function handler({ options, error }: HandlerOptions<Options>) {
       return;
     }
 
-    let operation: DependabotOperation | undefined = undefined;
-    if (forListDependencies) {
-      operation = builder.forDependenciesList({
-        id: `discover-${updateId}-${update['package-ecosystem']}-dependency-list`,
+    if (pullRequestId) {
+      operation = builder.forUpdate({
+        id: `update-pr-${pullRequestId}`,
+        existingPullRequests: existingPullRequestDependenciesForPackageManager,
+        pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
+        securityVulnerabilities,
       });
     } else {
-      if (pullRequestId) {
-        operation = builder.forUpdate({
-          id: `update-pr-${pullRequestId}`,
-          existingPullRequests: existingPullRequestDependenciesForPackageManager,
-          pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
-          securityVulnerabilities,
-        });
-      } else {
-        operation = builder.forUpdate({
-          id: `update-${updateId}-${update['package-ecosystem']}-${securityUpdatesOnly ? 'security-only' : 'all'}`,
-          dependencyNamesToUpdate,
-          existingPullRequests: existingPullRequestDependenciesForPackageManager,
-          securityVulnerabilities,
-        });
-      }
+      operation = builder.forUpdate({
+        id: `update-${updateId}-${update['package-ecosystem']}-${securityUpdatesOnly ? 'security-only' : 'all'}`,
+        dependencyNamesToUpdate,
+        existingPullRequests: existingPullRequestDependenciesForPackageManager,
+        securityVulnerabilities,
+      });
     }
 
-    const contents = yaml.dump({
-      job: operation.job,
-      credentials: operation.credentials,
-    });
-    logger.trace(`JobConfig:\r\n${contents}`);
-    const outputPath = join(outDir, `${operation.job.id}.yaml`);
-    await writeFile(outputPath, contents);
+    // create working directory if it does not exist
+    const workingDirectory = join(outDir, operation.job.id!);
+    if (!existsSync(workingDirectory)) await mkdir(workingDirectory, { recursive: true });
 
-    // if we only wanted to generate the files, continue to the next one
-    if (generateOnly) continue;
+    // if we only wanted to generate the files, save and continue to the next one
+    if (generateOnly) {
+      const contents = yaml.dump({
+        job: operation.job,
+        credentials: operation.credentials,
+      });
+      logger.trace(`JobConfig:\r\n${contents}`);
+      const jobDefinitionFilePath = join(workingDirectory, 'job.yaml');
+      await writeFile(jobDefinitionFilePath, contents);
+
+      continue;
+    }
 
     // add the job to the local server for tracking
     server!.addJob({ ...operation, token: jobToken });
 
-    // TODO: run the docker container(s) using logic from dependabot-action
-    await new Promise((resolve) => setTimeout(resolve, 10 * 1000));
-    error('This has not been implemented yet. Sorry');
+    const params = getJobParameters({
+      jobId: operation.job.id!,
+      jobToken,
+      credentialsToken: gitToken,
+      dependabotApiUrl: server?.url,
+      dependabotApiDockerUrl: `http://host.docker.internal:${port}`,
+      updaterImage: undefined,
+      workingDirectory,
+    })!;
+    // The dynamic workflow can specify which updater image to use. If it doesn't, fall back to the pinned version.
+    const updaterImage = params.updaterImage || updaterImageName(operation.job['package-manager']);
+
+    // The sendMetrics function is used to send metrics to the API client.
+    // It uses the package manager as a tag to identify the metric.
+    const sendMetricsWithPackageManager: MetricReporter = async (name, metricType, value, additionalTags = {}) => {
+      logger.debug(`Metric: ${name}=${value} (${metricType}) [${JSON.stringify(additionalTags)}]`);
+      // try {
+      //   await apiClient.sendMetrics(name, metricType, value, {
+      //     package_manager: operation.job['package-manager'],
+      //     ...additionalTags
+      //   })
+      // } catch (error) {
+      //   logger.warn(
+      //     `Metric sending failed for ${name}: ${(error as Error).message}`
+      //   )
+      // }
+    };
+
+    const credentials = operation.credentials || [];
+
+    const updater = new Updater(updaterImage, PROXY_IMAGE_NAME, params, operation.job, credentials);
+
+    try {
+      // Using sendMetricsWithPackageManager wrapper to inject package manager tag ti
+      // avoid passing additional parameters to ImageService.pull method
+      await ImageService.pull(updaterImage, sendMetricsWithPackageManager);
+      await ImageService.pull(PROXY_IMAGE_NAME, sendMetricsWithPackageManager);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        error('Error fetching updater images: ' + err.message);
+        return;
+      }
+    }
+
+    try {
+      await updater.runUpdater();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        error('Error running updater: ' + err.message);
+        return;
+      }
+    }
+    logger.info(`Update job ${operation.job.id} completed`);
   }
 
   server?.stop();
@@ -236,12 +291,11 @@ export const command = new Command('run')
     '--github-token <GITHUB-TOKEN>',
     'GitHub token to use for authentication. If not specified, you may get rate limited.',
   )
-  .option('--for-list-dependencies', 'Whether to only generate the job for listing dependencies.', false)
   .option(
     '--pull-request-id <PULL-REQUEST-ID>',
     'Identifier of pull request to update. If not specified, a job that updates everything is generated.',
   )
-  .option('--out-dir', 'Output directory. If not specified, defaults to "dependabot-jobs".', 'dependabot-jobs')
+  .option('--out-dir', 'Working directory.', 'work')
   .option('--auto-approve', 'Whether to automatically approve the pull request.', false)
   .option('--auto-approve-token <AUTO-APPROVE-TOKEN>', 'Token to use for auto-approving the pull request.')
   .option(

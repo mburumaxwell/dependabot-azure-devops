@@ -1,0 +1,3 @@
+[submodule "dependabot-action"]
+	path = dependabot-action
+	url = https://github.com/github/dependabot-action.git

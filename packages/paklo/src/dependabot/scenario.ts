@@ -1,6 +1,5 @@
 import { z } from 'zod/v4';
-import { DependabotJobConfigSchema } from './job';
-import { DependabotCredentialSchema } from './proxy';
+import { DependabotCredentialSchema, DependabotJobConfigSchema } from './job';
 import {
   DependabotClosePullRequestSchema,
   DependabotCreatePullRequestSchema,

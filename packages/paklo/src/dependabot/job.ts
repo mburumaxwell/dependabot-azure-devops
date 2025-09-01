@@ -1,8 +1,22 @@
 import { z } from 'zod/v4';
 import { DependabotCooldownSchema } from './config';
-import { DependabotCredentialSchema } from './proxy';
 
 // we use nullish() because it does optional() and allows the value to be set to null
+
+export const DependabotCredentialSchema = z.record(z.string(), z.any());
+export type DependabotCredential = z.infer<typeof DependabotCredentialSchema>;
+
+export const CertificateAuthoritySchema = z.object({
+  cert: z.string(),
+  key: z.string(),
+});
+export type CertificateAuthority = z.infer<typeof CertificateAuthoritySchema>;
+
+export const DependabotProxyConfigSchema = z.object({
+  all_credentials: DependabotCredentialSchema.array(),
+  ca: CertificateAuthoritySchema,
+});
+export type DependabotProxyConfig = z.infer<typeof DependabotProxyConfigSchema>;
 
 export const DependabotSourceProviderSchema = z.enum(['azure']);
 export type DependabotSourceProvider = z.infer<typeof DependabotSourceProviderSchema>;
@@ -174,3 +188,36 @@ export const DependabotJobFileSchema = z.object({
   job: DependabotJobConfigSchema,
 });
 export type DependabotJobFile = z.infer<typeof DependabotJobFileSchema>;
+
+// Code below is borrowed and adapted from dependabot-action
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export type FetchedFiles = {
+  base_commit_sha: string;
+  dependency_files: any[];
+  base64_dependency_files: any[];
+};
+
+export type JobDetails = Pick<
+  DependabotJobConfig,
+  'id' | 'package-manager' | 'allowed-updates' | 'experiments' | 'credentials-metadata'
+>;
+export type FileFetcherInput = {
+  job: JobDetails;
+};
+
+export type DependencyFile = {
+  name: string;
+  content: any;
+  directory: string;
+  type: string;
+  support_file: boolean;
+  content_encoding: string;
+  deleted: boolean;
+  operation: string;
+};
+
+export type FileUpdaterInput = FetchedFiles & {
+  job: JobDetails;
+};
+/* eslint-enable @typescript-eslint/no-explicit-any */
