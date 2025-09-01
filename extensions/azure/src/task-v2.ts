@@ -281,7 +281,6 @@ export async function performDependabotUpdatesAsync(
   const successfulOperations: DependabotOperationResult[] = [];
   const failedOperations: DependabotOperationResult[] = [];
   for (const update of dependabotUpdates) {
-    const updateId = dependabotUpdates.indexOf(update).toString();
     const packageEcosystem = update['package-ecosystem'];
     const packageManager = mapPackageEcosystemToPackageManager(packageEcosystem);
 

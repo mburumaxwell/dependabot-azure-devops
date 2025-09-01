@@ -145,135 +145,136 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 
-  const updates = config.updates;
-  for (const update of updates) {
-    const updateId = updates.indexOf(update).toString();
-    const packageEcosystem = update['package-ecosystem'];
-    const packageManager = mapPackageEcosystemToPackageManager(packageEcosystem);
+  try {
+    const updates = config.updates;
+    for (const update of updates) {
+      const packageEcosystem = update['package-ecosystem'];
+      const packageManager = mapPackageEcosystemToPackageManager(packageEcosystem);
 
-    // Parse the Dependabot metadata for the existing pull requests that are related to this update
-    // Dependabot will use this to determine if we need to create new pull requests or update/close existing ones
-    const existingPullRequestsForPackageManager = parsePullRequestProperties(existingPullRequests, packageManager);
-    const existingPullRequestDependenciesForPackageManager = Object.values(existingPullRequestsForPackageManager);
+      // Parse the Dependabot metadata for the existing pull requests that are related to this update
+      // Dependabot will use this to determine if we need to create new pull requests or update/close existing ones
+      const existingPullRequestsForPackageManager = parsePullRequestProperties(existingPullRequests, packageManager);
+      const existingPullRequestDependenciesForPackageManager = Object.values(existingPullRequestsForPackageManager);
 
-    const builder = new DependabotJobBuilder({
-      source: { provider: 'azure', ...url },
-      config,
-      update,
-      systemAccessToken: gitToken,
-      githubToken,
-      experiments: DEFAULT_EXPERIMENTS,
-      debug: false,
-    });
-
-    let operation: DependabotOperation | undefined = undefined;
-
-    // If this is a security-only update (i.e. 'open-pull-requests-limit: 0'), then we first need to discover the dependencies
-    // that need updating and check each one for vulnerabilities. This is because Dependabot requires the list of vulnerable dependencies
-    // to be supplied in the job definition of security-only update job, it will not automatically discover them like a versioned update does.
-    // https://docs.github.com/en/code-security/dependabot/dependabot-security-updates/configuring-dependabot-security-updates#overriding-the-default-behavior-with-a-configuration-file
-    let securityVulnerabilities: SecurityVulnerability[] = [];
-    let dependencyNamesToUpdate: string[] = [];
-    const securityUpdatesOnly = update['open-pull-requests-limit'] === 0;
-    if (securityUpdatesOnly) {
-      operation = builder.forDependenciesList({});
-      // TODO: handle this
-      securityVulnerabilities = [];
-      dependencyNamesToUpdate = [];
-      error('Security only updates not yet implemented. Sorry');
-      return;
-    }
-
-    if (pullRequestId) {
-      operation = builder.forUpdate({
-        existingPullRequests: existingPullRequestDependenciesForPackageManager,
-        pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
-        securityVulnerabilities,
+      const builder = new DependabotJobBuilder({
+        source: { provider: 'azure', ...url },
+        config,
+        update,
+        systemAccessToken: gitToken,
+        githubToken,
+        experiments: DEFAULT_EXPERIMENTS,
+        debug: false,
       });
-    } else {
-      operation = builder.forUpdate({
-        dependencyNamesToUpdate,
-        existingPullRequests: existingPullRequestDependenciesForPackageManager,
-        securityVulnerabilities,
-      });
-    }
 
-    // create working directory if it does not exist
-    const workingDirectory = join(outDir, `${operation.job.id}`);
-    if (!existsSync(workingDirectory)) await mkdir(workingDirectory, { recursive: true });
+      let operation: DependabotOperation | undefined = undefined;
 
-    // if we only wanted to generate the files, save and continue to the next one
-    if (generateOnly) {
-      const contents = yaml.dump({
-        job: operation.job,
-        credentials: operation.credentials,
-      });
-      logger.trace(`JobConfig:\r\n${contents}`);
-      const jobDefinitionFilePath = join(workingDirectory, 'job.yaml');
-      await writeFile(jobDefinitionFilePath, contents);
-
-      continue;
-    }
-
-    // add the job to the local server for tracking
-    server!.addJob({ ...operation, token: jobToken });
-
-    const params = getJobParameters({
-      jobId: operation.job.id!,
-      jobToken,
-      credentialsToken: gitToken,
-      dependabotApiUrl: server?.url,
-      dependabotApiDockerUrl: `http://host.docker.internal:${port}`,
-      updaterImage: undefined,
-      workingDirectory,
-    })!;
-    // The dynamic workflow can specify which updater image to use. If it doesn't, fall back to the pinned version.
-    const updaterImage = params.updaterImage || updaterImageName(operation.job['package-manager']);
-
-    // The sendMetrics function is used to send metrics to the API client.
-    // It uses the package manager as a tag to identify the metric.
-    const sendMetricsWithPackageManager: MetricReporter = async (name, metricType, value, additionalTags = {}) => {
-      logger.debug(`Metric: ${name}=${value} (${metricType}) [${JSON.stringify(additionalTags)}]`);
-      // try {
-      //   await apiClient.sendMetrics(name, metricType, value, {
-      //     package_manager: operation.job['package-manager'],
-      //     ...additionalTags
-      //   })
-      // } catch (error) {
-      //   logger.warn(
-      //     `Metric sending failed for ${name}: ${(error as Error).message}`
-      //   )
-      // }
-    };
-
-    const credentials = operation.credentials || [];
-
-    const updater = new Updater(updaterImage, PROXY_IMAGE_NAME, params, operation.job, credentials);
-
-    try {
-      // Using sendMetricsWithPackageManager wrapper to inject package manager tag ti
-      // avoid passing additional parameters to ImageService.pull method
-      await ImageService.pull(updaterImage, sendMetricsWithPackageManager);
-      await ImageService.pull(PROXY_IMAGE_NAME, sendMetricsWithPackageManager);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        error('Error fetching updater images: ' + err.message);
+      // If this is a security-only update (i.e. 'open-pull-requests-limit: 0'), then we first need to discover the dependencies
+      // that need updating and check each one for vulnerabilities. This is because Dependabot requires the list of vulnerable dependencies
+      // to be supplied in the job definition of security-only update job, it will not automatically discover them like a versioned update does.
+      // https://docs.github.com/en/code-security/dependabot/dependabot-security-updates/configuring-dependabot-security-updates#overriding-the-default-behavior-with-a-configuration-file
+      let securityVulnerabilities: SecurityVulnerability[] = [];
+      let dependencyNamesToUpdate: string[] = [];
+      const securityUpdatesOnly = update['open-pull-requests-limit'] === 0;
+      if (securityUpdatesOnly) {
+        operation = builder.forDependenciesList({});
+        // TODO: handle this
+        securityVulnerabilities = [];
+        dependencyNamesToUpdate = [];
+        error('Security only updates not yet implemented. Sorry');
         return;
       }
-    }
 
-    try {
-      await updater.runUpdater();
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        error('Error running updater: ' + err.message);
-        return;
+      if (pullRequestId) {
+        operation = builder.forUpdate({
+          existingPullRequests: existingPullRequestDependenciesForPackageManager,
+          pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
+          securityVulnerabilities,
+        });
+      } else {
+        operation = builder.forUpdate({
+          dependencyNamesToUpdate,
+          existingPullRequests: existingPullRequestDependenciesForPackageManager,
+          securityVulnerabilities,
+        });
       }
+
+      // create working directory if it does not exist
+      const workingDirectory = join(outDir, `${operation.job.id}`);
+      if (!existsSync(workingDirectory)) await mkdir(workingDirectory, { recursive: true });
+
+      // if we only wanted to generate the files, save and continue to the next one
+      if (generateOnly) {
+        const contents = yaml.dump({
+          job: operation.job,
+          credentials: operation.credentials,
+        });
+        logger.trace(`JobConfig:\r\n${contents}`);
+        const jobDefinitionFilePath = join(workingDirectory, 'job.yaml');
+        await writeFile(jobDefinitionFilePath, contents);
+
+        continue;
+      }
+
+      // add the job to the local server for tracking
+      server!.addJob({ ...operation, token: jobToken });
+
+      const params = getJobParameters({
+        jobId: operation.job.id!,
+        jobToken,
+        credentialsToken: gitToken,
+        dependabotApiUrl: server?.url,
+        dependabotApiDockerUrl: `http://host.docker.internal:${port}`,
+        updaterImage: undefined,
+        workingDirectory,
+      })!;
+      // The dynamic workflow can specify which updater image to use. If it doesn't, fall back to the pinned version.
+      const updaterImage = params.updaterImage || updaterImageName(operation.job['package-manager']);
+
+      // The sendMetrics function is used to send metrics to the API client.
+      // It uses the package manager as a tag to identify the metric.
+      const sendMetricsWithPackageManager: MetricReporter = async (name, metricType, value, additionalTags = {}) => {
+        logger.debug(`Metric: ${name}=${value} (${metricType}) [${JSON.stringify(additionalTags)}]`);
+        // try {
+        //   await apiClient.sendMetrics(name, metricType, value, {
+        //     package_manager: operation.job['package-manager'],
+        //     ...additionalTags
+        //   })
+        // } catch (error) {
+        //   logger.warn(
+        //     `Metric sending failed for ${name}: ${(error as Error).message}`
+        //   )
+        // }
+      };
+
+      const credentials = operation.credentials || [];
+
+      const updater = new Updater(updaterImage, PROXY_IMAGE_NAME, params, operation.job, credentials);
+
+      try {
+        // Using sendMetricsWithPackageManager wrapper to inject package manager tag ti
+        // avoid passing additional parameters to ImageService.pull method
+        await ImageService.pull(updaterImage, sendMetricsWithPackageManager);
+        await ImageService.pull(PROXY_IMAGE_NAME, sendMetricsWithPackageManager);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          error('Error fetching updater images: ' + err.message);
+          return;
+        }
+      }
+
+      try {
+        await updater.runUpdater();
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          error('Error running updater: ' + err.message);
+          return;
+        }
+      }
+      logger.info(`Update job ${operation.job.id} completed`);
     }
-    logger.info(`Update job ${operation.job.id} completed`);
+  } finally {
+    server?.stop();
   }
-
-  server?.stop();
 }
 
 export const command = new Command('run')
