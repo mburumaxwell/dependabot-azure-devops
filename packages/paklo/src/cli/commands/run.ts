@@ -221,7 +221,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
 
       const params = getJobParameters({
         jobId: operation.job.id!,
-        jobToken: `Bearer ${jobToken}`,
+        jobToken,
         credentialsToken: gitToken,
         // using host.docker.internal for dependabotApiUrl instead of server.url
         // so as to capture /record_metrics calls

@@ -96,7 +96,7 @@ export function createApiServerApp({ basePath = `/api/update_jobs`, apiKey, hand
   const app = new Hono().basePath(basePath);
   app.use(loggerMiddleware((str) => logger.debug(str))); // logger must be earliest
   // TODO: apiKey should not be optional once we move away from dependabot CLI
-  if (apiKey) app.use('/*', bearerAuth({ token: apiKey }));
+  if (apiKey) app.use('/*', bearerAuth({ token: apiKey, prefix: '' /* empty means no prefix expected */ }));
 
   // Handle endpoints:
   // - POST request to /create_pull_request
