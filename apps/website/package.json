@@ -16,7 +16,7 @@
   "dependencies": {
     "@vercel/analytics": "1.5.0",
     "@vercel/speed-insights": "1.2.0",
-    "next": "15.5.0",
+    "next": "15.5.2",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "fumadocs-core": "15.7.2",
@@ -31,7 +31,7 @@
     "@types/react": "19.1.10",
     "@types/react-dom": "19.1.7",
     "@types/mdx": "2.0.13",
-    "eslint-config-next": "15.5.0",
+    "eslint-config-next": "15.5.2",
     "reading-time": "1.5.0",
     "remark-emoji": "5.0.1",
     "postcss": "8.5.6",
