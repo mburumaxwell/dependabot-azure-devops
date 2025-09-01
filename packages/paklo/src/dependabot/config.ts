@@ -169,13 +169,7 @@ export const PackageEcosystemSchema = z.enum([
 ]);
 export type PackageEcosystem = z.infer<typeof PackageEcosystemSchema>;
 
-export const VersioningStrategySchema = z.enum([
-  'auto',
-  'increase',
-  'increase-if-necessary',
-  'lockfile-only',
-  'widen',
-]);
+export const VersioningStrategySchema = z.enum(['auto', 'increase', 'increase-if-necessary', 'lockfile-only', 'widen']);
 export type VersioningStrategy = z.infer<typeof VersioningStrategySchema>;
 
 export const DependabotUpdateSchema = z

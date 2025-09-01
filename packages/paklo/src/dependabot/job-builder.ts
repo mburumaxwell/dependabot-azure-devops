@@ -103,12 +103,12 @@ export class DependabotJobBuilder {
         'id': id,
         'package-manager': this.packageManager,
         'dependencies': null,
-        'allowed-updates': [{ "dependency-type": "direct", "update-type": "all" }],
+        'allowed-updates': [{ 'dependency-type': 'direct', 'update-type': 'all' }],
         'ignore-conditions': [{ 'dependency-name': '*' }],
         'source': this.source,
         'update-subdependencies': false,
         'existing-pull-requests': [],
-        "existing-group-pull-requests": [],
+        'existing-group-pull-requests': [],
         'experiments': this.experiments,
         'requirements-update-strategy': null,
         'lockfile-only': false,
@@ -154,9 +154,10 @@ export class DependabotJobBuilder {
     } else {
       updatingPullRequest = false;
       const names = dependencyNamesToUpdate?.length ? dependencyNamesToUpdate : null;
-      updateDependencyNames = securityOnlyUpdate && names
-        ? names?.filter((d) => securityVulnerabilities?.find((v) => v.package.name == d))
-        : names;
+      updateDependencyNames =
+        securityOnlyUpdate && names
+          ? names?.filter((d) => securityVulnerabilities?.find((v) => v.package.name == d))
+          : names;
     }
 
     return {
@@ -178,15 +179,14 @@ export class DependabotJobBuilder {
         'existing-group-pull-requests': existingPullRequests.filter(
           (pr): pr is DependabotExistingGroupPR => !Array.isArray(pr),
         ),
-        'commit-message-options':
-          this.update['commit-message']
-            ? {
-                'prefix': this.update['commit-message']?.prefix,
-                'prefix-development': this.update['commit-message']?.['prefix-development'],
-                'include-scope':
-                  this.update['commit-message']?.include?.toLocaleLowerCase()?.trim() == 'scope' ? true : null,
-              }
-            : null,
+        'commit-message-options': this.update['commit-message']
+          ? {
+              'prefix': this.update['commit-message']?.prefix,
+              'prefix-development': this.update['commit-message']?.['prefix-development'],
+              'include-scope':
+                this.update['commit-message']?.include?.toLocaleLowerCase()?.trim() == 'scope' ? true : null,
+            }
+          : null,
         'cooldown': this.update.cooldown,
         'experiments': mapExperiments(this.experiments),
         'reject-external-code': this.update['insecure-external-code-execution']?.toLocaleLowerCase()?.trim() == 'allow',
@@ -264,7 +264,7 @@ export function mapSourceFromDependabotConfigToJobConfig(
 }
 
 export function mapVersionStrategyToRequirementsUpdateStrategy(strategy?: VersioningStrategy): string | null {
-  if (!strategy) return null
+  if (!strategy) return null;
   switch (strategy) {
     case 'auto':
       return null;
@@ -361,9 +361,7 @@ export function mapExperiments(experiments?: DependabotExperiments): DependabotE
   }, {} as DependabotExperiments);
 }
 
-export function mapSecurityAdvisories(
-  securityVulnerabilities?: SecurityVulnerability[],
-): DependabotSecurityAdvisory[] {
+export function mapSecurityAdvisories(securityVulnerabilities?: SecurityVulnerability[]): DependabotSecurityAdvisory[] {
   if (!securityVulnerabilities) return [];
 
   // A single security advisory can cause a vulnerability in multiple versions of a package.
