@@ -440,5 +440,7 @@ export function makeCredentialsMetadata(credentials: DependabotCredential[]): De
 }
 
 export function makeRandomJobToken() {
-  return [...Array(30)].map(() => Math.random().toString(36)[2]).join('');
+  const array = new Uint8Array(30);
+  crypto.getRandomValues(array);
+  return Array.from(array, (byte) => (byte % 36).toString(36)).join('');
 }
