@@ -141,6 +141,8 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     };
     server = new AzureLocalDependabotServer(serverOptions);
     server.start(port);
+    // give the server a second to start
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 
   const updates = config.updates;
