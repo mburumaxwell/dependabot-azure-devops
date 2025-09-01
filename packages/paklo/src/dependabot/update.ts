@@ -101,8 +101,9 @@ export type DependabotIncrementMetric = z.infer<typeof DependabotIncrementMetric
 
 export const DependabotMetricSchema = z.object({
   metric: z.string(),
-  type: z.enum(['increment', 'gauge']),
-  value: z.number(),
+  type: z.enum(['increment', 'gauge', 'distribution', 'histogram']),
+  value: z.number().nullish(),
+  values: z.number().array().nullish(),
   tags: z.record(z.string(), z.string()).nullish(),
 });
 export type DependabotMetric = z.infer<typeof DependabotMetricSchema>;
