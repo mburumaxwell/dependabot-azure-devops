@@ -134,7 +134,7 @@ export function createApiServerApp({ basePath = `/api/update_jobs`, apiKey, hand
   operation('mark_as_processed', DependabotMarkAsProcessedSchema, 'patch');
   operation('update_dependency_list', DependabotUpdateDependencyListSchema);
   operation('record_ecosystem_versions', DependabotRecordEcosystemVersionsSchema);
-  operation('record_ecosystem_meta', DependabotRecordEcosystemMetaSchema);
+  operation('record_ecosystem_meta', DependabotRecordEcosystemMetaSchema.array());
   operation('increment_metric', DependabotIncrementMetricSchema);
   operation('record_metrics', DependabotMetricSchema.array());
 
