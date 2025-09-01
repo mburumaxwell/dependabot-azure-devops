@@ -176,11 +176,11 @@ importers:
   packages/paklo:
     dependencies:
       '@hono/node-server':
-        specifier: 1.19.0
-        version: 1.19.0(hono@4.9.4)
+        specifier: 1.19.1
+        version: 1.19.1(hono@4.9.5)
       '@hono/zod-validator':
         specifier: 0.7.2
-        version: 0.7.2(hono@4.9.4)(zod@4.1.5)
+        version: 0.7.2(hono@4.9.5)(zod@4.1.5)
       axios:
         specifier: 1.11.0
         version: 1.11.0
@@ -191,8 +191,8 @@ importers:
         specifier: 14.0.0
         version: 14.0.0
       hono:
-        specifier: 4.9.4
-        version: 4.9.4
+        specifier: 4.9.5
+        version: 4.9.5
       js-yaml:
         specifier: 4.1.0
         version: 4.1.0
@@ -509,8 +509,8 @@ packages:
   '@formatjs/intl-localematcher@0.6.1':
     resolution: {integrity: sha512-ePEgLgVCqi2BBFnTMWPfIghu6FkbZnnBVhO2sSxvLfrdFw7wCHAHiDoM2h4NRgjbaY7+B7HgOLZGkK187pZTZg==}
 
-  '@hono/node-server@1.19.0':
-    resolution: {integrity: sha512-1k8/8OHf5VIymJEcJyVksFpT+AQ5euY0VA5hUkCnlKpD4mr8FSbvXaHblxeTTEr90OaqWzAkQaqD80qHZQKxBA==}
+  '@hono/node-server@1.19.1':
+    resolution: {integrity: sha512-h44e5s+ByUriaRIbeS/C74O8v90m0A95luyYQGMF7KEn96KkYMXO7bZAwombzTpjQTU4e0TkU8U1WBIXlwuwtA==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
@@ -2724,8 +2724,8 @@ packages:
   help-me@5.0.0:
     resolution: {integrity: sha512-7xgomUX6ADmcYzFik0HzAxh/73YlKR9bmFzf51CZwR+b6YtzU2m0u49hQCqV6SvlqIqsaxovfwdvbnsw3b/zpg==}
 
-  hono@4.9.4:
-    resolution: {integrity: sha512-61hl6MF6ojTl/8QSRu5ran6GXt+6zsngIUN95KzF5v5UjiX/xnrLR358BNRawwIRO49JwUqJqQe3Rb2v559R8Q==}
+  hono@4.9.5:
+    resolution: {integrity: sha512-aLAVl5/67ifNnoFVxnhR89dpmSLsgwBprw/PT671ASwUpJqmd7Ne8KPTQo37DbRZfgpHaHeZ4bPVUvbOkeedMw==}
     engines: {node: '>=16.9.0'}
 
   html-void-elements@3.0.0:
@@ -5014,13 +5014,13 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@hono/node-server@1.19.0(hono@4.9.4)':
+  '@hono/node-server@1.19.1(hono@4.9.5)':
     dependencies:
-      hono: 4.9.4
+      hono: 4.9.5
 
-  '@hono/zod-validator@0.7.2(hono@4.9.4)(zod@4.1.5)':
+  '@hono/zod-validator@0.7.2(hono@4.9.5)(zod@4.1.5)':
     dependencies:
-      hono: 4.9.4
+      hono: 4.9.5
       zod: 4.1.5
 
   '@humanfs/core@0.19.1': {}
@@ -7400,7 +7400,7 @@ snapshots:
 
   help-me@5.0.0: {}
 
-  hono@4.9.4: {}
+  hono@4.9.5: {}
 
   html-void-elements@3.0.0: {}
 
