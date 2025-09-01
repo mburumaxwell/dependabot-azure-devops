@@ -176,9 +176,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     let dependencyNamesToUpdate: string[] = [];
     const securityUpdatesOnly = update['open-pull-requests-limit'] === 0;
     if (securityUpdatesOnly) {
-      operation = builder.forDependenciesList({
-        id: `discover-${updateId}-${update['package-ecosystem']}-dependency-list`,
-      });
+      operation = builder.forDependenciesList({});
       // TODO: handle this
       securityVulnerabilities = [];
       dependencyNamesToUpdate = [];
@@ -188,14 +186,12 @@ async function handler({ options, error }: HandlerOptions<Options>) {
 
     if (pullRequestId) {
       operation = builder.forUpdate({
-        id: `update-pr-${pullRequestId}`,
         existingPullRequests: existingPullRequestDependenciesForPackageManager,
         pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
         securityVulnerabilities,
       });
     } else {
       operation = builder.forUpdate({
-        id: `update-${updateId}-${update['package-ecosystem']}-${securityUpdatesOnly ? 'security-only' : 'all'}`,
         dependencyNamesToUpdate,
         existingPullRequests: existingPullRequestDependenciesForPackageManager,
         securityVulnerabilities,
@@ -203,7 +199,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     }
 
     // create working directory if it does not exist
-    const workingDirectory = join(outDir, operation.job.id!);
+    const workingDirectory = join(outDir, `${operation.job.id}`);
     if (!existsSync(workingDirectory)) await mkdir(workingDirectory, { recursive: true });
 
     // if we only wanted to generate the files, save and continue to the next one

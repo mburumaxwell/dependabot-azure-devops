@@ -310,9 +310,7 @@ export async function performDependabotUpdatesAsync(
     const securityUpdatesOnly = update['open-pull-requests-limit'] === 0;
     if (securityUpdatesOnly) {
       // Run an update job to discover all dependencies
-      const job = builder.forDependenciesList({
-        id: `discover-${updateId}-${update['package-ecosystem']}-dependency-list`,
-      });
+      const job = builder.forDependenciesList({});
       const outputs = await dependabotCli.update(jobToken, job, dependabotCliUpdateOptions);
 
       // Get the list of vulnerabilities that apply to the discovered dependencies
@@ -374,7 +372,6 @@ export async function performDependabotUpdatesAsync(
       const dependenciesHaveVulnerabilities = dependencyNamesToUpdate.length && securityVulnerabilities.length;
       if (!securityUpdatesOnly || dependenciesHaveVulnerabilities) {
         const job = builder.forUpdate({
-          id: `update-${updateId}-${update['package-ecosystem']}-${securityUpdatesOnly ? 'security-only' : 'all'}`,
           dependencyNamesToUpdate,
           existingPullRequests: existingPullRequestDependenciesForPackageManager,
           securityVulnerabilities,
@@ -397,7 +394,6 @@ export async function performDependabotUpdatesAsync(
       if (!taskInputs.dryRun) {
         for (const pullRequestId in existingPullRequestsForPackageManager) {
           const job = builder.forUpdate({
-            id: `update-pr-${pullRequestId}`,
             existingPullRequests: existingPullRequestDependenciesForPackageManager,
             pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
             securityVulnerabilities,

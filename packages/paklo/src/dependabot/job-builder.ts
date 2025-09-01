@@ -96,11 +96,11 @@ export class DependabotJobBuilder {
   /**
    * Create a dependabot update job that updates nothing, but will discover the dependency list for a package ecosystem
    */
-  public forDependenciesList({ id }: { id: string }): DependabotOperation {
+  public forDependenciesList({ id }: { id?: number }): DependabotOperation {
     return {
       update: this.update,
       job: {
-        'id': id,
+        'id': id ?? makeRandomJobId(),
         'package-manager': this.packageManager,
         'dependencies': null,
         'allowed-updates': [{ 'dependency-type': 'direct', 'update-type': 'all' }],
@@ -129,7 +129,7 @@ export class DependabotJobBuilder {
     pullRequestToUpdate,
     securityVulnerabilities,
   }: {
-    id: string;
+    id?: number;
     dependencyNamesToUpdate?: string[];
     existingPullRequests: (DependabotExistingPR[] | DependabotExistingGroupPR)[];
     pullRequestToUpdate?: DependabotExistingPR[] | DependabotExistingGroupPR;
@@ -163,7 +163,7 @@ export class DependabotJobBuilder {
     return {
       update: this.update,
       job: {
-        'id': id,
+        'id': id ?? makeRandomJobId(),
         'package-manager': this.packageManager,
         'updating-a-pull-request': updatingPullRequest || false,
         'dependency-group-to-refresh': updateDependencyGroupName,
@@ -437,6 +437,12 @@ export function makeCredentialsMetadata(credentials: DependabotCredential[]): De
   return credentials.map((cred) =>
     Object.fromEntries(Object.entries(cred).filter(([key]) => !sensitive.includes(key))),
   );
+}
+
+export function makeRandomJobId(): number {
+  const array = new Uint32Array(1);
+  crypto.getRandomValues(array);
+  return array[0]! % 1000000000; // Limit to 9 digits to match GitHub's job IDs
 }
 
 export function makeRandomJobToken() {

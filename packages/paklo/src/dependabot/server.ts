@@ -145,7 +145,7 @@ export type DependabotRequestHandleResult = {
 export abstract class LocalDependabotServer {
   private readonly hostname = 'localhost';
   private readonly server: ReturnType<typeof createAdaptorServer>;
-  private readonly jobs = new Map<string, DependabotInput & { update: DependabotUpdate }>();
+  private readonly jobs = new Map<number, DependabotInput & { update: DependabotUpdate }>();
 
   protected readonly createdPullRequestIds: number[] = [];
   protected readonly author: LocalDependabotServerOptions['author'];
@@ -193,7 +193,7 @@ export abstract class LocalDependabotServer {
    * @param id - The ID of the dependabot job to get.
    * @returns The dependabot job, or undefined if not found.
    */
-  getJob(id: string) {
+  getJob(id: number) {
     return this.jobs.get(id);
   }
 
