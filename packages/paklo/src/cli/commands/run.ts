@@ -223,7 +223,9 @@ async function handler({ options, error }: HandlerOptions<Options>) {
         jobId: operation.job.id!,
         jobToken: `Bearer ${jobToken}`,
         credentialsToken: gitToken,
-        dependabotApiUrl: `${server!.url}/api`,
+        // using host.docker.internal for dependabotApiUrl instead of server.url
+        // so as to capture /record_metrics calls
+        dependabotApiUrl: `http://host.docker.internal:${port}/api`,
         dependabotApiDockerUrl: `http://host.docker.internal:${port}/api`,
         updaterImage: undefined,
         workingDirectory,
