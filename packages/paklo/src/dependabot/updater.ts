@@ -39,6 +39,7 @@ export class Updater {
     // Create required folders in the workingDirectory
     await mkdir(this.outputHostPath);
 
+    // eslint-disable-next-line no-prototype-builtins
     const cachedMode = this.job.experiments.hasOwnProperty('proxy-cached') === true;
 
     const proxyBuilder = new ProxyBuilder(this.docker, this.proxyImage, cachedMode);
@@ -67,6 +68,7 @@ export class Updater {
         continue;
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const obj: any = { type: credential.type };
       if (credential.host !== undefined) {
         obj.host = credential.host;

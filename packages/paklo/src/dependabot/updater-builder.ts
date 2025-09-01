@@ -1,4 +1,5 @@
-import Docker, { type Container } from 'dockerode';
+import type Docker from 'dockerode';
+import { type Container } from 'dockerode';
 
 import { ContainerService } from './container-service';
 import { type FileFetcherInput, type FileUpdaterInput } from './job';
