@@ -128,7 +128,7 @@ jobs:
             com.github.image.source.branch=${{ github.ref }}
 
       - name: Provenance Attestation
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v3
         # Only if we have pushed the image (otherwise the digest is not available)
         if: ${{ !startsWith(github.ref, 'refs/pull') }}
         with:
