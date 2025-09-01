@@ -50,6 +50,11 @@ input:
     commit-message-options:
       prefix: build
     max-updater-run-time: 2700
+    update-subdependencies: false
+    lockfile-only: false
+    existing-group-pull-requests: []
+    existing-pull-requests: []
+    dependencies: []
   credentials:
     - host: dev.azure.com
       password: '01'

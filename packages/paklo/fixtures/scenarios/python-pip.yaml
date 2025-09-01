@@ -1,6 +1,11 @@
 input:
   job:
     package-manager: pip
+    dependencies: []
+    update-subdependencies: false
+    lockfile-only: false
+    existing-group-pull-requests: []
+    existing-pull-requests: []
     allowed-updates:
       - dependency-type: direct
         update-type: all

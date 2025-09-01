@@ -132,9 +132,9 @@ describe('mapAllowedUpdatesFromDependabotConfigToJobConfig', () => {
 });
 
 describe('mapIgnoreConditionsFromDependabotConfigToJobConfig', () => {
-  it('should return undefined if rules are undefined', () => {
+  it('should return an empty array if rules are undefined', () => {
     const result = mapIgnoreConditionsFromDependabotConfigToJobConfig(undefined);
-    expect(result).toBeUndefined();
+    expect(result).toEqual([]);
   });
 
   it('should handle single version string correctly', () => {
@@ -163,19 +163,19 @@ describe('mapIgnoreConditionsFromDependabotConfigToJobConfig', () => {
 });
 
 describe('mapGroupsFromDependabotConfigToJobConfig', () => {
-  it('should return undefined if dependencyGroups is undefined', () => {
+  it('should return an empty array if dependencyGroups is undefined', () => {
     const result = mapGroupsFromDependabotConfigToJobConfig(undefined);
-    expect(result).toBeUndefined();
+    expect(result).toEqual([]);
   });
 
-  it('should return undefined if dependencyGroups is an empty object', () => {
+  it('should return an empty array if dependencyGroups is an empty object', () => {
     const result = mapGroupsFromDependabotConfigToJobConfig({});
-    expect(result).toBeUndefined();
+    expect(result).toEqual([]);
   });
 
   it('should filter out undefined groups', () => {
-    const dependencyGroups: Record<string, DependabotGroup | undefined | null> = {
-      group1: undefined,
+    const dependencyGroups: Record<string, DependabotGroup | null> = {
+      group1: null,
       group2: {
         patterns: ['pattern2'],
       },
@@ -186,7 +186,7 @@ describe('mapGroupsFromDependabotConfigToJobConfig', () => {
   });
 
   it('should filter out null groups', () => {
-    const dependencyGroups: Record<string, DependabotGroup | undefined | null> = {
+    const dependencyGroups: Record<string, DependabotGroup | null> = {
       group1: null,
       group2: {
         patterns: ['pattern2'],

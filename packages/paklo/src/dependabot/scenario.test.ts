@@ -11,7 +11,6 @@ describe('input', () => {
 
     // parsing is enough to test that we generated the correct job schema
     // but we test a few fields to be sure
-    expect(input.job.id).toEqual('update-0-pip-all');
     expect(input.job['package-manager']).toEqual('pip');
     expect(input.job['credentials-metadata']).toBeDefined();
     expect(input.credentials[0]!.type).toEqual('git_source');

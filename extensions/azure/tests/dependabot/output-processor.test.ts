@@ -54,7 +54,7 @@ describe('DependabotOutputProcessor', () => {
       vi.clearAllMocks();
       update = {
         job: {
-          'id': 'job1',
+          'id': 1,
           'package-manager': 'npm_and_yarn',
           'source': {
             hostname: 'localhost:8081',
@@ -63,6 +63,14 @@ describe('DependabotOutputProcessor', () => {
           },
           'experiments': {},
           'credentials-metadata': [],
+          'allowed-updates': [],
+          'existing-group-pull-requests': [],
+          'existing-pull-requests': [],
+          'lockfile-only': false,
+          'requirements-update-strategy': null,
+          'update-subdependencies': false,
+          'debug': false,
+          'dependencies': [],
         },
         credentials: [],
         update: {

@@ -1,7 +1,8 @@
 job:
-  id: update-0-pip-all
   package-manager: pip
   updating-a-pull-request: false
+  update-subdependencies: false
+  dependencies: []
   allowed-updates:
     - dependency-type: direct
       update-type: all
