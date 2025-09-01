@@ -293,6 +293,9 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
       case 'increment_metric':
         return { success: true };
 
+      case 'record_metrics':
+        return { success: true };
+
       default:
         logger.warn(`Unknown dependabot output type '${type}', ignoring...`);
         return { success: true };

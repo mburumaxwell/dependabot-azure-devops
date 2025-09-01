@@ -15,6 +15,7 @@ import {
   DependabotCreatePullRequestSchema,
   DependabotIncrementMetricSchema,
   DependabotMarkAsProcessedSchema,
+  DependabotMetricSchema,
   DependabotRecordEcosystemMetaSchema,
   DependabotRecordEcosystemVersionsSchema,
   DependabotRecordUpdateJobErrorSchema,
@@ -49,6 +50,7 @@ export const DependabotRequestSchema = z.discriminatedUnion('type', [
     data: DependabotRecordEcosystemMetaSchema.array(),
   }),
   z.object({ type: z.literal('increment_metric'), data: DependabotIncrementMetricSchema }),
+  z.object({ type: z.literal('record_metrics'), data: DependabotMetricSchema.array() }),
 ]);
 export type DependabotRequest = z.infer<typeof DependabotRequestSchema>;
 
@@ -134,6 +136,7 @@ export function createApiServerApp({ basePath = `/api/update_jobs`, apiKey, hand
   operation('record_ecosystem_versions', DependabotRecordEcosystemVersionsSchema);
   operation('record_ecosystem_meta', DependabotRecordEcosystemMetaSchema);
   operation('increment_metric', DependabotIncrementMetricSchema);
+  operation('record_metrics', DependabotMetricSchema.array());
 
   return app;
 }

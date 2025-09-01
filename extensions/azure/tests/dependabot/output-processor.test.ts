@@ -332,6 +332,14 @@ describe('DependabotOutputProcessor', () => {
       expect(result).toEqual({ success: true });
     });
 
+    it('should process "record_metrics"', async () => {
+      const result = await processor.process(update, {
+        type: 'record_metrics',
+        expect: { data: [{ metric: 'random', value: 1, type: 'increment' }] },
+      });
+      expect(result).toEqual({ success: true });
+    });
+
     it('should handle unknown output type', async () => {
       // @ts-expect-error - trying non existed type
       const result = await processor.process(update, { type: 'non_existant_output_type', expect: { data: {} } });

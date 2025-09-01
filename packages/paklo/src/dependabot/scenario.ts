@@ -5,6 +5,7 @@ import {
   DependabotCreatePullRequestSchema,
   DependabotIncrementMetricSchema,
   DependabotMarkAsProcessedSchema,
+  DependabotMetricSchema,
   DependabotRecordEcosystemMetaSchema,
   DependabotRecordEcosystemVersionsSchema,
   DependabotRecordUpdateJobErrorSchema,
@@ -30,6 +31,7 @@ export const DependabotOperationTypeSchema = z.enum([
   'record_ecosystem_versions',
   'record_ecosystem_meta',
   'increment_metric',
+  'record_metrics',
 ]);
 export type DependabotOperationType = z.infer<typeof DependabotOperationTypeSchema>;
 
@@ -59,6 +61,7 @@ export const DependabotOutputSchema = z.discriminatedUnion('type', [
     expect: z.object({ data: DependabotRecordEcosystemMetaSchema.array() }),
   }),
   z.object({ type: z.literal('increment_metric'), expect: z.object({ data: DependabotIncrementMetricSchema }) }),
+  z.object({ type: z.literal('record_metrics'), expect: z.object({ data: DependabotMetricSchema.array() }) }),
 ]);
 export type DependabotOutput = z.infer<typeof DependabotOutputSchema>;
 

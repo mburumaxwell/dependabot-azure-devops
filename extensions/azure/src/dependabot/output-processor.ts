@@ -311,6 +311,10 @@ export class DependabotOutputProcessor {
         // No action required
         return { success: true };
 
+      case 'record_metrics':
+        // No action required
+        return { success: true };
+
       default:
         warning(`Unknown dependabot output type '${type}', ignoring...`);
         return { success: true };

@@ -46,6 +46,7 @@ describe('scenario', () => {
     expect(scenario.output.filter((o) => o.type == 'record_ecosystem_versions').length).toBe(1);
     expect(scenario.output.filter((o) => o.type == 'record_ecosystem_meta').length).toBe(25);
     expect(scenario.output.filter((o) => o.type == 'increment_metric').length).toBe(0);
+    expect(scenario.output.filter((o) => o.type == 'record_metrics').length).toBe(0);
   });
 
   it('nuget', async () => {
@@ -72,5 +73,6 @@ describe('scenario', () => {
     expect(scenario.output.filter((o) => o.type == 'record_ecosystem_versions').length).toBe(0);
     expect(scenario.output.filter((o) => o.type == 'record_ecosystem_meta').length).toBe(0);
     expect(scenario.output.filter((o) => o.type == 'increment_metric').length).toBe(0);
+    expect(scenario.output.filter((o) => o.type == 'record_metrics').length).toBe(0);
   });
 });
