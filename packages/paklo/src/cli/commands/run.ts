@@ -43,6 +43,7 @@ const schema = z.object({
   githubToken: z.string().optional(),
   pullRequestId: z.coerce.string().optional(),
   outDir: z.string(),
+  jobToken: z.string().optional(),
   generateOnly: z.boolean(),
   port: z.coerce.number().min(1).max(65535),
   autoApprove: z.boolean(),
@@ -66,6 +67,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     repository,
     pullRequestId,
     outDir,
+    jobToken = makeRandomJobToken(),
     generateOnly,
     port,
     autoApprove,
@@ -121,7 +123,6 @@ async function handler({ options, error }: HandlerOptions<Options>) {
   );
 
   // Prepare local server if we are not in generate-only mode
-  const jobToken = makeRandomJobToken();
   let server: AzureLocalDependabotServer | undefined = undefined;
   if (!generateOnly) {
     const serverOptions: AzureLocalDependabotServerOptions = {
@@ -295,8 +296,15 @@ export const command = new Command('run')
     'Identifier of pull request to update. If not specified, a job that updates everything is generated.',
   )
   .option('--out-dir', 'Working directory.', 'work')
+  .option(
+    '--job-token <JOB-TOKEN>',
+    'Token to use for the job API calls. If not specified, a random token will be generated.',
+  )
   .option('--auto-approve', 'Whether to automatically approve the pull request.', false)
-  .option('--auto-approve-token <AUTO-APPROVE-TOKEN>', 'Token to use for auto-approving the pull request.')
+  .option(
+    '--auto-approve-token <AUTO-APPROVE-TOKEN>',
+    'Token to use for auto-approving the pull request, if different from GIT-TOKEN.',
+  )
   .option(
     '--set-auto-complete',
     'Whether to set the pull request to auto-complete once all policies have been met.',
