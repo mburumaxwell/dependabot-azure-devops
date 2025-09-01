@@ -7,6 +7,7 @@ import {
   type DependabotRegistry,
   type DependabotUpdate,
   type PackageEcosystem,
+  type VersioningStrategy,
 } from './config';
 import {
   type DependabotAllowed,
@@ -101,9 +102,16 @@ export class DependabotJobBuilder {
       job: {
         'id': id,
         'package-manager': this.packageManager,
+        'dependencies': null,
+        'allowed-updates': [{ "dependency-type": "direct", "update-type": "all" }],
         'ignore-conditions': [{ 'dependency-name': '*' }],
         'source': this.source,
+        'update-subdependencies': false,
+        'existing-pull-requests': [],
+        "existing-group-pull-requests": [],
         'experiments': this.experiments,
+        'requirements-update-strategy': null,
+        'lockfile-only': false,
         'debug': this.debug,
         'credentials-metadata': this.credentialsMetadata,
       },
@@ -123,21 +131,21 @@ export class DependabotJobBuilder {
   }: {
     id: string;
     dependencyNamesToUpdate?: string[];
-    existingPullRequests?: (DependabotExistingPR[] | DependabotExistingGroupPR)[];
+    existingPullRequests: (DependabotExistingPR[] | DependabotExistingGroupPR)[];
     pullRequestToUpdate?: DependabotExistingPR[] | DependabotExistingGroupPR;
     securityVulnerabilities?: SecurityVulnerability[];
   }): DependabotOperation {
     const securityOnlyUpdate = this.update['open-pull-requests-limit'] == 0;
 
     let updatingPullRequest: boolean;
-    let updateDependencyGroupName: string | undefined;
-    let updateDependencyNames: string[] | undefined;
+    let updateDependencyGroupName: string | null = null;
+    let updateDependencyNames: string[] | null;
     let vulnerabilities: SecurityVulnerability[] | undefined;
 
     if (pullRequestToUpdate) {
       updatingPullRequest = true;
       updateDependencyGroupName = Array.isArray(pullRequestToUpdate)
-        ? undefined
+        ? null
         : pullRequestToUpdate['dependency-group-name'];
       updateDependencyNames = (
         Array.isArray(pullRequestToUpdate) ? pullRequestToUpdate : pullRequestToUpdate.dependencies
@@ -145,9 +153,10 @@ export class DependabotJobBuilder {
       vulnerabilities = securityVulnerabilities?.filter((v) => updateDependencyNames?.includes(v.package.name));
     } else {
       updatingPullRequest = false;
-      updateDependencyNames = securityOnlyUpdate
-        ? dependencyNamesToUpdate?.filter((d) => securityVulnerabilities?.find((v) => v.package.name == d))
-        : dependencyNamesToUpdate;
+      const names = dependencyNamesToUpdate?.length ? dependencyNamesToUpdate : null;
+      updateDependencyNames = securityOnlyUpdate && names
+        ? names?.filter((d) => securityVulnerabilities?.find((v) => v.package.name == d))
+        : names;
     }
 
     return {
@@ -158,25 +167,26 @@ export class DependabotJobBuilder {
         'updating-a-pull-request': updatingPullRequest || false,
         'dependency-group-to-refresh': updateDependencyGroupName,
         'dependency-groups': mapGroupsFromDependabotConfigToJobConfig(this.update.groups),
-        'dependencies': updateDependencyNames?.length ? updateDependencyNames : undefined,
+        'dependencies': updateDependencyNames,
         'allowed-updates': mapAllowedUpdatesFromDependabotConfigToJobConfig(this.update.allow, securityOnlyUpdate),
         'ignore-conditions': mapIgnoreConditionsFromDependabotConfigToJobConfig(this.update.ignore),
         'security-updates-only': securityOnlyUpdate,
         'security-advisories': mapSecurityAdvisories(vulnerabilities),
         'source': this.source,
-        'existing-pull-requests': existingPullRequests?.filter((pr) => Array.isArray(pr)),
-        'existing-group-pull-requests': existingPullRequests?.filter(
+        'update-subdependencies': false,
+        'existing-pull-requests': existingPullRequests.filter((pr) => Array.isArray(pr)),
+        'existing-group-pull-requests': existingPullRequests.filter(
           (pr): pr is DependabotExistingGroupPR => !Array.isArray(pr),
         ),
         'commit-message-options':
-          this.update['commit-message'] === undefined
-            ? undefined
-            : {
+          this.update['commit-message']
+            ? {
                 'prefix': this.update['commit-message']?.prefix,
                 'prefix-development': this.update['commit-message']?.['prefix-development'],
                 'include-scope':
-                  this.update['commit-message']?.include?.toLocaleLowerCase()?.trim() == 'scope' ? true : undefined,
-              },
+                  this.update['commit-message']?.include?.toLocaleLowerCase()?.trim() == 'scope' ? true : null,
+              }
+            : null,
         'cooldown': this.update.cooldown,
         'experiments': mapExperiments(this.experiments),
         'reject-external-code': this.update['insecure-external-code-execution']?.toLocaleLowerCase()?.trim() == 'allow',
@@ -247,19 +257,17 @@ export function mapSourceFromDependabotConfigToJobConfig(
     'hostname': source.hostname,
     'repo': source['repository-slug'],
     'branch': update['target-branch'],
-    'commit': undefined, // use latest commit of target branch
+    'commit': null, // use latest commit of target branch
     'directory': update.directory,
     'directories': update.directories,
   };
 }
 
-export function mapVersionStrategyToRequirementsUpdateStrategy(versioningStrategy?: string): string | undefined {
-  if (!versioningStrategy) {
-    return undefined;
-  }
-  switch (versioningStrategy) {
+export function mapVersionStrategyToRequirementsUpdateStrategy(strategy?: VersioningStrategy): string | null {
+  if (!strategy) return null
+  switch (strategy) {
     case 'auto':
-      return undefined;
+      return null;
     case 'increase':
       return 'bump_versions';
     case 'increase-if-necessary':
@@ -269,16 +277,14 @@ export function mapVersionStrategyToRequirementsUpdateStrategy(versioningStrateg
     case 'widen':
       return 'widen_ranges';
     default:
-      throw new Error(`Invalid dependabot.yaml versioning strategy option '${versioningStrategy}'`);
+      throw new Error(`Invalid dependabot.yaml versioning strategy option '${strategy}'`);
   }
 }
 
 export function mapGroupsFromDependabotConfigToJobConfig(
-  dependencyGroups?: Record<string, DependabotGroup | undefined | null>,
-): DependabotGroupJob[] | undefined {
-  if (!dependencyGroups || !Object.keys(dependencyGroups).length) {
-    return undefined;
-  }
+  dependencyGroups?: Record<string, DependabotGroup | null>,
+): DependabotGroupJob[] {
+  if (!dependencyGroups || !Object.keys(dependencyGroups).length) return [];
   return Object.keys(dependencyGroups)
     .filter((name) => dependencyGroups[name])
     .map((name) => {
@@ -322,10 +328,8 @@ export function mapAllowedUpdatesFromDependabotConfigToJobConfig(
 
 export function mapIgnoreConditionsFromDependabotConfigToJobConfig(
   ignoreConditions?: DependabotIgnoreCondition[],
-): DependabotCondition[] | undefined {
-  if (!ignoreConditions) {
-    return undefined;
-  }
+): DependabotCondition[] {
+  if (!ignoreConditions) return [];
   return ignoreConditions.map((ignore) => {
     return {
       'source': ignore.source,
@@ -359,10 +363,8 @@ export function mapExperiments(experiments?: DependabotExperiments): DependabotE
 
 export function mapSecurityAdvisories(
   securityVulnerabilities?: SecurityVulnerability[],
-): DependabotSecurityAdvisory[] | undefined {
-  if (!securityVulnerabilities) {
-    return undefined;
-  }
+): DependabotSecurityAdvisory[] {
+  if (!securityVulnerabilities) return [];
 
   // A single security advisory can cause a vulnerability in multiple versions of a package.
   // We need to map each unique security advisory to a list of affected-versions and patched-versions.

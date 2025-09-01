@@ -169,6 +169,15 @@ export const PackageEcosystemSchema = z.enum([
 ]);
 export type PackageEcosystem = z.infer<typeof PackageEcosystemSchema>;
 
+export const VersioningStrategySchema = z.enum([
+  'auto',
+  'increase',
+  'increase-if-necessary',
+  'lockfile-only',
+  'widen',
+]);
+export type VersioningStrategy = z.infer<typeof VersioningStrategySchema>;
+
 export const DependabotUpdateSchema = z
   .object({
     'package-ecosystem': PackageEcosystemSchema,
@@ -190,7 +199,7 @@ export const DependabotUpdateSchema = z
     'schedule': DependabotScheduleSchema.optional(),
     'target-branch': z.string().optional(),
     'vendor': z.boolean().optional(),
-    'versioning-strategy': z.string().optional(),
+    'versioning-strategy': VersioningStrategySchema.optional(),
   })
   .transform((value, { addIssue }) => {
     // either 'directory' or 'directories' must be specified
