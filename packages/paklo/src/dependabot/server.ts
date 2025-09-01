@@ -2,7 +2,6 @@ import { createAdaptorServer } from '@hono/node-server';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { bearerAuth } from 'hono/bearer-auth';
-import { logger as loggerMiddleware } from 'hono/logger';
 import { type AddressInfo } from 'node:net';
 import { z, type ZodType } from 'zod/v4';
 
@@ -94,7 +93,6 @@ export type CreateApiServerAppOptions = {
 export function createApiServerApp({ basePath = `/api/update_jobs`, apiKey, handle }: CreateApiServerAppOptions): Hono {
   // Setup app with base path and middleware
   const app = new Hono().basePath(basePath);
-  app.use(loggerMiddleware((str) => logger.debug(str))); // logger must be earliest
   // TODO: apiKey should not be optional once we move away from dependabot CLI
   if (apiKey) app.use('/*', bearerAuth({ token: apiKey, prefix: '' /* empty means no prefix expected */ }));
 
