@@ -4,7 +4,12 @@ import { mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 
 import { ContainerService } from './container-service';
-import { type DependabotCredential, type FileFetcherInput, type FileUpdaterInput, type JobDetails } from './job';
+import {
+  type DependabotCredential,
+  type DependabotJobConfig,
+  type FileFetcherInput,
+  type FileUpdaterInput,
+} from './job';
 import type { JobParameters } from './params';
 import { ProxyBuilder, type Proxy } from './proxy';
 import { UpdaterBuilder } from './updater-builder';
@@ -18,13 +23,13 @@ export class Updater {
     private readonly updaterImage: string,
     private readonly proxyImage: string,
     private readonly params: JobParameters,
-    private readonly details: JobDetails,
+    private readonly job: DependabotJobConfig,
     private readonly credentials: DependabotCredential[],
   ) {
     this.docker = new Docker();
     this.outputHostPath = path.join(params.workingDirectory, 'output');
     this.repoHostPath = path.join(params.workingDirectory, 'repo');
-    this.details['credentials-metadata'] = this.generateCredentialsMetadata();
+    this.job['credentials-metadata'] = this.generateCredentialsMetadata();
   }
 
   /**
@@ -34,7 +39,7 @@ export class Updater {
     // Create required folders in the workingDirectory
     await mkdir(this.outputHostPath);
 
-    const cachedMode = this.details.experiments?.hasOwnProperty('proxy-cached') === true;
+    const cachedMode = this.job.experiments.hasOwnProperty('proxy-cached') === true;
 
     const proxyBuilder = new ProxyBuilder(this.docker, this.proxyImage, cachedMode);
 
@@ -142,7 +147,7 @@ export class Updater {
   private async runUpdate(proxy: Proxy): Promise<void> {
     const name = `dependabot-job-${this.params.jobId}`;
     const container = await this.createContainer(proxy, name, {
-      job: this.details,
+      job: this.job,
     });
 
     await ContainerService.run(container);

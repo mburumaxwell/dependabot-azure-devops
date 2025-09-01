@@ -197,27 +197,12 @@ export type FetchedFiles = {
   dependency_files: any[];
   base64_dependency_files: any[];
 };
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
-export type JobDetails = Pick<
-  DependabotJobConfig,
-  'id' | 'package-manager' | 'allowed-updates' | 'experiments' | 'credentials-metadata'
->;
 export type FileFetcherInput = {
-  job: JobDetails;
-};
-
-export type DependencyFile = {
-  name: string;
-  content: any;
-  directory: string;
-  type: string;
-  support_file: boolean;
-  content_encoding: string;
-  deleted: boolean;
-  operation: string;
+  job: DependabotJobConfig;
 };
 
 export type FileUpdaterInput = FetchedFiles & {
-  job: JobDetails;
+  job: DependabotJobConfig;
 };
-/* eslint-enable @typescript-eslint/no-explicit-any */
