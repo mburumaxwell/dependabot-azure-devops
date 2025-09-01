@@ -221,10 +221,10 @@ async function handler({ options, error }: HandlerOptions<Options>) {
 
       const params = getJobParameters({
         jobId: operation.job.id!,
-        jobToken,
+        jobToken: `Bearer ${jobToken}`,
         credentialsToken: gitToken,
-        dependabotApiUrl: server?.url,
-        dependabotApiDockerUrl: `http://host.docker.internal:${port}`,
+        dependabotApiUrl: `${server!.url}/api`,
+        dependabotApiDockerUrl: `http://host.docker.internal:${port}/api`,
         updaterImage: undefined,
         workingDirectory,
       })!;
