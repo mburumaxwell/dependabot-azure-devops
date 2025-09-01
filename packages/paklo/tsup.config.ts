@@ -11,7 +11,8 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   // tsup default for libraries: mark all node_modules as external
-  noExternal: ['semver', 'azure-devops-node-api'],
+  noExternal: ['semver', 'azure-devops-node-api', 'cpu-features', 'ssh2', 'dockerode'],
+  skipNodeModulesBundle: true, // TODO: investigate why this is needed
   entry: {
     azure: 'src/azure/index.ts',
     dependabot: 'src/dependabot/index.ts',
