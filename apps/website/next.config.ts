@@ -4,6 +4,7 @@ import { type NextConfig } from 'next';
 const config: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
+  typedRoutes: true,
   logging: { fetches: { fullUrl: true } }, // allows us to see cache behavior for fetches
   images: {
     formats: ['image/avif', 'image/webp'],
