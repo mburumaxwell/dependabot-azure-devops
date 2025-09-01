@@ -24,7 +24,7 @@
     "fumadocs-ui": "15.7.2",
     "paklo": "workspace:*",
     "sharp": "0.34.3",
-    "zod": "4.1.3"
+    "zod": "4.1.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.1.12",
