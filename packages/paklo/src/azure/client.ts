@@ -1,5 +1,4 @@
-import { WebApi, getPersonalAccessTokenHandler } from 'azure-devops-node-api';
-import { type IHttpClientResponse } from 'typed-rest-client/Interfaces';
+import { getPersonalAccessTokenHandler, WebApi } from 'azure-devops-node-api';
 
 import { logger } from './logger';
 import {
@@ -17,6 +16,7 @@ import {
   PullRequestAsyncStatus,
   PullRequestStatus,
   type IdentityRefWithVote,
+  type IHttpClientResponse,
 } from './types';
 import { type AzureDevOpsUrl } from './url-parts';
 import { normalizeBranchName, normalizeFilePath } from './utils';

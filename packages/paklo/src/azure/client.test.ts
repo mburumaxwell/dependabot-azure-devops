@@ -1,10 +1,9 @@
 import { type IncomingMessage } from 'http';
-import { type IHttpClientResponse } from 'typed-rest-client/Interfaces';
 import { beforeEach, describe, expect, it, vi, type MockedFunction } from 'vitest';
 
 import { AzureDevOpsWebApiClient, isErrorTemporaryFailure, sendRestApiRequestWithRetry } from './client';
 import { HttpRequestError, type ICreatePullRequest } from './models';
-import { VersionControlChangeType } from './types';
+import { VersionControlChangeType, type IHttpClientResponse } from './types';
 import { extractUrlParts } from './url-parts';
 
 vi.mock('azure-devops-node-api');
