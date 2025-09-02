@@ -75,10 +75,10 @@ export type CreateApiServerAppOptions = {
    */
   basePath?: string;
 
-  /** Handle function for authenticating requests */
-  authenticator?: AuthenticatorFunc;
+  /** Handler function for authenticating requests. */
+  authenticate: AuthenticatorFunc;
 
-  /** Handler function for processing the operations */
+  /** Handler function for processing the operations. */
   handle: HandlerFunc;
 };
 
@@ -94,7 +94,11 @@ export type CreateApiServerAppOptions = {
  * @param params - The parameters for creating the API server application.
  * @returns The created API server application.
  */
-export function createApiServerApp({ basePath = `/api/update_jobs`, authenticator, handle }: CreateApiServerAppOptions): Hono {
+export function createApiServerApp({
+  basePath = `/api/update_jobs`,
+  authenticate,
+  handle,
+}: CreateApiServerAppOptions): Hono {
   // Setup app with base path and middleware
   const app = new Hono().basePath(basePath);
 
@@ -116,12 +120,21 @@ export function createApiServerApp({ basePath = `/api/update_jobs`, authenticato
       `/:id/${type}`,
       zValidator('param', z.object({ id: z.coerce.number() })),
       async (context, next) => {
-        if (authenticator) {
+        /**
+         * Do not authenticate in scenarios where the server is not using HTTPS because the
+         * dependabot proxy will not send the job token over HTTP, yet trying to get HTTPS to work
+         * with localhost (self-signed certs) against docker (host.docker.internal) is complicated.
+         */
+        const url = new URL(context.req.url);
+        const isHTTPS = url.protocol === 'https:';
+        if (isHTTPS) {
           const { id } = context.req.valid('param');
           const value = context.req.header('Authorization');
           if (!value) return context.body(null, 401);
-          const valid = await authenticator(id, value);
+          const valid = await authenticate(id, value);
           if (!valid) return context.body(null, 403);
+        } else {
+          logger.trace(`Skipping authentication because it is not secure ${context.req.url}`);
         }
         await next();
       },
@@ -151,7 +164,7 @@ export function createApiServerApp({ basePath = `/api/update_jobs`, authenticato
   return app;
 }
 
-export type LocalDependabotServerOptions = Omit<CreateApiServerAppOptions, 'handle'> & {
+export type LocalDependabotServerOptions = Omit<CreateApiServerAppOptions, 'authenticate' | 'handle'> & {
   author: GitAuthor;
   debug: boolean;
   dryRun: boolean;
@@ -174,10 +187,19 @@ export abstract class LocalDependabotServer {
   constructor(options: LocalDependabotServerOptions) {
     const app = createApiServerApp({
       ...options,
-      authenticator: this.authenticate.bind(this),
+      authenticate: this.authenticate.bind(this),
       handle: this.handle.bind(this),
     });
-    this.server = createAdaptorServer(app);
+    this.server = createAdaptorServer({
+      ...app,
+      // Workaround for hono not respecting x-forwarded-proto header
+      // https://github.com/honojs/node-server/issues/146#issuecomment-3153435672
+      fetch: (req) => {
+        const url = new URL(req.url);
+        url.protocol = req.headers.get('x-forwarded-proto') ?? url.protocol;
+        return app.fetch(new Request(url, req));
+      },
+    });
 
     this.author = options.author;
     this.debug = options.debug;

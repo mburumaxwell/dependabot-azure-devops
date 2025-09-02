@@ -122,6 +122,10 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     await authorClient.getUserId(),
   );
 
+  // The API urls is constant when working in this CLI. Asking people to setup NGROK or similar
+  // just to get HTTPS for the job token to be used is too much hassle.
+  const dependabotApiUrl = `http://host.docker.internal:${port}/api`;
+
   // Prepare local server if we are not in generate-only mode
   let server: AzureLocalDependabotServer | undefined = undefined;
   if (!generateOnly) {
@@ -222,10 +226,9 @@ async function handler({ options, error }: HandlerOptions<Options>) {
         jobId: operation.job.id!,
         jobToken,
         credentialsToken: gitToken,
-        // using host.docker.internal for dependabotApiUrl instead of server.url
-        // so as to capture /record_metrics calls
-        dependabotApiUrl: `http://host.docker.internal:${port}/api`,
-        dependabotApiDockerUrl: `http://host.docker.internal:${port}/api`,
+        // using same value for dependabotApiUrl and dependabotApiDockerUrl so as to capture /record_metrics calls
+        dependabotApiUrl,
+        dependabotApiDockerUrl: dependabotApiUrl,
         updaterImage: undefined,
         workingDirectory,
       })!;
