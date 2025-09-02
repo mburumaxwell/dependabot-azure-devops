@@ -241,7 +241,13 @@ export abstract class LocalDependabotServer {
     return this.jobs.get(id);
   }
 
-  protected async authenticate(id: number, value: string) {
+  /**
+   * Authenticates a dependabot job.
+   * @param id - The ID of the dependabot job.
+   * @param value - The authentication value (e.g., API key).
+   * @returns A promise that resolves to a boolean indicating whether the authentication was successful.
+   */
+  protected async authenticate(id: number, value: string): Promise<boolean> {
     const job = this.jobs.get(id);
     if (!job) {
       logger.debug(`Authentication failed: job ${id} not found`);
