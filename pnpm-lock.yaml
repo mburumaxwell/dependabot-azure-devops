@@ -135,12 +135,6 @@ importers:
 
   extensions/azure:
     dependencies:
-      axios:
-        specifier: 1.11.0
-        version: 1.11.0
-      azure-devops-node-api:
-        specifier: 15.1.1
-        version: 15.1.1
       azure-pipelines-task-lib:
         specifier: 5.2.1
         version: 5.2.1

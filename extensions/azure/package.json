@@ -32,8 +32,6 @@
   },
   "homepage": "https://github.com/mburumaxwell/dependabot-azure-devops#readme",
   "dependencies": {
-    "axios": "1.11.0",
-    "azure-devops-node-api": "15.1.1",
     "azure-pipelines-task-lib": "5.2.1",
     "js-yaml": "4.1.0",
     "paklo": "workspace:*",
