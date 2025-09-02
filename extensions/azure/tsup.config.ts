@@ -8,7 +8,8 @@ const base: Options = {
   clean: true,
   dts: true, // required to make watch work
   sourcemap: true,
-  noExternal: [/./], // ⬅️ bundle everything
+  noExternal: [/^(?!cpu-features|ssh2|dockerode).*$/], // ⬅️ bundle everything everything except native modules
+  external: ['cpu-features', 'ssh2', 'dockerode'],
 };
 
 export default defineConfig([
