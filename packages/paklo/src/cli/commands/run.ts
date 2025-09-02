@@ -28,6 +28,7 @@ import {
   Updater,
   updaterImageName,
   type DependabotOperation,
+  type DependabotUpdate,
   type MetricReporter,
 } from '@/dependabot';
 import { type SecurityVulnerability } from '@/github';
@@ -50,9 +51,10 @@ const schema = z.object({
   autoApproveToken: z.string().optional(),
   setAutoComplete: z.boolean(),
   mergeStrategy: z.enum(MERGE_STRATEGIES),
-  autoCompleteIgnoreConfigIds: z.array(z.number()),
+  autoCompleteIgnoreConfigIds: z.coerce.number().array(),
   authorName: z.string(),
   authorEmail: z.email(),
+  targetUpdateIds: z.coerce.number().array(),
   debug: z.boolean(),
   dryRun: z.boolean(),
 });
@@ -77,6 +79,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     autoCompleteIgnoreConfigIds,
     authorName,
     authorEmail,
+    targetUpdateIds,
     debug,
     dryRun,
   } = options;
@@ -149,9 +152,29 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 
+  // If update identifiers are specified, select them; otherwise handle all
+  let dependabotUpdatesToPerform: DependabotUpdate[] = [];
+  if (targetUpdateIds && targetUpdateIds.length > 0) {
+    for (const id of targetUpdateIds) {
+      const upd = config.updates[id];
+      if (!upd) {
+        logger.warn(
+          `
+          Unable to find target update id '${id}'.
+          This value should be a zero based index of the update in your config file.
+          Expected range: 0-${config.updates.length - 1}
+          `,
+        );
+      } else {
+        dependabotUpdatesToPerform.push(upd);
+      }
+    }
+  } else {
+    dependabotUpdatesToPerform = config.updates;
+  }
+
   try {
-    const updates = config.updates;
-    for (const update of updates) {
+    for (const update of dependabotUpdatesToPerform) {
       const packageEcosystem = update['package-ecosystem'];
       const packageManager = mapPackageEcosystemToPackageManager(packageEcosystem);
 
@@ -329,6 +352,7 @@ export const command = new Command('run')
   )
   .option('--author-name <AUTHOR-NAME>', 'Name to use for the git author.', DEPENDABOT_DEFAULT_AUTHOR_NAME)
   .option('--author-email <AUTHOR-EMAIL>', 'Email to use for the git author.', DEPENDABOT_DEFAULT_AUTHOR_EMAIL)
+  .option('--target-update-ids <TARGET-UPDATE-IDS...>', 'List of target update IDs to perform.', [])
   .option('--generate-only', 'Whether to only generate the job files without running it.', false)
   .option('--port <PORT>', 'Port to run the API server on.', '3000')
   .option('--debug', 'Whether to enable debug logging.', false)
