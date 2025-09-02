@@ -1,4 +1,3 @@
-import { VersionControlChangeType } from 'azure-devops-node-api/interfaces/GitInterfaces';
 import * as path from 'path';
 
 import {
@@ -17,6 +16,7 @@ import {
   type IFileChange,
   type IPullRequestProperties,
 } from './models';
+import { VersionControlChangeType } from './types';
 
 export function normalizeFilePath(path: string): string {
   // Convert backslashes to forward slashes, convert './' => '/' and ensure the path starts with a forward slash if it doesn't already, this is how DevOps paths are formatted

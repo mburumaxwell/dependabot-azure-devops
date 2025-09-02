@@ -1,12 +1,4 @@
 import { WebApi, getPersonalAccessTokenHandler } from 'azure-devops-node-api';
-import {
-  CommentThreadStatus,
-  CommentType,
-  ItemContentType,
-  PullRequestAsyncStatus,
-  PullRequestStatus,
-  type IdentityRefWithVote,
-} from 'azure-devops-node-api/interfaces/GitInterfaces';
 import { type IHttpClientResponse } from 'typed-rest-client/Interfaces';
 
 import { logger } from './logger';
@@ -18,6 +10,14 @@ import {
   type IPullRequestProperties,
   type IUpdatePullRequest,
 } from './models';
+import {
+  CommentThreadStatus,
+  CommentType,
+  ItemContentType,
+  PullRequestAsyncStatus,
+  PullRequestStatus,
+  type IdentityRefWithVote,
+} from './types';
 import { type AzureDevOpsUrl } from './url-parts';
 import { normalizeBranchName, normalizeFilePath } from './utils';
 

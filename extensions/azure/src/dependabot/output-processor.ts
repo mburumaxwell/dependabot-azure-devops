@@ -1,4 +1,3 @@
-import { GitPullRequestMergeStrategy } from 'azure-devops-node-api/interfaces/GitInterfaces';
 import { debug, error, warning } from 'azure-pipelines-task-lib/task';
 import {
   buildPullRequestProperties,
@@ -7,6 +6,7 @@ import {
   getPullRequestDependenciesPropertyValueForOutputData,
   getPullRequestDescription,
   getPullRequestForDependencyNames,
+  GitPullRequestMergeStrategy,
   parsePullRequestProperties,
   type AzureDevOpsWebApiClient,
   type IPullRequestProperties,

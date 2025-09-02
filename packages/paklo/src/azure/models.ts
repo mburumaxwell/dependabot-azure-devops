@@ -1,5 +1,4 @@
-import { type GitPullRequestMergeStrategy } from 'azure-devops-node-api/interfaces/GitInterfaces';
-import { type VersionControlChangeType } from 'azure-devops-node-api/interfaces/TfvcInterfaces';
+import { type GitPullRequestMergeStrategy, type VersionControlChangeType } from './types';
 
 /**
  * Pull request property names used to store metadata about the pull request.

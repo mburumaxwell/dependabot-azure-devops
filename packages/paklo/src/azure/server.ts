@@ -5,10 +5,10 @@ import {
   type DependabotRequestHandleResult,
   type LocalDependabotServerOptions,
 } from '@/dependabot';
-import { GitPullRequestMergeStrategy } from 'azure-devops-node-api/interfaces/GitInterfaces';
 import { type AzureDevOpsWebApiClient } from './client';
 import { logger } from './logger';
 import { type IPullRequestProperties } from './models';
+import { GitPullRequestMergeStrategy } from './types';
 import type { AzureDevOpsUrl } from './url-parts';
 import {
   buildPullRequestProperties,
