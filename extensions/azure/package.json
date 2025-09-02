@@ -4,12 +4,12 @@
   "description": "Dependabot Azure DevOps task",
   "private": true,
   "scripts": {
-    "dev": "tsup --watch",
+    "dev": "tsc --watch",
     "prebuild": "tsc",
-    "build": "tsup",
+    "build": "ncc build src/task-v1.ts -o tasks/dependabotV1/dist --target es2022 --source-map && ncc build src/task-v2.ts -o tasks/dependabotV2/dist --target es2022 --source-map",
     "start": "pnpm start:V2",
-    "start:V1": "node tasks/dependabotV1/dist/task-v1.js",
-    "start:V2": "node tasks/dependabotV2/dist/task-v2.js",
+    "start:V1": "node tasks/dependabotV1/dist/index.js",
+    "start:V2": "node tasks/dependabotV2/dist/index.js",
     "lint": "eslint .",
     "test": "vitest",
     "clean": "rimraf .turbo dist tasks/dependabotV1/dist tasks/dependabotV2/dist",
@@ -43,6 +43,7 @@
     "@types/node": "24.3.0",
     "@types/q": "1.5.8",
     "@types/semver": "7.7.0",
+    "@vercel/ncc": "0.38.1",
     "tfx-cli": "0.22.0"
   }
 }

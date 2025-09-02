@@ -163,6 +163,9 @@ importers:
       '@types/semver':
         specifier: 7.7.0
         version: 7.7.0
+      '@vercel/ncc':
+        specifier: 0.38.1
+        version: 0.38.1
       tfx-cli:
         specifier: 0.22.0
         version: 0.22.0
@@ -1712,6 +1715,10 @@ packages:
         optional: true
       vue-router:
         optional: true
+
+  '@vercel/ncc@0.38.1':
+    resolution: {integrity: sha512-IBBb+iI2NLu4VQn3Vwldyi2QwaXt5+hTyh58ggAMoCGE6DJmPvwL3KPBWcJl1m9LYPChBLE980Jw+CS4Wokqxw==}
+    hasBin: true
 
   '@vercel/speed-insights@1.2.0':
     resolution: {integrity: sha512-y9GVzrUJ2xmgtQlzFP2KhVRoCglwfRQgjyfY607aU0hh0Un6d0OUyrJkjuAlsV18qR4zfoFPs/BiIj9YDS6Wzw==}
@@ -6299,6 +6306,8 @@ snapshots:
     optionalDependencies:
       next: 15.5.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       react: 19.1.1
+
+  '@vercel/ncc@0.38.1': {}
 
   '@vercel/speed-insights@1.2.0(next@15.5.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1)':
     optionalDependencies:

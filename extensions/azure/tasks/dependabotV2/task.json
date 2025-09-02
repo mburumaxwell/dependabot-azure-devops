@@ -257,12 +257,7 @@
   ],
   "execution": {
     "Node20_1": {
-      "target": "dist/task-v2.js"
-    }
-  },
-  "prejobexecution": {
-    "Node20_1": {
-      "target": "dist/task-v2-pre.js"
+      "target": "dist/index.js"
     }
   }
 }

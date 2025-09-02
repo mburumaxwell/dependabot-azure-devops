@@ -130,6 +130,7 @@ updates:
         patterns:
           - '@vercel/*'
           - 'vercel'
+        exclude-patterns: ['@vercel/ncc']
       tailwind:
         patterns:
           - 'tailwindcss'
