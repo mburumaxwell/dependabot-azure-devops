@@ -135,6 +135,9 @@ importers:
 
   extensions/azure:
     dependencies:
+      azure-devops-node-api:
+        specifier: 15.1.1
+        version: 15.1.1
       azure-pipelines-task-lib:
         specifier: 5.2.1
         version: 5.2.1
