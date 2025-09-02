@@ -1,4 +1,4 @@
-import * as http from 'http';
+import type * as http from 'http';
 
 /**
  * Local types to replace nested imports from azure-devops-node-api and typed-rest-client
