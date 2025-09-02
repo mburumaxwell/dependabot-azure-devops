@@ -1,7 +1,6 @@
 import { createAdaptorServer } from '@hono/node-server';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { bearerAuth } from 'hono/bearer-auth';
 import { type AddressInfo } from 'node:net';
 import { z, type ZodType } from 'zod/v4';
 
@@ -54,6 +53,14 @@ export const DependabotRequestSchema = z.discriminatedUnion('type', [
 export type DependabotRequest = z.infer<typeof DependabotRequestSchema>;
 
 /**
+ * Function type for authenticating requests.
+ * @param id - The ID of the dependabot job.
+ * @param value - The authentication value (e.g., API key).
+ * @returns A promise that resolves to a boolean indicating whether the authentication was successful.
+ */
+type AuthenticatorFunc = (id: number, value: string) => Promise<boolean>;
+
+/**
  * Handler function for processing dependabot requests.
  * @param id - The ID of the dependabot job.
  * @param request - The dependabot request to handle.
@@ -68,11 +75,8 @@ export type CreateApiServerAppOptions = {
    */
   basePath?: string;
 
-  /**
-   * Optional API key for protecting the endpoints
-   * Do not specify this if you are using the dependabot CLI as it does not support API keys.
-   */
-  apiKey?: string;
+  /** Handle function for authenticating requests */
+  authenticator?: AuthenticatorFunc;
 
   /** Handler function for processing the operations */
   handle: HandlerFunc;
@@ -90,11 +94,9 @@ export type CreateApiServerAppOptions = {
  * @param params - The parameters for creating the API server application.
  * @returns The created API server application.
  */
-export function createApiServerApp({ basePath = `/api/update_jobs`, apiKey, handle }: CreateApiServerAppOptions): Hono {
+export function createApiServerApp({ basePath = `/api/update_jobs`, authenticator, handle }: CreateApiServerAppOptions): Hono {
   // Setup app with base path and middleware
   const app = new Hono().basePath(basePath);
-  // TODO: apiKey should not be optional once we move away from dependabot CLI
-  if (apiKey) app.use('/*', bearerAuth({ token: apiKey, prefix: '' /* empty means no prefix expected */ }));
 
   // Handle endpoints:
   // - POST request to /create_pull_request
@@ -113,6 +115,16 @@ export function createApiServerApp({ basePath = `/api/update_jobs`, apiKey, hand
       method || 'post',
       `/:id/${type}`,
       zValidator('param', z.object({ id: z.coerce.number() })),
+      async (context, next) => {
+        if (authenticator) {
+          const { id } = context.req.valid('param');
+          const value = context.req.header('Authorization');
+          if (!value) return context.body(null, 401);
+          const valid = await authenticator(id, value);
+          if (!valid) return context.body(null, 403);
+        }
+        await next();
+      },
       zValidator('json', z.object({ data: schema })),
       async (context) => {
         const { id } = context.req.valid('param');
@@ -152,7 +164,7 @@ export type DependabotRequestHandleResult = {
 export abstract class LocalDependabotServer {
   private readonly hostname = 'localhost';
   private readonly server: ReturnType<typeof createAdaptorServer>;
-  private readonly jobs = new Map<number, DependabotInput & { update: DependabotUpdate }>();
+  private readonly jobs = new Map<number, DependabotInput & { update: DependabotUpdate; token: string }>();
 
   protected readonly createdPullRequestIds: number[] = [];
   protected readonly author: LocalDependabotServerOptions['author'];
@@ -162,6 +174,7 @@ export abstract class LocalDependabotServer {
   constructor(options: LocalDependabotServerOptions) {
     const app = createApiServerApp({
       ...options,
+      authenticator: this.authenticate.bind(this),
       handle: this.handle.bind(this),
     });
     this.server = createAdaptorServer(app);
@@ -204,6 +217,19 @@ export abstract class LocalDependabotServer {
    */
   getJob(id: number) {
     return this.jobs.get(id);
+  }
+
+  protected async authenticate(id: number, value: string) {
+    const job = this.jobs.get(id);
+    if (!job) {
+      logger.debug(`Authentication failed: job ${id} not found`);
+      return false;
+    }
+    if (job.token !== value) {
+      logger.debug(`Authentication failed: invalid token for job ${id}`);
+      return false;
+    }
+    return true;
   }
 
   /**

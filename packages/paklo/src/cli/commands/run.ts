@@ -126,7 +126,6 @@ async function handler({ options, error }: HandlerOptions<Options>) {
   let server: AzureLocalDependabotServer | undefined = undefined;
   if (!generateOnly) {
     const serverOptions: AzureLocalDependabotServerOptions = {
-      apiKey: jobToken,
       url,
       authorClient,
       autoApprove,
