@@ -111,6 +111,14 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     `Configuration file valid: ${config.updates.length} update(s) and ${config.registries?.length ?? 'no'} registries.`,
   );
 
+  // Print a warning about the required workarounds for security-only updates, if any update is configured as such
+  // TODO: If and when Dependabot supports a better way to do security-only updates, remove this.
+  if (config.updates?.some((u) => u['open-pull-requests-limit'] === 0)) {
+    logger.warn(
+      'Security-only updates incur a slight performance overhead due to limitations in Dependabot CLI. For more info, see: https://github.com/mburumaxwell/dependabot-azure-devops/blob/main/README.md#configuring-security-advisories-and-known-vulnerabilities',
+    );
+  }
+
   // Initialise the DevOps API clients (one for authoring the other for auto-approving (if configured))
   const authorClient = new AzureDevOpsWebApiClient(url, gitToken, debug);
   const approverClient = autoApprove
