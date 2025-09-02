@@ -1,4 +1,3 @@
-import axios from 'axios';
 import * as semver from 'semver';
 import { z } from 'zod/v4';
 
@@ -193,28 +192,27 @@ export class GitHubGraphClient {
           ecosystem: packageEcosystem,
           package: pkg.name,
         };
-        const response = await axios.post(
-          GHSA_GRAPHQL_API,
-          JSON.stringify({
+        const response = await fetch(GHSA_GRAPHQL_API, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
             query: GHSA_SECURITY_VULNERABILITIES_QUERY,
             variables: variables,
           }),
-          {
-            headers: {
-              'Authorization': `Bearer ${this.accessToken}`,
-              'Content-Type': 'application/json',
-            },
-          },
-        );
-        if (response.status < 200 || response.status > 299) {
+        });
+        if (!response.ok) {
           throw new Error(`GHSA GraphQL request failed with response: ${response.status} ${response.statusText}`);
         }
-        const errors = response.data?.errors;
+        const responseData = await response.json();
+        const errors = responseData?.errors;
         if (errors) {
           throw new Error(`GHSA GraphQL request failed with errors: ${JSON.stringify(errors)}`);
         }
 
-        const vulnerabilities = response.data?.data?.securityVulnerabilities?.nodes;
+        const vulnerabilities = responseData?.data?.securityVulnerabilities?.nodes;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return vulnerabilities?.filter((v: any) => v?.advisory)?.map((v: any) => ({ package: pkg, ...v }));
       },

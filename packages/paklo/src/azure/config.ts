@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import * as path from 'path';
@@ -62,33 +61,29 @@ export async function getDependabotConfig({
       logger.debug(`GET ${requestUrl}`);
 
       try {
-        const response = await axios.get(requestUrl, {
-          auth: {
-            username: 'x-access-token',
-            password: token,
-          },
+        const authHeader = 'Basic ' + Buffer.from(`x-access-token:${token}`).toString('base64');
+        const response = await fetch(requestUrl, {
           headers: {
+            Authorization: authHeader,
             Accept: '*/*', // Gotcha!!! without this SH*T fails terribly
           },
         });
-        if (response.status === 200) {
+        if (response.ok) {
           logger.debug(`Found configuration file at '${requestUrl}'`);
-          configContents = response.data;
+          configContents = await response.text();
           configPath = fp;
           break;
+        } else if (response.status === 404) {
+          logger.trace(`No configuration file at '${requestUrl}'`);
+          continue;
+        } else if (response.status === 401) {
+          throw new Error(`No or invalid access token has been provided to access '${requestUrl}'`);
+        } else if (response.status === 403) {
+          throw new Error(`The access token provided does not have permissions to access '${requestUrl}'`);
         }
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          const responseStatusCode = error?.response?.status;
-
-          if (responseStatusCode === 404) {
-            logger.trace(`No configuration file at '${requestUrl}'`);
-            continue;
-          } else if (responseStatusCode === 401) {
-            throw new Error(`No or invalid access token has been provided to access '${requestUrl}'`);
-          } else if (responseStatusCode === 403) {
-            throw new Error(`The access token provided does not have permissions to access '${requestUrl}'`);
-          }
+        if (error instanceof Error && error.message.includes('access token')) {
+          throw error;
         } else {
           throw error;
         }
