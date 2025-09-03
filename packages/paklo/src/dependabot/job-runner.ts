@@ -18,6 +18,7 @@ export type JobRunnerOptions = {
   jobToken: string;
   credentialsToken: string;
 };
+
 export class JobRunner {
   private readonly options: JobRunnerOptions;
 
@@ -49,6 +50,7 @@ export class JobRunner {
     // The sendMetrics function is used to send metrics to the API client.
     // It uses the package manager as a tag to identify the metric.
     const sendMetricsWithPackageManager: MetricReporter = async (name, metricType, value, additionalTags = {}) => {
+      // TODO: implement this
       logger.debug(`Metric: ${name}=${value} (${metricType}) [${JSON.stringify(additionalTags)}]`);
       // try {
       //   await apiClient.sendMetrics(name, metricType, value, {
@@ -85,4 +87,37 @@ export class JobRunner {
       }
     }
   }
+}
+
+export type RunJobResult = { success: true; message?: string } | { success: false; message: string };
+
+export async function runJob({
+  outDir,
+  dependabotApiUrl,
+  job,
+  jobToken,
+  credentialsToken,
+  credentials,
+}: {
+  outDir: string;
+  dependabotApiUrl: string;
+  job: DependabotJobConfig;
+  jobToken: string;
+  credentialsToken: string;
+  credentials: DependabotCredential[];
+}): Promise<RunJobResult> {
+  try {
+    const runner = new JobRunner({ dependabotApiUrl, job, jobToken, credentialsToken });
+    await runner.run({ outDir, credentials });
+  } catch (err) {
+    if (err instanceof JobRunnerImagingError) {
+      return { success: false, message: `Error fetching updater images: ${err.message}` };
+    } else if (err instanceof JobRunnerUpdaterError) {
+      return { success: false, message: `Error running updater: ${err.message}` };
+    } else {
+      return { success: false, message: `Unknown error: ${(err as Error).message}` };
+    }
+  }
+  logger.info(`Update job ${job.id} completed`);
+  return { success: true };
 }

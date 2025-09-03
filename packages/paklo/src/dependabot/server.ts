@@ -185,9 +185,6 @@ export abstract class LocalDependabotServer {
   private readonly receivedRequests = new Map<number, DependabotRequest[]>();
 
   protected readonly createdPullRequestIds: number[] = []; // TODO: not sure if we really need this or it should be a Map
-  protected readonly author: LocalDependabotServerOptions['author'];
-  protected readonly debug: LocalDependabotServerOptions['debug'];
-  protected readonly dryRun: LocalDependabotServerOptions['dryRun'];
 
   constructor(options: LocalDependabotServerOptions) {
     const app = createApiServerApp({
@@ -205,10 +202,6 @@ export abstract class LocalDependabotServer {
         return app.fetch(new Request(url, req));
       },
     });
-
-    this.author = options.author;
-    this.debug = options.debug;
-    this.dryRun = options.dryRun;
   }
 
   start(port: number) {
@@ -250,11 +243,12 @@ export abstract class LocalDependabotServer {
     credentialsToken: string;
   }) {
     const { id, update, job, jobToken, credentialsToken } = value;
-    this.trackedJobs.set(id, job);
-    this.updates.set(id, update);
-    this.jobTokens.set(id, jobToken);
-    this.credentialTokens.set(id, credentialsToken);
-    this.receivedRequests.set(id, []);
+    const { trackedJobs, updates, jobTokens, credentialTokens, receivedRequests } = this;
+    trackedJobs.set(id, job);
+    updates.set(id, update);
+    jobTokens.set(id, jobToken);
+    credentialTokens.set(id, credentialsToken);
+    receivedRequests.set(id, []);
   }
 
   /**

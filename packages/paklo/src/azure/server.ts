@@ -33,32 +33,33 @@ export type AzureLocalDependabotServerOptions = LocalDependabotServerOptions & {
 };
 
 export class AzureLocalDependabotServer extends LocalDependabotServer {
-  private readonly projectUrl: AzureLocalDependabotServerOptions['url'];
-  private readonly authorClient: AzureLocalDependabotServerOptions['authorClient'];
-  private readonly autoApprove: AzureLocalDependabotServerOptions['autoApprove'];
-  private readonly approverClient: AzureLocalDependabotServerOptions['approverClient'];
-  private readonly setAutoComplete: AzureLocalDependabotServerOptions['setAutoComplete'];
-  private readonly mergeStrategy: AzureLocalDependabotServerOptions['mergeStrategy'];
-  private readonly autoCompleteIgnoreConfigIds: AzureLocalDependabotServerOptions['autoCompleteIgnoreConfigIds'];
-  private readonly existingBranchNames: AzureLocalDependabotServerOptions['existingBranchNames'];
-  private readonly existingPullRequests: AzureLocalDependabotServerOptions['existingPullRequests'];
+  private readonly options: AzureLocalDependabotServerOptions;
 
   constructor(options: AzureLocalDependabotServerOptions) {
     super(options);
-
-    this.projectUrl = options.url;
-    this.authorClient = options.authorClient;
-    this.autoApprove = options.autoApprove;
-    this.approverClient = options.approverClient;
-    this.setAutoComplete = options.setAutoComplete;
-    this.mergeStrategy = options.mergeStrategy;
-    this.autoCompleteIgnoreConfigIds = options.autoCompleteIgnoreConfigIds;
-    this.existingBranchNames = options.existingBranchNames;
-    this.existingPullRequests = options.existingPullRequests;
+    this.options = options;
   }
 
   protected async handle(id: number, request: DependabotRequest): Promise<DependabotRequestHandleResult> {
     await super.handle(id, request); // common logic
+
+    const {
+      options: {
+        url,
+        authorClient,
+        approverClient,
+        existingBranchNames,
+        existingPullRequests,
+        autoApprove,
+        mergeStrategy,
+        setAutoComplete,
+        autoCompleteIgnoreConfigIds,
+        author,
+        debug,
+        dryRun,
+      },
+      createdPullRequestIds,
+    } = this;
 
     const { type, data } = request;
     const job = this.job(id);
@@ -68,12 +69,12 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
     }
     const { ['package-manager']: packageManager } = job;
     logger.info(`Processing '${type}' for job ID '${id}'`);
-    if (this.debug) {
+    if (debug) {
       logger.debug(JSON.stringify(data));
     }
 
     const update = this.update(id)!; // exists because job exists
-    const { project, repository } = this.projectUrl;
+    const { project, repository } = url;
 
     switch (type) {
       // Documentation on the 'data' model for each output type can be found here:
@@ -81,7 +82,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
 
       case 'create_pull_request': {
         const title = data['pr-title'];
-        if (this.dryRun) {
+        if (dryRun) {
           logger.warn(`Skipping pull request creation of '${title}' as 'dryRun' is set to 'true'`);
           return { success: true };
         }
@@ -91,12 +92,9 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
 
         // Parse the Dependabot metadata for the existing pull requests that are related to this update
         // Dependabot will use this to determine if we need to create new pull requests or update/close existing ones
-        const existingPullRequestsForPackageManager = parsePullRequestProperties(
-          this.existingPullRequests,
-          packageManager,
-        );
+        const existingPullRequestsForPackageManager = parsePullRequestProperties(existingPullRequests, packageManager);
         const existingPullRequestsCount = Object.entries(existingPullRequestsForPackageManager).length;
-        const openPullRequestsCount = this.createdPullRequestIds.length + existingPullRequestsCount;
+        const openPullRequestsCount = createdPullRequestIds.length + existingPullRequestsCount;
         const hasReachedOpenPullRequestLimit =
           openPullRequestsLimit > 0 && openPullRequestsCount >= openPullRequestsLimit;
 
@@ -109,7 +107,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
 
         const changedFiles = getPullRequestChangedFilesForOutputData(data);
         const dependencies = getPullRequestDependenciesPropertyValueForOutputData(data);
-        const targetBranch = update['target-branch'] || (await this.authorClient.getDefaultBranch(project, repository));
+        const targetBranch = update['target-branch'] || (await authorClient.getDefaultBranch(project, repository));
         const sourceBranch = getBranchNameForUpdate(
           update['package-ecosystem'],
           targetBranch,
@@ -120,14 +118,14 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         );
 
         // Check if the source branch already exists or conflicts with an existing branch
-        const existingBranch = this.existingBranchNames?.find((branch) => sourceBranch == branch) || [];
+        const existingBranch = existingBranchNames?.find((branch) => sourceBranch == branch) || [];
         if (existingBranch.length) {
           logger.error(
             `Unable to create pull request '${title}' as source branch '${sourceBranch}' already exists; Delete the existing branch and try again.`,
           );
           return { success: false };
         }
-        const conflictingBranches = this.existingBranchNames?.filter((branch) => sourceBranch.startsWith(branch)) || [];
+        const conflictingBranches = existingBranchNames?.filter((branch) => sourceBranch.startsWith(branch)) || [];
         if (conflictingBranches.length) {
           logger.error(
             `Unable to create pull request '${title}' as source branch '${sourceBranch}' would conflict with existing branch(es) '${conflictingBranches.join(', ')}'; Delete the conflicting branch(es) and try again.`,
@@ -136,7 +134,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         }
 
         // Create a new pull request
-        const newPullRequestId = await this.authorClient.createPullRequest({
+        const newPullRequestId = await authorClient.createPullRequest({
           project: project,
           repository: repository,
           source: {
@@ -146,15 +144,15 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           target: {
             branch: targetBranch!,
           },
-          author: this.author,
-          title: title,
+          author,
+          title,
           description: getPullRequestDescription(packageManager, data['pr-body'], data.dependencies),
           commitMessage: data['commit-message'],
-          autoComplete: this.setAutoComplete
+          autoComplete: setAutoComplete
             ? {
-                ignorePolicyConfigIds: this.autoCompleteIgnoreConfigIds,
+                ignorePolicyConfigIds: autoCompleteIgnoreConfigIds,
                 mergeStrategy: (() => {
-                  switch (this.mergeStrategy) {
+                  switch (mergeStrategy) {
                     case 'noFastForward':
                       return GitPullRequestMergeStrategy.NoFastForward;
                     case 'squash':
@@ -177,8 +175,8 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         });
 
         // Auto-approve the pull request, if required
-        if (this.autoApprove && this.approverClient && newPullRequestId) {
-          await this.approverClient.approvePullRequest({
+        if (autoApprove && approverClient && newPullRequestId) {
+          await approverClient.approvePullRequest({
             project: project,
             repository: repository,
             pullRequestId: newPullRequestId,
@@ -187,7 +185,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
 
         // Store the new pull request ID, so we can keep track of the total number of open pull requests
         if (newPullRequestId && newPullRequestId > 0) {
-          this.createdPullRequestIds.push(newPullRequestId);
+          createdPullRequestIds.push(newPullRequestId);
           return { success: true, pr: newPullRequestId };
         } else {
           return { success: false };
@@ -195,14 +193,14 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
       }
 
       case 'update_pull_request': {
-        if (this.dryRun) {
+        if (dryRun) {
           logger.warn(`Skipping pull request update as 'dryRun' is set to 'true'`);
           return { success: true };
         }
 
         // Find the pull request to update
         const pullRequestToUpdate = getPullRequestForDependencyNames(
-          this.existingPullRequests,
+          existingPullRequests,
           packageManager,
           data['dependency-names'],
         );
@@ -214,21 +212,21 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         }
 
         // Update the pull request
-        const pullRequestWasUpdated = await this.authorClient.updatePullRequest({
+        const pullRequestWasUpdated = await authorClient.updatePullRequest({
           project: project,
           repository: repository,
           pullRequestId: pullRequestToUpdate.id,
           commit: data['base-commit-sha'] || job.source.commit!,
-          author: this.author,
+          author,
           changes: getPullRequestChangedFilesForOutputData(data),
           skipIfDraft: true,
-          skipIfCommitsFromAuthorsOtherThan: this.author.email,
+          skipIfCommitsFromAuthorsOtherThan: author.email,
           skipIfNotBehindTargetBranch: true,
         });
 
         // Re-approve the pull request, if required
-        if (this.autoApprove && this.approverClient && pullRequestWasUpdated) {
-          await this.approverClient.approvePullRequest({
+        if (autoApprove && approverClient && pullRequestWasUpdated) {
+          await approverClient.approvePullRequest({
             project: project,
             repository: repository,
             pullRequestId: pullRequestToUpdate.id,
@@ -239,14 +237,14 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
       }
 
       case 'close_pull_request': {
-        if (this.dryRun) {
+        if (dryRun) {
           logger.warn(`Skipping pull request closure as 'dryRun' is set to 'true'`);
           return { success: true };
         }
 
         // Find the pull request to close
         const pullRequestToClose = getPullRequestForDependencyNames(
-          this.existingPullRequests,
+          existingPullRequests,
           packageManager,
           data['dependency-names'],
         );
@@ -261,7 +259,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         //       How do we detect this? Do we need to?
 
         // Close the pull request
-        const success = await this.authorClient.abandonPullRequest({
+        const success = await authorClient.abandonPullRequest({
           project: project,
           repository: repository,
           pullRequestId: pullRequestToClose.id,
