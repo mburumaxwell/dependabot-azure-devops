@@ -8,7 +8,7 @@
     "postinstall": "fumadocs-mdx",
     "build": "next build",
     "dev": "next dev --turbo",
-    "start": "next start",
+    "start": "next start --turbo",
     "lint": "eslint .",
     "test": "vitest",
     "clean": "rimraf .next .source out"
