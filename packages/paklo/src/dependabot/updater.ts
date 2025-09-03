@@ -10,7 +10,7 @@ import {
   type FileFetcherInput,
   type FileUpdaterInput,
 } from './job';
-import type { JobParameters } from './params';
+import { type JobParameters } from './params';
 import { ProxyBuilder, type Proxy } from './proxy';
 import { UpdaterBuilder } from './updater-builder';
 

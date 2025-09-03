@@ -7,6 +7,7 @@ export * from './experiments';
 export * from './image-service';
 export * from './job';
 export * from './job-builder';
+export * from './job-runner';
 export * from './params';
 export * from './placeholder';
 export * from './proxy';

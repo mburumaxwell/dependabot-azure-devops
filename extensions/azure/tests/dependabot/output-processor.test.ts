@@ -71,6 +71,10 @@ describe('DependabotOutputProcessor', () => {
           'update-subdependencies': false,
           'debug': false,
           'dependencies': [],
+          'security-advisories': [],
+          'security-updates-only': false,
+          'updating-a-pull-request': false,
+          "ignore-conditions": [],
         },
         credentials: [],
         update: {

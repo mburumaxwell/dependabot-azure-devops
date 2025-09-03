@@ -1,8 +1,6 @@
 import { Command, Option } from 'commander';
-import * as yaml from 'js-yaml';
 import { existsSync } from 'node:fs';
-import { mkdir, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { readFile } from 'node:fs/promises';
 import { stdin, stdout } from 'node:process';
 import readline from 'node:readline/promises';
 import { z } from 'zod/v4';
@@ -20,18 +18,23 @@ import {
   DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
   DEPENDABOT_DEFAULT_AUTHOR_NAME,
   DependabotJobBuilder,
-  getJobParameters,
-  ImageService,
+  JobRunner,
+  JobRunnerImagingError,
+  JobRunnerUpdaterError,
   makeRandomJobToken,
   mapPackageEcosystemToPackageManager,
-  PROXY_IMAGE_NAME,
-  Updater,
-  updaterImageName,
-  type DependabotOperation,
+  type DependabotCredential,
+  type DependabotJobConfig,
   type DependabotUpdate,
-  type MetricReporter,
 } from '@/dependabot';
-import { type SecurityVulnerability } from '@/github';
+import {
+  GitHubGraphClient,
+  SecurityVulnerabilitySchema,
+  filterVulnerabilities,
+  getGhsaPackageEcosystemFromDependabotPackageManager,
+  type Package,
+  type SecurityVulnerability,
+} from '@/github';
 import { logger } from '../logger';
 import { handlerOptions, type HandlerOptions } from './base';
 
@@ -45,8 +48,9 @@ const schema = z.object({
   pullRequestId: z.coerce.string().optional(),
   outDir: z.string(),
   jobToken: z.string().optional(),
-  generateOnly: z.boolean(),
+  credentialsToken: z.string().optional(),
   port: z.coerce.number().min(1).max(65535),
+  securityAdvisoriesFile: z.string().optional(),
   autoApprove: z.boolean(),
   autoApproveToken: z.string().optional(),
   setAutoComplete: z.boolean(),
@@ -69,9 +73,10 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     repository,
     pullRequestId,
     outDir,
-    jobToken = makeRandomJobToken(),
-    generateOnly,
+    jobToken: jobTokenOverride,
+    credentialsToken: credentialsTokenOverride,
     port,
+    securityAdvisoriesFile,
     autoApprove,
     autoApproveToken,
     setAutoComplete,
@@ -137,28 +142,25 @@ async function handler({ options, error }: HandlerOptions<Options>) {
   // just to get HTTPS for the job token to be used is too much hassle.
   const dependabotApiUrl = `http://host.docker.internal:${port}/api`;
 
-  // Prepare local server if we are not in generate-only mode
-  let server: AzureLocalDependabotServer | undefined = undefined;
-  if (!generateOnly) {
-    const serverOptions: AzureLocalDependabotServerOptions = {
-      url,
-      authorClient,
-      autoApprove,
-      approverClient,
-      setAutoComplete,
-      mergeStrategy,
-      autoCompleteIgnoreConfigIds,
-      existingBranchNames,
-      existingPullRequests,
-      author: { email: authorEmail, name: authorName },
-      debug,
-      dryRun,
-    };
-    server = new AzureLocalDependabotServer(serverOptions);
-    server.start(port);
-    // give the server a second to start
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-  }
+  // Prepare local server
+  const serverOptions: AzureLocalDependabotServerOptions = {
+    url,
+    authorClient,
+    autoApprove,
+    approverClient,
+    setAutoComplete,
+    mergeStrategy,
+    autoCompleteIgnoreConfigIds,
+    existingBranchNames,
+    existingPullRequests,
+    author: { email: authorEmail, name: authorName },
+    debug,
+    dryRun,
+  };
+  const server = new AzureLocalDependabotServer(serverOptions);
+  server.start(port);
+  // give the server a second to start
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   // If update identifiers are specified, select them; otherwise handle all
   let dependabotUpdatesToPerform: DependabotUpdate[] = [];
@@ -181,6 +183,13 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     dependabotUpdatesToPerform = config.updates;
   }
 
+  function makeTokens() {
+    return {
+      jobToken: jobTokenOverride ?? makeRandomJobToken(),
+      credentialsToken: credentialsTokenOverride ?? makeRandomJobToken(),
+    };
+  }
+
   try {
     for (const update of dependabotUpdatesToPerform) {
       const packageEcosystem = update['package-ecosystem'];
@@ -201,7 +210,10 @@ async function handler({ options, error }: HandlerOptions<Options>) {
         debug: false,
       });
 
-      let operation: DependabotOperation | undefined = undefined;
+      let job: DependabotJobConfig | undefined = undefined;
+      let credentials: DependabotCredential[] | undefined = undefined; // TODO: remove this to be handled by the ApiClient
+      let jobToken: string;
+      let credentialsToken: string;
 
       // If this is a security-only update (i.e. 'open-pull-requests-limit: 0'), then we first need to discover the dependencies
       // that need updating and check each one for vulnerabilities. This is because Dependabot requires the list of vulnerable dependencies
@@ -211,105 +223,117 @@ async function handler({ options, error }: HandlerOptions<Options>) {
       let dependencyNamesToUpdate: string[] = [];
       const securityUpdatesOnly = update['open-pull-requests-limit'] === 0;
       if (securityUpdatesOnly) {
-        operation = builder.forDependenciesList({});
-        // TODO: handle this
-        securityVulnerabilities = [];
-        dependencyNamesToUpdate = [];
-        error('Security only updates not yet implemented. Sorry');
-        return;
+        // Run an update job to discover all dependencies
+        ({ job, credentials } = builder.forDependenciesList({}));
+        ({ jobToken, credentialsToken } = makeTokens());
+        server.add({ id: job.id!, update, job, jobToken, credentialsToken });
+        try {
+          const runner = new JobRunner({ dependabotApiUrl, job, jobToken, credentialsToken });
+          await runner.run({
+            outDir,
+            credentials,
+          });
+        } catch (err) {
+          if (err instanceof JobRunnerImagingError) {
+            error(`Error fetching updater images: ${err.message}`);
+            return;
+          } else if (err instanceof JobRunnerUpdaterError) {
+            error(`Error running updater: ${err.message}`);
+            return;
+          }
+        }
+        logger.info(`Update job ${job.id} completed`);
+
+        const outputs = server.requests(job.id!);
+        const packagesToCheckForVulnerabilities: Package[] | undefined = outputs!
+          .find((o) => o.type == 'update_dependency_list')
+          ?.data.dependencies?.map((d) => ({ name: d.name, version: d.version }));
+        if (packagesToCheckForVulnerabilities?.length) {
+          logger.info(
+            `Detected ${packagesToCheckForVulnerabilities.length} dependencies; Checking for vulnerabilities...`,
+          );
+
+          // parse security advisories from file (private)
+          if (securityAdvisoriesFile) {
+            const filePath = securityAdvisoriesFile;
+            if (existsSync(filePath)) {
+              const fileContents = await readFile(filePath, 'utf-8');
+              securityVulnerabilities = await SecurityVulnerabilitySchema.array().parseAsync(JSON.parse(fileContents));
+            } else {
+              logger.info(`Private security advisories file '${filePath}' does not exist`);
+            }
+          }
+          if (githubToken) {
+            const ghsaClient = new GitHubGraphClient(githubToken);
+            const githubVulnerabilities = await ghsaClient.getSecurityVulnerabilitiesAsync(
+              getGhsaPackageEcosystemFromDependabotPackageManager(packageManager),
+              packagesToCheckForVulnerabilities || [],
+            );
+            securityVulnerabilities.push(...githubVulnerabilities);
+          } else {
+            logger.info(
+              'GitHub access token is not provided; Checking for vulnerabilities from GitHub is skipped. ' +
+                'This is not an issue if you are using private security advisories file.',
+            );
+          }
+
+          securityVulnerabilities = filterVulnerabilities(securityVulnerabilities);
+
+          // Only update dependencies that have vulnerabilities
+          dependencyNamesToUpdate = Array.from(new Set(securityVulnerabilities.map((v) => v.package.name)));
+          logger.info(
+            `Detected ${securityVulnerabilities.length} vulnerabilities affecting ${dependencyNamesToUpdate.length} dependencies`,
+          );
+          if (dependencyNamesToUpdate.length) {
+            logger.trace(dependencyNamesToUpdate);
+          }
+        } else {
+          logger.info(`No vulnerabilities detected for update ${update['package-ecosystem']} in ${update.directory}`);
+          server.clear(job.id!);
+          continue; // nothing more to do for this update
+        }
+
+        server.clear(job.id!);
       }
 
       if (pullRequestId) {
-        operation = builder.forUpdate({
+        ({ job, credentials } = builder.forUpdate({
           existingPullRequests: existingPullRequestDependenciesForPackageManager,
           pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
           securityVulnerabilities,
-        });
+        }));
       } else {
-        operation = builder.forUpdate({
+        ({ job, credentials } = builder.forUpdate({
           dependencyNamesToUpdate,
           existingPullRequests: existingPullRequestDependenciesForPackageManager,
           securityVulnerabilities,
-        });
-      }
-
-      // create working directory if it does not exist
-      const workingDirectory = join(outDir, `${operation.job.id}`);
-      if (!existsSync(workingDirectory)) await mkdir(workingDirectory, { recursive: true });
-
-      // if we only wanted to generate the files, save and continue to the next one
-      if (generateOnly) {
-        const contents = yaml.dump({
-          job: operation.job,
-          credentials: operation.credentials,
-        });
-        logger.trace(`JobConfig:\r\n${contents}`);
-        const jobDefinitionFilePath = join(workingDirectory, 'job.yaml');
-        await writeFile(jobDefinitionFilePath, contents);
-
-        continue;
+        }));
       }
 
       // add the job to the local server for tracking
-      server!.addJob({ ...operation, token: jobToken });
-
-      const params = getJobParameters({
-        jobId: operation.job.id!,
-        jobToken,
-        credentialsToken: gitToken,
-        // using same value for dependabotApiUrl and dependabotApiDockerUrl so as to capture /record_metrics calls
-        dependabotApiUrl,
-        dependabotApiDockerUrl: dependabotApiUrl,
-        updaterImage: undefined,
-        workingDirectory,
-      })!;
-      // The dynamic workflow can specify which updater image to use. If it doesn't, fall back to the pinned version.
-      const updaterImage = params.updaterImage || updaterImageName(operation.job['package-manager']);
-
-      // The sendMetrics function is used to send metrics to the API client.
-      // It uses the package manager as a tag to identify the metric.
-      const sendMetricsWithPackageManager: MetricReporter = async (name, metricType, value, additionalTags = {}) => {
-        logger.debug(`Metric: ${name}=${value} (${metricType}) [${JSON.stringify(additionalTags)}]`);
-        // try {
-        //   await apiClient.sendMetrics(name, metricType, value, {
-        //     package_manager: operation.job['package-manager'],
-        //     ...additionalTags
-        //   })
-        // } catch (error) {
-        //   logger.warn(
-        //     `Metric sending failed for ${name}: ${(error as Error).message}`
-        //   )
-        // }
-      };
-
-      const credentials = operation.credentials || [];
-
-      const updater = new Updater(updaterImage, PROXY_IMAGE_NAME, params, operation.job, credentials);
+      ({ jobToken, credentialsToken } = makeTokens());
+      server.add({ id: job.id!, update, job, jobToken, credentialsToken });
 
       try {
-        // Using sendMetricsWithPackageManager wrapper to inject package manager tag ti
-        // avoid passing additional parameters to ImageService.pull method
-        await ImageService.pull(updaterImage, sendMetricsWithPackageManager);
-        await ImageService.pull(PROXY_IMAGE_NAME, sendMetricsWithPackageManager);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          error('Error fetching updater images: ' + err.message);
+        const runner = new JobRunner({ dependabotApiUrl, job, jobToken, credentialsToken });
+        await runner.run({
+          outDir,
+          credentials,
+        });
+      } catch (err) {
+        if (err instanceof JobRunnerImagingError) {
+          error(`Error fetching updater images: ${err.message}`);
+          return;
+        } else if (err instanceof JobRunnerUpdaterError) {
+          error(`Error running updater: ${err.message}`);
           return;
         }
       }
-
-      try {
-        await updater.runUpdater();
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          error('Error running updater: ' + err.message);
-          return;
-        }
-      }
-      logger.info(`Update job ${operation.job.id} completed`);
+      logger.info(`Update job ${job.id} completed`);
+      server.clear(job.id!);
     }
   } finally {
-    server?.stop();
+    server.stop();
   }
 }
 
@@ -333,7 +357,11 @@ export const command = new Command('run')
   .option('--out-dir', 'Working directory.', 'work')
   .option(
     '--job-token <JOB-TOKEN>',
-    'Token to use for the job API calls. If not specified, a random token will be generated.',
+    'Token to use for the job API calls. If not specified, a random token will be generated. This should be used for testing only.',
+  )
+  .option(
+    '--credentials-token <CREDENTIALS-TOKEN>',
+    'Token to use for credentials API calls. If not specified, a random token will be generated. This should be used for testing only.',
   )
   .option('--auto-approve', 'Whether to automatically approve the pull request.', false)
   .option(
@@ -361,7 +389,7 @@ export const command = new Command('run')
   .option('--author-name <AUTHOR-NAME>', 'Name to use for the git author.', DEPENDABOT_DEFAULT_AUTHOR_NAME)
   .option('--author-email <AUTHOR-EMAIL>', 'Email to use for the git author.', DEPENDABOT_DEFAULT_AUTHOR_EMAIL)
   .option('--target-update-ids <TARGET-UPDATE-IDS...>', 'List of target update IDs to perform.', [])
-  .option('--generate-only', 'Whether to only generate the job files without running it.', false)
+  .option('--security-advisories-file <SECURITY-ADVISORIES-FILE>', 'Path to private security advisories file.')
   .option('--port <PORT>', 'Port to run the API server on.', '3000')
   .option('--debug', 'Whether to enable debug logging.', false)
   .option('--dry-run', 'Whether to enable dry run mode.', false)

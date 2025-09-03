@@ -14,6 +14,8 @@ import {
   DependabotUpdatePullRequestSchema,
 } from './update';
 
+// TODO: reconsider if we need all these once we stop using dependabot-cli
+
 export const DependabotInputSchema = z.object({
   job: DependabotJobConfigSchema,
   credentials: DependabotCredentialSchema.array(),

@@ -1,6 +1,10 @@
 input:
   job:
     package-manager: nuget
+    updating-a-pull-request: false
+    security-updates-only: false
+    security-advisories: []
+    ignore-conditions: []
     allowed-updates:
       - dependency-type: direct
         update-type: all

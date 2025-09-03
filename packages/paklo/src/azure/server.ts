@@ -9,7 +9,7 @@ import { type AzureDevOpsWebApiClient } from './client';
 import { logger } from './logger';
 import { type IPullRequestProperties } from './models';
 import { GitPullRequestMergeStrategy } from './types';
-import type { AzureDevOpsUrl } from './url-parts';
+import { type AzureDevOpsUrl } from './url-parts';
 import {
   buildPullRequestProperties,
   getPullRequestChangedFilesForOutputData,
@@ -58,18 +58,21 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
   }
 
   protected async handle(id: number, request: DependabotRequest): Promise<DependabotRequestHandleResult> {
+    super.handle(id, request); // common logic
+
     const { type, data } = request;
-    const operation = this.getJob(id);
-    if (!operation) {
+    const job = this.job(id);
+    if (!job) {
       logger.error(`No job found for ID '${id}', cannot process request of type '${type}'`);
       return { success: false };
     }
-    const { ['package-manager']: packageManager } = operation.job;
+    const { ['package-manager']: packageManager } = job;
     logger.info(`Processing '${type}' for job ID '${id}'`);
     if (this.debug) {
       logger.debug(JSON.stringify(data));
     }
 
+    const update = this.update(id)!; // exists because job exists
     const { project, repository } = this.projectUrl;
 
     switch (type) {
@@ -84,7 +87,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         }
 
         // Skip if active pull request limit reached.
-        const openPullRequestsLimit = operation.update['open-pull-requests-limit']!;
+        const openPullRequestsLimit = update['open-pull-requests-limit']!;
 
         // Parse the Dependabot metadata for the existing pull requests that are related to this update
         // Dependabot will use this to determine if we need to create new pull requests or update/close existing ones
@@ -106,16 +109,14 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
 
         const changedFiles = getPullRequestChangedFilesForOutputData(data);
         const dependencies = getPullRequestDependenciesPropertyValueForOutputData(data);
-        const targetBranch =
-          operation.update['target-branch'] || (await this.authorClient.getDefaultBranch(project, repository));
+        const targetBranch = update['target-branch'] || (await this.authorClient.getDefaultBranch(project, repository));
         const sourceBranch = getBranchNameForUpdate(
-          operation.update['package-ecosystem'],
+          update['package-ecosystem'],
           targetBranch,
-          operation.update.directory ||
-            operation.update.directories?.find((dir) => changedFiles[0]?.path?.startsWith(dir)),
+          update.directory || update.directories?.find((dir) => changedFiles[0]?.path?.startsWith(dir)),
           !Array.isArray(dependencies) ? dependencies['dependency-group-name'] : undefined,
           !Array.isArray(dependencies) ? dependencies.dependencies : dependencies,
-          operation.update['pull-request-branch-name']?.separator,
+          update['pull-request-branch-name']?.separator,
         );
 
         // Check if the source branch already exists or conflicts with an existing branch
@@ -139,7 +140,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           project: project,
           repository: repository,
           source: {
-            commit: data['base-commit-sha'] || operation.job.source.commit!,
+            commit: data['base-commit-sha'] || job.source.commit!,
             branch: sourceBranch,
           },
           target: {
@@ -168,9 +169,9 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
                 })(),
               }
             : undefined,
-          assignees: operation.update.assignees,
-          labels: operation.update.labels?.map((label) => label?.trim()) || [],
-          workItems: operation.update.milestone ? [operation.update.milestone] : [],
+          assignees: update.assignees,
+          labels: update.labels?.map((label) => label?.trim()) || [],
+          workItems: update.milestone ? [update.milestone] : [],
           changes: changedFiles,
           properties: buildPullRequestProperties(packageManager, dependencies),
         });
@@ -217,7 +218,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           project: project,
           repository: repository,
           pullRequestId: pullRequestToUpdate.id,
-          commit: data['base-commit-sha'] || operation.job.source.commit!,
+          commit: data['base-commit-sha'] || job.source.commit!,
           author: this.author,
           changes: getPullRequestChangedFilesForOutputData(data),
           skipIfDraft: true,

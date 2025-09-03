@@ -1,6 +1,9 @@
 input:
   job:
     package-manager: pip
+    updating-a-pull-request: false
+    security-updates-only: false
+    security-advisories: []
     dependencies: []
     update-subdependencies: false
     lockfile-only: false

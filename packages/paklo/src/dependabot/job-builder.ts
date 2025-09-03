@@ -31,6 +31,8 @@ export type DependabotSourceInfo = {
   'repository-slug': string;
 };
 
+// TODO: reconsider if we need all these types once we stop using dependabot-cli
+
 /** Represents a single Dependabot operation */
 export type DependabotOperation = DependabotInput & { update: DependabotUpdate };
 
@@ -102,9 +104,12 @@ export class DependabotJobBuilder {
       job: {
         'id': id ?? makeRandomJobId(),
         'package-manager': this.packageManager,
+        'updating-a-pull-request': false,
         'dependencies': null,
         'allowed-updates': [{ 'dependency-type': 'direct', 'update-type': 'all' }],
         'ignore-conditions': [{ 'dependency-name': '*' }],
+        'security-updates-only': false,
+        'security-advisories': [],
         'source': this.source,
         'update-subdependencies': false,
         'existing-pull-requests': [],
@@ -432,6 +437,7 @@ export function mapCredentials({
   return credentials;
 }
 
+// TODO: remove this because the updater does it
 export function makeCredentialsMetadata(credentials: DependabotCredential[]): DependabotCredential[] {
   const sensitive = ['username', 'token', 'password', 'key', 'auth-key'];
   return credentials.map((cred) =>

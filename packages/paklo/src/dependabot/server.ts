@@ -6,8 +6,9 @@ import { z, type ZodType } from 'zod/v4';
 
 import { type GitAuthor } from './author';
 import { type DependabotUpdate } from './config';
+import { type DependabotJobConfig } from './job';
 import { logger } from './logger';
-import { type DependabotInput, type DependabotOperationType } from './scenario';
+import { type DependabotOperationType } from './scenario';
 import {
   DependabotClosePullRequestSchema,
   DependabotCreatePullRequestSchema,
@@ -177,9 +178,13 @@ export type DependabotRequestHandleResult = {
 export abstract class LocalDependabotServer {
   private readonly hostname = 'localhost';
   private readonly server: ReturnType<typeof createAdaptorServer>;
-  private readonly jobs = new Map<number, DependabotInput & { update: DependabotUpdate; token: string }>();
+  private readonly trackedJobs = new Map<number, DependabotJobConfig>();
+  private readonly updates = new Map<number, DependabotUpdate>();
+  private readonly jobTokens = new Map<number, string>();
+  private readonly credentialTokens = new Map<number, string>();
+  private readonly receivedRequests = new Map<number, DependabotRequest[]>();
 
-  protected readonly createdPullRequestIds: number[] = [];
+  protected readonly createdPullRequestIds: number[] = []; // TODO: not sure if we really need this or it should be a Map
   protected readonly author: LocalDependabotServerOptions['author'];
   protected readonly debug: LocalDependabotServerOptions['debug'];
   protected readonly dryRun: LocalDependabotServerOptions['dryRun'];
@@ -224,12 +229,32 @@ export abstract class LocalDependabotServer {
     return `http://${this.hostname}:${info.port}`;
   }
 
+  get jobs() {
+    return this.trackedJobs;
+  }
+
   /**
    * Adds a dependabot job.
-   * @param value - The dependabot job to add.
+   * @param value - The dependabot job details.
    */
-  addJob(value: DependabotInput & { update: DependabotUpdate; token: string }) {
-    this.jobs.set(value.job.id!, value);
+  add(value: {
+    /** The ID of the dependabot job. */
+    id: number;
+    /** The dependabot update associated with the job. */
+    update: DependabotUpdate;
+    /** The dependabot job configuration. */
+    job: DependabotJobConfig;
+    /** The authentication token for the job. */
+    jobToken: string;
+    /** The authentication token for the job. */
+    credentialsToken: string;
+  }) {
+    const { id, update, job, jobToken, credentialsToken } = value;
+    this.trackedJobs.set(id, job);
+    this.updates.set(id, update);
+    this.jobTokens.set(id, jobToken);
+    this.credentialTokens.set(id, credentialsToken);
+    this.receivedRequests.set(id, []);
   }
 
   /**
@@ -237,8 +262,48 @@ export abstract class LocalDependabotServer {
    * @param id - The ID of the dependabot job to get.
    * @returns The dependabot job, or undefined if not found.
    */
-  getJob(id: number) {
-    return this.jobs.get(id);
+  job(id: number) {
+    return this.trackedJobs.get(id);
+  }
+
+  /**
+   * Gets a dependabot update by ID of the job.
+   * @param id - The ID of the dependabot job to get.
+   * @returns The dependabot update, or undefined if not found.
+   */
+  update(id: number): DependabotUpdate | undefined {
+    return this.updates.get(id);
+  }
+
+  /**
+   * Gets the job token by ID of the job.
+   * @param id - The ID of the dependabot job to get.
+   * @returns The job token, or undefined if not found.
+   */
+  token(id: number): string | undefined {
+    return this.jobTokens.get(id);
+  }
+
+  /**
+   * Gets the received requests for a dependabot job by ID.
+   * @param id - The ID of the dependabot job to get requests for.
+   * @returns The received requests for the job, or undefined if not found.
+   */
+  requests(id: number): DependabotRequest[] | undefined {
+    return this.receivedRequests.get(id);
+  }
+
+  /**
+   * Clears all data associated with a dependabot job by ID.
+   * This should be called when the job is no longer needed.
+   * @param id - The ID of the dependabot job to clear.
+   */
+  clear(id: number) {
+    this.trackedJobs.delete(id);
+    this.updates.delete(id);
+    this.jobTokens.delete(id);
+    this.credentialTokens.delete(id);
+    this.receivedRequests.delete(id);
   }
 
   /**
@@ -248,12 +313,12 @@ export abstract class LocalDependabotServer {
    * @returns A promise that resolves to a boolean indicating whether the authentication was successful.
    */
   protected async authenticate(id: number, value: string): Promise<boolean> {
-    const job = this.jobs.get(id);
-    if (!job) {
+    const token = this.jobTokens.get(id);
+    if (!token) {
       logger.debug(`Authentication failed: job ${id} not found`);
       return false;
     }
-    if (job.token !== value) {
+    if (token !== value) {
       logger.debug(`Authentication failed: invalid token for job ${id}`);
       return false;
     }
@@ -266,5 +331,8 @@ export abstract class LocalDependabotServer {
    * @param request - The dependabot request to handle.
    * @returns A promise that resolves to the result of handling the request.
    */
-  protected abstract handle(id: number, request: DependabotRequest): Promise<DependabotRequestHandleResult>;
+  protected handle(id: number, request: DependabotRequest): Promise<DependabotRequestHandleResult> {
+    this.receivedRequests.get(id)!.push(request);
+    return Promise.resolve({ success: true, pr: undefined });
+  }
 }
