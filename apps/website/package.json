@@ -16,9 +16,9 @@
   "dependencies": {
     "@vercel/analytics": "1.5.0",
     "@vercel/speed-insights": "1.2.0",
-    "fumadocs-core": "15.7.7",
-    "fumadocs-mdx": "11.8.2",
-    "fumadocs-ui": "15.7.7",
+    "fumadocs-core": "15.7.8",
+    "fumadocs-mdx": "11.8.3",
+    "fumadocs-ui": "15.7.8",
     "next": "15.5.2",
     "paklo": "workspace:*",
     "react": "19.1.1",
