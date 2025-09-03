@@ -1,5 +1,3 @@
-import { getPersonalAccessTokenHandler, WebApi } from 'azure-devops-node-api';
-
 import { logger } from './logger';
 import {
   HttpRequestError,
@@ -16,30 +14,28 @@ import {
   PullRequestAsyncStatus,
   PullRequestStatus,
   type IdentityRefWithVote,
-  type IHttpClientResponse,
 } from './types';
 import { type AzureDevOpsUrl } from './url-parts';
 import { normalizeBranchName, normalizeFilePath } from './utils';
 
-/**
- * Wrapper for DevOps WebApi client with helper methods for easier management of dependabot pull requests
- */
+/** Azure DevOps REST API client. */
 export class AzureDevOpsWebApiClient {
   private readonly organisationApiUrl: string;
   private readonly identityApiUrl: string;
-  private readonly connection: WebApi;
+  private readonly accessToken: string;
   private readonly debug: boolean;
 
   private authenticatedUserId?: string;
   private resolvedUserIds: Record<string, string>;
 
   public static API_VERSION = '5.0'; // this is the same version used by dependabot-core
+  public static API_VERSION_PREVIEW = '5.0-preview';
 
   constructor(url: AzureDevOpsUrl, accessToken: string, debug: boolean = false) {
     const organisationApiUrl = url.url.toString();
     this.organisationApiUrl = organisationApiUrl.replace(/\/$/, ''); // trim trailing slash
     this.identityApiUrl = getIdentityApiUrl(organisationApiUrl).replace(/\/$/, ''); // trim trailing slash
-    this.connection = new WebApi(organisationApiUrl, getPersonalAccessTokenHandler(accessToken, true));
+    this.accessToken = accessToken;
     this.debug = debug;
     this.resolvedUserIds = {};
   }
@@ -49,7 +45,17 @@ export class AzureDevOpsWebApiClient {
    * @returns
    */
   public async getUserId(): Promise<string> {
-    this.authenticatedUserId ??= (await this.connection.connect()).authenticatedUser!.id!;
+    if (!this.authenticatedUserId) {
+      const connectionData = await this.restApiGet(
+        `${this.organisationApiUrl}/_apis/connectiondata`,
+        undefined,
+        AzureDevOpsWebApiClient.API_VERSION_PREVIEW,
+      );
+      this.authenticatedUserId = connectionData?.authenticatedUser?.id;
+      if (!this.authenticatedUserId) {
+        throw new Error('Failed to get authenticated user ID');
+      }
+    }
     return this.authenticatedUserId;
   }
 
@@ -568,14 +574,20 @@ export class AzureDevOpsWebApiClient {
       .map((key) => `${key}=${params[key]}`)
       .join('&');
     const fullUrl = `${url}?api-version=${apiVersion}${queryString ? `&${queryString}` : ''}`;
+
     return await sendRestApiRequestWithRetry(
       'GET',
       fullUrl,
       undefined,
-      () =>
-        this.connection.rest.client.get(fullUrl, {
-          Accept: 'application/json',
-        }),
+      async () => {
+        return await fetch(fullUrl, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
+          },
+        });
+      },
       this.debug,
     );
   }
@@ -586,10 +598,16 @@ export class AzureDevOpsWebApiClient {
       'POST',
       fullUrl,
       data,
-      () =>
-        this.connection.rest.client.post(fullUrl, JSON.stringify(data), {
-          'Content-Type': 'application/json',
-        }),
+      async () => {
+        return await fetch(fullUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
+          },
+          body: JSON.stringify(data),
+        });
+      },
       this.debug,
     );
   }
@@ -600,10 +618,16 @@ export class AzureDevOpsWebApiClient {
       'PUT',
       fullUrl,
       data,
-      () =>
-        this.connection.rest.client.put(fullUrl, JSON.stringify(data), {
-          'Content-Type': 'application/json',
-        }),
+      async () => {
+        return await fetch(fullUrl, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
+          },
+          body: JSON.stringify(data),
+        });
+      },
       this.debug,
     );
   }
@@ -619,10 +643,16 @@ export class AzureDevOpsWebApiClient {
       'PATCH',
       fullUrl,
       data,
-      () =>
-        this.connection.rest.client.patch(fullUrl, JSON.stringify(data), {
-          'Content-Type': contentType || 'application/json',
-        }),
+      async () => {
+        return await fetch(fullUrl, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': contentType || 'application/json',
+            'Authorization': `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
+          },
+          body: JSON.stringify(data),
+        });
+      },
       this.debug,
     );
   }
@@ -671,7 +701,7 @@ export async function sendRestApiRequestWithRetry(
   method: string,
   url: string,
   payload: unknown,
-  requestAsync: () => Promise<IHttpClientResponse>,
+  requestAsync: () => Promise<Response>,
   isDebug: boolean = false,
   retryCount: number = 3,
   retryDelay: number = 3000,
@@ -681,12 +711,12 @@ export async function sendRestApiRequestWithRetry(
     // Send the request, ready the response
     if (isDebug) logger.debug(`🌎 🠊 [${method}] ${url}`);
     const response = await requestAsync();
-    body = await response.readBody();
-    const { statusCode, statusMessage } = response.message;
+    body = await response.text();
+    const { status: statusCode, statusText: statusMessage } = response;
     if (isDebug) logger.debug(`🌎 🠈 [${statusCode}] ${statusMessage}`);
 
     // Check that the request was successful
-    if (statusCode && (statusCode < 200 || statusCode > 299)) {
+    if (statusCode < 200 || statusCode > 299) {
       throw new HttpRequestError(`HTTP ${method} '${url}' failed: ${statusCode} ${statusMessage}`, statusCode);
     }
 

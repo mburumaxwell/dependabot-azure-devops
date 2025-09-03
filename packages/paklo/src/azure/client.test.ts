@@ -1,12 +1,11 @@
-import { type IncomingMessage } from 'http';
 import { beforeEach, describe, expect, it, vi, type MockedFunction } from 'vitest';
 
 import { AzureDevOpsWebApiClient, isErrorTemporaryFailure, sendRestApiRequestWithRetry } from './client';
 import { HttpRequestError, type ICreatePullRequest } from './models';
-import { VersionControlChangeType, type IHttpClientResponse } from './types';
+import { VersionControlChangeType } from './types';
 import { extractUrlParts } from './url-parts';
 
-vi.mock('azure-devops-node-api');
+global.fetch = vi.fn();
 
 describe('AzureDevOpsWebApiClient', () => {
   const url = extractUrlParts({
@@ -85,39 +84,38 @@ describe('AzureDevOpsWebApiClient', () => {
 });
 
 describe('sendRestApiRequestWithRetry', () => {
-  let mockRequestAsync: MockedFunction<() => Promise<IHttpClientResponse>>;
+  let mockRequestAsync: MockedFunction<() => Promise<Response>>;
   let mockResponseBody: unknown;
-  let mockResponse: Partial<IHttpClientResponse>;
+  let mockResponse: Partial<Response>;
 
   beforeEach(() => {
     mockRequestAsync = vi.fn();
     mockResponseBody = {};
     mockResponse = {
-      readBody: vi.fn(async () => JSON.stringify(mockResponseBody)),
-      message: {
-        statusCode: 200,
-        statusMessage: 'OK',
-      } as IncomingMessage,
+      text: vi.fn(async () => JSON.stringify(mockResponseBody)),
+      status: 200,
+      statusText: 'OK',
     };
   });
 
   it('should send a request and return the response', async () => {
-    mockRequestAsync.mockResolvedValue(mockResponse as IHttpClientResponse);
+    mockRequestAsync.mockResolvedValue(mockResponse as Response);
     mockResponseBody = { hello: 'world' };
 
     const result = await sendRestApiRequestWithRetry('GET', 'https://example.com', undefined, mockRequestAsync);
 
     expect(mockRequestAsync).toHaveBeenCalledTimes(1);
-    expect(mockResponse.readBody).toHaveBeenCalledTimes(1);
+    expect(mockResponse.text).toHaveBeenCalledTimes(1);
     expect(result).toEqual(mockResponseBody);
   });
 
   it('should throw an error if the response status code is not in the 2xx range', async () => {
-    mockRequestAsync.mockResolvedValue(mockResponse as IHttpClientResponse);
-    if (mockResponse.message) {
-      mockResponse.message.statusCode = 400;
-      mockResponse.message.statusMessage = 'Bad Request';
-    }
+    const badResponse = {
+      text: vi.fn(async () => JSON.stringify(mockResponseBody)),
+      status: 400,
+      statusText: 'Bad Request',
+    } as Partial<Response>;
+    mockRequestAsync.mockResolvedValue(badResponse as Response);
 
     await expect(
       sendRestApiRequestWithRetry('GET', 'https://example.com', undefined, mockRequestAsync),
@@ -125,8 +123,8 @@ describe('sendRestApiRequestWithRetry', () => {
   });
 
   it('should throw an error if the response cannot be parsed as JSON', async () => {
-    mockRequestAsync.mockResolvedValue(mockResponse as IHttpClientResponse);
-    mockResponse.readBody = vi.fn(async () => 'invalid json');
+    mockRequestAsync.mockResolvedValue(mockResponse as Response);
+    mockResponse.text = vi.fn(async () => 'invalid json');
 
     await expect(
       sendRestApiRequestWithRetry('GET', 'https://example.com', undefined, mockRequestAsync),
@@ -146,7 +144,7 @@ describe('sendRestApiRequestWithRetry', () => {
   it('should retry the request if a temporary failure error is thrown', async () => {
     const err = Object.assign(new Error('connect ETIMEDOUT 127.0.0.1:443'), { code: 'ETIMEDOUT' });
     mockRequestAsync.mockRejectedValueOnce(err);
-    mockRequestAsync.mockResolvedValueOnce(mockResponse as IHttpClientResponse);
+    mockRequestAsync.mockResolvedValueOnce(mockResponse as Response);
     mockResponseBody = { hello: 'world' };
 
     const result = await sendRestApiRequestWithRetry(
@@ -160,7 +158,7 @@ describe('sendRestApiRequestWithRetry', () => {
     );
 
     expect(mockRequestAsync).toHaveBeenCalledTimes(2);
-    expect(mockResponse.readBody).toHaveBeenCalledTimes(1);
+    expect(mockResponse.text).toHaveBeenCalledTimes(1);
     expect(result).toEqual(mockResponseBody);
   });
 });

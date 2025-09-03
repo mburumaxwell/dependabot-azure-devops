@@ -135,9 +135,6 @@ importers:
 
   extensions/azure:
     dependencies:
-      azure-devops-node-api:
-        specifier: 15.1.1
-        version: 15.1.1
       azure-pipelines-task-lib:
         specifier: 5.2.1
         version: 5.2.1
@@ -181,9 +178,6 @@ importers:
       '@hono/zod-validator':
         specifier: 0.7.2
         version: 0.7.2(hono@4.9.5)(zod@4.1.5)
-      azure-devops-node-api:
-        specifier: 15.1.1
-        version: 15.1.1
       commander:
         specifier: 14.0.0
         version: 14.0.0
@@ -1916,10 +1910,6 @@ packages:
 
   azure-devops-node-api@14.1.0:
     resolution: {integrity: sha512-QhpgjH1LQ+vgDJ7oBwcmsZ3+o4ZpjLVilw0D3oJQpYpRzN+L39lk5jZDLJ464hLUgsDzWn/Ksv7zLLMKLfoBzA==}
-    engines: {node: '>= 16.0.0'}
-
-  azure-devops-node-api@15.1.1:
-    resolution: {integrity: sha512-ohL2CY+zRAItKvwkHhefYxjr0Hndu6s8qKwyl0+wL4Ol6c4UrsI3A3G6ZPwwK81c1Ga3dEXjeDg4aKV4hn9loA==}
     engines: {node: '>= 16.0.0'}
 
   azure-pipelines-task-lib@5.2.1:
@@ -6505,11 +6495,6 @@ snapshots:
   axobject-query@4.1.0: {}
 
   azure-devops-node-api@14.1.0:
-    dependencies:
-      tunnel: 0.0.6
-      typed-rest-client: 2.1.0
-
-  azure-devops-node-api@15.1.1:
     dependencies:
       tunnel: 0.0.6
       typed-rest-client: 2.1.0

@@ -1,17 +1,3 @@
-import type * as http from 'http';
-
-/**
- * Local types to replace nested imports from azure-devops-node-api and typed-rest-client
- * This avoids bundling issues with dynamic requires in the package/dependency
- */
-
-// From: typed-rest-client/Interfaces
-export interface IHttpClientResponse {
-  message: http.IncomingMessage;
-  readBody(): Promise<string>;
-}
-
-// From: azure-devops-node-api/interfaces/TfvcInterfaces
 export enum VersionControlChangeType {
   None = 0,
   Add = 1,
@@ -30,7 +16,6 @@ export enum VersionControlChangeType {
   All = 8191,
 }
 
-// From: azure-devops-node-api/interfaces/GitInterfaces
 export enum GitPullRequestMergeStrategy {
   NoFastForward = 1,
   Squash = 2,
