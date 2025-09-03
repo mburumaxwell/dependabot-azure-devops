@@ -18,8 +18,8 @@ import {
   type DependabotOperation,
   type DependabotOutput,
 } from 'paklo/dependabot';
-import { section } from '../azure-devops/formatting';
-import { type ISharedVariables } from '../utils/shared-variables';
+import { section } from './formatting';
+import { type ISharedVariables } from './shared-variables';
 
 export type DependabotOutputProcessorResult = {
   success: boolean;

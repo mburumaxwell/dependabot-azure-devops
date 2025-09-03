@@ -13,7 +13,7 @@ import {
 } from 'paklo/dependabot';
 import * as path from 'path';
 import { Writable } from 'stream';
-import { endgroup, group, section } from '../azure-devops/formatting';
+import { endgroup, group, section } from './formatting';
 import { type DependabotOutputProcessor } from './output-processor';
 
 export type DependabotCliOptions = {

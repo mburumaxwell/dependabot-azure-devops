@@ -10,10 +10,10 @@ import {
 } from 'paklo/azure';
 import { type DependabotConfig, type DependabotOperationResult } from 'paklo/dependabot';
 import { GitHubGraphClient } from 'paklo/github';
-import { DependabotCli, type DependabotCliOptions } from '../src/dependabot/cli';
-import { abandonPullRequestsWhereSourceRefIsDeleted, performDependabotUpdatesAsync } from '../src/task-v2';
-import { type ISharedVariables } from '../src/utils/shared-variables';
+import { DependabotCli, type DependabotCliOptions } from './cli';
 import { AzureDevOpsWebApiClient } from './mockable';
+import { type ISharedVariables } from './shared-variables';
+import { abandonPullRequestsWhereSourceRefIsDeleted, performDependabotUpdatesAsync } from './task-v2';
 
 vi.mock('paklo/github');
 // vi.mock('paklo/azure');

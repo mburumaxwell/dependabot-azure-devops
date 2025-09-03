@@ -8,9 +8,9 @@ import {
   extractUrlParts,
   type IPullRequestProperties,
 } from 'paklo/azure';
-import { DependabotOutputProcessor } from '../../src/dependabot/output-processor';
-import { type ISharedVariables } from '../../src/utils/shared-variables';
-import { AzureDevOpsWebApiClient } from '../mockable';
+import { AzureDevOpsWebApiClient } from './mockable';
+import { DependabotOutputProcessor } from './output-processor';
+import { type ISharedVariables } from './shared-variables';
 
 vi.mock('azure-pipelines-task-lib/task');
 // vi.mock('paklo/azure');
@@ -74,7 +74,7 @@ describe('DependabotOutputProcessor', () => {
           'security-advisories': [],
           'security-updates-only': false,
           'updating-a-pull-request': false,
-          "ignore-conditions": [],
+          'ignore-conditions': [],
         },
         credentials: [],
         update: {

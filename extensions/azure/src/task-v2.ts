@@ -35,10 +35,10 @@ import {
   type Package,
   type SecurityVulnerability,
 } from 'paklo/github';
-import { section, setSecrets } from './azure-devops/formatting';
-import { DependabotCli, type DependabotCliOptions } from './dependabot/cli';
-import { DependabotOutputProcessor } from './dependabot/output-processor';
-import parseTaskInputConfiguration, { type ISharedVariables } from './utils/shared-variables';
+import { DependabotCli, type DependabotCliOptions } from './cli';
+import { section, setSecrets } from './formatting';
+import { DependabotOutputProcessor } from './output-processor';
+import parseTaskInputConfiguration, { type ISharedVariables } from './shared-variables';
 
 async function run() {
   let dependabotCli: DependabotCli | undefined;
