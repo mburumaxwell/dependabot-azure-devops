@@ -58,7 +58,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
   }
 
   protected async handle(id: number, request: DependabotRequest): Promise<DependabotRequestHandleResult> {
-    super.handle(id, request); // common logic
+    await super.handle(id, request); // common logic
 
     const { type, data } = request;
     const job = this.job(id);

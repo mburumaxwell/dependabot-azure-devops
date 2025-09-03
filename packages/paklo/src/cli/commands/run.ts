@@ -45,7 +45,6 @@ const schema = z.object({
   repository: z.string(),
   gitToken: z.string(),
   githubToken: z.string().optional(),
-  pullRequestId: z.coerce.string().optional(),
   outDir: z.string(),
   jobToken: z.string().optional(),
   credentialsToken: z.string().optional(),
@@ -71,7 +70,6 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     gitToken,
     project,
     repository,
-    pullRequestId,
     outDir,
     jobToken: jobTokenOverride,
     credentialsToken: credentialsTokenOverride,
@@ -190,6 +188,37 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     };
   }
 
+  async function doTheRun({
+    job,
+    jobToken,
+    credentialsToken,
+    credentials,
+  }: {
+    job: DependabotJobConfig;
+    jobToken: string;
+    credentialsToken: string;
+    credentials: DependabotCredential[];
+  }): Promise<boolean> {
+    try {
+      const runner = new JobRunner({ dependabotApiUrl, job, jobToken, credentialsToken });
+      await runner.run({
+        outDir,
+        credentials,
+      });
+    } catch (err) {
+      if (err instanceof JobRunnerImagingError) {
+        error(`Error fetching updater images: ${err.message}`);
+        return false;
+      } else if (err instanceof JobRunnerUpdaterError) {
+        error(`Error running updater: ${err.message}`);
+        return false;
+      }
+      return false;
+    }
+    logger.info(`Update job ${job.id} completed`);
+    return true;
+  }
+
   try {
     for (const update of dependabotUpdatesToPerform) {
       const packageEcosystem = update['package-ecosystem'];
@@ -227,22 +256,9 @@ async function handler({ options, error }: HandlerOptions<Options>) {
         ({ job, credentials } = builder.forDependenciesList({}));
         ({ jobToken, credentialsToken } = makeTokens());
         server.add({ id: job.id!, update, job, jobToken, credentialsToken });
-        try {
-          const runner = new JobRunner({ dependabotApiUrl, job, jobToken, credentialsToken });
-          await runner.run({
-            outDir,
-            credentials,
-          });
-        } catch (err) {
-          if (err instanceof JobRunnerImagingError) {
-            error(`Error fetching updater images: ${err.message}`);
-            return;
-          } else if (err instanceof JobRunnerUpdaterError) {
-            error(`Error running updater: ${err.message}`);
-            return;
-          }
+        if (!(await doTheRun({ job, jobToken, credentialsToken, credentials }))) {
+          return;
         }
-        logger.info(`Update job ${job.id} completed`);
 
         const outputs = server.requests(job.id!);
         const packagesToCheckForVulnerabilities: Package[] | undefined = outputs!
@@ -296,41 +312,57 @@ async function handler({ options, error }: HandlerOptions<Options>) {
         server.clear(job.id!);
       }
 
-      if (pullRequestId) {
-        ({ job, credentials } = builder.forUpdate({
-          existingPullRequests: existingPullRequestDependenciesForPackageManager,
-          pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
-          securityVulnerabilities,
-        }));
+      // Run an update job for "all dependencies"; this will create new pull requests for dependencies that need updating
+      const openPullRequestsLimit = update['open-pull-requests-limit']!;
+      const openPullRequestsCount = Object.entries(existingPullRequestsForPackageManager).length;
+      const hasReachedOpenPullRequestLimit =
+        openPullRequestsLimit > 0 && openPullRequestsCount >= openPullRequestsLimit;
+      if (!hasReachedOpenPullRequestLimit) {
+        const dependenciesHaveVulnerabilities = dependencyNamesToUpdate.length && securityVulnerabilities.length;
+        if (!securityUpdatesOnly || dependenciesHaveVulnerabilities) {
+          ({ job, credentials } = builder.forUpdate({
+            dependencyNamesToUpdate,
+            existingPullRequests: existingPullRequestDependenciesForPackageManager,
+            securityVulnerabilities,
+          }));
+          ({ jobToken, credentialsToken } = makeTokens());
+          server.add({ id: job.id!, update, job, jobToken, credentialsToken });
+          if (!(await doTheRun({ job, jobToken, credentialsToken, credentials }))) {
+            return;
+          }
+          server.clear(job.id!);
+        } else {
+          logger.info('Nothing to update; dependencies are not affected by any known vulnerability');
+        }
       } else {
-        ({ job, credentials } = builder.forUpdate({
-          dependencyNamesToUpdate,
-          existingPullRequests: existingPullRequestDependenciesForPackageManager,
-          securityVulnerabilities,
-        }));
+        logger.warn(
+          `Skipping update for ${packageEcosystem} packages as the open pull requests limit (${openPullRequestsLimit}) has already been reached`,
+        );
       }
 
-      // add the job to the local server for tracking
-      ({ jobToken, credentialsToken } = makeTokens());
-      server.add({ id: job.id!, update, job, jobToken, credentialsToken });
-
-      try {
-        const runner = new JobRunner({ dependabotApiUrl, job, jobToken, credentialsToken });
-        await runner.run({
-          outDir,
-          credentials,
-        });
-      } catch (err) {
-        if (err instanceof JobRunnerImagingError) {
-          error(`Error fetching updater images: ${err.message}`);
-          return;
-        } else if (err instanceof JobRunnerUpdaterError) {
-          error(`Error running updater: ${err.message}`);
-          return;
+      // If there are existing pull requests, run an update job for each one; this will resolve merge conflicts and close pull requests that are no longer needed
+      const numberOfPullRequestsToUpdate = Object.keys(existingPullRequestsForPackageManager).length;
+      if (numberOfPullRequestsToUpdate > 0) {
+        if (!dryRun) {
+          for (const pullRequestId in existingPullRequestsForPackageManager) {
+            ({ job, credentials } = builder.forUpdate({
+              existingPullRequests: existingPullRequestDependenciesForPackageManager,
+              pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
+              securityVulnerabilities,
+            }));
+            ({ jobToken, credentialsToken } = makeTokens());
+            server.add({ id: job.id!, update, job, jobToken, credentialsToken });
+            if (!(await doTheRun({ job, jobToken, credentialsToken, credentials }))) {
+              return;
+            }
+            server.clear(job.id!);
+          }
+        } else {
+          logger.warn(
+            `Skipping update of ${numberOfPullRequestsToUpdate} existing ${packageEcosystem} package pull request(s) as 'dryRun' is set to 'true'`,
+          );
         }
       }
-      logger.info(`Update job ${job.id} completed`);
-      server.clear(job.id!);
     }
   } finally {
     server.stop();
@@ -349,10 +381,6 @@ export const command = new Command('run')
   .option(
     '--github-token <GITHUB-TOKEN>',
     'GitHub token to use for authentication. If not specified, you may get rate limited.',
-  )
-  .option(
-    '--pull-request-id <PULL-REQUEST-ID>',
-    'Identifier of pull request to update. If not specified, a job that updates everything is generated.',
   )
   .option('--out-dir', 'Working directory.', 'work')
   .option(
