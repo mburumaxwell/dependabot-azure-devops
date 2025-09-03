@@ -18,8 +18,7 @@ import { abandonPullRequestsWhereSourceRefIsDeleted, performDependabotUpdatesAsy
 vi.mock('paklo/github');
 // vi.mock('paklo/azure');
 vi.mock('./mockable');
-vi.mock('../src/dependabot/cli');
-vi.mock('../src/dependabot/job-builder');
+vi.mock('./cli');
 
 describe('abandonPullRequestsWhereSourceRefIsDeleted', () => {
   let taskInputs: ISharedVariables;

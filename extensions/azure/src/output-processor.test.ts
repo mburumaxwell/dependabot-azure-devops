@@ -14,8 +14,8 @@ import { type ISharedVariables } from './shared-variables';
 
 vi.mock('azure-pipelines-task-lib/task');
 // vi.mock('paklo/azure');
-vi.mock('../mockable');
-vi.mock('../../src/utils/shared-variables');
+vi.mock('./mockable');
+vi.mock('./shared-variables');
 
 describe('DependabotOutputProcessor', () => {
   let processor: DependabotOutputProcessor;
