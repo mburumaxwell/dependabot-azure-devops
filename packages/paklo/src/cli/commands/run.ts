@@ -41,13 +41,24 @@ async function handler({ options, error }: HandlerOptions<Options>) {
   if (!organisationUrl.endsWith('/')) organisationUrl = `${organisationUrl}/`; // without trailing slash the extraction fails
   const url = extractUrlParts({ organisationUrl, project, repository });
 
-  // prepare to find variables by asking user for input
+  // prepare to find variables from env or by asking user for input
   const variables = new Map<string, string>();
   const rl = readline.createInterface({ input: stdin, output: stdout });
   async function variableFinder(name: string) {
+    // first, check cache
     if (variables.has(name)) return variables.get(name);
+
+    // second, check environment
+    let value = process.env[name];
+    if (value) {
+      logger.trace(`Found value for variable named: ${name} in environment`);
+      variables.set(name, value);
+      return value;
+    }
+
+    // finally, ask user
     logger.trace(`Asking value for variable named: ${name}`);
-    const value = await rl.question(`Please provide the value for '${name}': `);
+    value = await rl.question(`Please provide the value for '${name}': `);
     variables.set(name, value);
     return value;
   }
