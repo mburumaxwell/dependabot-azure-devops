@@ -74,10 +74,6 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       await authorClient.getUserId(),
     );
 
-    // The API urls is constant when working in this CLI. Asking people to setup NGROK
-    // or similar just to get HTTPS for the job token to be used is too much hassle.
-    const dependabotApiUrl = `http://host.docker.internal:${port}/api`;
-
     // Prepare local server
     const serverOptions: AzureLocalDependabotServerOptions = {
       authorClient,
@@ -90,6 +86,14 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
     server.start(port);
     // give the server a second to start
     await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // The API urls is constant when working in this CLI. Asking people to setup NGROK or similar just to get
+    // HTTPS for the job token to be used is too much hassle.
+    // Using same value for dependabotApiUrl and dependabotApiDockerUrl so as to capture /record_metrics calls.
+    // dependabotApiLocalUrl is used to avoid Docker for local calls.
+    const dependabotApiUrl = `http://host.docker.internal:${port}/api`;
+    const dependabotApiDockerUrl = dependabotApiUrl;
+    const dependabotApiLocalUrl = `${server.url}/api`;
 
     // If update identifiers are specified, select them; otherwise handle all
     let updates: DependabotUpdate[] = [];
@@ -117,7 +121,15 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       await this.abandonPullRequestsWhereSourceRefIsDeleted(existingBranchNames, existingPullRequests);
 
       // Perform updates for each of the [targeted] update blocks in dependabot.yaml
-      return await this.performUpdates(outDir, server, updates, existingPullRequests, dependabotApiUrl);
+      return await this.performUpdates(
+        outDir,
+        server,
+        updates,
+        existingPullRequests,
+        dependabotApiUrl,
+        dependabotApiDockerUrl,
+        dependabotApiLocalUrl,
+      );
     } finally {
       server.stop();
     }
@@ -182,9 +194,11 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
     updates: DependabotUpdate[],
     existingPullRequests: IPullRequestProperties[],
     dependabotApiUrl: string,
+    dependabotApiDockerUrl?: string,
+    dependabotApiLocalUrl?: string,
   ): Promise<RunJobResult> {
     const {
-      options: { url, gitToken, githubToken, config, dryRun, securityAdvisoriesFile },
+      options: { url, gitToken, githubToken, config, dryRun, securityAdvisoriesFile, secretMasker },
     } = this;
 
     for (const update of updates) {
@@ -206,6 +220,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
         debug: false,
       });
 
+      let jobId: number | undefined = undefined;
       let job: DependabotJobConfig | undefined = undefined;
       let credentials: DependabotCredential[] | undefined = undefined; // TODO: remove this to be handled by the ApiClient
       let jobToken: string;
@@ -220,20 +235,22 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       const securityUpdatesOnly = update['open-pull-requests-limit'] === 0;
       if (securityUpdatesOnly) {
         // Run an update job to discover all dependencies
-        ({ job, credentials } = builder.forDependenciesList({}));
+        ({ jobId, job, credentials } = builder.forDependenciesList({}));
         ({ jobToken, credentialsToken } = this.makeTokens());
-        server.add({ id: job.id!, update, job, jobToken, credentialsToken });
+        server.add({ id: jobId, update, job, jobToken, credentialsToken, credentials });
         const { success, message } = await runJob({
           outDir,
           dependabotApiUrl,
-          job,
+          dependabotApiDockerUrl,
+          dependabotApiLocalUrl,
+          jobId,
           jobToken,
           credentialsToken,
-          credentials,
+          secretMasker,
         });
         if (!success) return { success, message };
 
-        const outputs = server.requests(job.id!);
+        const outputs = server.requests(jobId);
         const packagesToCheckForVulnerabilities: Package[] | undefined = outputs!
           .find((o) => o.type == 'update_dependency_list')
           ?.data.dependencies?.map((d) => ({ name: d.name, version: d.version }));
@@ -278,11 +295,11 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
           }
         } else {
           logger.info(`No vulnerabilities detected for update ${update['package-ecosystem']} in ${update.directory}`);
-          server.clear(job.id!);
+          server.clear(jobId);
           continue; // nothing more to do for this update
         }
 
-        server.clear(job.id!);
+        server.clear(jobId);
       }
 
       // Run an update job for "all dependencies"; this will create new pull requests for dependencies that need updating
@@ -293,22 +310,24 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       if (!hasReachedOpenPullRequestLimit) {
         const dependenciesHaveVulnerabilities = dependencyNamesToUpdate.length && securityVulnerabilities.length;
         if (!securityUpdatesOnly || dependenciesHaveVulnerabilities) {
-          ({ job, credentials } = builder.forUpdate({
+          ({ jobId, job, credentials } = builder.forUpdate({
             dependencyNamesToUpdate,
             existingPullRequests: existingPullRequestDependenciesForPackageManager,
             securityVulnerabilities,
           }));
           ({ jobToken, credentialsToken } = this.makeTokens());
-          server.add({ id: job.id!, update, job, jobToken, credentialsToken });
+          server.add({ id: jobId, update, job, jobToken, credentialsToken, credentials });
           const { success, message } = await runJob({
             outDir,
             dependabotApiUrl,
-            job,
+            dependabotApiDockerUrl,
+            dependabotApiLocalUrl,
+            jobId,
             jobToken,
             credentialsToken,
-            credentials,
+            secretMasker,
           });
-          server.clear(job.id!);
+          server.clear(jobId);
           if (!success) return { success, message };
         } else {
           logger.info('Nothing to update; dependencies are not affected by any known vulnerability');
@@ -324,22 +343,24 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       if (numberOfPullRequestsToUpdate > 0) {
         if (!dryRun) {
           for (const pullRequestId in existingPullRequestsForPackageManager) {
-            ({ job, credentials } = builder.forUpdate({
+            ({ jobId, job, credentials } = builder.forUpdate({
               existingPullRequests: existingPullRequestDependenciesForPackageManager,
               pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
               securityVulnerabilities,
             }));
             ({ jobToken, credentialsToken } = this.makeTokens());
-            server.add({ id: job.id!, update, job, jobToken, credentialsToken });
+            server.add({ id: jobId, update, job, jobToken, credentialsToken, credentials });
             const { success, message } = await runJob({
               outDir,
               dependabotApiUrl,
-              job,
+              dependabotApiDockerUrl,
+              dependabotApiLocalUrl,
+              jobId,
               jobToken,
               credentialsToken,
-              credentials,
+              secretMasker,
             });
-            server.clear(job.id!);
+            server.clear(jobId);
             if (!success) return { success, message };
           }
         } else {

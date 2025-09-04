@@ -6,7 +6,7 @@ import { z, type ZodType } from 'zod/v4';
 
 import { type GitAuthor } from './author';
 import { type DependabotUpdate } from './config';
-import { type DependabotJobConfig } from './job';
+import { type DependabotCredential, type DependabotJobConfig } from './job';
 import { logger } from './logger';
 import { type DependabotOperationType } from './scenario';
 import {
@@ -53,13 +53,16 @@ export const DependabotRequestSchema = z.discriminatedUnion('type', [
 ]);
 export type DependabotRequest = z.infer<typeof DependabotRequestSchema>;
 
+export type DependabotTokenType = 'job' | 'credentials';
+
 /**
  * Function type for authenticating requests.
+ * @param type - The type of authentication ('job' or 'credentials').
  * @param id - The ID of the dependabot job.
  * @param value - The authentication value (e.g., API key).
  * @returns A promise that resolves to a boolean indicating whether the authentication was successful.
  */
-type AuthenticatorFunc = (id: number, value: string) => Promise<boolean>;
+type AuthenticatorFunc = (type: DependabotTokenType, id: number, value: string) => Promise<boolean>;
 
 /**
  * Handler function for processing dependabot requests.
@@ -78,6 +81,12 @@ export type CreateApiServerAppOptions = {
 
   /** Handler function for authenticating requests. */
   authenticate: AuthenticatorFunc;
+
+  /** Function for getting a dependabot job by ID. */
+  getJob: (id: number) => Promise<DependabotJobConfig | undefined>;
+
+  /** Function for getting dependabot credentials by job ID. */
+  getCredentials: (id: number) => Promise<DependabotCredential[] | undefined>;
 
   /** Handler function for processing the operations. */
   handle: HandlerFunc;
@@ -98,22 +107,24 @@ export type CreateApiServerAppOptions = {
 export function createApiServerApp({
   basePath = `/api/update_jobs`,
   authenticate,
+  getJob,
+  getCredentials,
   handle,
 }: CreateApiServerAppOptions): Hono {
   // Setup app with base path and middleware
   const app = new Hono().basePath(basePath);
 
   // Handle endpoints:
-  // - POST request to /create_pull_request
-  // - POST request to /update_pull_request
-  // - POST request to /close_pull_request
-  // - POST request to /record_update_job_error
-  // - POST request to /record_update_job_unknown_error
+  // - POST  request to /create_pull_request
+  // - POST  request to /update_pull_request
+  // - POST  request to /close_pull_request
+  // - POST  request to /record_update_job_error
+  // - POST  request to /record_update_job_unknown_error
   // - PATCH request to /mark_as_processed
-  // - POST request to /update_dependency_list
-  // - POST request to /record_ecosystem_versions
-  // - POST request to /record_ecosystem_meta
-  // - POST request to /increment_metric
+  // - POST  request to /update_dependency_list
+  // - POST  request to /record_ecosystem_versions
+  // - POST  request to /record_ecosystem_meta
+  // - POST  request to /increment_metric
 
   function operation<T extends ZodType>(type: DependabotOperationType, schema: T, method?: string) {
     app.on(
@@ -132,7 +143,7 @@ export function createApiServerApp({
           const { id } = context.req.valid('param');
           const value = context.req.header('Authorization');
           if (!value) return context.body(null, 401);
-          const valid = await authenticate(id, value);
+          const valid = await authenticate('job', id, value);
           if (!valid) return context.body(null, 403);
         } else {
           logger.trace(`Skipping authentication because it is not secure ${context.req.url}`);
@@ -162,10 +173,53 @@ export function createApiServerApp({
   operation('increment_metric', DependabotIncrementMetricSchema);
   operation('record_metrics', DependabotMetricSchema.array());
 
+  // Handle endpoints:
+  // - GET request to /details
+  // - GET request to /credentials
+  app.get(
+    '/:id/details',
+    zValidator('param', z.object({ id: z.coerce.number() })),
+    async (context, next) => {
+      const { id } = context.req.valid('param');
+      const value = context.req.header('Authorization');
+      if (!value) return context.body(null, 401);
+      const valid = await authenticate('job', id, value);
+      if (!valid) return context.body(null, 403);
+      await next();
+    },
+    async (context) => {
+      const { id } = context.req.valid('param');
+      const job = await getJob(id);
+      if (!job) return context.body(null, 204);
+      return context.json(job);
+    },
+  );
+  app.get(
+    '/:id/credentials',
+    zValidator('param', z.object({ id: z.coerce.number() })),
+    async (context, next) => {
+      const { id } = context.req.valid('param');
+      const value = context.req.header('Authorization');
+      if (!value) return context.body(null, 401);
+      const valid = await authenticate('credentials', id, value);
+      if (!valid) return context.body(null, 403);
+      await next();
+    },
+    async (context) => {
+      const { id } = context.req.valid('param');
+      const credentials = await getCredentials(id);
+      if (!credentials) return context.body(null, 204);
+      return context.json(credentials);
+    },
+  );
+
   return app;
 }
 
-export type LocalDependabotServerOptions = Omit<CreateApiServerAppOptions, 'authenticate' | 'handle'> & {
+export type LocalDependabotServerOptions = Omit<
+  CreateApiServerAppOptions,
+  'authenticate' | 'getJob' | 'getCredentials' | 'handle'
+> & {
   author: GitAuthor;
   debug: boolean;
   dryRun: boolean;
@@ -182,6 +236,7 @@ export abstract class LocalDependabotServer {
   private readonly updates = new Map<number, DependabotUpdate>();
   private readonly jobTokens = new Map<number, string>();
   private readonly credentialTokens = new Map<number, string>();
+  private readonly jobCredentials = new Map<number, DependabotCredential[]>();
   private readonly receivedRequests = new Map<number, DependabotRequest[]>();
 
   protected readonly createdPullRequestIds: number[] = []; // TODO: not sure if we really need this or it should be a Map
@@ -190,6 +245,8 @@ export abstract class LocalDependabotServer {
     const app = createApiServerApp({
       ...options,
       authenticate: this.authenticate.bind(this),
+      getJob: this.job.bind(this),
+      getCredentials: this.credentials.bind(this),
       handle: this.handle.bind(this),
     });
     this.server = createAdaptorServer({
@@ -241,13 +298,16 @@ export abstract class LocalDependabotServer {
     jobToken: string;
     /** The authentication token for the job. */
     credentialsToken: string;
+    /** The credentials associated with the job. */
+    credentials: DependabotCredential[];
   }) {
-    const { id, update, job, jobToken, credentialsToken } = value;
-    const { trackedJobs, updates, jobTokens, credentialTokens, receivedRequests } = this;
+    const { id, update, job, jobToken, credentialsToken, credentials } = value;
+    const { trackedJobs, updates, jobTokens, credentialTokens, jobCredentials, receivedRequests } = this;
     trackedJobs.set(id, job);
     updates.set(id, update);
     jobTokens.set(id, jobToken);
     credentialTokens.set(id, credentialsToken);
+    jobCredentials.set(id, credentials);
     receivedRequests.set(id, []);
   }
 
@@ -256,8 +316,8 @@ export abstract class LocalDependabotServer {
    * @param id - The ID of the dependabot job to get.
    * @returns The dependabot job, or undefined if not found.
    */
-  job(id: number) {
-    return this.trackedJobs.get(id);
+  job(id: number): Promise<DependabotJobConfig | undefined> {
+    return Promise.resolve(this.trackedJobs.get(id));
   }
 
   /**
@@ -270,12 +330,21 @@ export abstract class LocalDependabotServer {
   }
 
   /**
-   * Gets the job token by ID of the job.
+   * Gets a token by ID of the job.
    * @param id - The ID of the dependabot job to get.
    * @returns The job token, or undefined if not found.
    */
-  token(id: number): string | undefined {
-    return this.jobTokens.get(id);
+  token(id: number, type: DependabotTokenType): string | undefined {
+    return type === 'job' ? this.jobTokens.get(id) : this.credentialTokens.get(id);
+  }
+
+  /**
+   * Gets the credentials for a dependabot job by ID.
+   * @param id - The ID of the dependabot job to get credentials for.
+   * @returns The credentials for the job, or undefined if not found.
+   */
+  credentials(id: number): Promise<DependabotCredential[] | undefined> {
+    return Promise.resolve(this.jobCredentials.get(id));
   }
 
   /**
@@ -297,6 +366,7 @@ export abstract class LocalDependabotServer {
     this.updates.delete(id);
     this.jobTokens.delete(id);
     this.credentialTokens.delete(id);
+    this.jobCredentials.delete(id);
     this.receivedRequests.delete(id);
   }
 
@@ -306,14 +376,14 @@ export abstract class LocalDependabotServer {
    * @param value - The authentication value (e.g., API key).
    * @returns A promise that resolves to a boolean indicating whether the authentication was successful.
    */
-  protected async authenticate(id: number, value: string): Promise<boolean> {
-    const token = this.jobTokens.get(id);
+  protected async authenticate(type: DependabotTokenType, id: number, value: string): Promise<boolean> {
+    const token = type === 'job' ? this.jobTokens.get(id) : this.credentialTokens.get(id);
     if (!token) {
-      logger.debug(`Authentication failed: job ${id} not found`);
+      logger.debug(`Authentication failed: ${type} token ${id} not found`);
       return false;
     }
     if (token !== value) {
-      logger.debug(`Authentication failed: invalid token for job ${id}`);
+      logger.debug(`Authentication failed: invalid token for ${type} token ${id}`);
       return false;
     }
     return true;

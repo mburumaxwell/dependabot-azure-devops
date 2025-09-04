@@ -1,3 +1,4 @@
+import { type SecretMasker } from './api-client';
 import { type DependabotConfig } from './config';
 import { makeRandomJobToken } from './job-builder';
 import { type RunJobResult } from './job-runner';
@@ -6,6 +7,7 @@ import { type LocalDependabotServerOptions } from './server';
 export type LocalJobsRunnerOptions = Pick<LocalDependabotServerOptions, 'debug' | 'dryRun'> & {
   jobTokenOverride?: string;
   credentialsTokenOverride?: string;
+  secretMasker: SecretMasker;
 
   config: DependabotConfig;
   targetUpdateIds?: number[];

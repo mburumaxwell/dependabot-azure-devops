@@ -37,6 +37,10 @@ async function handler({ options, error }: HandlerOptions<Options>) {
   let { organisationUrl } = options;
   const { gitToken, project, repository, authorName, authorEmail, ...remainingOptions } = options;
 
+  function secretMasker(secret: string) {
+    // TODO: implement this (basically hide from logs)
+  }
+
   // extract url parts
   if (!organisationUrl.endsWith('/')) organisationUrl = `${organisationUrl}/`; // without trailing slash the extraction fails
   const url = extractUrlParts({ organisationUrl, project, repository });
@@ -78,6 +82,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
   try {
     const runnerOptions: AzureLocalJobsRunnerOptions = {
       config,
+      secretMasker,
 
       url,
       gitToken,

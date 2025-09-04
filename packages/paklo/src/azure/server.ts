@@ -62,7 +62,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
     } = this;
 
     const { type, data } = request;
-    const job = this.job(id);
+    const job = await this.job(id);
     if (!job) {
       logger.error(`No job found for ID '${id}', cannot process request of type '${type}'`);
       return { success: false };

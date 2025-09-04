@@ -1,3 +1,4 @@
+export * from './api-client';
 export * from './author';
 export * from './branch-name';
 export * from './config';

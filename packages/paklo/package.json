@@ -9,6 +9,11 @@
     "paklo": "./dist/cli.cjs"
   },
   "exports": {
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "require": "./dist/core.cjs",
+      "import": "./dist/core.js"
+    },
     "./azure": {
       "types": "./dist/azure.d.ts",
       "require": "./dist/azure.cjs",

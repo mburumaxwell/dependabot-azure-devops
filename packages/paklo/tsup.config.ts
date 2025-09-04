@@ -10,6 +10,7 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   entry: {
+    core: 'src/core/index.ts',
     azure: 'src/azure/index.ts',
     dependabot: 'src/dependabot/index.ts',
     environment: 'src/environment/index.ts',

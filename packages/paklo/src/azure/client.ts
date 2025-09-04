@@ -1,6 +1,6 @@
+import { HttpRequestError, isErrorTemporaryFailure } from '@/core';
 import { logger } from './logger';
 import {
-  HttpRequestError,
   type IAbandonPullRequest,
   type IApprovePullRequest,
   type ICreatePullRequest,
@@ -744,33 +744,5 @@ export async function sendRestApiRequestWithRetry(
 
     logger.trace('THROW' + e);
     throw e;
-  }
-}
-
-export function isErrorTemporaryFailure(e?: { code?: string | number; message?: string } | null): boolean {
-  if (e instanceof HttpRequestError) {
-    // Check for common HTTP status codes that indicate a temporary failure
-    // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-    switch (e.code) {
-      case 502:
-        return true; // 502 Bad Gateway
-      case 503:
-        return true; // 503 Service Unavailable
-      case 504:
-        return true; // 504 Gateway Timeout
-      default:
-        return false;
-    }
-  } else if (e?.code) {
-    // Check for Node.js system errors that indicate a temporary failure
-    // See: https://nodejs.org/api/errors.html#errors_common_system_errors
-    switch (e.code) {
-      case 'ETIMEDOUT':
-        return true; // Operation timed out
-      default:
-        return false;
-    }
-  } else {
-    return false;
   }
 }
