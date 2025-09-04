@@ -17,7 +17,7 @@ import {
 // TODO: reconsider if we need all these once we stop using dependabot-cli
 
 export const DependabotInputSchema = z.object({
-  jobId: z.number(),
+  jobId: z.number().default(0),
   job: DependabotJobConfigSchema,
   credentials: DependabotCredentialSchema.array(),
 });

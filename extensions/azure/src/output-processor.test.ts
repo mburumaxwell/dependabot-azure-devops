@@ -53,6 +53,7 @@ describe('DependabotOutputProcessor', () => {
     beforeEach(() => {
       vi.clearAllMocks();
       update = {
+        jobId: 1,
         job: {
           'id': 1,
           'package-manager': 'npm_and_yarn',
