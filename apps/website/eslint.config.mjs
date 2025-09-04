@@ -8,7 +8,16 @@ const compat = new FlatCompat({
 /** @type {import("eslint").Linter.Config} */
 export default [
   {
-    ignores: ['node_modules/**', '.next/**', 'out/**', 'build/**', 'next-env.d.ts', '.source/**'],
+    ignores: [
+      'node_modules/**',
+      '.next/**',
+      'out/**',
+      'build/**',
+      'next-env.d.ts',
+      '.source/**',
+      'eslint.config.mjs',
+      'postcss.config.mjs',
+    ],
   },
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   ...baseConfig,
