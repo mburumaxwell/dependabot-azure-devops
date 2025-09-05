@@ -67,7 +67,7 @@ describe('AzureLocalDependabotServer', () => {
     beforeEach(() => {
       vi.clearAllMocks();
       jobBuilderOutput = {
-        id: 1,
+        jobId: 1,
         job: {
           'id': 1,
           'package-manager': 'npm_and_yarn',

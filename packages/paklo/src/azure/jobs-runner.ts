@@ -235,7 +235,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       const securityUpdatesOnly = update['open-pull-requests-limit'] === 0;
       if (securityUpdatesOnly) {
         // Run an update job to discover all dependencies
-        ({ id: jobId, job, credentials } = builder.forDependenciesList({}));
+        ({ jobId, job, credentials } = builder.forDependenciesList({}));
         ({ jobToken, credentialsToken } = this.makeTokens());
         server.add({ id: jobId, update, job, jobToken, credentialsToken, credentials });
         await runJob({
@@ -309,7 +309,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       if (!hasReachedOpenPullRequestLimit) {
         const dependenciesHaveVulnerabilities = dependencyNamesToUpdate.length && securityVulnerabilities.length;
         if (!securityUpdatesOnly || dependenciesHaveVulnerabilities) {
-          ({ id: jobId, job, credentials } = builder.forUpdate({
+          ({ jobId, job, credentials } = builder.forUpdate({
             dependencyNamesToUpdate,
             existingPullRequests: existingPullRequestDependenciesForPackageManager,
             securityVulnerabilities,
@@ -343,7 +343,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       if (numberOfPullRequestsToUpdate > 0) {
         if (!dryRun) {
           for (const pullRequestId in existingPullRequestsForPackageManager) {
-            ({ id: jobId, job, credentials } = builder.forUpdate({
+            ({ jobId, job, credentials } = builder.forUpdate({
               existingPullRequests: existingPullRequestDependenciesForPackageManager,
               pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
               securityVulnerabilities,

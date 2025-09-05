@@ -32,7 +32,7 @@ export type DependabotSourceInfo = {
 };
 
 export type DependabotJobBuilderOutput = {
-  id: number;
+  jobId: number;
   job: DependabotJobConfig;
   credentials: DependabotCredential[];
 };
@@ -92,7 +92,7 @@ export class DependabotJobBuilder {
   public forDependenciesList({ id }: { id?: number }): DependabotJobBuilderOutput {
     id ??= makeRandomJobId();
     return {
-      id: id,
+      jobId: id,
       job: {
         'id': id,
         'package-manager': this.packageManager,
@@ -158,7 +158,7 @@ export class DependabotJobBuilder {
     }
 
     return {
-      id: id,
+      jobId: id,
       job: {
         'id': id,
         'package-manager': this.packageManager,
