@@ -165,10 +165,10 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: 1.19.1
-        version: 1.19.1(hono@4.9.5)
+        version: 1.19.1(hono@4.9.6)
       '@hono/zod-validator':
         specifier: 0.7.2
-        version: 0.7.2(hono@4.9.5)(zod@4.1.5)
+        version: 0.7.2(hono@4.9.6)(zod@4.1.5)
       commander:
         specifier: 14.0.0
         version: 14.0.0
@@ -176,8 +176,8 @@ importers:
         specifier: 4.0.7
         version: 4.0.7
       hono:
-        specifier: 4.9.5
-        version: 4.9.5
+        specifier: 4.9.6
+        version: 4.9.6
       js-yaml:
         specifier: 4.1.0
         version: 4.1.0
@@ -2822,8 +2822,8 @@ packages:
   help-me@5.0.0:
     resolution: {integrity: sha512-7xgomUX6ADmcYzFik0HzAxh/73YlKR9bmFzf51CZwR+b6YtzU2m0u49hQCqV6SvlqIqsaxovfwdvbnsw3b/zpg==}
 
-  hono@4.9.5:
-    resolution: {integrity: sha512-aLAVl5/67ifNnoFVxnhR89dpmSLsgwBprw/PT671ASwUpJqmd7Ne8KPTQo37DbRZfgpHaHeZ4bPVUvbOkeedMw==}
+  hono@4.9.6:
+    resolution: {integrity: sha512-doVjXhSFvYZ7y0dNokjwwSahcrAfdz+/BCLvAMa/vHLzjj8+CFyV5xteThGUsKdkaasgN+gF2mUxao+SGLpUeA==}
     engines: {node: '>=16.9.0'}
 
   html-void-elements@3.0.0:
@@ -5194,13 +5194,13 @@ snapshots:
       protobufjs: 7.5.4
       yargs: 17.7.2
 
-  '@hono/node-server@1.19.1(hono@4.9.5)':
+  '@hono/node-server@1.19.1(hono@4.9.6)':
     dependencies:
-      hono: 4.9.5
+      hono: 4.9.6
 
-  '@hono/zod-validator@0.7.2(hono@4.9.5)(zod@4.1.5)':
+  '@hono/zod-validator@0.7.2(hono@4.9.6)(zod@4.1.5)':
     dependencies:
-      hono: 4.9.5
+      hono: 4.9.6
       zod: 4.1.5
 
   '@humanfs/core@0.19.1': {}
@@ -7671,7 +7671,7 @@ snapshots:
 
   help-me@5.0.0: {}
 
-  hono@4.9.5: {}
+  hono@4.9.6: {}
 
   html-void-elements@3.0.0: {}
 
