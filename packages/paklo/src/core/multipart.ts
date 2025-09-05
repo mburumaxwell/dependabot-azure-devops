@@ -5,7 +5,7 @@ export class MultipartFormDataBody {
   private boundary: string = `${Math.random().toString(36).substring(2)}`;
   private parts: Array<MultipartFormDataBodyPart> = [];
 
-  public async encode(): Promise<ArrayBuffer> {
+  public async encode(): Promise<Buffer> {
     if (this.parts.length === 0) {
       throw new Error('MultipartFormDataBody must have at least one part');
     }
@@ -35,7 +35,7 @@ export class MultipartFormDataBody {
       else if (typeof item === 'string') list.push(Buffer.from(item, 'utf8'));
       else list.push(item);
     }
-    return Buffer.concat(list).buffer;
+    return Buffer.concat(list);
   }
 
   public getBoundary(): string {

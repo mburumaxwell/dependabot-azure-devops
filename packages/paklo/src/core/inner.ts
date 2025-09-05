@@ -166,7 +166,7 @@ export class InnerApiClient {
     let body: BodyInit | undefined = undefined;
     if (skipSerialization(payload)) body = payload;
     else if (payload instanceof MultipartFormDataBody) {
-      body = await payload.encode();
+      body = new Uint8Array(await payload.encode());
       headers.set(HEADER_NAME_CONTENT_TYPE, payload.getContentType());
     } else {
       body = JSON.stringify(payload);
@@ -266,7 +266,6 @@ function skipSerialization(
     payload instanceof Blob ||
     payload instanceof ArrayBuffer ||
     payload instanceof Buffer ||
-    // payload instanceof ArrayBufferView ||
     typeof payload === 'string' ||
     !payload
   );
