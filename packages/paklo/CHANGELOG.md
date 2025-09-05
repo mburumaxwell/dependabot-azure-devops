@@ -1,5 +1,34 @@
 # paklo
 
+## 0.7.0
+
+### Minor Changes
+
+- 464b287: Add support for running with Docker directly instead of through dependabot-cli
+- 6eedcd0: Add support for cleaning up old images, containers or networks
+- 98b0674: Update job config schema to make certain fields required. The dependabot-cli used to fill this automatically but without it, we need to add them
+- 47549f4: Add jobs runner that contains most logic from run command
+- e552f59: Replace axios with inbuilt fetch
+- b8c85fd: Allow selection of target update ids in the CLI
+- 81eed7e: Replicate output processor functionality into a local server bridging Azure DevOps and dependabot
+- 50ab5c7: Skip authentication of job token if the request is HTTP because the proxy will have omitted it
+- 544fca1: Convert extension task to no longer use dependabot CLI
+- 5fe3503: Support security only updates in CLI
+- 16b1cb6: Added ApiClient which sits in between the runner and the API
+  This gets the CLI and shared package at par with github/dependabot-action clearing the way for migrating the v2 task and for managed runs later.
+- 058603b: Replace azure-devops-node-api with native fetch calls
+- 99dd824: Change job id values to be numbers generated randomly by default
+- c63f3ee: Refactor authentication to be job specific even though we use the same token for all jobs in the CLI
+
+### Patch Changes
+
+- 566068d: Give the server a second to startup
+- 48ed65e: Remove logging using `azure-pipelines-task-lib` in shared package
+- 2a09c52: Change job token generation to crypto random
+- 076178d: Find values for replacing tokens from the environment variables too
+- 3790eee: Add --job-token option for easier life during testing
+- 9ef5de7: Server should listen to all interfaces for local/host server
+
 ## 0.6.0
 
 ### Minor Changes

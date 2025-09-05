@@ -1,5 +1,41 @@
 # extension-azure-devops
 
+## 2.58.0
+
+### Minor Changes
+
+- 6eedcd0: Add support for cleaning up old images, containers or networks
+- 81eed7e: Replicate output processor functionality into a local server bridging Azure DevOps and dependabot
+- 544fca1: Convert extension task to no longer use dependabot CLI
+- 058603b: Replace azure-devops-node-api with native fetch calls
+- 99dd824: Change job id values to be numbers generated randomly by default
+
+### Patch Changes
+
+- 5fe3503: Support security only updates in CLI
+- 44bd9a9: Flat file layout in the extension for easier migration to shared tools
+- Updated dependencies [464b287]
+- Updated dependencies [566068d]
+- Updated dependencies [6eedcd0]
+- Updated dependencies [98b0674]
+- Updated dependencies [47549f4]
+- Updated dependencies [48ed65e]
+- Updated dependencies [e552f59]
+- Updated dependencies [2a09c52]
+- Updated dependencies [b8c85fd]
+- Updated dependencies [076178d]
+- Updated dependencies [3790eee]
+- Updated dependencies [81eed7e]
+- Updated dependencies [50ab5c7]
+- Updated dependencies [544fca1]
+- Updated dependencies [5fe3503]
+- Updated dependencies [16b1cb6]
+- Updated dependencies [058603b]
+- Updated dependencies [99dd824]
+- Updated dependencies [9ef5de7]
+- Updated dependencies [c63f3ee]
+  - paklo@0.7.0
+
 ## 2.57.0
 
 ### Minor Changes
