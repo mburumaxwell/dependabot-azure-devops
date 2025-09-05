@@ -1,7 +1,4 @@
-# Paklo
-
-[![npm version](https://img.shields.io/npm/v/paklo.svg)](https://www.npmjs.com/package/paklo)
-[![license](https://img.shields.io/github/license/mburumaxwell/dependabot-azure-devops.svg?style=flat-square)](LICENSE)
+# Paklo CLI
 
 A powerful CLI tool for running Dependabot updates against Azure DevOps repositories from anywhere - your local machine, CI/CD pipelines, or any environment with Docker support.
 
@@ -21,10 +18,10 @@ Unlike GitHub's hosted Dependabot service, Azure DevOps repositories need a diff
 
 ```bash
 # Install globally
-npm install -g paklo
+npm install -g @paklo/cli
 
 # Or use with npx
-npx paklo --help
+npx @paklo/cli --help
 ```
 
 ## Quick Start
@@ -211,7 +208,7 @@ Paklo can be integrated into CI/CD pipelines for testing dependency updates:
 ```yaml
 # Azure Pipelines example
 - script: |
-    npm install -g paklo
+    npm install -g @paklo/cli
     paklo validate $(System.TeamFoundationCollectionUri) $(System.TeamProject) $(Build.Repository.Name) --git-token $(System.AccessToken)
   displayName: 'Validate Dependabot Config'
 ```
@@ -222,7 +219,7 @@ Run Paklo in a containerized environment:
 
 ```dockerfile
 FROM node:22-alpine
-RUN npm install -g paklo
+RUN npm install -g @paklo/cli
 WORKDIR /app
 CMD ["paklo", "--help"]
 ```
