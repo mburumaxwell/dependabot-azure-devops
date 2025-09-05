@@ -58,7 +58,7 @@ export const command = new Command('validate')
     '<organisation-url>',
     'URL of the organisation e.g. https://dev.azure.com/my-org or https://my-org.visualstudio.com or http://my-org.com:8443/tfs',
   )
-  .argument('<project>', 'Name or ID of the project')
+  .requiredOption('--project <PROJECT>', 'Name or ID of the project')
   .requiredOption('--repository <REPOSITORY>', 'Name or ID of the repository')
   .requiredOption('--git-token <GIT-TOKEN>', 'Token to use for authenticating access to the git repository.')
   .action(
@@ -69,8 +69,7 @@ export const command = new Command('validate')
           schema,
           input: {
             organisationUrl: args[0],
-            project: args[1],
-            ...args[2],
+            ...args[1],
           },
           command: args.at(-1),
         }),
