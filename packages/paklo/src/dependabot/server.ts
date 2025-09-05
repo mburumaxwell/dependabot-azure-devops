@@ -8,7 +8,6 @@ import { type GitAuthor } from './author';
 import { type DependabotUpdate } from './config';
 import { type DependabotCredential, type DependabotJobConfig } from './job';
 import { logger } from './logger';
-import { type DependabotOperationType } from './scenario';
 import {
   DependabotClosePullRequestSchema,
   DependabotCreatePullRequestSchema,
@@ -23,31 +22,31 @@ import {
   DependabotUpdatePullRequestSchema,
 } from './update';
 
+export const DependabotRequestTypeSchema = z.enum([
+  'create_pull_request',
+  'update_pull_request',
+  'close_pull_request',
+  'record_update_job_error',
+  'record_update_job_unknown_error',
+  'mark_as_processed',
+  'update_dependency_list',
+  'record_ecosystem_versions',
+  'record_ecosystem_meta',
+  'increment_metric',
+  'record_metrics',
+]);
+export type DependabotRequestType = z.infer<typeof DependabotRequestTypeSchema>;
+
 export const DependabotRequestSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('create_pull_request'), data: DependabotCreatePullRequestSchema }),
   z.object({ type: z.literal('update_pull_request'), data: DependabotUpdatePullRequestSchema }),
   z.object({ type: z.literal('close_pull_request'), data: DependabotClosePullRequestSchema }),
-  z.object({
-    type: z.literal('record_update_job_error'),
-    data: DependabotRecordUpdateJobErrorSchema,
-  }),
-  z.object({
-    type: z.literal('record_update_job_unknown_error'),
-    data: DependabotRecordUpdateJobUnknownErrorSchema,
-  }),
+  z.object({ type: z.literal('record_update_job_error'), data: DependabotRecordUpdateJobErrorSchema }),
+  z.object({ type: z.literal('record_update_job_unknown_error'), data: DependabotRecordUpdateJobUnknownErrorSchema }),
   z.object({ type: z.literal('mark_as_processed'), data: DependabotMarkAsProcessedSchema }),
-  z.object({
-    type: z.literal('update_dependency_list'),
-    data: DependabotUpdateDependencyListSchema,
-  }),
-  z.object({
-    type: z.literal('record_ecosystem_versions'),
-    data: DependabotRecordEcosystemVersionsSchema,
-  }),
-  z.object({
-    type: z.literal('record_ecosystem_meta'),
-    data: DependabotRecordEcosystemMetaSchema.array(),
-  }),
+  z.object({ type: z.literal('update_dependency_list'), data: DependabotUpdateDependencyListSchema }),
+  z.object({ type: z.literal('record_ecosystem_versions'), data: DependabotRecordEcosystemVersionsSchema }),
+  z.object({ type: z.literal('record_ecosystem_meta'), data: DependabotRecordEcosystemMetaSchema.array() }),
   z.object({ type: z.literal('increment_metric'), data: DependabotIncrementMetricSchema }),
   z.object({ type: z.literal('record_metrics'), data: DependabotMetricSchema.array() }),
 ]);
@@ -126,7 +125,7 @@ export function createApiServerApp({
   // - POST  request to /record_ecosystem_meta
   // - POST  request to /increment_metric
 
-  function operation<T extends ZodType>(type: DependabotOperationType, schema: T, method?: string) {
+  function operation<T extends ZodType>(type: DependabotRequestType, schema: T, method?: string) {
     app.on(
       method || 'post',
       `/:id/${type}`,

@@ -223,7 +223,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
 
       let jobId: number | undefined = undefined;
       let job: DependabotJobConfig | undefined = undefined;
-      let credentials: DependabotCredential[] | undefined = undefined; // TODO: remove this to be handled by the ApiClient
+      let credentials: DependabotCredential[] | undefined = undefined;
       let jobToken: string;
       let credentialsToken: string;
 
@@ -236,10 +236,10 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       const securityUpdatesOnly = update['open-pull-requests-limit'] === 0;
       if (securityUpdatesOnly) {
         // Run an update job to discover all dependencies
-        ({ jobId, job, credentials } = builder.forDependenciesList({}));
+        ({ id: jobId, job, credentials } = builder.forDependenciesList({}));
         ({ jobToken, credentialsToken } = this.makeTokens());
         server.add({ id: jobId, update, job, jobToken, credentialsToken, credentials });
-        const { success, message } = await runJob({
+        await runJob({
           outDir,
           dependabotApiUrl,
           dependabotApiDockerUrl,
@@ -310,7 +310,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       if (!hasReachedOpenPullRequestLimit) {
         const dependenciesHaveVulnerabilities = dependencyNamesToUpdate.length && securityVulnerabilities.length;
         if (!securityUpdatesOnly || dependenciesHaveVulnerabilities) {
-          ({ jobId, job, credentials } = builder.forUpdate({
+          ({ id: jobId, job, credentials } = builder.forUpdate({
             dependencyNamesToUpdate,
             existingPullRequests: existingPullRequestDependenciesForPackageManager,
             securityVulnerabilities,
@@ -344,7 +344,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       if (numberOfPullRequestsToUpdate > 0) {
         if (!dryRun) {
           for (const pullRequestId in existingPullRequestsForPackageManager) {
-            ({ jobId, job, credentials } = builder.forUpdate({
+            ({ id: jobId, job, credentials } = builder.forUpdate({
               existingPullRequests: existingPullRequestDependenciesForPackageManager,
               pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
               securityVulnerabilities,

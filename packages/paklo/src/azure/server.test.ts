@@ -2,7 +2,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { type DependabotOperation } from '@/dependabot';
+import { type DependabotJobBuilderOutput, type DependabotUpdate } from '@/dependabot';
 import { type AzureDevOpsWebApiClient } from './client';
 import {
   DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
@@ -61,12 +61,13 @@ describe('AzureLocalDependabotServer', () => {
   });
 
   describe('handle', () => {
-    let operation: DependabotOperation;
+    let jobBuilderOutput: DependabotJobBuilderOutput;
+    let update: DependabotUpdate;
 
     beforeEach(() => {
       vi.clearAllMocks();
-      operation = {
-        jobId: 1,
+      jobBuilderOutput = {
+        id: 1,
         job: {
           'id': 1,
           'package-manager': 'npm_and_yarn',
@@ -91,19 +92,19 @@ describe('AzureLocalDependabotServer', () => {
           'ignore-conditions': [],
         },
         credentials: [],
-        update: {
-          'package-ecosystem': 'npm',
-        },
+      };
+      update = {
+        'package-ecosystem': 'npm',
       };
 
       // Mock the job and update methods
       server.add({
         id: 1,
-        update: operation.update,
-        job: operation.job,
+        update,
+        job: jobBuilderOutput.job,
         jobToken: 'test-token',
         credentialsToken: 'test-creds-token',
-        credentials: operation.credentials,
+        credentials: jobBuilderOutput.credentials,
       });
     });
 
@@ -124,11 +125,11 @@ describe('AzureLocalDependabotServer', () => {
       server = new AzureLocalDependabotServer(options);
       server.add({
         id: 1,
-        update: operation.update,
-        job: operation.job,
+        update,
+        job: jobBuilderOutput.job,
         jobToken: 'test-token',
         credentialsToken: 'test-creds-token',
-        credentials: operation.credentials,
+        credentials: jobBuilderOutput.credentials,
       });
 
       const result = await (server as any).handle(1, {
@@ -149,8 +150,8 @@ describe('AzureLocalDependabotServer', () => {
 
     it('should skip processing "create_pull_request" if open pull request limit is reached', async () => {
       const packageManager = 'nuget';
-      operation.update['open-pull-requests-limit'] = 1;
-      operation.job['package-manager'] = packageManager;
+      update['open-pull-requests-limit'] = 1;
+      jobBuilderOutput.job['package-manager'] = packageManager;
       existingPullRequests.push({
         id: 1,
         properties: [
@@ -162,11 +163,11 @@ describe('AzureLocalDependabotServer', () => {
       server = new AzureLocalDependabotServer(options);
       server.add({
         id: 1,
-        update: operation.update,
-        job: operation.job,
+        update,
+        job: jobBuilderOutput.job,
         jobToken: 'test-token',
         credentialsToken: 'test-creds-token',
-        credentials: operation.credentials,
+        credentials: jobBuilderOutput.credentials,
       });
 
       const result = await (server as any).handle(1, {
@@ -190,11 +191,11 @@ describe('AzureLocalDependabotServer', () => {
       server = new AzureLocalDependabotServer(options);
       server.add({
         id: 1,
-        update: operation.update,
-        job: operation.job,
+        update,
+        job: jobBuilderOutput.job,
         jobToken: 'test-token',
         credentialsToken: 'test-creds-token',
-        credentials: operation.credentials,
+        credentials: jobBuilderOutput.credentials,
       });
 
       vi.mocked(authorClient.createPullRequest).mockResolvedValue(11);
@@ -223,11 +224,11 @@ describe('AzureLocalDependabotServer', () => {
       server = new AzureLocalDependabotServer(options);
       server.add({
         id: 1,
-        update: operation.update,
-        job: operation.job,
+        update,
+        job: jobBuilderOutput.job,
         jobToken: 'test-token',
         credentialsToken: 'test-creds-token',
-        credentials: operation.credentials,
+        credentials: jobBuilderOutput.credentials,
       });
 
       const result = await (server as any).handle(1, {
@@ -265,7 +266,7 @@ describe('AzureLocalDependabotServer', () => {
 
     it('should process "update_pull_request"', async () => {
       options.autoApprove = true;
-      operation.job['package-manager'] = 'npm_and_yarn';
+      jobBuilderOutput.job['package-manager'] = 'npm_and_yarn';
 
       existingPullRequests.push({
         id: 11,
@@ -281,11 +282,11 @@ describe('AzureLocalDependabotServer', () => {
       server = new AzureLocalDependabotServer(options);
       server.add({
         id: 1,
-        update: operation.update,
-        job: operation.job,
+        update,
+        job: jobBuilderOutput.job,
         jobToken: 'test-token',
         credentialsToken: 'test-creds-token',
-        credentials: operation.credentials,
+        credentials: jobBuilderOutput.credentials,
       });
 
       vi.mocked(authorClient.updatePullRequest).mockResolvedValue(true);
@@ -313,11 +314,11 @@ describe('AzureLocalDependabotServer', () => {
       server = new AzureLocalDependabotServer(options);
       server.add({
         id: 1,
-        update: operation.update,
-        job: operation.job,
+        update,
+        job: jobBuilderOutput.job,
         jobToken: 'test-token',
         credentialsToken: 'test-creds-token',
-        credentials: operation.credentials,
+        credentials: jobBuilderOutput.credentials,
       });
 
       const result = await (server as any).handle(1, {
@@ -340,7 +341,7 @@ describe('AzureLocalDependabotServer', () => {
     });
 
     it('should process "close_pull_request"', async () => {
-      operation.job['package-manager'] = 'npm_and_yarn';
+      jobBuilderOutput.job['package-manager'] = 'npm_and_yarn';
       existingPullRequests.push({
         id: 11,
         properties: [
@@ -355,11 +356,11 @@ describe('AzureLocalDependabotServer', () => {
       server = new AzureLocalDependabotServer(options);
       server.add({
         id: 1,
-        update: operation.update,
-        job: operation.job,
+        update,
+        job: jobBuilderOutput.job,
         jobToken: 'test-token',
         credentialsToken: 'test-creds-token',
-        credentials: operation.credentials,
+        credentials: jobBuilderOutput.credentials,
       });
 
       vi.mocked(authorClient.abandonPullRequest).mockResolvedValue(true);

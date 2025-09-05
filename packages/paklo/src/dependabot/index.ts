@@ -13,7 +13,6 @@ export * from './jobs-runner';
 export * from './params';
 export * from './placeholder';
 export * from './proxy';
-export * from './scenario';
 export * from './server';
 export * from './update';
 export * from './updater';

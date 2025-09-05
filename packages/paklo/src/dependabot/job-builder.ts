@@ -17,12 +17,12 @@ import {
   type DependabotExistingPR,
   type DependabotExperiments,
   type DependabotGroupJob,
+  type DependabotJobConfig,
   type DependabotPackageManager,
   type DependabotSecurityAdvisory,
   type DependabotSource,
   type DependabotSourceProvider,
 } from './job';
-import { type DependabotInput } from './scenario';
 
 export type DependabotSourceInfo = {
   'provider': DependabotSourceProvider;
@@ -31,10 +31,11 @@ export type DependabotSourceInfo = {
   'repository-slug': string;
 };
 
-// TODO: reconsider if we need all these types once we stop using dependabot-cli
-
-/** Represents a single Dependabot operation */
-export type DependabotOperation = DependabotInput & { update: DependabotUpdate };
+export type DependabotJobBuilderOutput = {
+  id: number;
+  job: DependabotJobConfig;
+  credentials: DependabotCredential[];
+};
 
 /**
  * Class for building dependabot job objects
@@ -48,7 +49,6 @@ export class DependabotJobBuilder {
   private readonly packageManager: DependabotPackageManager;
   private readonly source: DependabotSource;
   private readonly credentials: DependabotCredential[];
-  private readonly credentialsMetadata: DependabotCredential[];
 
   constructor({
     source,
@@ -84,17 +84,15 @@ export class DependabotJobBuilder {
       githubToken,
       registries: config.registries,
     });
-    this.credentialsMetadata = makeCredentialsMetadata(this.credentials);
   }
 
   /**
    * Create a dependabot update job that updates nothing, but will discover the dependency list for a package ecosystem
    */
-  public forDependenciesList({ id }: { id?: number }): DependabotOperation {
+  public forDependenciesList({ id }: { id?: number }): DependabotJobBuilderOutput {
     id ??= makeRandomJobId();
     return {
-      jobId: id,
-      update: this.update,
+      id: id,
       job: {
         'id': id,
         'package-manager': this.packageManager,
@@ -112,7 +110,6 @@ export class DependabotJobBuilder {
         'requirements-update-strategy': null,
         'lockfile-only': false,
         'debug': this.debug,
-        'credentials-metadata': this.credentialsMetadata,
       },
       credentials: this.credentials,
     };
@@ -133,7 +130,7 @@ export class DependabotJobBuilder {
     existingPullRequests: (DependabotExistingPR[] | DependabotExistingGroupPR)[];
     pullRequestToUpdate?: DependabotExistingPR[] | DependabotExistingGroupPR;
     securityVulnerabilities?: SecurityVulnerability[];
-  }): DependabotOperation {
+  }): DependabotJobBuilderOutput {
     id ??= makeRandomJobId();
     const securityOnlyUpdate = this.update['open-pull-requests-limit'] == 0;
 
@@ -161,8 +158,7 @@ export class DependabotJobBuilder {
     }
 
     return {
-      jobId: id,
-      update: this.update,
+      id: id,
       job: {
         'id': id,
         'package-manager': this.packageManager,
@@ -197,7 +193,6 @@ export class DependabotJobBuilder {
         'lockfile-only': this.update['versioning-strategy'] === 'lockfile-only',
         'vendor-dependencies': this.update.vendor,
         'debug': this.debug,
-        'credentials-metadata': this.credentialsMetadata,
         'proxy-log-response-body-on-auth-failure': true,
         'max-updater-run-time': 2700,
         'enable-beta-ecosystems': this.config['enable-beta-ecosystems'] || false,
@@ -431,14 +426,6 @@ export function mapCredentials({
   }
 
   return credentials;
-}
-
-// TODO: remove this because the updater does it
-export function makeCredentialsMetadata(credentials: DependabotCredential[]): DependabotCredential[] {
-  const sensitive = ['username', 'token', 'password', 'key', 'auth-key'];
-  return credentials.map((cred) =>
-    Object.fromEntries(Object.entries(cred).filter(([key]) => !sensitive.includes(key))),
-  );
 }
 
 export function makeRandomJobId(): number {
