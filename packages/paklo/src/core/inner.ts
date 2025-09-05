@@ -207,7 +207,8 @@ export class InnerApiClient {
         }
       }
 
-      let data = Boolean(response.headers.get('content-length')) ? ((await response.json()) as T) : undefined;
+      const contentLength = response.headers.get('content-length');
+      let data = contentLength && contentLength !== '0' ? ((await response.json()) as T) : undefined;
       if (data && schema) {
         const result = await schema.safeParseAsync(data);
         if (!result.success) {
