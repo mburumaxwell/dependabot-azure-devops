@@ -64,6 +64,14 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       approverClient,
     } = this;
 
+    // Print a warning about the required workarounds for security-only updates, if any update is configured as such
+    // TODO: If and when Dependabot supports a better way to do security-only updates, remove this.
+    if (config.updates?.some((u) => u['open-pull-requests-limit'] === 0)) {
+      logger.warn(
+        'Security-only updates incur a slight performance overhead due to limitations in Dependabot CLI. For more info, see: https://github.com/mburumaxwell/dependabot-azure-devops/blob/main/README.md#configuring-security-advisories-and-known-vulnerabilities',
+      );
+    }
+
     // Fetch the active pull requests created by the author user
     const existingBranchNames = await authorClient.getBranchNames(url.project, url.repository);
     const existingPullRequests = await authorClient.getActivePullRequestProperties(

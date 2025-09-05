@@ -418,7 +418,6 @@ export function mapCredentials({
     });
   }
   if (registries) {
-    // TODO: only registries with secure information should be copied otherwise it does not quality to be a credential
     // TODO: only registries for the current update should be set
     // Required to authenticate with private package feeds when finding the latest version of dependencies.
     // The registries have already been worked on (see parseRegistries) so there is no need to do anything else.

@@ -1,13 +1,4 @@
-import {
-  debug,
-  error,
-  getVariable,
-  setResult,
-  setVariable,
-  TaskResult,
-  warning,
-  which,
-} from 'azure-pipelines-task-lib/task';
+import { debug, error, getVariable, setResult, setVariable, TaskResult, which } from 'azure-pipelines-task-lib/task';
 import { existsSync } from 'fs';
 import { rm } from 'fs/promises';
 import { tmpdir } from 'os';
@@ -65,14 +56,6 @@ async function run() {
       throw new Error('Failed to parse dependabot.yaml configuration file from the target repository');
     }
 
-    // Print a warning about the required workarounds for security-only updates, if any update is configured as such
-    // TODO: If and when Dependabot supports a better way to do security-only updates, remove this.
-    if (config.updates?.some((u) => u['open-pull-requests-limit'] === 0)) {
-      warning(
-        'Security-only updates incur a slight performance overhead due to limitations in Dependabot CLI. For more info, see: https://github.com/mburumaxwell/dependabot-azure-devops/blob/main/README.md#configuring-security-advisories-and-known-vulnerabilities',
-      );
-    }
-
     // Create a secret masker for Azure Pipelines
     const secretMasker: SecretMasker = (value: string) => (inputs.secrets ? setSecrets(value) : value);
 
@@ -94,6 +77,7 @@ async function run() {
       githubToken: inputs.githubAccessToken,
       author,
       autoApproveToken: inputs.autoApproveUserToken,
+      // TODO: pass proxyCertPath support if needed
     };
 
     // Run the Azure Local Jobs Runner

@@ -53,6 +53,15 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     ...remainingOptions
   } = options;
 
+  // Convert experiments from comma separated key value pairs to a record
+  // If no experiments are defined, use the default experiments
+  let experiments = parseExperiments(rawExperiments);
+  if (!experiments) {
+    experiments = DEFAULT_EXPERIMENTS;
+    logger.debug('No experiments provided; Using default experiments.');
+  }
+  logger.debug(`Experiments: ${JSON.stringify(experiments)}`);
+
   if (updaterImage) {
     // If the updater image is provided but does not contain the "{ecosystem}" placeholder, tell the user they've misconfigured it
     if (!updaterImage.includes('{ecosystem}')) {
@@ -106,24 +115,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     `Configuration file valid: ${config.updates.length} update(s) and ${config.registries?.length ?? 'no'} registries.`,
   );
 
-  // Print a warning about the required workarounds for security-only updates, if any update is configured as such
-  // TODO: If and when Dependabot supports a better way to do security-only updates, remove this.
-  if (config.updates?.some((u) => u['open-pull-requests-limit'] === 0)) {
-    logger.warn(
-      'Security-only updates incur a slight performance overhead due to limitations in Dependabot CLI. For more info, see: https://github.com/mburumaxwell/dependabot-azure-devops/blob/main/README.md#configuring-security-advisories-and-known-vulnerabilities',
-    );
-  }
-
   try {
-    // Convert experiments from comma separated key value pairs to a record
-    // If no experiments are defined, use the default experiments
-    let experiments = parseExperiments(rawExperiments);
-    if (!experiments) {
-      experiments = DEFAULT_EXPERIMENTS;
-      logger.debug('No experiments provided; Using default experiments.');
-    }
-    logger.debug(`Experiments: ${JSON.stringify(experiments)}`);
-
     const runnerOptions: AzureLocalJobsRunnerOptions = {
       config,
       secretMasker,
