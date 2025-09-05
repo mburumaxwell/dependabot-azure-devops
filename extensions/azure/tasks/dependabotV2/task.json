@@ -201,22 +201,6 @@
       "helpMarkDown": "A semicolon (`;`) delimited list of update identifiers run. Index are zero-based and in the order written in the configuration file. When not present, all the updates are run. This is meant to be used in scenarios where you want to run updates a different times from the same configuration file given you cannot schedule them independently in the pipeline."
     },
     {
-      "name": "dependabotCliPackage",
-      "type": "string",
-      "groupName": "advanced",
-      "label": "Dependabot CLI package",
-      "required": false,
-      "helpMarkDown": "The [Dependabot CLI package](https://pkg.go.dev/github.com/dependabot/cli) to use for updates. This is intended to be used in scenarios where 'latest' has issues and you want to pin a known working version, or use a custom package. Defaults to `github.com/dependabot/cli/cmd/dependabot@latest`"
-    },
-    {
-      "name": "dependabotCliApiUrl",
-      "type": "string",
-      "groupName": "advanced",
-      "label": "Dependabot CLI apiUrl argument",
-      "required": false,
-      "helpMarkDown": "The apiUrl argument of the `dependabot update` command. This argument is necessary when the DevOps agent is running inside docker."
-    },
-    {
       "name": "dependabotCliApiListeningPort",
       "type": "int",
       "groupName": "advanced",

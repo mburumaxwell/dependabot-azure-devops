@@ -70,7 +70,7 @@ type AuthenticatorFunc = (type: DependabotTokenType, id: number, value: string) 
  * @param request - The dependabot request to handle.
  * @returns A promise that resolves to the result of handling the request.
  */
-type HandlerFunc = (id: number, request: DependabotRequest) => Promise<DependabotRequestHandleResult>;
+type HandlerFunc = (id: number, request: DependabotRequest) => Promise<boolean>;
 
 export type CreateApiServerAppOptions = {
   /**
@@ -155,7 +155,7 @@ export function createApiServerApp({
         const { id } = context.req.valid('param');
         const { data } = context.req.valid('json') as { data: z.infer<typeof schema> };
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        const success = await handle(id, { type, data: data as any });
+        const success: boolean = await handle(id, { type, data: data as any });
         return context.body(null, success ? 200 : 400);
       },
     );
@@ -216,6 +216,27 @@ export function createApiServerApp({
   return app;
 }
 
+export type LocalDependabotServerAddOptions = {
+  /** The ID of the dependabot job. */
+  id: number;
+  /** The dependabot update associated with the job. */
+  update: DependabotUpdate;
+  /** The dependabot job configuration. */
+  job: DependabotJobConfig;
+  /** The authentication token for the job. */
+  jobToken: string;
+  /** The authentication token for the job. */
+  credentialsToken: string;
+  /** The credentials associated with the job. */
+  credentials: DependabotCredential[];
+};
+
+export type AffectedPullRequestIds = {
+  created: number[];
+  updated: number[];
+  closed: number[];
+};
+
 export type LocalDependabotServerOptions = Omit<
   CreateApiServerAppOptions,
   'authenticate' | 'getJob' | 'getCredentials' | 'handle'
@@ -224,11 +245,6 @@ export type LocalDependabotServerOptions = Omit<
   debug: boolean;
   dryRun: boolean;
 };
-export type DependabotRequestHandleResult = {
-  success: boolean;
-  pr?: number;
-};
-
 export abstract class LocalDependabotServer {
   private readonly hostname = 'localhost';
   private readonly server: ReturnType<typeof createAdaptorServer>;
@@ -239,7 +255,7 @@ export abstract class LocalDependabotServer {
   private readonly jobCredentials = new Map<number, DependabotCredential[]>();
   private readonly receivedRequests = new Map<number, DependabotRequest[]>();
 
-  protected readonly createdPullRequestIds: number[] = []; // TODO: not sure if we really need this or it should be a Map
+  protected readonly affectedPullRequestIds = new Map<number, AffectedPullRequestIds>();
 
   constructor(options: LocalDependabotServerOptions) {
     const app = createApiServerApp({
@@ -287,28 +303,24 @@ export abstract class LocalDependabotServer {
    * Adds a dependabot job.
    * @param value - The dependabot job details.
    */
-  add(value: {
-    /** The ID of the dependabot job. */
-    id: number;
-    /** The dependabot update associated with the job. */
-    update: DependabotUpdate;
-    /** The dependabot job configuration. */
-    job: DependabotJobConfig;
-    /** The authentication token for the job. */
-    jobToken: string;
-    /** The authentication token for the job. */
-    credentialsToken: string;
-    /** The credentials associated with the job. */
-    credentials: DependabotCredential[];
-  }) {
+  add(value: LocalDependabotServerAddOptions) {
     const { id, update, job, jobToken, credentialsToken, credentials } = value;
-    const { trackedJobs, updates, jobTokens, credentialTokens, jobCredentials, receivedRequests } = this;
+    const {
+      trackedJobs,
+      updates,
+      jobTokens,
+      credentialTokens,
+      jobCredentials,
+      receivedRequests,
+      affectedPullRequestIds,
+    } = this;
     trackedJobs.set(id, job);
     updates.set(id, update);
     jobTokens.set(id, jobToken);
     credentialTokens.set(id, credentialsToken);
     jobCredentials.set(id, credentials);
     receivedRequests.set(id, []);
+    affectedPullRequestIds.set(id, { created: [], updated: [], closed: [] });
   }
 
   /**
@@ -357,6 +369,27 @@ export abstract class LocalDependabotServer {
   }
 
   /**
+   * Gets the IDs of pull requests affected by a dependabot job by ID.
+   * @param id - The ID of the dependabot job to get affected pull request IDs for.
+   * @returns The affected pull request IDs for the job, or undefined if not found.
+   */
+  affectedPrs(id: number): AffectedPullRequestIds | undefined {
+    const { affectedPullRequestIds } = this;
+    return affectedPullRequestIds.get(id);
+  }
+
+  /**
+   * Gets all IDs of pull requests affected by a dependabot job by ID.
+   * @param id - The ID of the dependabot job to get affected pull request IDs for.
+   * @returns The affected pull request IDs for the job, or undefined if not found.
+   */
+  allAffectedPrs(id: number): number[] {
+    const affected = this.affectedPrs(id);
+    if (!affected) return [];
+    return [...affected.created, ...affected.updated, ...affected.closed];
+  }
+
+  /**
    * Clears all data associated with a dependabot job by ID.
    * This should be called when the job is no longer needed.
    * @param id - The ID of the dependabot job to clear.
@@ -368,6 +401,7 @@ export abstract class LocalDependabotServer {
     this.credentialTokens.delete(id);
     this.jobCredentials.delete(id);
     this.receivedRequests.delete(id);
+    this.affectedPullRequestIds.delete(id);
   }
 
   /**
@@ -395,8 +429,8 @@ export abstract class LocalDependabotServer {
    * @param request - The dependabot request to handle.
    * @returns A promise that resolves to the result of handling the request.
    */
-  protected handle(id: number, request: DependabotRequest): Promise<DependabotRequestHandleResult> {
+  protected handle(id: number, request: DependabotRequest): Promise<boolean> {
     this.receivedRequests.get(id)!.push(request);
-    return Promise.resolve({ success: true, pr: undefined });
+    return Promise.resolve(true);
   }
 }

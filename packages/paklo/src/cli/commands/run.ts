@@ -79,6 +79,14 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     `Configuration file valid: ${config.updates.length} update(s) and ${config.registries?.length ?? 'no'} registries.`,
   );
 
+  // Print a warning about the required workarounds for security-only updates, if any update is configured as such
+  // TODO: If and when Dependabot supports a better way to do security-only updates, remove this.
+  if (config.updates?.some((u) => u['open-pull-requests-limit'] === 0)) {
+    logger.warn(
+      'Security-only updates incur a slight performance overhead due to limitations in Dependabot CLI. For more info, see: https://github.com/mburumaxwell/dependabot-azure-devops/blob/main/README.md#configuring-security-advisories-and-known-vulnerabilities',
+    );
+  }
+
   try {
     const runnerOptions: AzureLocalJobsRunnerOptions = {
       config,
@@ -90,9 +98,10 @@ async function handler({ options, error }: HandlerOptions<Options>) {
       ...remainingOptions,
     };
     const runner = new AzureLocalJobsRunner(runnerOptions);
-    const { success, message } = await runner.run();
+    const result = await runner.run();
+    const success = result.every((r) => r.success);
     if (!success) {
-      error(message);
+      error(result.map((r) => r.message).join('\n'));
       return;
     }
   } catch (err) {

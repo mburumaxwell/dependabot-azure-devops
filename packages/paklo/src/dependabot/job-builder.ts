@@ -22,7 +22,7 @@ import {
   type DependabotSource,
   type DependabotSourceProvider,
 } from './job';
-import { type DependabotInput, type DependabotOutput } from './scenario';
+import { type DependabotInput } from './scenario';
 
 export type DependabotSourceInfo = {
   'provider': DependabotSourceProvider;
@@ -35,14 +35,6 @@ export type DependabotSourceInfo = {
 
 /** Represents a single Dependabot operation */
 export type DependabotOperation = DependabotInput & { update: DependabotUpdate };
-
-/** Represents the output of a Dependabot CLI update operation */
-export type DependabotOperationResult = {
-  success: boolean;
-  error?: Error;
-  output?: DependabotOutput;
-  pr?: number;
-};
 
 /**
  * Class for building dependabot job objects

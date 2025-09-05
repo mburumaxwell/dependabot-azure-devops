@@ -2,7 +2,6 @@ import {
   getBranchNameForUpdate,
   LocalDependabotServer,
   type DependabotRequest,
-  type DependabotRequestHandleResult,
   type LocalDependabotServerOptions,
 } from '@/dependabot';
 import { type AzureDevOpsWebApiClient } from './client';
@@ -40,7 +39,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
     this.options = options;
   }
 
-  protected async handle(id: number, request: DependabotRequest): Promise<DependabotRequestHandleResult> {
+  protected override async handle(id: number, request: DependabotRequest): Promise<boolean> {
     await super.handle(id, request); // common logic
 
     const {
@@ -58,14 +57,14 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         debug,
         dryRun,
       },
-      createdPullRequestIds,
+      affectedPullRequestIds,
     } = this;
 
     const { type, data } = request;
     const job = await this.job(id);
     if (!job) {
       logger.error(`No job found for ID '${id}', cannot process request of type '${type}'`);
-      return { success: false };
+      return false;
     }
     const { ['package-manager']: packageManager } = job;
     logger.info(`Processing '${type}' for job ID '${id}'`);
@@ -84,7 +83,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         const title = data['pr-title'];
         if (dryRun) {
           logger.warn(`Skipping pull request creation of '${title}' as 'dryRun' is set to 'true'`);
-          return { success: true };
+          return true;
         }
 
         // Skip if active pull request limit reached.
@@ -94,7 +93,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         // Dependabot will use this to determine if we need to create new pull requests or update/close existing ones
         const existingPullRequestsForPackageManager = parsePullRequestProperties(existingPullRequests, packageManager);
         const existingPullRequestsCount = Object.entries(existingPullRequestsForPackageManager).length;
-        const openPullRequestsCount = createdPullRequestIds.length + existingPullRequestsCount;
+        const openPullRequestsCount = affectedPullRequestIds.get(id)!.created.length + existingPullRequestsCount;
         const hasReachedOpenPullRequestLimit =
           openPullRequestsLimit > 0 && openPullRequestsCount >= openPullRequestsLimit;
 
@@ -102,7 +101,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           logger.warn(
             `Skipping pull request creation of '${title}' as the open pull requests limit (${openPullRequestsLimit}) has been reached`,
           );
-          return { success: true };
+          return true;
         }
 
         const changedFiles = getPullRequestChangedFilesForOutputData(data);
@@ -123,14 +122,14 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           logger.error(
             `Unable to create pull request '${title}' as source branch '${sourceBranch}' already exists; Delete the existing branch and try again.`,
           );
-          return { success: false };
+          return false;
         }
         const conflictingBranches = existingBranchNames?.filter((branch) => sourceBranch.startsWith(branch)) || [];
         if (conflictingBranches.length) {
           logger.error(
             `Unable to create pull request '${title}' as source branch '${sourceBranch}' would conflict with existing branch(es) '${conflictingBranches.join(', ')}'; Delete the conflicting branch(es) and try again.`,
           );
-          return { success: false };
+          return false;
         }
 
         // Create a new pull request
@@ -185,17 +184,17 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
 
         // Store the new pull request ID, so we can keep track of the total number of open pull requests
         if (newPullRequestId && newPullRequestId > 0) {
-          createdPullRequestIds.push(newPullRequestId);
-          return { success: true, pr: newPullRequestId };
+          affectedPullRequestIds.get(id)!.created.push(newPullRequestId);
+          return true;
         } else {
-          return { success: false };
+          return false;
         }
       }
 
       case 'update_pull_request': {
         if (dryRun) {
           logger.warn(`Skipping pull request update as 'dryRun' is set to 'true'`);
-          return { success: true };
+          return true;
         }
 
         // Find the pull request to update
@@ -208,7 +207,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           logger.error(
             `Could not find pull request to update for package manager '${packageManager}' with dependencies '${data['dependency-names'].join(', ')}'`,
           );
-          return { success: false };
+          return false;
         }
 
         // Update the pull request
@@ -233,13 +232,17 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           });
         }
 
-        return { success: pullRequestWasUpdated, pr: pullRequestToUpdate.id };
+        if (pullRequestWasUpdated) {
+          affectedPullRequestIds.get(id)!.updated.push(pullRequestToUpdate.id);
+          return true;
+        }
+        return false;
       }
 
       case 'close_pull_request': {
         if (dryRun) {
           logger.warn(`Skipping pull request closure as 'dryRun' is set to 'true'`);
-          return { success: true };
+          return true;
         }
 
         // Find the pull request to close
@@ -252,7 +255,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           logger.error(
             `Could not find pull request to close for package manager '${packageManager}' with dependencies '${data['dependency-names'].join(', ')}'`,
           );
-          return { success: false };
+          return false;
         }
 
         // TODO: GitHub Dependabot will close with reason "Superseded by ${new_pull_request_id}" when another PR supersedes it.
@@ -266,38 +269,33 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           comment: getPullRequestCloseReasonForOutputData(data),
           deleteSourceBranch: true,
         });
-        return { success, pr: pullRequestToClose.id };
+        if (success) {
+          affectedPullRequestIds.get(id)!.closed.push(pullRequestToClose.id);
+          return true;
+        }
+        return false;
       }
 
+      // No action required
       case 'update_dependency_list':
-        return { success: true }; // No action required
-
       case 'mark_as_processed':
-        return { success: true };
-
       case 'record_ecosystem_versions':
-        return { success: true };
-
       case 'record_ecosystem_meta':
-        return { success: true };
+      case 'increment_metric':
+      case 'record_metrics':
+        return true;
 
       case 'record_update_job_error':
         logger.error(`Update job error: ${data['error-type']} ${JSON.stringify(data['error-details'])}`);
-        return { success: false };
+        return true;
 
       case 'record_update_job_unknown_error':
         logger.error(`Update job unknown error: ${data['error-type']}, ${JSON.stringify(data['error-details'])}`);
-        return { success: false };
-
-      case 'increment_metric':
-        return { success: true };
-
-      case 'record_metrics':
-        return { success: true };
+        return true;
 
       default:
         logger.warn(`Unknown dependabot output type '${type}', ignoring...`);
-        return { success: true };
+        return true;
     }
   }
 }

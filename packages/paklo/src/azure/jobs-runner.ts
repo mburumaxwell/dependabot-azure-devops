@@ -10,9 +10,8 @@ import {
   type DependabotCredential,
   type DependabotJobConfig,
   type DependabotUpdate,
-  type LocalDependabotServer,
   type LocalJobsRunnerOptions,
-  type RunJobResult,
+  type RunJobsResult,
 } from '@/dependabot';
 import {
   filterVulnerabilities,
@@ -57,7 +56,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       : undefined;
   }
 
-  public async run(): Promise<RunJobResult> {
+  public override async run(): Promise<RunJobsResult> {
     await super.run(); // common logic
 
     const {
@@ -190,16 +189,18 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
    */
   private async performUpdates(
     outDir: string,
-    server: LocalDependabotServer,
+    server: AzureLocalDependabotServer,
     updates: DependabotUpdate[],
     existingPullRequests: IPullRequestProperties[],
     dependabotApiUrl: string,
     dependabotApiDockerUrl?: string,
     dependabotApiLocalUrl?: string,
-  ): Promise<RunJobResult> {
+  ): Promise<RunJobsResult> {
     const {
       options: { url, gitToken, githubToken, config, dryRun, securityAdvisoriesFile, secretMasker },
     } = this;
+
+    const results: RunJobsResult = [];
 
     for (const update of updates) {
       const packageEcosystem = update['package-ecosystem'];
@@ -248,7 +249,6 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
           credentialsToken,
           secretMasker,
         });
-        if (!success) return { success, message };
 
         const outputs = server.requests(jobId);
         const packagesToCheckForVulnerabilities: Package[] | undefined = outputs!
@@ -327,8 +327,9 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
             credentialsToken,
             secretMasker,
           });
+          const affectedPrs = server.allAffectedPrs(jobId);
           server.clear(jobId);
-          if (!success) return { success, message };
+          results.push({ id: jobId, success, message, affectedPrs });
         } else {
           logger.info('Nothing to update; dependencies are not affected by any known vulnerability');
         }
@@ -360,8 +361,9 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
               credentialsToken,
               secretMasker,
             });
+            const affectedPrs = server.allAffectedPrs(jobId);
             server.clear(jobId);
-            if (!success) return { success, message };
+            results.push({ id: jobId, success, message, affectedPrs });
           }
         } else {
           logger.warn(
@@ -371,6 +373,6 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       }
     }
 
-    return { success: true };
+    return results;
   }
 }

@@ -1,20 +1,36 @@
 import { handle } from 'hono/vercel';
 
-import { createApiServerApp, type DependabotRequest, type DependabotRequestHandleResult } from 'paklo/dependabot';
+import {
+  createApiServerApp,
+  type DependabotCredential,
+  type DependabotJobConfig,
+  type DependabotRequest,
+  type DependabotTokenType,
+} from 'paklo/dependabot';
 
 export const dynamic = 'force-dynamic';
 
-function authenticate(id: number, value: string): Promise<boolean> {
+function authenticate(type: DependabotTokenType, id: number, value: string): Promise<boolean> {
   return Promise.resolve(false); // TODO: implement actual logic
 }
 
-function handleRequest(id: number, request: DependabotRequest): Promise<DependabotRequestHandleResult> {
-  return undefined!; // TODO: implement actual logic
+function getJob(id: number): Promise<DependabotJobConfig | undefined> {
+  return Promise.resolve(undefined); // TODO: implement actual logic
+}
+
+function getCredentials(id: number): Promise<DependabotCredential[] | undefined> {
+  return Promise.resolve(undefined); // TODO: implement actual logic
+}
+
+function handleRequest(id: number, request: DependabotRequest): Promise<boolean> {
+  return Promise.resolve(true); // TODO: implement actual logic
 }
 
 const app = createApiServerApp({
   basePath: '/api/update_jobs',
   authenticate,
+  getJob,
+  getCredentials,
   handle: handleRequest,
 });
 

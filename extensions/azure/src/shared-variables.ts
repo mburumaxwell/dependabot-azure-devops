@@ -46,10 +46,6 @@ export interface ISharedVariables {
   /** Whether to test logic without creating, updating or abandoning pull requests */
   dryRun: boolean;
 
-  /** The dependabot-cli go package to use for updates. e.g. github.com/dependabot/cli/cmd/dependabot@latest */
-  dependabotCliPackage?: string;
-  /** The apiUrl argument of the dependabot update command */
-  dependabotCliApiUrl?: string;
   /** The listening port of the dependabot update command */
   dependabotCliApiListeningPort?: number;
   /** The dependabot-updater docker image to use for updates. e.g. ghcr.io/dependabot/dependabot-updater-{ecosystem}:latest */
@@ -137,8 +133,6 @@ export default function getSharedVariables(): ISharedVariables {
   const securityAdvisoriesFile: string | undefined = tl.getInput('securityAdvisoriesFile');
   const dryRun: boolean = tl.getBoolInput('dryRun', false);
 
-  const dependabotCliPackage: string | undefined = tl.getInput('dependabotCliPackage');
-  const dependabotCliApiUrl: string | undefined = tl.getInput('dependabotCliApiUrl', false);
   const dependabotCliApiListeningPortStr: string | undefined = tl.getInput('dependabotCliApiListeningPort', false);
   const dependabotCliApiListeningPort: number | undefined =
     (dependabotCliApiListeningPortStr ?? '').length > 0 ? Number(dependabotCliApiListeningPortStr) : undefined;
@@ -174,8 +168,6 @@ export default function getSharedVariables(): ISharedVariables {
 
     dryRun,
 
-    dependabotCliPackage,
-    dependabotCliApiUrl,
     dependabotCliApiListeningPort,
     dependabotUpdaterImage,
 
