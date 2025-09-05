@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "tsc --watch",
     "prebuild": "tsc",
-    "build": "ncc build src/task-v1.ts -o tasks/dependabotV1/dist --target es2022 --source-map --external none && ncc build src/task-v2.ts -o tasks/dependabotV2/dist --target es2022 --source-map --external none",
+    "build:V1": "ncc build src/task-v1.ts --out tasks/dependabotV1/dist/main --target es2022 --source-map --external none",
+    "build:V2": "ncc build src/task-v2.ts --out tasks/dependabotV2/dist/main --target es2022 --source-map --external none",
+    "build:V2-cleanup": "ncc build src/task-v2-cleanup.ts --out tasks/dependabotV2/dist/cleanup --target es2022 --source-map --external none",
+    "build": "pnpm run build:V1 && pnpm run build:V2 && pnpm run build:V2-cleanup",
     "start": "pnpm start:V2",
     "start:V1": "node tasks/dependabotV1/dist/index.js",
     "start:V2": "node tasks/dependabotV2/dist/index.js",

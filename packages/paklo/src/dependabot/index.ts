@@ -1,6 +1,7 @@
 export * from './api-client';
 export * from './author';
 export * from './branch-name';
+export * from './cleanup';
 export * from './config';
 export * from './container-service';
 export * from './docker-tags';

@@ -241,7 +241,12 @@
   ],
   "execution": {
     "Node20_1": {
-      "target": "dist/index.js"
+      "target": "dist/main/index.js"
+    }
+  },
+  "postjobexecution": {
+    "Node20_1": {
+      "target": "dist/cleanup/index.js"
     }
   }
 }

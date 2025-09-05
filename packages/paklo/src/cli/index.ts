@@ -2,7 +2,7 @@
 
 import { Command } from 'commander';
 import packageJson from '../../package.json';
-import { run, validate } from './commands';
+import { cleanup, run, validate } from './commands';
 
 const root = new Command();
 
@@ -11,6 +11,7 @@ root.usage();
 root.version(packageJson.version, '--version');
 root.addCommand(validate);
 root.addCommand(run);
+root.addCommand(cleanup);
 
 const args = process.argv;
 root.parse(args);
