@@ -155,7 +155,7 @@ export function createApiServerApp({
         const { data } = context.req.valid('json') as { data: z.infer<typeof schema> };
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         const success: boolean = await handle(id, { type, data: data as any });
-        return context.body(null, success ? 200 : 400);
+        return context.body(null, success ? 204 : 400);
       },
     );
   }
