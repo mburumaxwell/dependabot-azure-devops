@@ -4,6 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "private": true,
+  "author": "mburumaxwell",
   "license": "AGPL-3.0-later",
   "bin": {
     "paklo": "./dist/cli.cjs"

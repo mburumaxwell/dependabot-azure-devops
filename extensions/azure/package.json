@@ -2,6 +2,8 @@
   "name": "extension-azure-devops",
   "version": "2.57.0",
   "description": "Dependabot Azure DevOps task",
+  "license": "AGPL-3.0-later",
+  "author": "mburumaxwell",
   "private": true,
   "scripts": {
     "dev": "tsc --watch",
@@ -28,8 +30,6 @@
     "azure",
     "devops"
   ],
-  "author": "Tingle Software",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/mburumaxwell/dependabot-azure-devops/issues"
   },
