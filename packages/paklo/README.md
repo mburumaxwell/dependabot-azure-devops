@@ -28,10 +28,10 @@ npx @paklo/cli --help
 
 ```bash
 # Validate your dependabot.yml configuration
-paklo validate https://dev.azure.com/my-org my-project my-repo --git-token <TOKEN>
+paklo validate https://dev.azure.com/my-org my-project --repository my-repo --git-token <TOKEN>
 
 # Run dependency updates locally
-paklo run https://dev.azure.com/my-org my-project my-repo --git-token <TOKEN>
+paklo run https://dev.azure.com/my-org my-project --repository my-repo --git-token <TOKEN>
 
 # Clean up Docker resources
 paklo cleanup
@@ -44,17 +44,17 @@ paklo cleanup
 Validates your Dependabot configuration file against a repository.
 
 ```bash
-paklo validate <organisation-url> <project> <repository> --git-token <TOKEN>
+paklo validate <organisation-url> <project> --repository <REPOSITORY> --git-token <TOKEN>
 ```
 
 **Arguments:**
 
 - `organisation-url` - Azure DevOps organization URL (e.g., `https://dev.azure.com/my-org`)
 - `project` - Project name or ID
-- `repository` - Repository name or ID
 
 **Options:**
 
+- `--repository <REPOSITORY>` - Repository name or ID (required)
 - `--git-token <TOKEN>` - Git access token (required)
 
 ### `run`
@@ -62,11 +62,12 @@ paklo validate <organisation-url> <project> <repository> --git-token <TOKEN>
 Executes Dependabot updates locally with full control over the process.
 
 ```bash
-paklo run <organisation-url> <project> <repository> [options]
+paklo run <organisation-url> <project> --repository <REPOSITORY> [options]
 ```
 
 **Key Options:**
 
+- `--repository <REPOSITORY>` - Repository name or ID (required)
 - `--git-token <TOKEN>` - Git access token (required)
 - `--github-token <TOKEN>` - GitHub token to avoid rate limiting
 - `--out-dir <DIR>` - Working directory (default: `work`)
@@ -83,7 +84,8 @@ paklo run <organisation-url> <project> <repository> [options]
 **Example:**
 
 ```bash
-paklo run https://dev.azure.com/contoso contoso-project web-app \
+paklo run https://dev.azure.com/contoso contoso-project \
+  --repository web-app \
   --git-token $GIT_TOKEN \
   --github-token $GITHUB_TOKEN \
   --auto-approve \
@@ -209,7 +211,7 @@ Paklo can be integrated into CI/CD pipelines for testing dependency updates:
 # Azure Pipelines example
 - script: |
     npm install -g @paklo/cli
-    paklo validate $(System.TeamFoundationCollectionUri) $(System.TeamProject) $(Build.Repository.Name) --git-token $(System.AccessToken)
+    paklo validate $(System.TeamFoundationCollectionUri) $(System.TeamProject) --repository $(Build.Repository.Name) --git-token $(System.AccessToken)
   displayName: 'Validate Dependabot Config'
 ```
 

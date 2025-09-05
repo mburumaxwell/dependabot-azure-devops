@@ -59,7 +59,7 @@ export const command = new Command('validate')
     'URL of the organisation e.g. https://dev.azure.com/my-org or https://my-org.visualstudio.com or http://my-org.com:8443/tfs',
   )
   .argument('<project>', 'Name or ID of the project')
-  .argument('<repository>', 'Name or ID of the repository')
+  .requiredOption('--repository <REPOSITORY>', 'Name or ID of the repository')
   .requiredOption('--git-token <GIT-TOKEN>', 'Token to use for authenticating access to the git repository.')
   .action(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,8 +70,7 @@ export const command = new Command('validate')
           input: {
             organisationUrl: args[0],
             project: args[1],
-            repository: args[2],
-            ...args[3],
+            ...args[2],
           },
           command: args.at(-1),
         }),
