@@ -43,3 +43,20 @@ export const DEFAULT_EXPERIMENTS: DependabotExperiments = {
   'enable-cooldown-for-hex': true,
   'enable-cooldown-for-dotnet-sdk': true,
 };
+
+/**
+ * Parses a comma-separated list of key=value pairs representing experiments.
+ * @param raw A comma-separated list of key=value pairs representing experiments.
+ * @returns A map of experiment names to their values.
+ */
+export function parseExperiments(raw?: string): DependabotExperiments | undefined {
+  let experiments = raw
+    ?.split(',')
+    .filter((entry) => entry.trim() !== '') // <-- filter out empty entries
+    .reduce((acc, cur) => {
+      const [key, value] = cur.split('=', 2);
+      acc[key!] = value || true;
+      return acc;
+    }, {} as DependabotExperiments);
+  return experiments;
+}

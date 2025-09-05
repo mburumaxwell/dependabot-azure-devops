@@ -4,7 +4,12 @@ import readline from 'node:readline/promises';
 import { z } from 'zod/v4';
 
 import { AzureLocalJobsRunner, extractUrlParts, getDependabotConfig, type AzureLocalJobsRunnerOptions } from '@/azure';
-import { DEPENDABOT_DEFAULT_AUTHOR_EMAIL, DEPENDABOT_DEFAULT_AUTHOR_NAME } from '@/dependabot';
+import {
+  DEFAULT_EXPERIMENTS,
+  DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
+  DEPENDABOT_DEFAULT_AUTHOR_NAME,
+  parseExperiments,
+} from '@/dependabot';
 import { logger } from '../logger';
 import { handlerOptions, type HandlerOptions } from './base';
 
@@ -28,6 +33,7 @@ const schema = z.object({
   authorName: z.string(),
   authorEmail: z.email(),
   targetUpdateIds: z.coerce.number().array(),
+  experiments: z.string().optional(),
   debug: z.boolean(),
   dryRun: z.boolean(),
 });
@@ -35,7 +41,15 @@ type Options = z.infer<typeof schema>;
 
 async function handler({ options, error }: HandlerOptions<Options>) {
   let { organisationUrl } = options;
-  const { gitToken, project, repository, authorName, authorEmail, ...remainingOptions } = options;
+  const {
+    gitToken,
+    project,
+    repository,
+    authorName,
+    authorEmail,
+    experiments: rawExperiments,
+    ...remainingOptions
+  } = options;
 
   function secretMasker(secret: string) {
     // TODO: implement this (basically hide from logs)
@@ -88,6 +102,15 @@ async function handler({ options, error }: HandlerOptions<Options>) {
   }
 
   try {
+    // Convert experiments from comma separated key value pairs to a record
+    // If no experiments are defined, use the default experiments
+    let experiments = parseExperiments(rawExperiments);
+    if (!experiments) {
+      experiments = DEFAULT_EXPERIMENTS;
+      logger.debug('No experiments provided; Using default experiments.');
+    }
+    logger.debug(`Experiments: ${JSON.stringify(experiments)}`);
+
     const runnerOptions: AzureLocalJobsRunnerOptions = {
       config,
       secretMasker,
@@ -95,6 +118,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
       url,
       gitToken,
       author: { email: authorEmail, name: authorName },
+      experiments,
       ...remainingOptions,
     };
     const runner = new AzureLocalJobsRunner(runnerOptions);
@@ -159,6 +183,10 @@ export const command = new Command('run')
   .option('--author-email <AUTHOR-EMAIL>', 'Email to use for the git author.', DEPENDABOT_DEFAULT_AUTHOR_EMAIL)
   .option('--target-update-ids <TARGET-UPDATE-IDS...>', 'List of target update IDs to perform.', [])
   .option('--security-advisories-file <SECURITY-ADVISORIES-FILE>', 'Path to private security advisories file.')
+  .option(
+    '--experiments <EXPERIMENTS>',
+    'Comma-separated list of experiments to enable. If not set, default experiments will be used.',
+  )
   .option('--port <PORT>', 'Port to run the API server on.', '3000')
   .option('--debug', 'Whether to enable debug logging.', false)
   .option('--dry-run', 'Whether to enable dry run mode.', false)

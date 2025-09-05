@@ -1,6 +1,6 @@
 import * as tl from 'azure-pipelines-task-lib/task';
-import { type AzureDevOpsUrl, extractUrlParts } from 'paklo/azure';
-import { DEFAULT_EXPERIMENTS, type DependabotExperiments } from 'paklo/dependabot';
+import { extractUrlParts, type AzureDevOpsUrl } from 'paklo/azure';
+import { DEFAULT_EXPERIMENTS, parseExperiments, type DependabotExperiments } from 'paklo/dependabot';
 import { getAzureDevOpsAccessToken, getGithubAccessToken } from './tokens';
 
 export interface ISharedVariables {
@@ -105,22 +105,12 @@ export default function getSharedVariables(): ISharedVariables {
   const autoApproveUserToken = tl.getInput('autoApproveUserToken')!;
 
   // Convert experiments from comma separated key value pairs to a record
-  let experiments = tl
-    .getInput('experiments', false)
-    ?.split(',')
-    .filter((entry) => entry.trim() !== '') // <-- filter out empty entries
-    .reduce((acc, cur) => {
-      const [key, value] = cur.split('=', 2);
-      acc[key!] = value || true;
-      return acc;
-    }, {} as DependabotExperiments);
-
   // If no experiments are defined, use the default experiments
+  let experiments = parseExperiments(tl.getInput('experiments', false));
   if (!experiments) {
     experiments = DEFAULT_EXPERIMENTS;
     tl.debug('No experiments provided; Using default experiments.');
   }
-
   console.log('Experiments:', experiments);
 
   const debug: boolean = tl.getVariable('System.Debug')?.match(/true/i) ? true : false;

@@ -2,7 +2,6 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 
 import {
-  DEFAULT_EXPERIMENTS,
   DependabotJobBuilder,
   LocalJobsRunner,
   mapPackageEcosystemToPackageManager,
@@ -197,7 +196,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
     dependabotApiLocalUrl?: string,
   ): Promise<RunJobsResult> {
     const {
-      options: { url, gitToken, githubToken, config, dryRun, securityAdvisoriesFile, secretMasker },
+      options: { url, gitToken, githubToken, experiments, config, dryRun, securityAdvisoriesFile, secretMasker },
     } = this;
 
     const results: RunJobsResult = [];
@@ -217,7 +216,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
         update,
         systemAccessToken: gitToken,
         githubToken,
-        experiments: DEFAULT_EXPERIMENTS,
+        experiments,
         debug: false,
       });
 

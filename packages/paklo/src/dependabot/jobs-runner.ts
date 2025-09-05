@@ -1,5 +1,6 @@
 import { type SecretMasker } from './api-client';
 import { type DependabotConfig } from './config';
+import { type DependabotExperiments } from './job';
 import { makeRandomJobToken } from './job-builder';
 import { type LocalDependabotServerOptions } from './server';
 
@@ -13,6 +14,7 @@ export type LocalJobsRunnerOptions = Pick<LocalDependabotServerOptions, 'debug' 
   config: DependabotConfig;
   targetUpdateIds?: number[];
   outDir: string;
+  experiments: DependabotExperiments;
 };
 
 export abstract class LocalJobsRunner {
