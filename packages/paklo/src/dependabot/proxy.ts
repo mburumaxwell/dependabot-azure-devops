@@ -25,7 +25,6 @@ const CONFIG_FILE_PATH = '/';
 const CONFIG_FILE_NAME = 'config.json';
 const CA_CERT_INPUT_PATH = '/usr/local/share/ca-certificates';
 const CUSTOM_CA_CERT_NAME = 'custom-ca-cert.crt';
-// TODO: change this to match Paklo
 const CERT_SUBJECT = [
   { name: 'commonName', value: 'Dependabot Internal CA' },
   { name: 'organizationName', value: 'GitHub Inc.' },

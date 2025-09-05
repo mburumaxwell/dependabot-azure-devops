@@ -1,7 +1,6 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  // TODO: stop producing cjs when we can convert everything to ESM
   format: ['esm', 'cjs'],
   target: 'node22',
   platform: 'node',
