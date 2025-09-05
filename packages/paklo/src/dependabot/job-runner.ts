@@ -20,6 +20,7 @@ export type JobRunnerOptions = {
   jobId: number;
   jobToken: string;
   credentialsToken: string;
+  updaterImage?: string;
   secretMasker: SecretMasker;
 };
 
@@ -51,7 +52,7 @@ export class JobRunner {
       credentialsToken,
       dependabotApiUrl,
       dependabotApiDockerUrl: dependabotApiDockerUrl ?? dependabotApiUrl,
-      updaterImage: undefined,
+      updaterImage: this.options.updaterImage,
       workingDirectory,
     })!;
 

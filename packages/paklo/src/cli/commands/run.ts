@@ -34,6 +34,7 @@ const schema = z.object({
   authorEmail: z.email(),
   targetUpdateIds: z.coerce.number().array(),
   experiments: z.string().optional(),
+  updaterImage: z.string().optional(),
   debug: z.boolean(),
   dryRun: z.boolean(),
 });
@@ -48,8 +49,20 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     authorName,
     authorEmail,
     experiments: rawExperiments,
+    updaterImage,
     ...remainingOptions
   } = options;
+
+  if (updaterImage) {
+    // If the updater image is provided but does not contain the "{ecosystem}" placeholder, tell the user they've misconfigured it
+    if (!updaterImage.includes('{ecosystem}')) {
+      error(
+        `Dependabot Updater image '${updaterImage}' is invalid. ` +
+          `Please ensure the image contains a "{ecosystem}" placeholder to denote the package ecosystem; e.g. "ghcr.io/dependabot/dependabot-updater-{ecosystem}:latest"`,
+      );
+      return;
+    }
+  }
 
   function secretMasker(secret: string) {
     // TODO: implement this (basically hide from logs)
@@ -119,6 +132,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
       gitToken,
       author: { email: authorEmail, name: authorName },
       experiments,
+      updaterImage,
       ...remainingOptions,
     };
     const runner = new AzureLocalJobsRunner(runnerOptions);
@@ -186,6 +200,10 @@ export const command = new Command('run')
   .option(
     '--experiments <EXPERIMENTS>',
     'Comma-separated list of experiments to enable. If not set, default experiments will be used.',
+  )
+  .option(
+    '--updater-image <UPDATER-IMAGE>',
+    'The dependabot-updater docker image to use for updates. e.g. ghcr.io/dependabot/dependabot-updater-{ecosystem}:latest',
   )
   .option('--port <PORT>', 'Port to run the API server on.', '3000')
   .option('--debug', 'Whether to enable debug logging.', false)

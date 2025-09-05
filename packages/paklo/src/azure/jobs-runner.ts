@@ -205,6 +205,10 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       const packageEcosystem = update['package-ecosystem'];
       const packageManager = mapPackageEcosystemToPackageManager(packageEcosystem);
 
+      // If there is an updater image, replace the placeholder in it
+      let { updaterImage } = this.options;
+      updaterImage = updaterImage?.replace(/\{ecosystem\}/i, packageEcosystem);
+
       // Parse the Dependabot metadata for the existing pull requests that are related to this update
       // Dependabot will use this to determine if we need to create new pull requests or update/close existing ones
       const existingPullRequestsForPackageManager = parsePullRequestProperties(existingPullRequests, packageManager);
@@ -246,6 +250,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
           jobId,
           jobToken,
           credentialsToken,
+          updaterImage,
           secretMasker,
         });
 

@@ -15,6 +15,7 @@ export type LocalJobsRunnerOptions = Pick<LocalDependabotServerOptions, 'debug' 
   targetUpdateIds?: number[];
   outDir: string;
   experiments: DependabotExperiments;
+  updaterImage?: string;
 };
 
 export abstract class LocalJobsRunner {

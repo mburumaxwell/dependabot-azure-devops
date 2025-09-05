@@ -127,6 +127,15 @@ export default function getSharedVariables(): ISharedVariables {
   const dependabotCliApiListeningPort: number | undefined =
     (dependabotCliApiListeningPortStr ?? '').length > 0 ? Number(dependabotCliApiListeningPortStr) : undefined;
   const dependabotUpdaterImage: string | undefined = tl.getInput('dependabotUpdaterImage');
+  if (dependabotUpdaterImage) {
+    // If the updater image is provided but does not contain the "{ecosystem}" placeholder, tell the user they've misconfigured it
+    if (!dependabotUpdaterImage.includes('{ecosystem}')) {
+      throw new Error(
+        `Dependabot Updater image '${dependabotUpdaterImage}' is invalid. ` +
+          `Please ensure the image contains a "{ecosystem}" placeholder to denote the package ecosystem; e.g. "ghcr.io/dependabot/dependabot-updater-{ecosystem}:latest"`,
+      );
+    }
+  }
 
   const proxyCertPath: string | undefined = tl.getInput('proxyCertPath');
 
