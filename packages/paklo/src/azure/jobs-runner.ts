@@ -89,7 +89,9 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
     // HTTPS for the job token to be used is too much hassle.
     // Using same value for dependabotApiUrl and dependabotApiDockerUrl so as to capture /record_metrics calls.
     // dependabotApiLocalUrl is used to avoid Docker for local calls.
-    const dependabotApiUrl = `http://host.docker.internal:${port}/api`;
+    // Use platform-specific host resolution for Docker containers to avoid quirks
+    const dockerHost = process.platform === 'darwin' ? 'host.docker.internal' : '172.17.0.1';
+    const dependabotApiUrl = `http://${dockerHost}:${port}/api`;
     const dependabotApiDockerUrl = dependabotApiUrl;
     const dependabotApiLocalUrl = `${server.url}/api`;
 

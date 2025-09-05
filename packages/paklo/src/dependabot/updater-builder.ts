@@ -57,7 +57,6 @@ export class UpdaterBuilder {
       HostConfig: {
         Memory: UPDATER_MAX_MEMORY,
         NetworkMode: this.proxy.networkName,
-        ExtraHosts: ['host.docker.internal:host-gateway'], // needed for Docker on Linux
       },
     });
 
