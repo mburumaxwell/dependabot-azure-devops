@@ -2,7 +2,13 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { type DependabotConfig, type DependabotUpdate, runJob, type SecretMasker } from '@/dependabot';
+import {
+  DEFAULT_EXPERIMENTS,
+  type DependabotConfig,
+  type DependabotUpdate,
+  runJob,
+  type SecretMasker,
+} from '@/dependabot';
 import { GitHubGraphClient } from '@/github';
 import { AzureDevOpsWebApiClient } from './client';
 import { AzureLocalJobsRunner, type AzureLocalJobsRunnerOptions } from './jobs-runner';
@@ -110,6 +116,7 @@ describe('AzureLocalJobsRunner', () => {
         registries: {},
       } as DependabotConfig,
       outDir: '/tmp/dependabot',
+      experiments: DEFAULT_EXPERIMENTS,
     };
 
     // Mock AzureDevOpsWebApiClient

@@ -50,7 +50,7 @@ export const DEFAULT_EXPERIMENTS: DependabotExperiments = {
  * @returns A map of experiment names to their values.
  */
 export function parseExperiments(raw?: string): DependabotExperiments | undefined {
-  let experiments = raw
+  return raw
     ?.split(',')
     .filter((entry) => entry.trim() !== '') // <-- filter out empty entries
     .reduce((acc, cur) => {
@@ -58,5 +58,4 @@ export function parseExperiments(raw?: string): DependabotExperiments | undefine
       acc[key!] = value || true;
       return acc;
     }, {} as DependabotExperiments);
-  return experiments;
 }
