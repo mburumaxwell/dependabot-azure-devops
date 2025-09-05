@@ -1,6 +1,7 @@
 import * as tl from 'azure-pipelines-task-lib/task';
-import { extractUrlParts, type AzureDevOpsUrl } from 'paklo/azure';
-import { DEFAULT_EXPERIMENTS, parseExperiments, type DependabotExperiments } from 'paklo/dependabot';
+
+import { extractUrlParts, type AzureDevOpsUrl } from '@paklo/cli/azure';
+import { DEFAULT_EXPERIMENTS, parseExperiments, type DependabotExperiments } from '@paklo/cli/dependabot';
 import { getAzureDevOpsAccessToken, getGithubAccessToken } from './tokens';
 
 export interface ISharedVariables {

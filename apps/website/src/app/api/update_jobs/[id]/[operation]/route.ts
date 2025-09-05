@@ -6,7 +6,7 @@ import {
   type DependabotJobConfig,
   type DependabotRequest,
   type DependabotTokenType,
-} from 'paklo/dependabot';
+} from '@paklo/cli/dependabot';
 
 export const dynamic = 'force-dynamic';
 

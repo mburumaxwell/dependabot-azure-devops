@@ -15,13 +15,13 @@
     "clean": "rimraf .next .source out"
   },
   "dependencies": {
+    "@paklo/cli": "workspace:*",
     "@vercel/analytics": "1.5.0",
     "@vercel/speed-insights": "1.2.0",
     "fumadocs-core": "15.7.9",
     "fumadocs-mdx": "11.8.3",
     "fumadocs-ui": "15.7.9",
     "next": "15.5.2",
-    "paklo": "workspace:*",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "sharp": "0.34.3",

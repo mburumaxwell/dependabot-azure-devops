@@ -1,3 +1,3 @@
-import { cleanup } from 'paklo/dependabot';
+import { cleanup } from '@paklo/cli/dependabot';
 
 cleanup();

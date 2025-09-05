@@ -1,5 +1,5 @@
 {
-  "name": "paklo",
+  "name": "@paklo/cli",
   "version": "0.7.0",
   "sideEffects": false,
   "type": "module",

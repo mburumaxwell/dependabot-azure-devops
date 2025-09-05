@@ -4,14 +4,14 @@ import { rm } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 
-import { AzureLocalJobsRunner, getDependabotConfig, type AzureLocalJobsRunnerOptions } from 'paklo/azure';
+import { AzureLocalJobsRunner, getDependabotConfig, type AzureLocalJobsRunnerOptions } from '@paklo/cli/azure';
 import {
   DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
   DEPENDABOT_DEFAULT_AUTHOR_NAME,
   type GitAuthor,
   type SecretMasker,
-} from 'paklo/dependabot';
-import { section, setSecrets } from './formatting';
+} from '@paklo/cli/dependabot';
+import { setSecrets } from './formatting';
 import parseTaskInputConfiguration from './shared-variables';
 
 async function run() {
@@ -81,7 +81,6 @@ async function run() {
     };
 
     // Run the Azure Local Jobs Runner
-    section('Starting Dependabot update jobs');
     const runner = new AzureLocalJobsRunner(runnerOptions);
     const result = await runner.run();
     const success = result.every((r) => r.success);

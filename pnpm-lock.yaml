@@ -68,6 +68,9 @@ importers:
 
   apps/website:
     dependencies:
+      '@paklo/cli':
+        specifier: workspace:*
+        version: link:../../packages/paklo
       '@vercel/analytics':
         specifier: 1.5.0
         version: 1.5.0(next@15.5.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1)
@@ -86,9 +89,6 @@ importers:
       next:
         specifier: 15.5.2
         version: 15.5.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      paklo:
-        specifier: workspace:*
-        version: link:../../packages/paklo
       react:
         specifier: 19.1.1
         version: 19.1.1
@@ -135,12 +135,12 @@ importers:
 
   extensions/azure:
     dependencies:
+      '@paklo/cli':
+        specifier: workspace:*
+        version: link:../../packages/paklo
       azure-pipelines-task-lib:
         specifier: 5.2.1
         version: 5.2.1
-      paklo:
-        specifier: workspace:*
-        version: link:../../packages/paklo
       semver:
         specifier: 7.7.2
         version: 7.7.2
