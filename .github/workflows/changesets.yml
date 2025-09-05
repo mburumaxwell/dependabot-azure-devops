@@ -57,7 +57,7 @@ jobs:
           git config user.name release-automator-mburumaxwell[bot]
           git config user.email 214517399+release-automator-mburumaxwell[bot]@users.noreply.github.com
 
-      - name: Create release pull request
+      - name: Create release PR or Publish
         if: ${{ github.event_name != 'pull_request' }}
         uses: changesets/action@v1
         with:
