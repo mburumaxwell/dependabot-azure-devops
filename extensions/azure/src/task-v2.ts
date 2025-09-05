@@ -75,7 +75,7 @@ async function run() {
     const dependabotConfig = await getDependabotConfig({
       url: taskInputs.url,
       token: taskInputs.systemAccessToken,
-      rootDir: getVariable('Build.SourcesDirectory')!,
+      rootDir: getVariable('Build.SourcesDirectory') ?? getVariable('System.DefaultWorkingDirectory')!,
       variableFinder: getVariable,
     });
     if (!dependabotConfig) {
