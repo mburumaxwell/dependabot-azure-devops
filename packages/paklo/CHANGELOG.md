@@ -1,5 +1,13 @@
 # paklo
 
+## 0.8.0
+
+### Minor Changes
+
+- df23ea4: Change repository argument into required option
+- f8842b3: Change project argument into required option
+- 477100c: Change organisation-url argument into required option
+
 ## 0.7.0
 
 ### Minor Changes
