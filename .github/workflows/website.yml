@@ -3,8 +3,8 @@ name: Website
 on:
   workflow_dispatch:
   push:
-    # branches: [main]
-    tags: ['website*']
+    branches: [main]
+    # tags: ['website*']
     paths:
       - 'apps/website/**'
       - '.github/workflows/website.yml'
