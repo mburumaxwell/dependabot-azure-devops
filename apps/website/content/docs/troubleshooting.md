@@ -18,4 +18,3 @@ For private registries, supply credentials via environment variables and the `re
 ## Debugging Updates
 
 Set the `dryRun` input to `true` to test without creating pull requests. Review pipeline logs for details on failures or missing permissions.
-

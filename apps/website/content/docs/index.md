@@ -9,4 +9,3 @@ Welcome to the documentation for **Dependabot for Azure DevOps**. These guides s
 - [Using Private Registries](./private-registries) – Configure authentication for feeds and registries.
 - [Troubleshooting](./troubleshooting) – Resolve common issues.
 - [Contributing](./contributing) – Learn how to develop and submit changes.
-
