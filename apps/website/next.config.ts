@@ -10,6 +10,18 @@ const config: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     unoptimized: true, // hoping this improves site performance
   },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Externalize server-side dependencies that contain native modules
+      config.externals = config.externals || [];
+      config.externals.push({
+        'ssh2': 'commonjs ssh2',
+        'dockerode': 'commonjs dockerode',
+        '@hono/node-server': 'commonjs @hono/node-server',
+      });
+    }
+    return config;
+  },
   async headers() {
     return [
       // security headers
