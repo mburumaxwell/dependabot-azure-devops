@@ -3,9 +3,9 @@ title: Troubleshooting
 description: Fix common problems when running Dependabot in Azure Pipelines.
 ---
 
-## Missing Go or Docker
+## Missing Docker
 
-The task relies on [dependabot-cli](https://github.com/dependabot/cli), which requires Go 1.22+ and Docker with Linux containers. Ensure your agents meet these requirements. The Microsoft-hosted `ubuntu-latest` image already includes them.
+The task relies on [dependabot-cli](https://github.com/dependabot/cli), which requires Docker with Linux containers. Ensure your agents have Docker available. The Microsoft-hosted `ubuntu-latest` image already includes it.
 
 ## Existing Pull Requests
 

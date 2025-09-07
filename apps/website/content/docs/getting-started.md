@@ -7,7 +7,7 @@ Dependabot runs as a task inside your pipeline. Follow these steps to enable it:
 
 1. Install the **Dependabot** extension from the Azure DevOps Marketplace.
 2. Add a `.azuredevops/dependabot.yml` or `.github/dependabot.yml` file to your repository following the [official configuration](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference).
-3. Create a pipeline that includes the `dependabot@2` task. The agent must have Go 1.22+ and Docker installed; the Microsoft-hosted `ubuntu-latest` image satisfies these requirements.
+3. Create a pipeline that includes the `dependabot@2` task. The agent must have Docker installed; the Microsoft-hosted `ubuntu-latest` image already includes it.
 
 ```yaml
 trigger: none # Disable CI trigger
