@@ -5,7 +5,7 @@ description: Fix common problems when running Dependabot in Azure Pipelines.
 
 ## Missing Docker
 
-The task relies on [dependabot-cli](https://github.com/dependabot/cli), which requires Docker with Linux containers. Ensure your agents have Docker available. The Microsoft-hosted `ubuntu-latest` image already includes it.
+Dependabot runs inside Docker with Linux containers. Ensure your agents have Docker available. The Microsoft-hosted `ubuntu-latest` image already includes it.
 
 ## Existing Pull Requests
 
