@@ -16,7 +16,7 @@ const defaultUserAgent = `paklo/${environment.sha?.substring(0, 7) ?? 'dogfood'}
 export type CreateInnerApiClientOptions = {
   /**
    * The base URL to use for the API.
-   * @example 'https://api.paklo.software'
+   * @example 'https://api.paklo.app'
    */
   baseUrl: string;
 
@@ -57,7 +57,7 @@ export type InnerRequestOptions<T> = RequestOptions & {
   /**
    * The base URL to use for the request.
    * This overrides the default base URL.
-   * @example 'https://api.paklo.software'
+   * @example 'https://api.paklo.app'
    */
   baseUrl?: string;
 

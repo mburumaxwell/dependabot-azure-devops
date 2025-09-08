@@ -1,7 +1,7 @@
 import { environment, getSiteUrl } from '@paklo/cli/environment';
 
 const { development, main } = environment;
-const siteUrl = getSiteUrl({ defaultValue: 'https://paklo.software' });
+const siteUrl = getSiteUrl({ defaultValue: 'https://www.paklo.app' });
 
 const siteConfig = {
   siteUrl: siteUrl,

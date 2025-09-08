@@ -10,8 +10,8 @@ This repository contains tools for updating dependencies in Azure DevOps reposit
 
 In this repository you'll find:
 
-1. [Azure DevOps Extension](https://marketplace.visualstudio.com/items?itemName=tingle-software.dependabot), [source code](./extensions/azure) and [docs](https://paklo.software/docs/extensions/azure).
-2. Dependabot Server, [source code](./server/) and [docs](https://paklo.software/docs/server).
+1. [Azure DevOps Extension](https://marketplace.visualstudio.com/items?itemName=tingle-software.dependabot), [source code](./extensions/azure) and [docs](https://www.paklo.app/docs/extensions/azure).
+2. Dependabot Server, [source code](./server/) and [docs](https://www.paklo.app/docs/server).
 
 ## Table of Contents
 
@@ -71,7 +71,7 @@ Dependabot for Azure DevOps must be explicitly configured to run in your organis
 
 </details>
 
-- [Hosted Server](https://paklo.software/docs/server) - Ideal if you have a large number of projects and repositories or prefer to run Dependabot as a managed service instead of using pipeline agents. See [why should I use the server?](https://paklo.software/docs/server#why-should-i-use-the-server) for more info.
+- [Hosted Server](https://www.paklo.app/docs/server) - Ideal if you have a large number of projects and repositories or prefer to run Dependabot as a managed service instead of using pipeline agents. See [why should I use the server?](https://www.paklo.app/docs/server#why-should-i-use-the-server) for more info.
 
 ### Other Guides
 
