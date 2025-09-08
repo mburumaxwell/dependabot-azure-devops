@@ -1,9 +1,9 @@
-import { Command, Option } from 'commander';
 import { stdin, stdout } from 'node:process';
 import readline from 'node:readline/promises';
+import { Command, Option } from 'commander';
 import { z } from 'zod/v4';
 
-import { AzureLocalJobsRunner, extractUrlParts, getDependabotConfig, type AzureLocalJobsRunnerOptions } from '@/azure';
+import { AzureLocalJobsRunner, type AzureLocalJobsRunnerOptions, extractUrlParts, getDependabotConfig } from '@/azure';
 import {
   DEFAULT_EXPERIMENTS,
   DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
@@ -11,7 +11,7 @@ import {
   parseExperiments,
 } from '@/dependabot';
 import { logger } from '../logger';
-import { handlerOptions, type HandlerOptions } from './base';
+import { type HandlerOptions, handlerOptions } from './base';
 
 const MERGE_STRATEGIES = ['squash', 'rebase', 'merge'] as const;
 const schema = z.object({
@@ -201,8 +201,7 @@ export const command = new Command('run')
   .option('--debug', 'Whether to enable debug logging.', false)
   .option('--dry-run', 'Whether to enable dry run mode.', false)
   .action(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async (...args: any[]) =>
+    async (...args) =>
       await handler(
         await handlerOptions({
           schema,

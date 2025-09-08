@@ -1,18 +1,17 @@
-import Docker, { type Container } from 'dockerode';
+// biome-ignore-all lint/suspicious/noShadowRestrictedNames: Proxy is okay
+
 import { existsSync } from 'node:fs';
 import { mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
+import Docker, { type Container } from 'dockerode';
 
 import { ContainerService } from './container-service';
-import {
-  type DependabotCredential,
-  type DependabotJobConfig,
-  type FileFetcherInput,
-  type FileUpdaterInput,
-} from './job';
-import { type JobParameters } from './params';
-import { ProxyBuilder, type Proxy } from './proxy';
+import type { DependabotCredential, DependabotJobConfig, FileFetcherInput, FileUpdaterInput } from './job';
+import type { JobParameters } from './params';
+import { type Proxy, ProxyBuilder } from './proxy';
 import { UpdaterBuilder } from './updater-builder';
+
+// Code below is borrowed and adapted from dependabot-action
 
 export class Updater {
   docker: Docker;
@@ -39,8 +38,7 @@ export class Updater {
     // Create required folders in the workingDirectory
     await mkdir(this.outputHostPath);
 
-    // eslint-disable-next-line no-prototype-builtins
-    const cachedMode = this.job.experiments.hasOwnProperty('proxy-cached') === true;
+    const cachedMode = Object.hasOwn(this.job.experiments, 'proxy-cached') === true;
 
     const proxyBuilder = new ProxyBuilder(this.docker, this.proxyImage, cachedMode);
 
@@ -68,7 +66,7 @@ export class Updater {
         continue;
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: necessary
       const obj: any = { type: credential.type };
       if (credential.host !== undefined) {
         obj.host = credential.host;

@@ -1,20 +1,20 @@
 import {
   HEADER_NAME_AUTHORIZATION,
   HttpRequestError,
-  isErrorTemporaryFailure,
   type InnerApiClient,
   type InnerRequestOptions,
+  isErrorTemporaryFailure,
   type ResourceResponse,
 } from '@/core';
 import {
-  DependabotCredentialSchema,
-  DependabotJobConfigSchema,
   type DependabotCredential,
+  DependabotCredentialSchema,
   type DependabotJobConfig,
+  DependabotJobConfigSchema,
 } from './job';
 import { logger } from './logger';
-import { type JobParameters } from './params';
-import { type DependabotMetric, type DependabotRecordUpdateJobError } from './update';
+import type { JobParameters } from './params';
+import type { DependabotMetric, DependabotRecordUpdateJobError } from './update';
 
 export class JobDetailsFetchingError extends Error {}
 export class CredentialFetchingError extends Error {}
@@ -190,7 +190,7 @@ export class ApiClient {
     const execute = async (): Promise<ResourceResponse<T>> => {
       try {
         const res = await this.client.get<T>(url, {
-          headers: { ['Authorization']: token },
+          headers: { Authorization: token },
           ...options,
         });
 

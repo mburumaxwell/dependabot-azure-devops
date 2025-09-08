@@ -1,4 +1,4 @@
-name: Prettier
+name: Format Check
 
 on:
   workflow_dispatch:

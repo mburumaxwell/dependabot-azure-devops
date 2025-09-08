@@ -1,6 +1,6 @@
+import type { MetadataRoute } from 'next';
 import { docs, legal } from '@/lib/source';
 import siteConfig from '@/site-config';
-import type { MetadataRoute } from 'next';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   type Route = MetadataRoute.Sitemap[number];

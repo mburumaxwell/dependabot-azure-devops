@@ -1,7 +1,7 @@
-import { type Container } from 'dockerode';
+import type { Container } from 'dockerode';
 import { pack } from 'tar-stream';
 
-import { type DependabotProxyConfig, type FileFetcherInput, type FileUpdaterInput } from './job';
+import type { DependabotProxyConfig, FileFetcherInput, FileUpdaterInput } from './job';
 import { logger } from './logger';
 import { errStream, outStream } from './utils';
 

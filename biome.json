@@ -1,0 +1,91 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.2.3/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "**",
+      "!node_modules",
+      "!package.json",
+      "!package-lock.json",
+      "!pnpm-lock.yaml",
+      "!next-env.d.ts",
+      "!.next",
+      "!out",
+      "!dist",
+      "!build",
+      "!.turbo",
+      "!.vercel",
+      "!.source",
+      "!public",
+      "!static",
+      "!src/components/ui",
+      "!dependabot-action/**",
+      "!extensions/azure/tasks/*/task.json",
+      "!extensions/azure/vss-extension.json",
+      "!.config/dotnet-tools.json",
+      "!.github/ISSUE_TEMPLATE/**",
+      "!.vscode/settings.json",
+      "!README.md",
+      "!advisories-example.json",
+      "!server/main.json",
+      "!server/Tingle.Dependabot/work",
+      "!server/Tingle.Dependabot/appsettings.json"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 120,
+    "lineEnding": "lf"
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedFunctionParameters": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
+      },
+      "suspicious": {
+        "noUnknownAtRules": "off"
+      }
+    },
+    "domains": {
+      "next": "recommended",
+      "react": "recommended"
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "single",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "always",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "bracketSameLine": false,
+      "quoteStyle": "single",
+      "attributePosition": "auto"
+    }
+  },
+  "css": {
+    "formatter": {
+      "quoteStyle": "single"
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  }
+}

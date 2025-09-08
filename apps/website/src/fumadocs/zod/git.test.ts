@@ -1,4 +1,4 @@
-import { execSync, type ExecException } from 'node:child_process';
+import { type ExecException, execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { git } from './git';
@@ -10,7 +10,7 @@ vi.mock('node:fs');
 describe('git', () => {
   const defaultGitFileInfo: GitFileInfo = {
     date: new Date().toISOString(),
-    timestamp: new Date().getTime(),
+    timestamp: Date.now(),
     author: 'unknown',
   };
 

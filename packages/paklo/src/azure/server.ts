@@ -1,14 +1,14 @@
 import {
+  type DependabotRequest,
   getBranchNameForUpdate,
   LocalDependabotServer,
-  type DependabotRequest,
   type LocalDependabotServerOptions,
 } from '@/dependabot';
-import { type AzureDevOpsWebApiClient } from './client';
+import type { AzureDevOpsWebApiClient } from './client';
 import { logger } from './logger';
-import { type IPullRequestProperties } from './models';
+import type { IPullRequestProperties } from './models';
 import { GitPullRequestMergeStrategy } from './types';
-import { type AzureDevOpsUrl } from './url-parts';
+import type { AzureDevOpsUrl } from './url-parts';
 import {
   buildPullRequestProperties,
   getPullRequestChangedFilesForOutputData,
@@ -32,6 +32,7 @@ export type AzureLocalDependabotServerOptions = LocalDependabotServerOptions & {
 };
 
 export class AzureLocalDependabotServer extends LocalDependabotServer {
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: options is used
   private readonly options: AzureLocalDependabotServerOptions;
 
   constructor(options: AzureLocalDependabotServerOptions) {
@@ -42,23 +43,21 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
   protected override async handle(id: number, request: DependabotRequest): Promise<boolean> {
     await super.handle(id, request); // common logic
 
+    const { options, affectedPullRequestIds } = this;
     const {
-      options: {
-        url,
-        authorClient,
-        approverClient,
-        existingBranchNames,
-        existingPullRequests,
-        autoApprove,
-        mergeStrategy,
-        setAutoComplete,
-        autoCompleteIgnoreConfigIds,
-        author,
-        debug,
-        dryRun,
-      },
-      affectedPullRequestIds,
-    } = this;
+      url,
+      authorClient,
+      approverClient,
+      existingBranchNames,
+      existingPullRequests,
+      autoApprove,
+      mergeStrategy,
+      setAutoComplete,
+      autoCompleteIgnoreConfigIds,
+      author,
+      debug,
+      dryRun,
+    } = options;
 
     const { type, data } = request;
     const job = await this.job(id);
@@ -66,7 +65,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
       logger.error(`No job found for ID '${id}', cannot process request of type '${type}'`);
       return false;
     }
-    const { ['package-manager']: packageManager } = job;
+    const { 'package-manager': packageManager } = job;
     logger.info(`Processing '${type}' for job ID '${id}'`);
     if (debug) {
       logger.debug(JSON.stringify(data));
@@ -117,7 +116,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         );
 
         // Check if the source branch already exists or conflicts with an existing branch
-        const existingBranch = existingBranchNames?.find((branch) => sourceBranch == branch) || [];
+        const existingBranch = existingBranchNames?.find((branch) => sourceBranch === branch) || [];
         if (existingBranch.length) {
           logger.error(
             `Unable to create pull request '${title}' as source branch '${sourceBranch}' already exists; Delete the existing branch and try again.`,

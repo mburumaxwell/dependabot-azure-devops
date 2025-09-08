@@ -1,4 +1,4 @@
-import { type DependabotExperiments } from './job';
+import type { DependabotExperiments } from './job';
 
 // The default experiments known to be used by the GitHub Dependabot service.
 // This changes often, update as needed by extracting them from a Dependabot GitHub Action run.

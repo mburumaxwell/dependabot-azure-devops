@@ -48,13 +48,11 @@ export default defineConfig({
         ...(rehypeCodeDefaultOptions.transformers ?? []),
         {
           name: 'transformers:remove-notation-escape',
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          code(hast: any) {
+          code(hast) {
             for (const line of hast.children) {
               if (line.type !== 'element') continue;
 
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const lastSpan = line.children.findLast((v: any) => v.type === 'element');
+              const lastSpan = line.children.findLast((v) => v.type === 'element');
 
               const head = lastSpan?.children[0];
               if (head?.type !== 'text') return;

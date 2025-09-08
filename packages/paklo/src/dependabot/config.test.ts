@@ -1,14 +1,14 @@
-import { readFile } from 'fs/promises';
+import { readFile } from 'node:fs/promises';
 import * as yaml from 'js-yaml';
 import { describe, expect, it } from 'vitest';
 
 import {
   DependabotConfigSchema,
+  type DependabotRegistry,
+  type DependabotUpdate,
   parseRegistries,
   parseUpdates,
   validateConfiguration,
-  type DependabotRegistry,
-  type DependabotUpdate,
 } from './config';
 
 describe('Parse configuration file', () => {
@@ -75,8 +75,8 @@ describe('Parse configuration file', () => {
     expect(update['package-ecosystem']).toBe('npm');
     expect(update['insecure-external-code-execution']).toBeUndefined();
     expect(update.registries).toEqual(['platform-clients', 'custom-packages']);
-    expect(update.ignore?.length).toEqual(21);
-    expect(update.ignore![20]!.versions).toEqual('>=3');
+    expect(update.ignore?.length).toEqual(18);
+    expect(update.ignore![17]!.versions).toEqual('>=3');
   });
 });
 
@@ -89,7 +89,7 @@ describe('Parse registries', () => {
     expect(Object.keys(registries).length).toBe(11);
 
     // composer-repository
-    let registry = registries['composer']!; // eslint-disable-line dot-notation
+    let registry = registries.composer!;
     expect(registry.type).toBe('composer_repository');
     expect(registry.url).toBe('https://repo.packagist.com/example-company/');
     expect(registry['index-url']).toBeUndefined();
@@ -106,7 +106,7 @@ describe('Parse registries', () => {
     expect(registry['replaces-base']).toBeUndefined();
 
     // docker-registry
-    registry = registries['dockerhub']!; // eslint-disable-line dot-notation
+    registry = registries.dockerhub!;
     expect(registry.type).toBe('docker_registry');
     expect(registry.url).toBeUndefined();
     expect(registry['index-url']).toBeUndefined();
@@ -287,9 +287,9 @@ describe('Validate registries', () => {
     const updates: DependabotUpdate[] = [
       {
         'package-ecosystem': 'npm',
-        'directory': '/',
-        'directories': undefined,
-        'registries': ['dummy1', 'dummy2'],
+        directory: '/',
+        directories: undefined,
+        registries: ['dummy1', 'dummy2'],
       },
     ];
 
@@ -300,10 +300,10 @@ describe('Validate registries', () => {
         token: 'pwd_1234567890',
       },
       dummy2: {
-        'type': 'python-index',
-        'url': 'https://pkgs.dev.azure.com/octocat/_packaging/my-feed/pypi/example',
-        'username': 'octocat@example.com',
-        'password': 'pwd_1234567890',
+        type: 'python-index',
+        url: 'https://pkgs.dev.azure.com/octocat/_packaging/my-feed/pypi/example',
+        username: 'octocat@example.com',
+        password: 'pwd_1234567890',
         'replaces-base': true,
       },
     };

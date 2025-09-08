@@ -1,15 +1,15 @@
-import { existsSync } from 'fs';
-import { readFile } from 'fs/promises';
-import * as path from 'path';
+import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import * as path from 'node:path';
 
 import {
-  parseDependabotConfig,
-  POSSIBLE_CONFIG_FILE_PATHS,
   type DependabotConfig,
+  POSSIBLE_CONFIG_FILE_PATHS,
+  parseDependabotConfig,
   type VariableFinderFn,
 } from '@/dependabot';
 import { logger } from './logger';
-import { type AzureDevOpsUrl } from './url-parts';
+import type { AzureDevOpsUrl } from './url-parts';
 
 /**
  * Parse the dependabot config YAML file to specify update configuration.
@@ -61,7 +61,7 @@ export async function getDependabotConfig({
       logger.debug(`GET ${requestUrl}`);
 
       try {
-        const authHeader = 'Basic ' + Buffer.from(`x-access-token:${token}`).toString('base64');
+        const authHeader = `Basic ${Buffer.from(`x-access-token:${token}`).toString('base64')}`;
         const response = await fetch(requestUrl, {
           headers: {
             Authorization: authHeader,
@@ -75,6 +75,7 @@ export async function getDependabotConfig({
           break;
         } else if (response.status === 404) {
           logger.trace(`No configuration file at '${requestUrl}'`);
+          // biome-ignore lint/complexity/noUselessContinue: continue is useful here for clarity
           continue;
         } else if (response.status === 401) {
           throw new Error(`No or invalid access token has been provided to access '${requestUrl}'`);

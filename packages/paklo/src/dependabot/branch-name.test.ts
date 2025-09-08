@@ -11,7 +11,7 @@ describe('getBranchNameForUpdate', () => {
 
   it('generates correct branch name for a removed dependency', () => {
     const result = getBranchNameForUpdate('npm', 'main', '/', undefined, [
-      { 'dependency-name': 'react', 'removed': true },
+      { 'dependency-name': 'react', removed: true },
     ]);
     expect(result).toBe('dependabot/npm/main/react-removed');
   });

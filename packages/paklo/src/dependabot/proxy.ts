@@ -1,10 +1,10 @@
-import type Docker from 'dockerode';
-import { type Container, type Network } from 'dockerode';
-import { md, pki } from 'node-forge';
 import { readFile } from 'node:fs/promises';
+import type Docker from 'dockerode';
+import type { Container, Network } from 'dockerode';
+import { md, pki } from 'node-forge';
 
 import { ContainerService } from './container-service';
-import { type CertificateAuthority, type DependabotCredential, type DependabotProxyConfig } from './job';
+import type { CertificateAuthority, DependabotCredential, DependabotProxyConfig } from './job';
 import { logger } from './logger';
 import { errStream, outStream } from './utils';
 

@@ -1,11 +1,14 @@
+// biome-ignore-all lint/suspicious/noShadowRestrictedNames: Proxy is okay
+// biome-ignore-all lint/correctness/noUnusedPrivateClassMembers: imported code
+
 import type Docker from 'dockerode';
-import { type Container } from 'dockerode';
+import type { Container } from 'dockerode';
 
 import { ContainerService } from './container-service';
-import { type FileFetcherInput, type FileUpdaterInput } from './job';
+import type { FileFetcherInput, FileUpdaterInput } from './job';
 import { logger } from './logger';
-import { type JobParameters } from './params';
-import { type Proxy } from './proxy';
+import type { JobParameters } from './params';
+import type { Proxy } from './proxy';
 
 const JOB_OUTPUT_FILENAME = 'output.json';
 const JOB_OUTPUT_PATH = '/home/dependabot/dependabot-updater/output';
@@ -15,6 +18,8 @@ const REPO_CONTENTS_PATH = '/home/dependabot/dependabot-updater/repo';
 const CA_CERT_INPUT_PATH = '/usr/local/share/ca-certificates';
 const CA_CERT_FILENAME = 'dbot-ca.crt';
 const UPDATER_MAX_MEMORY = 8 * 1024 * 1024 * 1024; // 8GB in bytes
+
+// Code below is borrowed and adapted from dependabot-action
 
 export class UpdaterBuilder {
   constructor(

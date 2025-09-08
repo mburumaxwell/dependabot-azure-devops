@@ -40,7 +40,7 @@ export function getSha(): string | undefined {
 function getShaFromGit(): string | undefined {
   try {
     if (process.env.NEXT_RUNTIME === 'nodejs') {
-      const { execSync } = require('child_process'); // eslint-disable-line @typescript-eslint/no-require-imports
+      const { execSync } = require('node:child_process');
       return execSync('git rev-parse HEAD').toString().trim();
     }
   } catch {
@@ -55,7 +55,7 @@ function getShaFromGit(): string | undefined {
 function getBranchFromGit(): string | undefined {
   try {
     if (process.env.NEXT_RUNTIME === 'nodejs') {
-      const { execSync } = require('child_process'); // eslint-disable-line @typescript-eslint/no-require-imports
+      const { execSync } = require('node:child_process');
       return execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
     }
   } catch {

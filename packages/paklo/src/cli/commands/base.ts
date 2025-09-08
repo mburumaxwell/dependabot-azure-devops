@@ -1,5 +1,5 @@
-import { type Command, type ErrorOptions } from 'commander';
-import { type ZodType } from 'zod/v4';
+import type { Command, ErrorOptions } from 'commander';
+import type { ZodType } from 'zod/v4';
 import { logger } from '../logger';
 
 export type HandlerErrorOptions = ErrorOptions & {
@@ -21,13 +21,13 @@ export type HandlerOptions<T> = {
   error: (options: string | HandlerErrorOptions) => void;
 };
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// biome-ignore-start lint/suspicious/noExplicitAny: generic
 export type CreateHandlerOptions<T> = {
   schema: ZodType<T>;
   input: Record<string, any>;
   command: any;
 };
-/* eslint-enable @typescript-eslint/no-explicit-any */
+// biome-ignore-end lint/suspicious/noExplicitAny: generic
 
 export async function handlerOptions<T>({
   schema,

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// biome-ignore-all lint/suspicious/noExplicitAny: testing
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -109,7 +109,7 @@ describe('AzureLocalJobsRunner', () => {
         updates: [
           {
             'package-ecosystem': 'npm',
-            'directory': '/',
+            directory: '/',
             'open-pull-requests-limit': 5,
           } as DependabotUpdate,
         ],
@@ -478,12 +478,12 @@ describe('AzureLocalJobsRunner', () => {
       options.config.updates = [
         {
           'package-ecosystem': 'npm',
-          'directory': '/',
+          directory: '/',
           'open-pull-requests-limit': 5,
         } as DependabotUpdate,
         {
           'package-ecosystem': 'nuget',
-          'directory': '/src',
+          directory: '/src',
           'open-pull-requests-limit': 5,
         } as DependabotUpdate,
       ];
@@ -551,12 +551,12 @@ describe('AzureLocalJobsRunner', () => {
       options.config.updates = [
         {
           'package-ecosystem': 'npm',
-          'directory': '/',
+          directory: '/',
           'open-pull-requests-limit': 5,
         } as DependabotUpdate,
         {
           'package-ecosystem': 'nuget',
-          'directory': '/src',
+          directory: '/src',
           'open-pull-requests-limit': 5,
         } as DependabotUpdate,
       ];

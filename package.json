@@ -5,8 +5,8 @@
   "author": "mburumaxwell",
   "private": true,
   "scripts": {
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "biome format --write",
+    "format:check": "biome format",
 
     "changeset": "changeset",
     "packages:version": "changeset version && turbo run packages:version",
@@ -28,23 +28,15 @@
     "clean": "turbo run clean && rimraf .turbo"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.2.3",
     "@changesets/cli": "2.29.6",
     "@types/node": "24.3.1",
-    "eslint": "9.35.0",
-    "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-react": "7.37.5",
-    "eslint-plugin-react-hooks": "5.2.0",
-    "eslint-plugin-turbo": "2.5.6",
     "globals": "16.3.0",
     "husky": "9.1.7",
-    "prettier": "3.6.2",
-    "prettier-plugin-organize-imports": "4.2.0",
-    "pretty-quick": "4.2.2",
     "rimraf": "6.0.1",
     "tsup": "8.5.0",
     "turbo": "2.5.6",
     "typescript": "5.9.2",
-    "typescript-eslint": "8.42.0",
     "vite-tsconfig-paths": "5.1.4",
     "vitest": "3.2.4"
   },

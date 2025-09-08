@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { type DependabotGroup, type DependabotIgnoreCondition, type DependabotUpdate } from './config';
+import type { DependabotGroup, DependabotIgnoreCondition, DependabotUpdate } from './config';
 import {
+  type DependabotSourceInfo,
   mapAllowedUpdatesFromDependabotConfigToJobConfig,
   mapExperiments,
   mapGroupsFromDependabotConfigToJobConfig,
   mapIgnoreConditionsFromDependabotConfigToJobConfig,
   mapSourceFromDependabotConfigToJobConfig,
-  type DependabotSourceInfo,
 } from './job-builder';
 
 describe('mapExperiments', () => {
@@ -67,45 +67,45 @@ describe('mapExperiments', () => {
 describe('mapSourceFromDependabotConfigToJobConfig', () => {
   it('should map source correctly for Azure DevOps Services', () => {
     const sourceInfo: DependabotSourceInfo = {
-      'provider': 'azure',
-      'hostname': 'dev.azure.com',
+      provider: 'azure',
+      hostname: 'dev.azure.com',
       'api-endpoint': 'https://dev.azure.com',
       'repository-slug': 'my-org/my-project/_git/my-repo',
     };
     const update = {
       'package-ecosystem': 'nuget',
-      'directory': '/',
-      'directories': [],
+      directory: '/',
+      directories: [],
     } as DependabotUpdate;
 
     const result = mapSourceFromDependabotConfigToJobConfig(sourceInfo, update);
     expect(result).toMatchObject({
-      'provider': 'azure',
+      provider: 'azure',
       'api-endpoint': 'https://dev.azure.com',
-      'hostname': 'dev.azure.com',
-      'repo': 'my-org/my-project/_git/my-repo',
+      hostname: 'dev.azure.com',
+      repo: 'my-org/my-project/_git/my-repo',
     });
   });
 
   it('should map source correctly for Azure DevOps Server', () => {
     const sourceInfo: DependabotSourceInfo = {
-      'provider': 'azure',
+      provider: 'azure',
       'api-endpoint': 'https://my-org.com:8443/tfs',
-      'hostname': 'my-org.com',
+      hostname: 'my-org.com',
       'repository-slug': 'tfs/my-collection/my-project/_git/my-repo',
     };
     const update = {
       'package-ecosystem': 'nuget',
-      'directory': '/',
-      'directories': [],
+      directory: '/',
+      directories: [],
     } as DependabotUpdate;
 
     const result = mapSourceFromDependabotConfigToJobConfig(sourceInfo, update);
     expect(result).toMatchObject({
-      'provider': 'azure',
+      provider: 'azure',
       'api-endpoint': 'https://my-org.com:8443/tfs',
-      'hostname': 'my-org.com',
-      'repo': 'tfs/my-collection/my-project/_git/my-repo',
+      hostname: 'my-org.com',
+      repo: 'tfs/my-collection/my-project/_git/my-repo',
     });
   });
 });
@@ -129,25 +129,25 @@ describe('mapIgnoreConditionsFromDependabotConfigToJobConfig', () => {
   });
 
   it('should handle single version string correctly', () => {
-    const ignore: DependabotIgnoreCondition[] = [{ 'dependency-name': 'dep1', 'versions': '>3' }];
+    const ignore: DependabotIgnoreCondition[] = [{ 'dependency-name': 'dep1', versions: '>3' }];
     const result = mapIgnoreConditionsFromDependabotConfigToJobConfig(ignore);
     expect(result).toEqual([{ 'dependency-name': 'dep1', 'version-requirement': '>3' }]);
   });
 
   it('should handle single version string array correctly', () => {
-    const ignore: DependabotIgnoreCondition[] = [{ 'dependency-name': 'dep1', 'versions': ['>1.0.0'] }];
+    const ignore: DependabotIgnoreCondition[] = [{ 'dependency-name': 'dep1', versions: ['>1.0.0'] }];
     const result = mapIgnoreConditionsFromDependabotConfigToJobConfig(ignore);
     expect(result).toEqual([{ 'dependency-name': 'dep1', 'version-requirement': '>1.0.0' }]);
   });
 
   it('should handle multiple version strings correctly', () => {
-    const ignore: DependabotIgnoreCondition[] = [{ 'dependency-name': 'dep1', 'versions': ['>1.0.0', '<2.0.0'] }];
+    const ignore: DependabotIgnoreCondition[] = [{ 'dependency-name': 'dep1', versions: ['>1.0.0', '<2.0.0'] }];
     const result = mapIgnoreConditionsFromDependabotConfigToJobConfig(ignore);
     expect(result).toEqual([{ 'dependency-name': 'dep1', 'version-requirement': '>1.0.0, <2.0.0' }]);
   });
 
   it('should handle empty versions array correctly', () => {
-    const ignore: DependabotIgnoreCondition[] = [{ 'dependency-name': 'dep1', 'versions': [] }];
+    const ignore: DependabotIgnoreCondition[] = [{ 'dependency-name': 'dep1', versions: [] }];
     const result = mapIgnoreConditionsFromDependabotConfigToJobConfig(ignore);
     expect(result).toEqual([{ 'dependency-name': 'dep1', 'version-requirement': '' }]);
   });
@@ -192,7 +192,7 @@ describe('mapGroupsFromDependabotConfigToJobConfig', () => {
     const dependencyGroups: Record<string, DependabotGroup> = {
       group: {
         'applies-to': 'version-updates',
-        'patterns': ['pattern1', 'pattern2'],
+        patterns: ['pattern1', 'pattern2'],
         'exclude-patterns': ['exclude1'],
         'dependency-type': 'production',
         'update-types': ['major'],
@@ -203,10 +203,10 @@ describe('mapGroupsFromDependabotConfigToJobConfig', () => {
 
     expect(result).toEqual([
       {
-        'name': 'group',
+        name: 'group',
         'applies-to': 'version-updates',
-        'rules': {
-          'patterns': ['pattern1', 'pattern2'],
+        rules: {
+          patterns: ['pattern1', 'pattern2'],
           'exclude-patterns': ['exclude1'],
           'dependency-type': 'production',
           'update-types': ['major'],

@@ -1,6 +1,6 @@
 import Docker from 'dockerode';
 
-import { PROXY_IMAGE_NAME, digestName, hasDigest, repositoryName, updaterImages } from './docker-tags';
+import { digestName, hasDigest, PROXY_IMAGE_NAME, repositoryName, updaterImages } from './docker-tags';
 import { logger } from './logger';
 
 // Code below is borrowed and adapted from dependabot-action
@@ -43,7 +43,7 @@ export async function cleanupOldImageVersions(docker: Docker, imageName: string)
 
   logger.info(`Cleaning up images for ${repo}`);
 
-  docker.listImages(options, async function (err, imageInfoList) {
+  docker.listImages(options, async (err, imageInfoList) => {
     if (imageInfoList && imageInfoList.length > 0) {
       for (const imageInfo of imageInfoList) {
         // The given imageName is expected to be a tag + digest, however to avoid any surprises in future

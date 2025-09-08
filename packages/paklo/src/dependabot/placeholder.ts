@@ -21,7 +21,7 @@ async function convertPlaceholder({
 }
 
 function extractPlaceholder(input: string) {
-  const regexp: RegExp = new RegExp('\\${{\\s*([a-zA-Z_]+[a-zA-Z0-9\\._-]*)\\s*}}', 'g');
+  const regexp: RegExp = /\${{\s*([a-zA-Z_]+[a-zA-Z0-9._-]*)\s*}}/g;
 
   return matchAll(input, regexp);
 }

@@ -1,4 +1,4 @@
-import stream, { type Writable } from 'stream';
+import stream, { type Writable } from 'node:stream';
 
 // Code below is borrowed and adapted from dependabot-action
 

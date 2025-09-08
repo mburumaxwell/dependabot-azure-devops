@@ -1,8 +1,8 @@
-import { type SecretMasker } from './api-client';
-import { type DependabotConfig } from './config';
-import { type DependabotExperiments } from './job';
+import type { SecretMasker } from './api-client';
+import type { DependabotConfig } from './config';
+import type { DependabotExperiments } from './job';
 import { makeRandomJobToken } from './job-builder';
-import { type LocalDependabotServerOptions } from './server';
+import type { LocalDependabotServerOptions } from './server';
 
 export type RunJobsResult = { id: number; success: boolean; message?: string; affectedPrs: number[] }[];
 

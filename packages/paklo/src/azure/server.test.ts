@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// biome-ignore-all lint/suspicious/noExplicitAny: test file
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { type DependabotJobBuilderOutput, type DependabotUpdate } from '@/dependabot';
-import { type AzureDevOpsWebApiClient } from './client';
+import type { DependabotJobBuilderOutput, DependabotUpdate } from '@/dependabot';
+import type { AzureDevOpsWebApiClient } from './client';
 import {
   DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
   DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
@@ -69,14 +69,14 @@ describe('AzureLocalDependabotServer', () => {
       jobBuilderOutput = {
         jobId: 1,
         job: {
-          'id': 1,
+          id: 1,
           'package-manager': 'npm_and_yarn',
-          'source': {
+          source: {
             hostname: 'localhost:8081',
             provider: 'azure',
             repo: 'testproject/_git/test-repo',
           },
-          'experiments': {},
+          experiments: {},
           'credentials-metadata': [],
           'allowed-updates': [],
           'existing-group-pull-requests': [],
@@ -84,8 +84,8 @@ describe('AzureLocalDependabotServer', () => {
           'lockfile-only': false,
           'requirements-update-strategy': null,
           'update-subdependencies': false,
-          'debug': false,
-          'dependencies': [],
+          debug: false,
+          dependencies: [],
           'security-advisories': [],
           'security-updates-only': false,
           'updating-a-pull-request': false,
@@ -140,7 +140,7 @@ describe('AzureLocalDependabotServer', () => {
           'pr-body': 'Test body',
           'pr-title': 'Test PR',
           'updated-dependency-files': [],
-          'dependencies': [],
+          dependencies: [],
         },
       });
 
@@ -178,7 +178,7 @@ describe('AzureLocalDependabotServer', () => {
           'pr-body': 'Test body',
           'pr-title': 'Test PR',
           'updated-dependency-files': [],
-          'dependencies': [],
+          dependencies: [],
         },
       });
 
@@ -210,7 +210,7 @@ describe('AzureLocalDependabotServer', () => {
           'pr-body': 'Test body',
           'pr-title': 'Test PR',
           'updated-dependency-files': [],
-          'dependencies': [],
+          dependencies: [],
         },
       });
 
