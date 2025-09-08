@@ -1,0 +1,33 @@
+{
+  "name": "dashboard",
+  "version": "0.1.11",
+  "license": "AGPL-3.0-later",
+  "author": "mburumaxwell",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev --turbo",
+    "start": "next start --turbo",
+    "lint": "biome check",
+    "test": "vitest",
+    "clean": "rimraf .next out"
+  },
+  "dependencies": {
+    "@paklo/cli": "workspace:*",
+    "@vercel/analytics": "1.5.0",
+    "@vercel/speed-insights": "1.2.0",
+    "next": "15.5.2",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "zod": "4.1.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.13",
+    "@types/mdx": "2.0.13",
+    "@types/react": "19.1.12",
+    "@types/react-dom": "19.1.9",
+    "postcss": "8.5.6",
+    "tailwindcss": "4.1.13"
+  }
+}
