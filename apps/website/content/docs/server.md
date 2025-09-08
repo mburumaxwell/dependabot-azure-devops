@@ -1,23 +1,13 @@
-# Table of Contents
-
-- [Why should I use the server?](#why-should-i-use-the-server)
-- [Composition](#composition)
-- [Deployment](#deployment)
-  - [Single click deployment](#single-click-deployment)
-  - [Deployment Parameters](#deployment-parameters)
-  - [Deployment with CLI](#deployment-with-cli)
-  - [Service Hooks and Subscriptions](#service-hooks-and-subscriptions)
-  - [Docker Compose](#docker-compose)
-- [Keeping updated](#keeping-updated)
-- [Development guide](#development-guide)
-  - [Getting the development environment ready](#getting-the-development-environment-ready)
-  - [Running the unit tests](#running-the-unit-tests)
+---
+title: Dependabot Server
+description: Deploy and manage the Dependabot server component for organization-wide dependency updates in Azure DevOps.
+---
 
 ## Why should I use the server?
 
 Running multiple pipelines in Azure DevOps can quickly become overwhelming especially when you have many repositories. In some cases, you might want to keep one pipeline to manage multiple repositories but that can quickly get opaque with over-generalization in templates.
 
-The extension is a good place to start but when you need to roll out across all the repositories in your organization, you would need something similar to the GitHub-hosted dependabot. The [server](../server) component in this repository provides similar functionality:
+The extension is a good place to start but when you need to roll out across all the repositories in your organization, you would need something similar to the GitHub-hosted dependabot. The [server](https://github.com/mburumaxwell/dependabot-azure-devops/tree/main/server) component in this repository provides similar functionality:
 
 1. Support for the `schedule` node hence different update times and timezones.
 2. Trigger based on pushes to the default branch. The configuration file is picked up automatically.
@@ -48,19 +38,19 @@ The easiest means of deployment is to use the relevant button below.
 [![Deploy to Azure US Gov](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Ftinglesoftware%2Fdependabot-azure-devops%2Fmain%2Fserver%2Fmain.json)
 [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Ftinglesoftware%2Fdependabot-azure-devops%2Fmain%2Fserver%2Fmain.json)
 
-You can also use the [server/main.json](../server/main.json) file, [server/main.bicep](../server/main.bicep) file, or pull either file from the [latest release](https://github.com/mburumaxwell/dependabot-azure-devops/releases/latest). You will need an Azure subscription and a resource group to deploy to.
+You can also use the [server/main.json](https://github.com/mburumaxwell/dependabot-azure-devops/blob/main/server/main.json) file, [server/main.bicep](https://github.com/mburumaxwell/dependabot-azure-devops/blob/main/server/main.bicep) file, or pull either file from the [latest release](https://github.com/mburumaxwell/dependabot-azure-devops/releases/latest). You will need an Azure subscription and a resource group to deploy to.
 
 ### Deployment Parameters
 
 The deployment exposes the following parameters that can be tuned to suit the setup.
 
-|Parameter Name|Remarks|Required|Default|
-|--|--|--|--|
-|location|Location to deploy the resources.|No|&lt;resource-group-location&gt;|
-|name|The name of all resources.|No|`dependabot`|
-|projectSetups|A JSON array string representing the projects to be setup on startup. This is useful when running your own setup. Example: `[{\"url\":\"https://dev.azure.com/tingle/dependabot\",\"token\":\"dummy\",\"AutoComplete\":true}]`|Yes|&lt;empty&gt;|
-|githubToken|Access token for authenticating requests to GitHub. Required for vulnerability checks and to avoid rate limiting on free requests|No|&lt;empty&gt;|
-|imageTag|The image tag to use when pulling the docker containers. A tag also defines the version. You should avoid using `latest`. Example: `1.1.0`|No|&lt;version-downloaded&gt;|
+| Parameter Name | Remarks                                                                                                                                                                                                                        | Required | Default                         |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ------------------------------- |
+| location       | Location to deploy the resources.                                                                                                                                                                                              | No       | &lt;resource-group-location&gt; |
+| name           | The name of all resources.                                                                                                                                                                                                     | No       | `dependabot`                    |
+| projectSetups  | A JSON array string representing the projects to be setup on startup. This is useful when running your own setup. Example: `[{\"url\":\"https://dev.azure.com/tingle/dependabot\",\"token\":\"dummy\",\"AutoComplete\":true}]` | Yes      | &lt;empty&gt;                   |
+| githubToken    | Access token for authenticating requests to GitHub. Required for vulnerability checks and to avoid rate limiting on free requests                                                                                              | No       | &lt;empty&gt;                   |
+| imageTag       | The image tag to use when pulling the docker containers. A tag also defines the version. You should avoid using `latest`. Example: `1.1.0`                                                                                     | No       | &lt;version-downloaded&gt;      |
 
 > [!NOTE]
 > The template includes a User Assigned Managed Identity, which is used when performing Azure Resource Manager operations such as deletions. In the deployment it creates the role assignments that it needs. These role assignments are on the resource group that you deploy to.

@@ -33,4 +33,4 @@ pnpm dlx husky
 2. Make your changes and ensure all quality checks pass.
 3. Commit using clear messages and open a pull request.
 
-For more details see the [CONTRIBUTING guide](https://github.com/mburumaxwell/dependabot-azure-devops/blob/main/CONTRIBUTING.MD) and the [extension development guide](https://github.com/mburumaxwell/dependabot-azure-devops/blob/main/docs/extensions/azure.md#development-guide).
+For more details see the [CONTRIBUTING guide](https://github.com/mburumaxwell/dependabot-azure-devops/blob/main/CONTRIBUTING.MD) and the [extension development guide](./extensions/azure#development-guide).

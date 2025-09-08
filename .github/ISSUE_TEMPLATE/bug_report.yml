@@ -57,7 +57,7 @@ body:
       label: Logs and screenshots
       description: |
         If applicable, include relevant logs or screenshots to help explain your problem.
-        See [Azure extension troubleshooting](https://github.com/mburumaxwell/dependabot-azure-devops/blob/main/docs/extensions/azure.md#troubleshooting-issues)
+        See [Azure extension troubleshooting](https://paklo.software/docs/extensions/azure#troubleshooting-issues)
         for more on how to collect additional diagnostic logs.
     validations:
       required: false
