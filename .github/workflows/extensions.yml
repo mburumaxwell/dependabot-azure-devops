@@ -47,7 +47,6 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: 22
-          cache: pnpm
 
       - name: Download deps
         run: pnpm install
@@ -131,7 +130,6 @@ jobs:
   #       uses: actions/setup-node@v5
   #       with:
   #         node-version: 22
-  #         cache: pnpm
 
   #     - name: Download deps
   #       run: pnpm install

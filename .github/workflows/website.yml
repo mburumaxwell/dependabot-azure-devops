@@ -50,7 +50,6 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: 22
-          cache: pnpm
 
       - name: Setup turborepo caching
         uses: rharkor/caching-for-turbo@v2.3.1
