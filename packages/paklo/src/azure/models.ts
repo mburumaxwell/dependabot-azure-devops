@@ -1,4 +1,4 @@
-import { type GitPullRequestMergeStrategy, type VersionControlChangeType } from './types';
+import type { GitPullRequestMergeStrategy, VersionControlChangeType } from './types';
 
 /**
  * Pull request property names used to store metadata about the pull request.

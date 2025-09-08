@@ -1,5 +1,5 @@
 import { createMDX } from 'fumadocs-mdx/next';
-import { type NextConfig } from 'next';
+import type { NextConfig } from 'next';
 
 const config: NextConfig = {
   output: 'standalone',
@@ -15,8 +15,8 @@ const config: NextConfig = {
       // Externalize server-side dependencies that contain native modules
       config.externals = config.externals || [];
       config.externals.push({
-        'ssh2': 'commonjs ssh2',
-        'dockerode': 'commonjs dockerode',
+        ssh2: 'commonjs ssh2',
+        dockerode: 'commonjs dockerode',
         '@hono/node-server': 'commonjs @hono/node-server',
       });
     }

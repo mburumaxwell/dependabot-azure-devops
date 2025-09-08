@@ -2,9 +2,9 @@ import { Command } from 'commander';
 import { z } from 'zod/v4';
 
 import { extractUrlParts, getDependabotConfig } from '@/azure';
-import { type DependabotConfig } from '@/dependabot';
+import type { DependabotConfig } from '@/dependabot';
 import { logger } from '../logger';
-import { handlerOptions, type HandlerOptions } from './base';
+import { type HandlerOptions, handlerOptions } from './base';
 
 const schema = z.object({
   organisationUrl: z.string(),
@@ -62,8 +62,7 @@ export const command = new Command('validate')
   .requiredOption('--repository <REPOSITORY>', 'Name or ID of the repository')
   .requiredOption('--git-token <GIT-TOKEN>', 'Token to use for authenticating access to the git repository.')
   .action(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async (...args: any[]) =>
+    async (...args) =>
       await handler(
         await handlerOptions({
           schema,

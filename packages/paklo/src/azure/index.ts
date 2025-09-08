@@ -4,5 +4,5 @@ export * from './jobs-runner';
 export * from './models';
 export * from './server';
 export * from './types';
-export { extractUrlParts, type AzureDevOpsUrl } from './url-parts';
+export { type AzureDevOpsUrl, extractUrlParts } from './url-parts';
 export * from './utils';

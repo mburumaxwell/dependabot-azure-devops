@@ -1,13 +1,13 @@
-import * as path from 'path';
+import * as path from 'node:path';
 
 import {
-  DependabotExistingGroupPRSchema,
-  DependabotExistingPRSchema,
   type DependabotClosePullRequest,
   type DependabotCreatePullRequest,
   type DependabotDependency,
   type DependabotExistingGroupPR,
+  DependabotExistingGroupPRSchema,
   type DependabotExistingPR,
+  DependabotExistingPRSchema,
   type DependabotUpdatePullRequest,
 } from '@/dependabot';
 import {
@@ -159,14 +159,14 @@ export function getPullRequestDependenciesPropertyValueForOutputData(
     return {
       'dependency-name': dep.name,
       'dependency-version': dep.version,
-      'directory': dep.directory,
+      directory: dep.directory,
     };
   });
   const dependencyGroupName = data['dependency-group']?.name;
   if (!dependencyGroupName) return dependencies;
   return {
     'dependency-group-name': dependencyGroupName,
-    'dependencies': dependencies,
+    dependencies: dependencies,
   } as DependabotExistingGroupPR;
 }
 
@@ -190,7 +190,7 @@ export function getPullRequestDescription(
     const compatibilityScoreBadges = dependencies.map((dep) => {
       return `![Dependabot compatibility score](https://dependabot-badges.githubapp.com/badges/compatibility_score?dependency-name=${dep.name}&package-manager=${packageManager}&previous-version=${dep['previous-version']}&new-version=${dep.version})`;
     });
-    header += compatibilityScoreBadges.join(' ') + '\n\n';
+    header += `${compatibilityScoreBadges.join(' ')}\n\n`;
   }
 
   // Build the full pull request description.

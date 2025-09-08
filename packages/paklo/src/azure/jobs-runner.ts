@@ -2,23 +2,23 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 
 import {
-  DependabotJobBuilder,
-  LocalJobsRunner,
-  mapPackageEcosystemToPackageManager,
-  runJob,
   type DependabotCredential,
+  DependabotJobBuilder,
   type DependabotJobConfig,
   type DependabotUpdate,
+  LocalJobsRunner,
   type LocalJobsRunnerOptions,
+  mapPackageEcosystemToPackageManager,
   type RunJobsResult,
+  runJob,
 } from '@/dependabot';
 import {
   filterVulnerabilities,
-  getGhsaPackageEcosystemFromDependabotPackageManager,
   GitHubGraphClient,
-  SecurityVulnerabilitySchema,
+  getGhsaPackageEcosystemFromDependabotPackageManager,
   type Package,
   type SecurityVulnerability,
+  SecurityVulnerabilitySchema,
 } from '@/github';
 
 import { AzureDevOpsWebApiClient } from './client';
@@ -40,13 +40,16 @@ export type AzureLocalJobsRunnerOptions = LocalJobsRunnerOptions &
   };
 
 export class AzureLocalJobsRunner extends LocalJobsRunner {
+  // biome-ignore-start lint/correctness/noUnusedPrivateClassMembers: variables are used
   private readonly options: AzureLocalJobsRunnerOptions;
   private readonly authorClient: AzureDevOpsWebApiClient;
   private readonly approverClient?: AzureDevOpsWebApiClient;
+  // biome-ignore-end lint/correctness/noUnusedPrivateClassMembers: variables are used
 
   constructor(options: AzureLocalJobsRunnerOptions) {
     super({ ...options });
-    const { url, gitToken, autoApprove, debug } = (this.options = options);
+    this.options = options;
+    const { url, gitToken, autoApprove, debug } = this.options;
 
     // Initialise the DevOps API clients (one for authoring the other for auto-approving (if configured))
     this.authorClient = new AzureDevOpsWebApiClient(url, gitToken, debug);
@@ -234,9 +237,9 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
         debug: false,
       });
 
-      let jobId: number | undefined = undefined;
-      let job: DependabotJobConfig | undefined = undefined;
-      let credentials: DependabotCredential[] | undefined = undefined;
+      let jobId: number | undefined;
+      let job: DependabotJobConfig | undefined;
+      let credentials: DependabotCredential[] | undefined;
       let jobToken: string;
       let credentialsToken: string;
 
@@ -266,7 +269,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
 
         const outputs = server.requests(jobId);
         const packagesToCheckForVulnerabilities: Package[] | undefined = outputs!
-          .find((o) => o.type == 'update_dependency_list')
+          .find((o) => o.type === 'update_dependency_list')
           ?.data.dependencies?.map((d) => ({ name: d.name, version: d.version }));
         if (packagesToCheckForVulnerabilities?.length) {
           logger.info(

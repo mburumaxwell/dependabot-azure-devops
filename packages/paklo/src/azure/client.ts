@@ -1,21 +1,21 @@
 import { HttpRequestError, isErrorTemporaryFailure } from '@/core';
 import { logger } from './logger';
-import {
-  type IAbandonPullRequest,
-  type IApprovePullRequest,
-  type ICreatePullRequest,
-  type IPullRequestProperties,
-  type IUpdatePullRequest,
+import type {
+  IAbandonPullRequest,
+  IApprovePullRequest,
+  ICreatePullRequest,
+  IPullRequestProperties,
+  IUpdatePullRequest,
 } from './models';
 import {
   CommentThreadStatus,
   CommentType,
+  type IdentityRefWithVote,
   ItemContentType,
   PullRequestAsyncStatus,
   PullRequestStatus,
-  type IdentityRefWithVote,
 } from './types';
-import { type AzureDevOpsUrl } from './url-parts';
+import type { AzureDevOpsUrl } from './url-parts';
 import { normalizeBranchName, normalizeFilePath } from './utils';
 
 /** Azure DevOps REST API client. */
@@ -274,7 +274,7 @@ export class AzureDevOpsWebApiClient {
           pr.properties.map((property) => {
             return {
               op: 'add',
-              path: '/' + property.name,
+              path: `/${property.name}`,
               value: property.value,
             };
           }),
@@ -474,7 +474,7 @@ export class AzureDevOpsWebApiClient {
         //      https://learn.microsoft.com/en-us/azure/devops/integrate/concepts/rest-api-versioning?view=azure-devops#supported-versions
         '7.1',
       );
-      if (userVote?.vote != 10) {
+      if (userVote?.vote !== 10) {
         throw new Error('Failed to approve pull request, vote was not recorded');
       }
 
@@ -603,7 +603,7 @@ export class AzureDevOpsWebApiClient {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
+            Authorization: `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
           },
           body: JSON.stringify(data),
         });
@@ -623,7 +623,7 @@ export class AzureDevOpsWebApiClient {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
+            Authorization: `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
           },
           body: JSON.stringify(data),
         });
@@ -648,7 +648,7 @@ export class AzureDevOpsWebApiClient {
           method: 'PATCH',
           headers: {
             'Content-Type': contentType || 'application/json',
-            'Authorization': `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
+            Authorization: `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
           },
           body: JSON.stringify(data),
         });
@@ -742,7 +742,7 @@ export async function sendRestApiRequestWithRetry(
       }
     }
 
-    logger.trace('THROW' + e);
+    logger.trace(`THROW${e}`);
     throw e;
   }
 }

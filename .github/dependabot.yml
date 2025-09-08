@@ -81,10 +81,6 @@ updates:
         patterns:
           - '@types/dockerode'
           - 'dockerode'
-      eslint:
-        patterns:
-          - '@eslint/*'
-          - 'eslint'
       fumadocs:
         patterns:
           - 'fumadocs-*'
@@ -101,7 +97,6 @@ updates:
         patterns:
           - '@next/*'
           - 'next'
-          - 'eslint-config-next'
       node-forge:
         patterns:
           - '@types/node-forge'
@@ -110,13 +105,6 @@ updates:
         patterns:
           - 'pino'
           - 'pino-*'
-      prettier:
-        patterns:
-          - 'prettier'
-          - 'prettier-*'
-          - 'eslint-config-prettier'
-        exclude-patterns:
-          - 'prettier-plugin-tailwindcss'
       react:
         patterns:
           - '@types/react'
@@ -124,8 +112,6 @@ updates:
           - 'react'
           - 'react-dom'
           - 'react-router-dom'
-          - 'eslint-plugin-react'
-          - 'eslint-plugin-react-hooks'
       vercel:
         patterns:
           - '@vercel/*'
@@ -136,15 +122,10 @@ updates:
           - 'tailwindcss'
           - 'tailwind-merge'
           - '@tailwindcss/*'
-          - 'prettier-plugin-tailwindcss'
       tar-stream:
         patterns:
           - '@types/tar-stream'
           - 'tar-stream'
-      turbo:
-        patterns:
-          - 'eslint-plugin-turbo'
-          - 'turbo'
 
   - package-ecosystem: 'gitsubmodule'
     directory: '/'

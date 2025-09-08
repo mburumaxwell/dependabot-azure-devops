@@ -1,6 +1,6 @@
-import { docs as allDocs, legal as allLegal } from '@/../.source';
 import { loader } from 'fumadocs-core/source';
 import { createMDXSource } from 'fumadocs-mdx';
+import { docs as allDocs, legal as allLegal } from '@/../.source';
 
 export const legal = loader({
   baseUrl: '/legal',

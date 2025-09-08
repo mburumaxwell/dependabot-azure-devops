@@ -1,5 +1,3 @@
-import { handle } from 'hono/vercel';
-
 import {
   createApiServerApp,
   type DependabotCredential,
@@ -7,6 +5,7 @@ import {
   type DependabotRequest,
   type DependabotTokenType,
 } from '@paklo/cli/dependabot';
+import { handle } from 'hono/vercel';
 
 export const dynamic = 'force-dynamic';
 

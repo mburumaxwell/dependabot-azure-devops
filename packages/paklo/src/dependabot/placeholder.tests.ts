@@ -1,3 +1,5 @@
+// biome-ignore-all lint/suspicious/noTemplateCurlyInString: testing
+
 import { describe, expect, it } from 'vitest';
 
 import { extractPlaceholder } from './placeholder';

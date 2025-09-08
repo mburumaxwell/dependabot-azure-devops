@@ -1,12 +1,12 @@
+import type { AddressInfo } from 'node:net';
 import { createAdaptorServer } from '@hono/node-server';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { type AddressInfo } from 'node:net';
-import { z, type ZodType } from 'zod/v4';
+import { type ZodType, z } from 'zod/v4';
 
-import { type GitAuthor } from './author';
-import { type DependabotUpdate } from './config';
-import { type DependabotCredential, type DependabotJobConfig } from './job';
+import type { GitAuthor } from './author';
+import type { DependabotUpdate } from './config';
+import type { DependabotCredential, DependabotJobConfig } from './job';
 import { logger } from './logger';
 import {
   DependabotClosePullRequestSchema,
@@ -153,7 +153,7 @@ export function createApiServerApp({
       async (context) => {
         const { id } = context.req.valid('param');
         const { data } = context.req.valid('json') as { data: z.infer<typeof schema> };
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        // biome-ignore lint/suspicious/noExplicitAny: generic
         const success: boolean = await handle(id, { type, data: data as any });
         return context.body(null, success ? 204 : 400);
       },

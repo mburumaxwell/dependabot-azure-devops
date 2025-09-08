@@ -1,6 +1,6 @@
-import * as crypto from 'crypto';
-import { type PackageEcosystem } from './config';
-import { type DependabotExistingPR } from './job';
+import * as crypto from 'node:crypto';
+import type { PackageEcosystem } from './config';
+import type { DependabotExistingPR } from './job';
 
 // TODO: figure out how to handle IDENTIFIER field (in a group) in branch naming
 // Docs: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#groups--
@@ -46,7 +46,9 @@ export function getBranchNameForUpdate(
       packageEcosystem,
       targetBranchName,
       // normalize directory to remove leading/trailing slashes and replace remaining ones with the separator
-      directory?.replace(/^\/+|\/+$/g, '').replace(/\//g, separator),
+      directory
+        ?.replace(/^\/+|\/+$/g, '')
+        .replace(/\//g, separator),
       branchName,
     ],
     separator,

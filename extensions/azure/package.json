@@ -15,7 +15,7 @@
     "start": "pnpm start:V2",
     "start:V1": "node tasks/dependabotV1/dist/index.js",
     "start:V2": "node tasks/dependabotV2/dist/index.js",
-    "lint": "eslint .",
+    "lint": "biome check",
     "test": "vitest",
     "clean": "rimraf .turbo dist tasks/dependabotV1/dist tasks/dependabotV2/dist",
     "packages:version": "node scripts/update-versions.mjs",

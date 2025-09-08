@@ -1,7 +1,6 @@
+import { type AzureDevOpsUrl, extractUrlParts } from '@paklo/cli/azure';
+import { DEFAULT_EXPERIMENTS, type DependabotExperiments, parseExperiments } from '@paklo/cli/dependabot';
 import * as tl from 'azure-pipelines-task-lib/task';
-
-import { extractUrlParts, type AzureDevOpsUrl } from '@paklo/cli/azure';
-import { DEFAULT_EXPERIMENTS, parseExperiments, type DependabotExperiments } from '@paklo/cli/dependabot';
 import { getAzureDevOpsAccessToken, getGithubAccessToken } from './tokens';
 
 export interface ISharedVariables {
@@ -114,8 +113,8 @@ export default function getSharedVariables(): ISharedVariables {
   }
   console.log('Experiments:', experiments);
 
-  const debug: boolean = tl.getVariable('System.Debug')?.match(/true/i) ? true : false;
-  const secrets: boolean = tl.getVariable('System.Secrets')?.match(/true/i) ? true : false;
+  const debug: boolean = Boolean(tl.getVariable('System.Debug')?.match(/true/i));
+  const secrets: boolean = Boolean(tl.getVariable('System.Secrets')?.match(/true/i));
 
   // Get the target identifiers
   const targetUpdateIds = tl.getDelimitedInput('targetUpdateIds', ';', false).map(Number);

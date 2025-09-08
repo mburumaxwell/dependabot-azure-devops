@@ -1,4 +1,4 @@
-import { type ZodType } from 'zod/v4';
+import type { ZodType } from 'zod/v4';
 
 import { environment } from '@/environment';
 
@@ -9,7 +9,7 @@ import {
   HEADER_NAME_USER_AGENT,
 } from './headers';
 import { MultipartFormDataBody } from './multipart';
-import { type ProblemDetails } from './problem';
+import type { ProblemDetails } from './problem';
 
 const defaultUserAgent = `paklo/${environment.sha?.substring(0, 7) ?? 'dogfood'}`;
 
@@ -152,6 +152,7 @@ export class InnerApiClient {
     }
 
     // populate additional headers
+    // biome-ignore-start lint/suspicious/useIterableCallbackReturn: not used
     if (additionalHeaders) {
       if (additionalHeaders instanceof Headers) {
         additionalHeaders.forEach((value, key) => headers.set(key, value as string));
@@ -161,9 +162,10 @@ export class InnerApiClient {
         Object.entries(additionalHeaders).forEach(([key, value]) => headers.set(key, value as string));
       }
     }
+    // biome-ignore-end lint/suspicious/useIterableCallbackReturn: not used
 
     // prepare body
-    let body: BodyInit | undefined = undefined;
+    let body: BodyInit | undefined;
     if (skipSerialization(payload)) body = payload;
     else if (payload instanceof MultipartFormDataBody) {
       body = new Uint8Array(await payload.encode());

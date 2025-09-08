@@ -1,16 +1,15 @@
-import { debug, error, getVariable, setResult, setVariable, TaskResult, which } from 'azure-pipelines-task-lib/task';
-import { existsSync } from 'fs';
-import { rm } from 'fs/promises';
-import { tmpdir } from 'os';
-import { join } from 'path';
-
-import { AzureLocalJobsRunner, getDependabotConfig, type AzureLocalJobsRunnerOptions } from '@paklo/cli/azure';
+import { existsSync } from 'node:fs';
+import { rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { AzureLocalJobsRunner, type AzureLocalJobsRunnerOptions, getDependabotConfig } from '@paklo/cli/azure';
 import {
   DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
   DEPENDABOT_DEFAULT_AUTHOR_NAME,
   type GitAuthor,
   type SecretMasker,
 } from '@paklo/cli/dependabot';
+import { debug, error, getVariable, setResult, setVariable, TaskResult, which } from 'azure-pipelines-task-lib/task';
 import { setSecrets } from './formatting';
 import parseTaskInputConfiguration from './shared-variables';
 

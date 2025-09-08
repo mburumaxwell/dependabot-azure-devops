@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi, type MockedFunction } from 'vitest';
+import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vitest';
 
 import { HttpRequestError, isErrorTemporaryFailure } from '@/core';
 import { AzureDevOpsWebApiClient, sendRestApiRequestWithRetry } from './client';
-import { type ICreatePullRequest } from './models';
+import type { ICreatePullRequest } from './models';
 import { VersionControlChangeType } from './types';
 import { extractUrlParts } from './url-parts';
 
@@ -73,12 +73,12 @@ describe('AzureDevOpsWebApiClient', () => {
       const pullRequestId = await client.createPullRequest(pr);
 
       // Assert
-      /* eslint-disable @typescript-eslint/no-explicit-any */
+      // biome-ignore-start lint/suspicious/noExplicitAny: tests
       expect(mockRestApiPost).toHaveBeenCalledTimes(2);
       expect((mockRestApiPost.mock.calls[1] as any)[1].reviewers.length).toBe(2);
       expect((mockRestApiPost.mock.calls[1] as any)[1].reviewers).toContainEqual({ id: 'user1' });
       expect((mockRestApiPost.mock.calls[1] as any)[1].reviewers).toContainEqual({ id: 'user2' });
-      /* eslint-enable @typescript-eslint/no-explicit-any */
+      // biome-ignore-end lint/suspicious/noExplicitAny: tests
       expect(pullRequestId).toBe(1);
     });
   });

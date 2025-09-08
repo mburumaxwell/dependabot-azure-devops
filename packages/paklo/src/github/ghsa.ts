@@ -195,7 +195,7 @@ export class GitHubGraphClient {
         const response = await fetch(GHSA_GRAPHQL_API, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${this.accessToken}`,
+            Authorization: `Bearer ${this.accessToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -213,7 +213,7 @@ export class GitHubGraphClient {
         }
 
         const vulnerabilities = responseData?.data?.securityVulnerabilities?.nodes;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // biome-ignore lint/suspicious/noExplicitAny: generic
         return vulnerabilities?.filter((v: any) => v?.advisory)?.map((v: any) => ({ package: pkg, ...v }));
       },
     );

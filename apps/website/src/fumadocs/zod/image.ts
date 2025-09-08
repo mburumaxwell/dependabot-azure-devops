@@ -5,7 +5,7 @@ import { basename, extname, join, relative, resolve } from 'node:path';
 import sharp, { type FormatEnum } from 'sharp';
 import { z } from 'zod/v4';
 
-import { ImageFormats, type ImageData, type ImageFormat } from './types';
+import { type ImageData, type ImageFormat, ImageFormats } from './types';
 
 export type ImageParams = {
   /**
@@ -155,7 +155,7 @@ export async function processAsset<T extends true | undefined = undefined>(
   const buffer = await readFile(path);
   const name = format.replace(/\[(name|hash|ext)(:(\d+))?\]/g, (substring, ...groups) => {
     const key = groups[0];
-    const length = groups[2] == null ? undefined : parseInt(groups[2]);
+    const length = groups[2] == null ? undefined : parseInt(groups[2], 10);
     switch (key) {
       case 'name':
         return basename(path, ext).slice(0, length);

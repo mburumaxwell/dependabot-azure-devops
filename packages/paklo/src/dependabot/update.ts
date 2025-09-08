@@ -25,7 +25,7 @@ export type DependabotUpdateDependencyList = z.infer<typeof DependabotUpdateDepe
 
 export const DependabotCreatePullRequestSchema = z.object({
   'base-commit-sha': z.string(),
-  'dependencies': DependabotDependencySchema.array(),
+  dependencies: DependabotDependencySchema.array(),
   'updated-dependency-files': DependabotDependencyFileSchema.array(),
   'pr-title': z.string(),
   'pr-body': z.string().nullish(),
@@ -47,7 +47,7 @@ export type DependabotUpdatePullRequest = z.infer<typeof DependabotUpdatePullReq
 
 export const DependabotClosePullRequestSchema = z.object({
   'dependency-names': z.string().array(),
-  'reason': z.string().nullish(), // TODO: convert to enum?
+  reason: z.string().nullish(), // TODO: convert to enum?
 });
 export type DependabotClosePullRequest = z.infer<typeof DependabotClosePullRequestSchema>;
 

@@ -1,4 +1,4 @@
-import { execSync, type ExecException } from 'node:child_process';
+import { type ExecException, execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { basename, dirname } from 'node:path';
 import { custom } from 'zod/v4';
@@ -48,7 +48,7 @@ export type GitParams = {
 export function git({
   age = 'newest',
   author = false,
-  default: defaultValue = { date: new Date().toISOString(), timestamp: new Date().getTime(), author: 'unknown' },
+  default: defaultValue = { date: new Date().toISOString(), timestamp: Date.now(), author: 'unknown' },
   path,
 }: GitParams & { path: string }) {
   return custom().transform<GitFileInfo>(async (value, { addIssue }): Promise<GitFileInfo> => {

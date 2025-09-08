@@ -1,18 +1,18 @@
 export type AzureDevOpsUrl = {
   /** URL of the organisation. This may lack the project name */
-  'url': URL;
+  url: URL;
 
   /** Organisation URL hostname */
-  'hostname': string;
+  hostname: string;
 
   /** Organisation API endpoint URL */
   'api-endpoint': string;
 
   /** Project ID or Name */
-  'project': string;
+  project: string;
 
   /** Repository ID or Name */
-  'repository': string;
+  repository: string;
 
   /** Slug of the repository e.g. `contoso/prj1/_git/repo1`, `tfs/contoso/prj1/_git/repo1` */
   'repository-slug': string;
@@ -48,8 +48,8 @@ export function extractUrlParts({
     hostname,
     'api-endpoint': apiEndpoint,
 
-    'project': escapedProject,
-    'repository': escapedRepository,
+    project: escapedProject,
+    repository: escapedRepository,
     'repository-slug': repoSlug,
   };
 }
@@ -95,5 +95,5 @@ function extractVirtualDirectory(organisationUrl: URL) {
   // Virtual Directories are sometimes used in on-premises
   // URLs typically are like this: https://server.domain.com/tfs/x/
   // The pathname extracted looks like this: '/tfs/x/'
-  return path.length == 4 ? path[1]! : undefined;
+  return path.length === 4 ? path[1]! : undefined;
 }
