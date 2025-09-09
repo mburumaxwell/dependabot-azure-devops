@@ -201,6 +201,11 @@ export const DependabotUpdateSchema = z
       addIssue("Either 'directory' or 'directories' must be specified in the dependency update configuration.");
     }
 
+    // validate that 'directory' does not contain glob patterns
+    if (value.directory && /[*?[\]{}]/.test(value.directory)) {
+      addIssue("The 'directory' field must not include glob pattern.");
+    }
+
     value['open-pull-requests-limit'] ??= 5; // default to 5 if not specified
 
     return value;

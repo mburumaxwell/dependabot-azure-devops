@@ -1,11 +1,13 @@
 import { readFile } from 'node:fs/promises';
 import * as yaml from 'js-yaml';
 import { describe, expect, it } from 'vitest';
+import { ZodError } from 'zod/v4';
 
 import {
   DependabotConfigSchema,
   type DependabotRegistry,
   type DependabotUpdate,
+  DependabotUpdateSchema,
   parseRegistries,
   parseUpdates,
   validateConfiguration,
@@ -77,6 +79,92 @@ describe('Parse configuration file', () => {
     expect(update.registries).toEqual(['platform-clients', 'custom-packages']);
     expect(update.ignore?.length).toEqual(18);
     expect(update.ignore![17]!.versions).toEqual('>=3');
+  });
+});
+
+describe('Directory validation', () => {
+  it('Should reject directory with glob patterns', async () => {
+    const invalidConfigs = [
+      { version: 2, updates: [{ 'package-ecosystem': 'npm', directory: '/src/*' }] },
+      { version: 2, updates: [{ 'package-ecosystem': 'npm', directory: '/src/app-?' }] },
+      { version: 2, updates: [{ 'package-ecosystem': 'npm', directory: '/src/[abc]' }] },
+      { version: 2, updates: [{ 'package-ecosystem': 'npm', directory: '/src/{a,b}' }] },
+    ];
+
+    for (const config of invalidConfigs) {
+      await expect(DependabotConfigSchema.parseAsync(config)).rejects.toThrow(
+        "The 'directory' field must not include glob pattern.",
+      );
+    }
+  });
+
+  it('Should accept directory without glob patterns', async () => {
+    const validConfig = {
+      version: 2,
+      updates: [{ 'package-ecosystem': 'npm', directory: '/src/app' }],
+    };
+
+    const result = await DependabotConfigSchema.parseAsync(validConfig);
+    expect(result.updates[0]?.directory).toBe('/src/app');
+  });
+
+  it('Should accept valid directory paths with special but non-glob characters', async () => {
+    const validConfig = {
+      version: 2,
+      updates: [
+        { 'package-ecosystem': 'npm', directory: '/src/app-name' },
+        { 'package-ecosystem': 'docker', directory: '/src/app_name' },
+        { 'package-ecosystem': 'nuget', directory: '/src/app.name' },
+        { 'package-ecosystem': 'pip', directory: '/src/app@version' },
+      ],
+    };
+
+    const result = await DependabotConfigSchema.parseAsync(validConfig);
+    expect(result.updates).toHaveLength(4);
+    expect(result.updates[0]?.directory).toBe('/src/app-name');
+    expect(result.updates[1]?.directory).toBe('/src/app_name');
+    expect(result.updates[2]?.directory).toBe('/src/app.name');
+    expect(result.updates[3]?.directory).toBe('/src/app@version');
+  });
+
+  it('Should validate individual DependabotUpdate schema with glob patterns', async () => {
+    const invalidUpdate = { 'package-ecosystem': 'npm', directory: '/src/*' };
+
+    await expect(DependabotUpdateSchema.parseAsync(invalidUpdate)).rejects.toThrow(
+      "The 'directory' field must not include glob pattern.",
+    );
+  });
+
+  it('Should validate individual DependabotUpdate schema without glob patterns', async () => {
+    const validUpdate = { 'package-ecosystem': 'npm', directory: '/src/app' };
+
+    const result = await DependabotUpdateSchema.parseAsync(validUpdate);
+    expect(result.directory).toBe('/src/app');
+  });
+
+  it('Should reject config file with glob patterns in directory', async () => {
+    const configWithGlob = {
+      version: 2,
+      updates: [
+        { 'package-ecosystem': 'npm', directory: '/src/*' },
+        { 'package-ecosystem': 'docker', directory: '/apps/[abc]' },
+      ],
+    };
+
+    try {
+      await DependabotConfigSchema.parseAsync(configWithGlob);
+      expect.fail('Expected validation to fail but it passed');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ZodError);
+      const zodError = error as ZodError;
+      expect(zodError.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            message: "The 'directory' field must not include glob pattern.",
+          }),
+        ]),
+      );
+    }
   });
 });
 
