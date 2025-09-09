@@ -103,7 +103,7 @@ jobs:
         if: ${{ startsWith(github.ref, 'refs/heads/main') }}
         timeout-minutes: 2
         with:
-          app-name: korra
+          app-name: paklo-dashboard
           slot-name: ${{ env.WEB_APP_SLOT_FOR_PR }}
           package: ./apps/dashboard/.next/standalone
           clean: true
@@ -117,7 +117,7 @@ jobs:
           inlineScript: >
             az webapp config appsettings set
             --resource-group ${{ env. RESOURCE_GROUP }}
-            --name korra
+            --name paklo-dashboard
             ${{ env.WEB_APP_SLOT_FOR_PR != 'Production' && format('--slot {0}', env.WEB_APP_SLOT_FOR_PR) || '' }}
             --settings ${{ env.APP_SETTINGS }}
         env:
