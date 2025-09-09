@@ -90,6 +90,13 @@ describe('AzureLocalDependabotServer', () => {
           'security-updates-only': false,
           'updating-a-pull-request': false,
           'ignore-conditions': [],
+          'commit-message-options': {
+            prefix: null,
+            'prefix-development': null,
+            'include-scope': null,
+          },
+          'repo-private': true,
+          'vendor-dependencies': false,
         },
         credentials: [],
       };
