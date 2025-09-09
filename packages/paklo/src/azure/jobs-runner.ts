@@ -342,6 +342,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
             jobId,
             jobToken,
             credentialsToken,
+            updaterImage,
             secretMasker,
           });
           const affectedPrs = server.allAffectedPrs(jobId);
@@ -376,6 +377,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
               jobId,
               jobToken,
               credentialsToken,
+              updaterImage,
               secretMasker,
             });
             const affectedPrs = server.allAffectedPrs(jobId);
