@@ -1,5 +1,13 @@
 # paklo
 
+## 0.8.2
+
+### Patch Changes
+
+- cb0dabc: Add support for macOS by disabling WriteXorExecute for .NET updates on Apple Silicon
+- 4dda9b7: Add missing updaterImage to job execution calls
+- 565a4b7: Make `rootDir` optional when calling `getDependabotConfig` but default to current process directory
+
 ## 0.8.1
 
 ### Patch Changes
