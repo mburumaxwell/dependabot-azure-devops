@@ -1,5 +1,13 @@
 # paklo
 
+## 0.8.1
+
+### Patch Changes
+
+- 6965069: Set security vulnerabilities also when not updating a specific PR
+- fd21a8e: Make 'commit-message-options' required in DependabotJobConfigSchema and default to null members when mapping
+- 14516ac: Make 'dependency-name' required in DependabotConditionSchema and default to wildcard when mapping
+
 ## 0.8.0
 
 ### Minor Changes
