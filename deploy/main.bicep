@@ -87,30 +87,6 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = [
   }
 ]
 
-/* Static WebApps */
-resource staticWebApps 'Microsoft.Web/staticSites@2024-11-01' = [
-  for appName in appNames: {
-    name: '${name}-${appName}'
-    location: location
-    properties: {
-      repositoryUrl: 'https://github.com/mburumaxwell/dependabot-azure-devops'
-      branch: 'main'
-      stagingEnvironmentPolicy: 'Enabled'
-      allowConfigFileUpdates: true
-      provider: 'GitHub'
-      enterpriseGradeCdnStatus: 'Disabled'
-      #disable-next-line BCP037
-      deploymentAuthPolicy: 'DeploymentToken'
-      #disable-next-line BCP037
-      #disable-next-line BCP037
-      trafficSplitting: { environmentDistribution: { default: 100 } }
-      publicNetworkAccess: 'Enabled'
-    }
-    sku: { name: 'Free', tier: 'Free' }
-    // identity: { type: 'UserAssigned', userAssignedIdentities: { '${managedIdentity.id}': {} } }
-  }
-]
-
 /** WebApps */
 resource webApps 'Microsoft.Web/sites@2024-04-01' = [
   for appName in appNames: {

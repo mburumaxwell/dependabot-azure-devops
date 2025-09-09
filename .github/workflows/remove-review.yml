@@ -29,15 +29,6 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Remove SWA environment (website)
-        uses: azure/static-web-apps-deploy@v1
-        if: ${{ github.event_name == 'pull_request' }}
-        continue-on-error: true # Ignore errors when the SWA does not exist
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_SWA_TOKEN_WEBSITE }}
-          action: 'close'
-          app_location: ''
-
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:

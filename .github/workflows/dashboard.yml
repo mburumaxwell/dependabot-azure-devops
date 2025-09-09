@@ -1,18 +1,18 @@
-name: Website
+name: Dashboard
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    # tags: ['website*']
+    # tags: ['dashboard*']
     paths:
-      - 'apps/website/**'
-      - '.github/workflows/website.yml'
+      - 'apps/dashboard/**'
+      - '.github/workflows/dashboard.yml'
   pull_request:
     branches: [main]
     paths:
-      - 'apps/website/**'
-      - '.github/workflows/website.yml'
+      - 'apps/dashboard/**'
+      - '.github/workflows/dashboard.yml'
 
 permissions:
   contents: read
@@ -34,7 +34,7 @@ env:
   RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
 
 jobs:
-  Website:
+  Dashboard:
     runs-on: ubuntu-latest
 
     steps:
@@ -56,39 +56,39 @@ jobs:
 
       - name: Download deps
         run: pnpm install
-        working-directory: '${{ github.workspace }}/apps/website'
+        working-directory: '${{ github.workspace }}/apps/dashboard'
 
       - name: Restore .next/cache
         id: cache-next-restore
         uses: actions/cache/restore@v4
         with:
-          path: ${{ github.workspace }}/apps/website/.next/cache
-          key: ${{ runner.os }}-next-website-${{ github.sha }}
+          path: ${{ github.workspace }}/apps/dashboard/.next/cache
+          key: ${{ runner.os }}-next-dashboard-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-next-website
+            ${{ runner.os }}-next-dashboard
 
       - name: Build
         run: pnpm turbo build
-        working-directory: '${{ github.workspace }}/apps/website'
+        working-directory: '${{ github.workspace }}/apps/dashboard'
 
       - name: Lint
         run: pnpm turbo lint
-        working-directory: '${{ github.workspace }}/apps/website'
+        working-directory: '${{ github.workspace }}/apps/dashboard'
 
       - name: Test
         run: pnpm turbo test
-        working-directory: '${{ github.workspace }}/apps/website'
+        working-directory: '${{ github.workspace }}/apps/dashboard'
 
       # https://github.com/Azure/static-web-apps/issues/1059#issuecomment-1638817705
       # https://learn.microsoft.com/en-us/azure/static-web-apps/deploy-nextjs-hybrid#enable-standalone-feature
       # https://medium.com/@wdedweliwaththa/the-ultimate-guide-to-deploying-next-js-a1501de3e4d0
       - name: Copy standalone output files
         run: |
-          cp -r .next/standalone/apps/website/. .next/standalone && \
+          cp -r .next/standalone/apps/dashboard/. .next/standalone && \
           cp -r .next/static .next/standalone/.next/ && \
           cp -r public .next/standalone/ && \
           echo 'Done'
-        working-directory: '${{ github.workspace }}/apps/website'
+        working-directory: '${{ github.workspace }}/apps/dashboard'
 
       - name: Azure Login
         if: ${{ !contains(github.actor, '[bot]') }}
@@ -105,7 +105,7 @@ jobs:
         with:
           app-name: korra
           slot-name: ${{ env.WEB_APP_SLOT_FOR_PR }}
-          package: ./apps/website/.next/standalone
+          package: ./apps/dashboard/.next/standalone
           clean: true
           restart: true
 
@@ -131,13 +131,13 @@ jobs:
         if: ${{ false && !contains(github.actor, '[bot]') && github.event_name == 'pull_request' }}
         with:
           message: |
-            Review App for `website` succeeded.
+            Review App for `dashboard` succeeded.
             [Preview](${{ steps.web-app.outputs.webapp-url }})
-          comment-tag: website
+          comment-tag: dashboard
 
       - name: Save .next/cache
         if: always() && steps.cache-next-restore.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: ${{ github.workspace }}/apps/website/.next/cache
+          path: ${{ github.workspace }}/apps/dashboard/.next/cache
           key: ${{ steps.cache-next-restore.outputs.cache-primary-key }}
