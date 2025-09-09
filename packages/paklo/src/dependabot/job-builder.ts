@@ -109,6 +109,11 @@ export class DependabotJobBuilder {
         experiments: this.experiments,
         'requirements-update-strategy': null,
         'lockfile-only': false,
+        'commit-message-options': {
+          prefix: null,
+          'prefix-development': null,
+          'include-scope': null,
+        },
         debug: this.debug,
       },
       credentials: this.credentials,
@@ -176,14 +181,12 @@ export class DependabotJobBuilder {
         'existing-group-pull-requests': existingPullRequests.filter(
           (pr): pr is DependabotExistingGroupPR => !Array.isArray(pr),
         ),
-        'commit-message-options': this.update['commit-message']
-          ? {
-              prefix: this.update['commit-message']?.prefix,
-              'prefix-development': this.update['commit-message']?.['prefix-development'],
-              'include-scope':
-                this.update['commit-message']?.include?.toLocaleLowerCase()?.trim() === 'scope' ? true : null,
-            }
-          : null,
+        'commit-message-options': {
+          prefix: this.update['commit-message']?.prefix ?? null,
+          'prefix-development': this.update['commit-message']?.['prefix-development'] ?? null,
+          'include-scope':
+            this.update['commit-message']?.include?.toLocaleLowerCase()?.trim() === 'scope' ? true : null,
+        },
         cooldown: this.update.cooldown,
         experiments: mapExperiments(this.experiments),
         'reject-external-code':

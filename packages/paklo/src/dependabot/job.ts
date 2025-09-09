@@ -174,7 +174,7 @@ export const DependabotJobConfigSchema = z.object({
   'vendor-dependencies': z.boolean().nullish(),
   'reject-external-code': z.boolean().nullish(),
   'repo-private': z.boolean().nullish(),
-  'commit-message-options': DependabotCommitOptionsSchema.nullish(),
+  'commit-message-options': DependabotCommitOptionsSchema,
   'credentials-metadata': DependabotCredentialSchema.array().nullish(),
   'max-updater-run-time': z.int().nullish(),
   cooldown: DependabotCooldownSchema.nullish(),
