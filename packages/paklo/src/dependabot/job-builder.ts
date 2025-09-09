@@ -331,7 +331,7 @@ export function mapIgnoreConditionsFromDependabotConfigToJobConfig(
     return {
       source: ignore.source,
       'updated-at': ignore['updated-at'],
-      'dependency-name': ignore['dependency-name'],
+      'dependency-name': ignore['dependency-name'] ?? '*',
       'update-types': ignore['update-types'],
 
       // The dependabot.yml config docs are not very clear about acceptable values; after scanning dependabot-core and dependabot-cli,

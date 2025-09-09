@@ -72,7 +72,7 @@ export const DependabotGroupJobSchema = z.object({
 export type DependabotGroupJob = z.infer<typeof DependabotGroupJobSchema>;
 
 export const DependabotConditionSchema = z.object({
-  'dependency-name': z.string().nullish(),
+  'dependency-name': z.string(),
   source: z.string().nullish(),
   'update-types': z.string().array().nullish(),
   'updated-at': z.coerce.string().nullish(),
