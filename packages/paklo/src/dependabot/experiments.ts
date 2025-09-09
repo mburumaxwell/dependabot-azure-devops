@@ -31,7 +31,6 @@ export const DEFAULT_EXPERIMENTS: DependabotExperiments = {
   'enable-cooldown-for-cargo': true,
   'enable-cooldown-for-maven': true,
   'enable-cooldown-for-gomodules': true,
-  'enable-cooldown-metrics-collection': true,
   'enable-cooldown-for-composer': true,
   'enable-cooldown-for-gradle': true,
   'enable-cooldown-for-pub': true,
@@ -42,6 +41,7 @@ export const DEFAULT_EXPERIMENTS: DependabotExperiments = {
   'enable-cooldown-for-dev-containers': true,
   'enable-cooldown-for-hex': true,
   'enable-cooldown-for-dotnet-sdk': true,
+  'enable-exclude-paths-subdirectory-manifest-files': true,
 };
 
 /**
