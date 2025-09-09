@@ -329,7 +329,6 @@ healthchecksdb
 
 *git.store
 *.vsix
-*flamegraph.html
 *.tsbuildinfo
 .DS_Store
 .idea

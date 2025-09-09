@@ -11,8 +11,6 @@ Refer to the extension [README.md](https://github.com/mburumaxwell/dependabot-az
 
 Dependabot will log more diagnostic information when [verbose logs are enabled](https://learn.microsoft.com/en-us/azure/devops/pipelines/troubleshooting/review-logs?view=azure-devops&tabs=windows-agent#configure-verbose-logs); i.e. `System.Debug` variable is set to `true`.
 
-When verbose logs are enable, Dependabot will also generate a [Flame Graph performance metrics report](https://www.brendangregg.com/flamegraphs.html), which can be viewed by [downloading the pipeline logs](https://learn.microsoft.com/en-us/azure/devops/pipelines/troubleshooting/review-logs?view=azure-devops&tabs=windows-agent#view-and-download-logs), then locating the corresponding HTML report file in the `Job` folder. To understand how to read Flame Graph reports, see: <https://www.brendangregg.com/flamegraphs.html#summary>
-
 :::warning
 
 When sharing pipeline logs, please be aware that the **task log contains potentially sensitive information** such as your DevOps organisation name, project names, repository names, private package feeds URLs, list of used dependency names/versions, and the contents of any dependency files that are updated (e.g. `package.json`, `*.csproj`, etc). The Flame Graph report does **not** contain any sensitive information about your DevOps environment.
