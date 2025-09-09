@@ -56,6 +56,13 @@ export class UpdaterBuilder {
         `HTTPS_PROXY=${proxyUrl}`,
         `UPDATER_ONE_CONTAINER=1`,
         `ENABLE_CONNECTIVITY_CHECK=${process.env.DEPENDABOT_ENABLE_CONNECTIVITY_CHECK || '1'}`,
+
+        // for updates relying on .NET (e.g. NuGet) and running on macOS (e.g. dev laptop or local MacMini),
+        // we need to disable WriteXorExecute to avoid issues with emulation of Linux containers on macOS hosts
+        // with Apple Silicon (M1/M2) chips
+        // See - https://github.com/dotnet/runtime/issues/103063#issuecomment-2149599940
+        //     - https://github.com/dependabot/dependabot-core/issues/5037
+        ...(process.platform === 'darwin' ?[`DOTNET_EnableWriteXorExecute=0`] : []),
       ],
       Cmd: ['/bin/sh'],
       Tty: true,
