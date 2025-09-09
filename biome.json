@@ -23,7 +23,7 @@
       "!.source",
       "!public",
       "!static",
-      "!src/components/ui",
+      "!**/src/components/ui",
       "!dependabot-action/**",
       "!extensions/azure/tasks/*/task.json",
       "!extensions/azure/vss-extension.json",

@@ -38,6 +38,11 @@
       "types": "./dist/logger.d.ts",
       "require": "./dist/logger.cjs",
       "import": "./dist/logger.js"
+    },
+    "./shared-data": {
+      "types": "./dist/shared-data.d.ts",
+      "require": "./dist/shared-data.cjs",
+      "import": "./dist/shared-data.js"
     }
   },
   "files": [

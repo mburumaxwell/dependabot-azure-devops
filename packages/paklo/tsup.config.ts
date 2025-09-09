@@ -16,6 +16,7 @@ export default defineConfig({
     github: 'src/github/index.ts',
     logger: 'src/logger.ts',
     cli: 'src/cli/index.ts',
+    'shared-data': 'src/shared-data/index.ts',
   },
   outDir: 'dist',
 });
