@@ -62,7 +62,7 @@ export class UpdaterBuilder {
         // with Apple Silicon (M1/M2) chips
         // See - https://github.com/dotnet/runtime/issues/103063#issuecomment-2149599940
         //     - https://github.com/dependabot/dependabot-core/issues/5037
-        ...(process.platform === 'darwin' ?[`DOTNET_EnableWriteXorExecute=0`] : []),
+        ...(process.platform === 'darwin' ? [`DOTNET_EnableWriteXorExecute=0`] : []),
       ],
       Cmd: ['/bin/sh'],
       Tty: true,
