@@ -162,6 +162,7 @@ export class DependabotJobBuilder {
         securityOnlyUpdate && names
           ? names?.filter((d) => securityVulnerabilities?.find((v) => v.package.name === d))
           : names;
+      vulnerabilities = securityVulnerabilities;
     }
 
     return {
