@@ -107,7 +107,6 @@ async function handler({ options, error }: HandlerOptions<Options>) {
   const config = await getDependabotConfig({
     url,
     token: gitToken,
-    rootDir: process.cwd(),
     variableFinder,
   });
   rl.close();

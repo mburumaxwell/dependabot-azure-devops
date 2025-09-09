@@ -34,8 +34,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     config = await getDependabotConfig({
       url,
       token: gitToken,
-      rootDir: process.cwd(),
-      variableFinder: variableFinder,
+      variableFinder,
     });
   } catch (e) {
     error((e as Error).message);

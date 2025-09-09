@@ -23,12 +23,12 @@ import type { AzureDevOpsUrl } from './url-parts';
 export async function getDependabotConfig({
   url,
   token,
-  rootDir,
+  rootDir = process.cwd(),
   variableFinder,
 }: {
   url: AzureDevOpsUrl;
   token: string;
-  rootDir: string;
+  rootDir?: string;
   variableFinder: VariableFinderFn;
 }): Promise<DependabotConfig> {
   let configPath: undefined | string;
