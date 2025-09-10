@@ -117,15 +117,19 @@ resource siteConfig 'Microsoft.Web/sites/config@2024-11-01' = [
 ]
 
 /* Role Assignments */
-resource appConfigurationDataReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(managedIdentity.id, 'AppConfigurationDataReader')
-  scope: resourceGroup()
-  properties: {
-    roleDefinitionId: subscriptionResourceId(
-      'Microsoft.Authorization/roleDefinitions',
-      '516239f1-63e1-4d78-a4de-a74fb236a071'
-    )
-    principalId: managedIdentity.properties.principalId
-    principalType: 'ServicePrincipal'
+var roles = [
+  { name: 'App Configuration Data Reader', id: '516239f1-63e1-4d78-a4de-a74fb236a071' } // Allow read access to App Configuration
+]
+
+resource roleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
+  for role in roles: {
+    name: guid(managedIdentity.id, role.name)
+    scope: resourceGroup()
+    properties: {
+      roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', role.id)
+      principalId: managedIdentity.properties.principalId
+    }
   }
-}
+]
+
+output managedIdentityPrincipalId string = managedIdentity.properties.principalId
