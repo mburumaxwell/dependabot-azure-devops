@@ -4,7 +4,7 @@ const siteUrl = getSiteUrl({ defaultValue: 'https://app.paklo.software' });
 
 export const config = {
   siteUrl,
-  themeColor: '#264C3F', // TODO: update this to match actual
+  themeColor: '#2E6417',
   title: 'Paklo Dashboard',
   description: 'Dependabot-like automation on Azure DevOps',
 };
