@@ -1,5 +1,11 @@
 # paklo
 
+## 0.8.3
+
+### Patch Changes
+
+- 776d6ef: Do not allow glob patterns in update.directory
+
 ## 0.8.2
 
 ### Patch Changes

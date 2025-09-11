@@ -1,6 +1,6 @@
 {
   "name": "extension-azure-devops",
-  "version": "2.58.3",
+  "version": "2.58.4",
   "description": "Dependabot Azure DevOps task",
   "license": "AGPL-3.0-later",
   "author": "mburumaxwell",
