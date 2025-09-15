@@ -270,11 +270,11 @@ importers:
   packages/paklo:
     dependencies:
       '@hono/node-server':
-        specifier: 1.19.1
-        version: 1.19.1(hono@4.9.6)
+        specifier: 1.19.2
+        version: 1.19.2(hono@4.9.7)
       '@hono/zod-validator':
         specifier: 0.7.2
-        version: 0.7.2(hono@4.9.6)(zod@4.1.5)
+        version: 0.7.2(hono@4.9.7)(zod@4.1.5)
       commander:
         specifier: 14.0.0
         version: 14.0.0
@@ -282,8 +282,8 @@ importers:
         specifier: 4.0.7
         version: 4.0.7
       hono:
-        specifier: 4.9.6
-        version: 4.9.6
+        specifier: 4.9.7
+        version: 4.9.7
       js-yaml:
         specifier: 4.1.0
         version: 4.1.0
@@ -796,8 +796,8 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  '@hono/node-server@1.19.1':
-    resolution: {integrity: sha512-h44e5s+ByUriaRIbeS/C74O8v90m0A95luyYQGMF7KEn96KkYMXO7bZAwombzTpjQTU4e0TkU8U1WBIXlwuwtA==}
+  '@hono/node-server@1.19.2':
+    resolution: {integrity: sha512-lndWsd9De/btN998Aiv6gkeMVV2h9Cc0AR0qwFTmxx/YFh/PbrjgoxTpHaNaRn6F4GAkPiVJwI0W0gQF4Wn8EA==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
@@ -3212,8 +3212,8 @@ packages:
   history@5.3.0:
     resolution: {integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==}
 
-  hono@4.9.6:
-    resolution: {integrity: sha512-doVjXhSFvYZ7y0dNokjwwSahcrAfdz+/BCLvAMa/vHLzjj8+CFyV5xteThGUsKdkaasgN+gF2mUxao+SGLpUeA==}
+  hono@4.9.7:
+    resolution: {integrity: sha512-t4Te6ERzIaC48W3x4hJmBwgNlLhmiEdEE5ViYb02ffw4ignHNHa5IBtPjmbKstmtKa8X6C35iWwK4HaqvrzG9w==}
     engines: {node: '>=16.9.0'}
 
   html-void-elements@3.0.0:
@@ -6056,13 +6056,13 @@ snapshots:
       protobufjs: 7.5.4
       yargs: 17.7.2
 
-  '@hono/node-server@1.19.1(hono@4.9.6)':
+  '@hono/node-server@1.19.2(hono@4.9.7)':
     dependencies:
-      hono: 4.9.6
+      hono: 4.9.7
 
-  '@hono/zod-validator@0.7.2(hono@4.9.6)(zod@4.1.5)':
+  '@hono/zod-validator@0.7.2(hono@4.9.7)(zod@4.1.5)':
     dependencies:
-      hono: 4.9.6
+      hono: 4.9.7
       zod: 4.1.5
 
   '@img/sharp-darwin-arm64@0.34.3':
@@ -8618,7 +8618,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.28.4
 
-  hono@4.9.6: {}
+  hono@4.9.7: {}
 
   html-void-elements@3.0.0: {}
 
