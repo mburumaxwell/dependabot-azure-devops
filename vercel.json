@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "ignoreCommand": "./scripts/vercel-ignore-build.sh",
+  "github": {
+    "autoJobCancelation": true
+  }
+}
