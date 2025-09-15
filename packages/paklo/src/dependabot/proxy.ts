@@ -205,6 +205,7 @@ export class ProxyBuilder {
 
       HostConfig: {
         NetworkMode: internalNetworkName,
+        ExtraHosts: ['host.docker.internal:host-gateway'], // needed for Docker on Linux
       },
     });
 
