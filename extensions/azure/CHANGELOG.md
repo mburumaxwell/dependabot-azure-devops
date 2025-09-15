@@ -1,5 +1,14 @@
 # extension-azure-devops
 
+## 2.58.4
+
+### Patch Changes
+
+- Updated dependencies [fd123bc]
+- Updated dependencies [8162cb8]
+- Updated dependencies [776d6ef]
+  - @paklo/cli@0.8.3
+
 ## 2.58.3
 
 ### Patch Changes
