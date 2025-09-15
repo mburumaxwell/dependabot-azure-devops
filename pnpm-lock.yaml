@@ -264,8 +264,8 @@ importers:
         specifier: 0.38.3
         version: 0.38.3
       tfx-cli:
-        specifier: 0.22.0
-        version: 0.22.0
+        specifier: 0.22.1
+        version: 0.22.1
 
   packages/paklo:
     dependencies:
@@ -4945,8 +4945,8 @@ packages:
   text-decoder@1.2.3:
     resolution: {integrity: sha512-3/o9z3X0X0fTupwsYvR03pJ/DjWuqqrfwBgTQzdWDiQSm9KitAyz/9WqsT2JQW7KV2m+bC2ol/zqpW37NHxLaA==}
 
-  tfx-cli@0.22.0:
-    resolution: {integrity: sha512-DAG4fSWf4rkvCxJyt1Ph/EQbOL9RdBEESvtjz2y1GWhSgBTFSv2ak/N9rfeq7OHOdJWjaL6QleAtpGhu35UJig==}
+  tfx-cli@0.22.1:
+    resolution: {integrity: sha512-LhKzq0HJ7/kznsoCsoX+wqeYzHCfS0RuBMT4g6/pEZ+cPPZZIKC55Nh+0XwjaruVVoMuuK5BrNk2QHS6gDfk5Q==}
     engines: {node: '>=8.0.0'}
     hasBin: true
 
@@ -10741,7 +10741,7 @@ snapshots:
     dependencies:
       b4a: 1.6.7
 
-  tfx-cli@0.22.0:
+  tfx-cli@0.22.1:
     dependencies:
       app-root-path: 1.0.0
       archiver: 2.0.3
