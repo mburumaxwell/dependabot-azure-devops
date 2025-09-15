@@ -1,5 +1,13 @@
 # paklo
 
+## 0.8.3
+
+### Patch Changes
+
+- fd123bc: Fix Docker host resolution for API URLs and add extra hosts for Linux compatibility
+- 8162cb8: Remove `dependabotApiLocalUrl` instead manipulate `dependabotApiUrl`
+- 776d6ef: Do not allow glob patterns in update.directory
+
 ## 0.8.2
 
 ### Patch Changes
