@@ -44,6 +44,6 @@
     "@types/q": "1.5.8",
     "@types/semver": "7.7.1",
     "@vercel/ncc": "0.38.3",
-    "tfx-cli": "0.22.0"
+    "tfx-cli": "0.22.1"
   }
 }
