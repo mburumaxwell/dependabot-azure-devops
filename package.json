@@ -36,7 +36,7 @@
     "@biomejs/biome": "2.2.3",
     "@changesets/cli": "2.29.6",
     "@types/node": "24.3.1",
-    "globals": "16.3.0",
+    "globals": "16.4.0",
     "husky": "9.1.7",
     "rimraf": "6.0.1",
     "tsup": "8.5.0",
