@@ -52,7 +52,6 @@ class TestableAzureLocalJobsRunner extends AzureLocalJobsRunner {
     existingPullRequests: IPullRequestProperties[],
     dependabotApiUrl: string,
     dependabotApiDockerUrl?: string,
-    dependabotApiLocalUrl?: string,
   ): Promise<any> {
     return (this as any).performUpdates(
       outDir,
@@ -61,7 +60,6 @@ class TestableAzureLocalJobsRunner extends AzureLocalJobsRunner {
       existingPullRequests,
       dependabotApiUrl,
       dependabotApiDockerUrl,
-      dependabotApiLocalUrl,
     );
   }
 }
@@ -233,7 +231,6 @@ describe('AzureLocalJobsRunner', () => {
         [],
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        'http://localhost:3000/api',
       );
 
       expect(result).toHaveLength(1);
@@ -269,7 +266,6 @@ describe('AzureLocalJobsRunner', () => {
         mockServer,
         options.config.updates,
         existingPRs,
-        'http://localhost:3000/api',
         'http://localhost:3000/api',
         'http://localhost:3000/api',
       );
@@ -311,7 +307,6 @@ describe('AzureLocalJobsRunner', () => {
         [],
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        'http://localhost:3000/api',
       );
 
       expect(result).toEqual([]);
@@ -344,7 +339,6 @@ describe('AzureLocalJobsRunner', () => {
         existingPRs,
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        'http://localhost:3000/api',
       );
 
       expect(result).toHaveLength(1);
@@ -366,7 +360,6 @@ describe('AzureLocalJobsRunner', () => {
         [],
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        'http://localhost:3000/api',
       );
 
       expect(result).toHaveLength(1);
@@ -385,7 +378,6 @@ describe('AzureLocalJobsRunner', () => {
         mockServer,
         options.config.updates,
         [],
-        'http://localhost:3000/api',
         'http://localhost:3000/api',
         'http://localhost:3000/api',
       );
@@ -425,7 +417,6 @@ describe('AzureLocalJobsRunner', () => {
         [],
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        'http://localhost:3000/api',
       );
 
       expect(result).toEqual([]);
@@ -455,7 +446,6 @@ describe('AzureLocalJobsRunner', () => {
         mockServer,
         options.config.updates,
         existingPRs,
-        'http://localhost:3000/api',
         'http://localhost:3000/api',
         'http://localhost:3000/api',
       );
@@ -496,7 +486,6 @@ describe('AzureLocalJobsRunner', () => {
         [],
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        'http://localhost:3000/api',
       );
 
       expect(result).toHaveLength(2);
@@ -535,7 +524,6 @@ describe('AzureLocalJobsRunner', () => {
         [],
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        'http://localhost:3000/api',
       );
 
       expect(result).toEqual([]);
@@ -567,7 +555,6 @@ describe('AzureLocalJobsRunner', () => {
         mockServer,
         options.config.updates,
         [],
-        'http://localhost:3000/api',
         'http://localhost:3000/api',
         'http://localhost:3000/api',
       );

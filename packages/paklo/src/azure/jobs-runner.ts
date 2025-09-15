@@ -99,10 +99,8 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
     // The API urls is constant when working in this CLI. Asking people to setup NGROK or similar just to get
     // HTTPS for the job token to be used is too much hassle.
     // Using same value for dependabotApiUrl and dependabotApiDockerUrl so as to capture /record_metrics calls.
-    // dependabotApiLocalUrl is used to avoid Docker for local calls.
     const dependabotApiUrl = `http://host.docker.internal:${port}/api`;
     const dependabotApiDockerUrl = dependabotApiUrl;
-    const dependabotApiLocalUrl = `${server.url}/api`;
 
     // If update identifiers are specified, select them; otherwise handle all
     let updates: DependabotUpdate[] = [];
@@ -137,7 +135,6 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
         existingPullRequests,
         dependabotApiUrl,
         dependabotApiDockerUrl,
-        dependabotApiLocalUrl,
       );
     } finally {
       server.stop();
@@ -204,7 +201,6 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
     existingPullRequests: IPullRequestProperties[],
     dependabotApiUrl: string,
     dependabotApiDockerUrl?: string,
-    dependabotApiLocalUrl?: string,
   ): Promise<RunJobsResult> {
     const {
       options: { url, gitToken, githubToken, experiments, config, dryRun, securityAdvisoriesFile, secretMasker },
@@ -257,7 +253,6 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
           outDir,
           dependabotApiUrl,
           dependabotApiDockerUrl,
-          dependabotApiLocalUrl,
           jobId,
           jobToken,
           credentialsToken,
@@ -336,7 +331,6 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
             outDir,
             dependabotApiUrl,
             dependabotApiDockerUrl,
-            dependabotApiLocalUrl,
             jobId,
             jobToken,
             credentialsToken,
@@ -371,7 +365,6 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
               outDir,
               dependabotApiUrl,
               dependabotApiDockerUrl,
-              dependabotApiLocalUrl,
               jobId,
               jobToken,
               credentialsToken,

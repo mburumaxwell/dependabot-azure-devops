@@ -16,7 +16,6 @@ export class JobRunnerUpdaterError extends Error {}
 export type JobRunnerOptions = {
   dependabotApiUrl: string;
   dependabotApiDockerUrl?: string;
-  dependabotApiLocalUrl?: string;
   jobId: number;
   jobToken: string;
   credentialsToken: string;
@@ -32,15 +31,7 @@ export class JobRunner {
   }
 
   async run(outDir: string) {
-    const {
-      dependabotApiUrl,
-      dependabotApiDockerUrl,
-      dependabotApiLocalUrl,
-      jobId,
-      jobToken,
-      credentialsToken,
-      secretMasker,
-    } = this.options;
+    const { dependabotApiUrl, dependabotApiDockerUrl, jobId, jobToken, credentialsToken, secretMasker } = this.options;
 
     // create working directory if it does not exist
     const workingDirectory = join(outDir, `${jobId}`);
@@ -56,7 +47,9 @@ export class JobRunner {
       workingDirectory,
     })!;
 
-    const client = new InnerApiClient({ baseUrl: dependabotApiLocalUrl ?? dependabotApiUrl });
+    // if dependabotApiUrl contains "host.docker.internal", we need to replace it with "localhost" for local calls
+    const baseUrl = dependabotApiUrl.replace('host.docker.internal', 'localhost');
+    const client = new InnerApiClient({ baseUrl });
     const apiClient = new ApiClient(client, params, jobToken, credentialsToken, secretMasker);
 
     // If we fail to succeed in fetching the job details, we cannot be sure the job has entered a 'processing' state,
