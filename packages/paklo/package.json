@@ -76,7 +76,7 @@
   "dependencies": {
     "@hono/node-server": "1.19.2",
     "@hono/zod-validator": "0.7.2",
-    "commander": "14.0.0",
+    "commander": "14.0.1",
     "dockerode": "4.0.7",
     "hono": "4.9.7",
     "js-yaml": "4.1.0",
