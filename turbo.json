@@ -1,7 +1,13 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env", "**/.env.*", "**/biome.json", "**/vitest.config.*"],
-  "globalEnv": ["NODE_ENV", "NEXT_PUBLIC_APP_INSIGHTS_CONNECTION_STRING"],
+  "globalEnv": [
+    "NODE_ENV",
+    "NEXT_PUBLIC_APP_INSIGHTS_CONNECTION_STRING",
+    "BETTER_AUTH_SECRET",
+    "DATABASE_URL",
+    "RESEND_API_KEY"
+  ],
   "globalPassThroughEnv": ["GOPATH"],
   "tasks": {
     "build": {

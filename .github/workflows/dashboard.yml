@@ -124,6 +124,10 @@ jobs:
           APP_SETTINGS: >
             GITHUB_SHA="${{ github.sha }}"
             GITHUB_REF_NAME="${{ github.ref_name }}"
+            DATABASE_URL="${{ secrets.DATABASE_URL }}"
+            BETTER_AUTH_SECRET="${{ secrets.BETTER_AUTH_SECRET }}"
+            BETTER_AUTH_SECRET="${{ secrets.BETTER_AUTH_SECRET }}"
+            RESEND_API_KEY="${{ secrets.RESEND_API_KEY }}"
 
       - name: Publish review app URLs
         uses: thollander/actions-comment-pull-request@v3

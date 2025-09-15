@@ -344,3 +344,4 @@ out
 .source
 next-env.d.ts
 .env*.local
+.react-email

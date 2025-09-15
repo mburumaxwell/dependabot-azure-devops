@@ -1,6 +1,6 @@
 import { getSiteUrl } from '@paklo/cli/environment';
 
-const siteUrl = getSiteUrl({ defaultValue: 'https://app.paklo.software' });
+const siteUrl = getSiteUrl({ defaultValue: 'https://dashboard.paklo.app' });
 
 export const config = {
   siteUrl,

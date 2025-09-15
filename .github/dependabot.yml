@@ -77,6 +77,10 @@ updates:
       time: '02:00'
     open-pull-requests-limit: 10
     groups:
+      better-auth:
+        patterns:
+          - 'better-auth'
+          - '@better-auth/*'
       dockerode:
         patterns:
           - '@types/dockerode'
@@ -101,6 +105,9 @@ updates:
         patterns:
           - '@types/node-forge'
           - 'node-forge'
+      opentelemetry:
+        patterns:
+          - '@opentelemetry/*'
       pino:
         patterns:
           - 'pino'
@@ -112,6 +119,10 @@ updates:
           - 'react'
           - 'react-dom'
           - 'react-router-dom'
+      react-email:
+        patterns:
+          - '@react-email/*'
+          - 'react-email'
       vercel:
         patterns:
           - '@vercel/*'
