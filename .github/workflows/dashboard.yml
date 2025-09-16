@@ -90,54 +90,55 @@ jobs:
           echo 'Done'
         working-directory: '${{ github.workspace }}/apps/dashboard'
 
-      - name: Azure Login
-        if: ${{ !contains(github.actor, '[bot]') }}
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      # Using Vercel for now (much faster) but we need the workflow to validate builds especially for dependabot PRs
+      # - name: Azure Login
+      #   if: ${{ !contains(github.actor, '[bot]') }}
+      #   uses: azure/login@v2
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        id: web-app
-        # if: ${{ !contains(github.actor, '[bot]') }}
-        if: ${{ startsWith(github.ref, 'refs/heads/main') }}
-        timeout-minutes: 2
-        with:
-          app-name: paklo-dashboard
-          slot-name: ${{ env.WEB_APP_SLOT_FOR_PR }}
-          package: ./apps/dashboard/.next/standalone
-          clean: true
-          restart: true
+      # - name: Deploy to Azure Web App
+      #   uses: azure/webapps-deploy@v3
+      #   id: web-app
+      #   # if: ${{ !contains(github.actor, '[bot]') }}
+      #   if: ${{ startsWith(github.ref, 'refs/heads/main') }}
+      #   timeout-minutes: 2
+      #   with:
+      #     app-name: paklo-dashboard
+      #     slot-name: ${{ env.WEB_APP_SLOT_FOR_PR }}
+      #     package: ./apps/dashboard/.next/standalone
+      #     clean: true
+      #     restart: true
 
-      - name: Set app settings for Web App # bear in mind that this creates or updates but does not remove
-        uses: azure/cli@v2
-        # if: ${{ !contains(github.actor, '[bot]') }}
-        if: ${{ startsWith(github.ref, 'refs/heads/main') }}
-        with:
-          inlineScript: >
-            az webapp config appsettings set
-            --resource-group ${{ env. RESOURCE_GROUP }}
-            --name paklo-dashboard
-            ${{ env.WEB_APP_SLOT_FOR_PR != 'Production' && format('--slot {0}', env.WEB_APP_SLOT_FOR_PR) || '' }}
-            --settings ${{ env.APP_SETTINGS }}
-        env:
-          APP_SETTINGS: >
-            GITHUB_SHA="${{ github.sha }}"
-            GITHUB_REF_NAME="${{ github.ref_name }}"
-            DATABASE_URL="${{ secrets.DATABASE_URL }}"
-            BETTER_AUTH_SECRET="${{ secrets.BETTER_AUTH_SECRET }}"
-            BETTER_AUTH_SECRET="${{ secrets.BETTER_AUTH_SECRET }}"
-            RESEND_API_KEY="${{ secrets.RESEND_API_KEY }}"
+      # - name: Set app settings for Web App # bear in mind that this creates or updates but does not remove
+      #   uses: azure/cli@v2
+      #   # if: ${{ !contains(github.actor, '[bot]') }}
+      #   if: ${{ startsWith(github.ref, 'refs/heads/main') }}
+      #   with:
+      #     inlineScript: >
+      #       az webapp config appsettings set
+      #       --resource-group ${{ env. RESOURCE_GROUP }}
+      #       --name paklo-dashboard
+      #       ${{ env.WEB_APP_SLOT_FOR_PR != 'Production' && format('--slot {0}', env.WEB_APP_SLOT_FOR_PR) || '' }}
+      #       --settings ${{ env.APP_SETTINGS }}
+      #   env:
+      #     APP_SETTINGS: >
+      #       GITHUB_SHA="${{ github.sha }}"
+      #       GITHUB_REF_NAME="${{ github.ref_name }}"
+      #       DATABASE_URL="${{ secrets.DATABASE_URL }}"
+      #       BETTER_AUTH_SECRET="${{ secrets.BETTER_AUTH_SECRET }}"
+      #       BETTER_AUTH_SECRET="${{ secrets.BETTER_AUTH_SECRET }}"
+      #       RESEND_API_KEY="${{ secrets.RESEND_API_KEY }}"
 
-      - name: Publish review app URLs
-        uses: thollander/actions-comment-pull-request@v3
-        # remove false once we are deploying to slots or ACA
-        if: ${{ false && !contains(github.actor, '[bot]') && github.event_name == 'pull_request' }}
-        with:
-          message: |
-            Review App for `dashboard` succeeded.
-            [Preview](${{ steps.web-app.outputs.webapp-url }})
-          comment-tag: dashboard
+      # - name: Publish review app URLs
+      #   uses: thollander/actions-comment-pull-request@v3
+      #   # remove false once we are deploying to slots or ACA
+      #   if: ${{ false && !contains(github.actor, '[bot]') && github.event_name == 'pull_request' }}
+      #   with:
+      #     message: |
+      #       Review App for `dashboard` succeeded.
+      #       [Preview](${{ steps.web-app.outputs.webapp-url }})
+      #     comment-tag: dashboard
 
       - name: Save .next/cache
         if: always() && steps.cache-next-restore.outputs.cache-hit != 'true'
