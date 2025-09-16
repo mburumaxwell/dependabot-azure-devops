@@ -35,7 +35,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.2.4",
     "@changesets/cli": "2.29.7",
-    "@types/node": "24.4.0",
+    "@types/node": "24.5.0",
     "globals": "16.4.0",
     "husky": "9.1.7",
     "rimraf": "6.0.1",
