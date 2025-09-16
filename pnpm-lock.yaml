@@ -297,8 +297,8 @@ importers:
   packages/paklo:
     dependencies:
       '@hono/node-server':
-        specifier: 1.19.2
-        version: 1.19.2(hono@4.9.7)
+        specifier: 1.19.3
+        version: 1.19.3(hono@4.9.7)
       '@hono/zod-validator':
         specifier: 0.7.2
         version: 0.7.2(hono@4.9.7)(zod@4.1.8)
@@ -999,8 +999,8 @@ packages:
   '@hexagon/base64@1.1.28':
     resolution: {integrity: sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw==}
 
-  '@hono/node-server@1.19.2':
-    resolution: {integrity: sha512-lndWsd9De/btN998Aiv6gkeMVV2h9Cc0AR0qwFTmxx/YFh/PbrjgoxTpHaNaRn6F4GAkPiVJwI0W0gQF4Wn8EA==}
+  '@hono/node-server@1.19.3':
+    resolution: {integrity: sha512-Fjyxfux0rMPXMSob79OmddfpK5ArJa2xLkLCV+zamHkbeXQtSNKOi0keiBKyHZ/hCRKjigjmKGp4AJnDFq8PUw==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
@@ -7842,7 +7842,7 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/node-server@1.19.2(hono@4.9.7)':
+  '@hono/node-server@1.19.3(hono@4.9.7)':
     dependencies:
       hono: 4.9.7
 
