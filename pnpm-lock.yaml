@@ -169,8 +169,8 @@ importers:
         specifier: 4.2.11
         version: 4.2.11
       shadcn:
-        specifier: 3.2.1
-        version: 3.2.1(@types/node@24.4.0)(typescript@5.9.2)
+        specifier: 3.3.0
+        version: 3.3.0(@types/node@24.4.0)(typescript@5.9.2)
       tailwindcss:
         specifier: 4.1.13
         version: 4.1.13
@@ -6186,8 +6186,8 @@ packages:
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
 
-  shadcn@3.2.1:
-    resolution: {integrity: sha512-j+yLAXa6CFBz96+O6dtiA+BllDOokYH65eofCYbPY2+NBsFYiSKbyfj6psbujNfng9HP7N9/+j6Uzo2iYxRqtw==}
+  shadcn@3.3.0:
+    resolution: {integrity: sha512-DBy9057aG3BeYaaWS4LzIauspVpF7nQG9/Cgmeqr9nlDhpw4r/YXTaNvUghsjrUHqSnQLnIqf5Vmr9pQX5wAHQ==}
     hasBin: true
 
   sharp@0.34.1:
@@ -7237,7 +7237,7 @@ snapshots:
       '@babel/helper-compilation-targets': 7.27.2
       '@babel/helper-module-transforms': 7.28.3(@babel/core@7.26.10)
       '@babel/helpers': 7.28.4
-      '@babel/parser': 7.27.0
+      '@babel/parser': 7.28.4
       '@babel/template': 7.27.2
       '@babel/traverse': 7.27.0
       '@babel/types': 7.28.4
@@ -7405,7 +7405,7 @@ snapshots:
     dependencies:
       '@babel/code-frame': 7.27.1
       '@babel/generator': 7.28.3
-      '@babel/parser': 7.27.0
+      '@babel/parser': 7.28.4
       '@babel/template': 7.27.2
       '@babel/types': 7.28.4
       debug: 4.4.3
@@ -13724,7 +13724,7 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shadcn@3.2.1(@types/node@24.4.0)(typescript@5.9.2):
+  shadcn@3.3.0(@types/node@24.4.0)(typescript@5.9.2):
     dependencies:
       '@antfu/ni': 25.0.0
       '@babel/core': 7.28.4
