@@ -43,10 +43,10 @@
     "package.json"
   ],
   "scripts": {
-    "postinstall": "tsup",
-    "dev": "tsup --watch",
+    "postinstall": "tsdown",
+    "dev": "tsdown --watch",
     "prebuild": "tsc",
-    "build": "tsup",
+    "build": "tsdown",
     "lint": "biome check",
     "test": "vitest",
     "clean": "rimraf .turbo dist",
@@ -86,7 +86,7 @@
     "@types/node-forge": "1.3.14",
     "@types/semver": "7.7.1",
     "@types/tar-stream": "3.1.4",
-    "tsup": "8.5.0"
+    "tsdown": "0.15.2"
   },
   "publishConfig": {
     "access": "public"

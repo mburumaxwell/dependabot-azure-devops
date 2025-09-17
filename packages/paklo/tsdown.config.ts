@@ -1,10 +1,10 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsdown';
 
 export default defineConfig({
   format: ['esm'],
   target: 'node22',
   platform: 'node',
-  splitting: false,
+  // splitting: false,
   clean: true,
   dts: true,
   sourcemap: true,
