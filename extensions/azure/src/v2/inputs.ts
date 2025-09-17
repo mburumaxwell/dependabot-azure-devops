@@ -1,9 +1,9 @@
 import { type AzureDevOpsUrl, extractUrlParts } from '@paklo/cli/azure';
 import { DEFAULT_EXPERIMENTS, type DependabotExperiments, parseExperiments } from '@paklo/cli/dependabot';
 import * as tl from 'azure-pipelines-task-lib/task';
-import { getAzureDevOpsAccessToken, getGithubAccessToken } from './tokens';
+import { setSecrets } from '../formatting';
 
-export interface ISharedVariables {
+export type TaskInputs = {
   url: AzureDevOpsUrl;
 
   /** Whether the repository was overridden via input */
@@ -53,14 +53,10 @@ export interface ISharedVariables {
 
   /* Path to a certificate the proxy will trust */
   proxyCertPath?: string;
-}
+};
 
-/**
- * Extract shared variables
- *
- * @returns shared variables
- */
-export default function getSharedVariables(): ISharedVariables {
+/** Extract task inputs (a.k.a. shared variables). */
+export function getTaskInputs(): TaskInputs {
   let project = tl.getInput('targetProjectName');
   const projectOverridden = typeof project === 'string';
   if (!projectOverridden) {
@@ -138,15 +134,8 @@ export default function getSharedVariables(): ISharedVariables {
   }
 
   const proxyCertPath: string | undefined = tl.getInput('proxyCertPath');
-  if (proxyCertPath) {
-    tl.warning(
-      'In a recent major update, the job logic was changed to replace dependabot-cli and follow dependabot-action closely. ' +
-      'As a result, the proxy certificate path has not yet been fully integrated.' +
-      'If this affects your setup and there is no alternative, please let me known by opening an issue on GitHub.'
-    );
-  }
 
-  return {
+  const inputs: TaskInputs = {
     url: urlParts,
     repositoryOverridden,
 
@@ -179,4 +168,86 @@ export default function getSharedVariables(): ISharedVariables {
 
     proxyCertPath,
   };
+
+  // Mask environment, organisation, and project specific variables from the logs.
+  // Most user's environments are private and they're less likely to share diagnostic info when it exposes information about their environment or organisation.
+  // Although not exhaustive, this will mask the most common information that could be used to identify the user's environment.
+  if (inputs.secrets) {
+    setSecrets(
+      inputs.url.hostname,
+      inputs.url.project,
+      inputs.url.repository,
+      inputs.githubAccessToken,
+      inputs.systemAccessUser,
+      inputs.systemAccessToken,
+      inputs.autoApproveUserToken,
+      authorEmail,
+    );
+  }
+
+  return inputs;
+}
+
+/**
+ * Get the access token for Azure DevOps Repos.
+ * If the user has not provided one, we use the one from the SystemVssConnection.
+ */
+function getAzureDevOpsAccessToken() {
+  const systemAccessToken = tl.getInput('azureDevOpsAccessToken');
+  if (systemAccessToken) {
+    tl.debug('azureDevOpsAccessToken provided, using for authenticating');
+    return systemAccessToken;
+  }
+
+  const serviceConnectionName = tl.getInput('azureDevOpsServiceConnection');
+  if (serviceConnectionName) {
+    tl.debug('TFS connection supplied. A token shall be extracted from it.');
+    return tl.getEndpointAuthorizationParameter(serviceConnectionName, 'apitoken', false)!;
+  }
+
+  tl.debug("No custom token provided. The SystemVssConnection's AccessToken shall be used.");
+  return tl.getEndpointAuthorizationParameter('SystemVssConnection', 'AccessToken', false)!;
+}
+
+/** Extract the Github access token from `gitHubAccessToken` or `gitHubConnection` inputs. */
+function getGithubAccessToken(): string | undefined {
+  let gitHubAccessToken = tl.getInput('gitHubAccessToken');
+  if (gitHubAccessToken) {
+    tl.debug('gitHubAccessToken provided, using for authenticating');
+    return gitHubAccessToken;
+  }
+
+  const githubEndpointId = tl.getInput('gitHubConnection');
+  if (githubEndpointId) {
+    tl.debug('GitHub connection supplied. A token shall be extracted from it.');
+    gitHubAccessToken = getGithubEndPointToken(githubEndpointId);
+  }
+
+  return gitHubAccessToken;
+}
+
+/** Extract access token from Github endpoint. */
+function getGithubEndPointToken(githubEndpoint: string): string {
+  const githubEndpointObject = tl.getEndpointAuthorization(githubEndpoint, false);
+  let githubEndpointToken: string | undefined;
+
+  if (githubEndpointObject) {
+    tl.debug(`Endpoint scheme: ${githubEndpointObject.scheme}`);
+
+    if (githubEndpointObject.scheme === 'PersonalAccessToken') {
+      githubEndpointToken = githubEndpointObject.parameters.accessToken;
+    } else if (githubEndpointObject.scheme === 'OAuth') {
+      githubEndpointToken = githubEndpointObject.parameters.AccessToken;
+    } else if (githubEndpointObject.scheme === 'Token') {
+      githubEndpointToken = githubEndpointObject.parameters.AccessToken;
+    } else if (githubEndpointObject.scheme) {
+      throw new Error(tl.loc('InvalidEndpointAuthScheme', githubEndpointObject.scheme));
+    }
+  }
+
+  if (!githubEndpointToken) {
+    throw new Error(tl.loc('InvalidGitHubEndpoint', githubEndpoint));
+  }
+
+  return githubEndpointToken;
 }

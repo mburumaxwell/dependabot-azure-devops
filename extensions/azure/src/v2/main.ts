@@ -9,47 +9,31 @@ import {
   type GitAuthor,
   type SecretMasker,
 } from '@paklo/cli/dependabot';
-import { debug, error, getVariable, setResult, setVariable, TaskResult, which } from 'azure-pipelines-task-lib/task';
-import { setSecrets } from './formatting';
-import parseTaskInputConfiguration from './shared-variables';
+import * as tl from 'azure-pipelines-task-lib/task';
+import { setSecrets } from '../formatting';
+import { getTaskInputs } from './inputs';
 
 async function run() {
   const outDir = join(tmpdir(), 'dependabot-azure-devops');
   try {
     // Check if required tools are installed
-    debug('Checking for `docker` install...');
-    which('docker', true);
+    tl.debug('Checking for `docker` install...');
+    tl.which('docker', true);
 
     // Parse task input configuration
-    const inputs = parseTaskInputConfiguration();
+    const inputs = getTaskInputs();
     if (!inputs) {
       throw new Error('Failed to parse task input configuration');
     }
 
     const { url, authorEmail, authorName, ...remainingInputs } = inputs;
 
-    // Mask environment, organisation, and project specific variables from the logs.
-    // Most user's environments are private and they're less likely to share diagnostic info when it exposes information about their environment or organisation.
-    // Although not exhaustive, this will mask the most common information that could be used to identify the user's environment.
-    if (inputs.secrets) {
-      setSecrets(
-        url.hostname,
-        url.project,
-        url.repository,
-        inputs.githubAccessToken,
-        inputs.systemAccessUser,
-        inputs.systemAccessToken,
-        inputs.autoApproveUserToken,
-        authorEmail,
-      );
-    }
-
     // Parse dependabot configuration file
     const config = await getDependabotConfig({
       url,
       token: inputs.systemAccessToken,
-      rootDir: getVariable('Build.SourcesDirectory')!,
-      variableFinder: getVariable,
+      rootDir: tl.getVariable('Build.SourcesDirectory')!,
+      variableFinder: tl.getVariable,
     });
     if (!config) {
       throw new Error('Failed to parse dependabot.yaml configuration file from the target repository');
@@ -76,8 +60,16 @@ async function run() {
       githubToken: inputs.githubAccessToken,
       author,
       autoApproveToken: inputs.autoApproveUserToken,
-      // TODO: pass proxyCertPath support if needed
+      // TODO: pass proxyCertPath support if needed hence remove warning below
     };
+
+    if (inputs.proxyCertPath) {
+      tl.warning(
+        'In a recent major update, the job logic was changed to replace dependabot-cli and follow dependabot-action closely. ' +
+          'As a result, the proxy certificate path has not yet been fully integrated.' +
+          'If this affects your setup and there is no alternative, please let me known by opening an issue on GitHub.',
+      );
+    }
 
     // Run the Azure Local Jobs Runner
     const runner = new AzureLocalJobsRunner(runnerOptions);
@@ -85,7 +77,7 @@ async function run() {
     const success = result.every((r) => r.success);
 
     if (success) {
-      setResult(TaskResult.Succeeded, 'All update tasks completed successfully');
+      tl.setResult(tl.TaskResult.Succeeded, 'All update tasks completed successfully');
     } else {
       let message = result
         .map((r) => r.message)
@@ -94,13 +86,13 @@ async function run() {
       if (message.length === 0) {
         message = 'Update tasks failed. Check the logs for more information';
       }
-      setResult(TaskResult.Failed, message);
+      tl.setResult(tl.TaskResult.Failed, message);
     }
 
     // Collect unique list of all affected PRs and set it as an output variable
     const prs = Array.from(new Set(result.flatMap((r) => r.affectedPrs)));
 
-    setVariable(
+    tl.setVariable(
       'affectedPrs', // name
       prs.join(','), // value
       false, // secret
@@ -108,8 +100,8 @@ async function run() {
     );
   } catch (e) {
     const err = e as Error;
-    setResult(TaskResult.Failed, err.message);
-    error(`An unhandled exception occurred: ${e}`);
+    tl.setResult(tl.TaskResult.Failed, err.message);
+    tl.error(`An unhandled exception occurred: ${e}`);
     console.debug(e); // Dump the stack trace to help with debugging
   } finally {
     if (existsSync(outDir)) {
