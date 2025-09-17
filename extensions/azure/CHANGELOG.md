@@ -1,5 +1,15 @@
 # extension-azure-devops
 
+## 2.58.5
+
+### Patch Changes
+
+- 48f5703: Restructure files into folders by version to allow for other versions smoothly
+- 095be37: Warn the use of proxy cert not migrated
+- Updated dependencies [755c770]
+- Updated dependencies [93e4044]
+  - @paklo/cli@0.9.0
+
 ## 2.58.4
 
 ### Patch Changes
