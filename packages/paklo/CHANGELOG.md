@@ -1,5 +1,12 @@
 # paklo
 
+## 0.9.0
+
+### Minor Changes
+
+- 755c770: Migrate to CJS+ESM to ESM-only
+- 93e4044: Migrate from tsup to tsdown
+
 ## 0.8.3
 
 ### Patch Changes
