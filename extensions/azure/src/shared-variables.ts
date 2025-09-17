@@ -138,6 +138,13 @@ export default function getSharedVariables(): ISharedVariables {
   }
 
   const proxyCertPath: string | undefined = tl.getInput('proxyCertPath');
+  if (proxyCertPath) {
+    tl.warning(
+      'In a recent major update, the job logic was changed to replace dependabot-cli and follow dependabot-action closely. ' +
+      'As a result, the proxy certificate path has not yet been fully integrated.' +
+      'If this affects your setup and there is no alternative, please let me known by opening an issue on GitHub.'
+    );
+  }
 
   return {
     url: urlParts,
