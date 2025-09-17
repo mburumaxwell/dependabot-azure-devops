@@ -6,42 +6,35 @@
   "author": "mburumaxwell",
   "license": "AGPL-3.0-later",
   "bin": {
-    "paklo": "./dist/cli.cjs"
+    "paklo": "./dist/cli.js"
   },
   "exports": {
     "./core": {
       "types": "./dist/core.d.ts",
-      "require": "./dist/core.cjs",
       "import": "./dist/core.js"
     },
     "./azure": {
       "types": "./dist/azure.d.ts",
-      "require": "./dist/azure.cjs",
       "import": "./dist/azure.js"
     },
     "./dependabot": {
       "types": "./dist/dependabot.d.ts",
-      "require": "./dist/dependabot.cjs",
       "import": "./dist/dependabot.js"
     },
     "./environment": {
       "types": "./dist/environment.d.ts",
-      "require": "./dist/environment.cjs",
       "import": "./dist/environment.js"
     },
     "./github": {
       "types": "./dist/github.d.ts",
-      "require": "./dist/github.cjs",
       "import": "./dist/github.js"
     },
     "./logger": {
       "types": "./dist/logger.d.ts",
-      "require": "./dist/logger.cjs",
       "import": "./dist/logger.js"
     },
     "./shared-data": {
       "types": "./dist/shared-data.d.ts",
-      "require": "./dist/shared-data.cjs",
       "import": "./dist/shared-data.js"
     }
   },
@@ -57,7 +50,7 @@
     "lint": "biome check",
     "test": "vitest",
     "clean": "rimraf .turbo dist",
-    "cli": "node dist/cli.cjs"
+    "cli": "node dist/cli.js"
   },
   "repository": {
     "type": "git",
@@ -92,7 +85,8 @@
     "@types/js-yaml": "4.0.9",
     "@types/node-forge": "1.3.14",
     "@types/semver": "7.7.1",
-    "@types/tar-stream": "3.1.4"
+    "@types/tar-stream": "3.1.4",
+    "tsup": "8.5.0"
   },
   "publishConfig": {
     "access": "public"

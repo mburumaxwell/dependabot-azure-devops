@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  format: ['esm', 'cjs'],
+  format: ['esm'],
   target: 'node22',
   platform: 'node',
   splitting: false,

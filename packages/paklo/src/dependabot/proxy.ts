@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import type Docker from 'dockerode';
 import type { Container, Network } from 'dockerode';
-import { md, pki } from 'node-forge';
 
 import { ContainerService } from './container-service';
 import type { CertificateAuthority, DependabotCredential, DependabotProxyConfig } from './job';
@@ -48,7 +47,7 @@ export class ProxyBuilder {
     credentials: DependabotCredential[],
   ): Promise<Proxy> {
     const name = `dependabot-job-${jobId}-proxy`;
-    const config = this.buildProxyConfig(credentials);
+    const config = await this.buildProxyConfig(credentials);
     const cert = config.ca.cert;
 
     const externalNetworkName = `dependabot-job-${jobId}-external-network`;
@@ -120,15 +119,19 @@ export class ProxyBuilder {
     }
   }
 
-  private buildProxyConfig(credentials: DependabotCredential[]): DependabotProxyConfig {
-    const ca = this.generateCertificateAuthority();
+  private async buildProxyConfig(credentials: DependabotCredential[]): Promise<DependabotProxyConfig> {
+    const ca = await this.generateCertificateAuthority();
 
     const config: DependabotProxyConfig = { all_credentials: credentials, ca };
 
     return config;
   }
 
-  private generateCertificateAuthority(): CertificateAuthority {
+  private async generateCertificateAuthority(): Promise<CertificateAuthority> {
+    // node-forge is a CommonJS module, so we need to import it dynamically
+    const {
+      default: { md, pki },
+    } = await import('node-forge');
     const keys = pki.rsa.generateKeyPair(KEY_SIZE);
     const cert = pki.createCertificate();
 
