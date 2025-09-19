@@ -53,7 +53,7 @@ async function run() {
       ...remainingInputs,
       config,
       outDir,
-      port: inputs.dependabotCliApiListeningPort || 3001,
+      port: inputs.dependabotApiPort || 3001,
       url,
       secretMasker,
       gitToken: inputs.systemAccessToken,

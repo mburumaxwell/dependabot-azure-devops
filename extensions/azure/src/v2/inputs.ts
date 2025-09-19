@@ -46,8 +46,8 @@ export type TaskInputs = {
   /** Whether to test logic without creating, updating or abandoning pull requests */
   dryRun: boolean;
 
-  /** The listening port of the dependabot update command */
-  dependabotCliApiListeningPort?: number;
+  /** The listening port of the dependabot API */
+  dependabotApiPort?: number;
   /** The dependabot-updater docker image to use for updates. e.g. ghcr.io/dependabot/dependabot-updater-{ecosystem}:latest */
   dependabotUpdaterImage?: string;
 
@@ -119,9 +119,9 @@ export function getTaskInputs(): TaskInputs {
   const securityAdvisoriesFile: string | undefined = tl.getInput('securityAdvisoriesFile');
   const dryRun: boolean = tl.getBoolInput('dryRun', false);
 
-  const dependabotCliApiListeningPortStr: string | undefined = tl.getInput('dependabotCliApiListeningPort', false);
-  const dependabotCliApiListeningPort: number | undefined =
-    (dependabotCliApiListeningPortStr ?? '').length > 0 ? Number(dependabotCliApiListeningPortStr) : undefined;
+  const dependabotApiPortStr: string | undefined = tl.getInput('dependabotCliApiListeningPort', false);
+  const dependabotApiPort: number | undefined =
+    (dependabotApiPortStr ?? '').length > 0 ? Number(dependabotApiPortStr) : undefined;
   const dependabotUpdaterImage: string | undefined = tl.getInput('dependabotUpdaterImage');
   if (dependabotUpdaterImage) {
     // If the updater image is provided but does not contain the "{ecosystem}" placeholder, tell the user they've misconfigured it
@@ -163,7 +163,7 @@ export function getTaskInputs(): TaskInputs {
 
     dryRun,
 
-    dependabotCliApiListeningPort,
+    dependabotApiPort,
     dependabotUpdaterImage,
 
     proxyCertPath,
