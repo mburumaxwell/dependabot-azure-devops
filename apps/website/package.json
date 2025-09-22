@@ -33,7 +33,7 @@
     "next": "15.5.3",
     "react": "19.1.1",
     "react-dom": "19.1.1",
-    "sharp": "0.34.3",
+    "sharp": "0.34.4",
     "zod": "4.1.8"
   },
   "devDependencies": {
