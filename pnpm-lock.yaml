@@ -69,8 +69,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/paklo
       '@prisma/client':
-        specifier: 6.16.1
-        version: 6.16.1(prisma@6.16.1(typescript@5.9.2))(typescript@5.9.2)
+        specifier: 6.16.2
+        version: 6.16.2(prisma@6.16.1(typescript@5.9.2))(typescript@5.9.2)
       '@radix-ui/react-alert-dialog':
         specifier: 1.1.15
         version: 1.1.15(@types/react-dom@19.1.9(@types/react@19.1.13))(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -1837,8 +1837,8 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
-  '@prisma/client@6.16.1':
-    resolution: {integrity: sha512-QaBCOY29lLAxEFFJgBPyW3WInCW52fJeQTmWx/h6YsP5u0bwuqP51aP0uhqFvhK9DaZPwvai/M4tSDYLVE9vRg==}
+  '@prisma/client@6.16.2':
+    resolution: {integrity: sha512-E00PxBcalMfYO/TWnXobBVUai6eW/g5OsifWQsQDzJYm7yaY+IRLo7ZLsaefi0QkTpxfuhFcQ/w180i6kX3iJw==}
     engines: {node: '>=18.18'}
     peerDependencies:
       prisma: '*'
@@ -8937,7 +8937,7 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@prisma/client@6.16.1(prisma@6.16.1(typescript@5.9.2))(typescript@5.9.2)':
+  '@prisma/client@6.16.2(prisma@6.16.1(typescript@5.9.2))(typescript@5.9.2)':
     optionalDependencies:
       prisma: 6.16.1(typescript@5.9.2)
       typescript: 5.9.2

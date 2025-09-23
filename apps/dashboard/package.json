@@ -34,7 +34,7 @@
     "@opentelemetry/instrumentation": "0.205.0",
     "@opentelemetry/sdk-logs": "0.205.0",
     "@paklo/cli": "workspace:*",
-    "@prisma/client": "6.16.1",
+    "@prisma/client": "6.16.2",
     "@radix-ui/react-alert-dialog": "1.1.15",
     "@radix-ui/react-label": "2.1.7",
     "@radix-ui/react-select": "2.2.6",
