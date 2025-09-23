@@ -112,6 +112,10 @@ updates:
         patterns:
           - 'pino'
           - 'pino-*'
+      prisma:
+        patterns:
+          - 'prisma'
+          - '@prisma/*'
       react:
         patterns:
           - '@types/react'
