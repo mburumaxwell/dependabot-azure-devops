@@ -294,11 +294,11 @@ importers:
   packages/paklo:
     dependencies:
       '@hono/node-server':
-        specifier: 1.19.3
-        version: 1.19.3(hono@4.9.7)
+        specifier: 1.19.4
+        version: 1.19.4(hono@4.9.8)
       '@hono/zod-validator':
-        specifier: 0.7.2
-        version: 0.7.2(hono@4.9.7)(zod@4.1.11)
+        specifier: 0.7.3
+        version: 0.7.3(hono@4.9.8)(zod@4.1.11)
       commander:
         specifier: 14.0.1
         version: 14.0.1
@@ -306,8 +306,8 @@ importers:
         specifier: 4.0.8
         version: 4.0.8
       hono:
-        specifier: 4.9.7
-        version: 4.9.7
+        specifier: 4.9.8
+        version: 4.9.8
       js-yaml:
         specifier: 4.1.0
         version: 4.1.0
@@ -1161,14 +1161,14 @@ packages:
   '@hexagon/base64@1.1.28':
     resolution: {integrity: sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw==}
 
-  '@hono/node-server@1.19.3':
-    resolution: {integrity: sha512-Fjyxfux0rMPXMSob79OmddfpK5ArJa2xLkLCV+zamHkbeXQtSNKOi0keiBKyHZ/hCRKjigjmKGp4AJnDFq8PUw==}
+  '@hono/node-server@1.19.4':
+    resolution: {integrity: sha512-AWKQZ/YkHUBSHeL/5Ld8FWgUs6wFf4TxGYxqp9wLZxRdFuHBpXmgOq+CuDoL4vllkZLzovCf5HBJnypiy3EtHA==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
 
-  '@hono/zod-validator@0.7.2':
-    resolution: {integrity: sha512-ub5eL/NeZ4eLZawu78JpW/J+dugDAYhwqUIdp9KYScI6PZECij4Hx4UsrthlEUutqDDhPwRI0MscUfNkvn/mqQ==}
+  '@hono/zod-validator@0.7.3':
+    resolution: {integrity: sha512-uYGdgVib3RlGD698WR5dVM0zB3UuPY5vHKXffGUbUh7r4xY+mFIhF3/v4AcQVLrU5CQdBso8BJr4wuVoCrjTuQ==}
     peerDependencies:
       hono: '>=3.9.0'
       zod: ^3.25.0 || ^4.0.0
@@ -4704,8 +4704,8 @@ packages:
   history@5.3.0:
     resolution: {integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==}
 
-  hono@4.9.7:
-    resolution: {integrity: sha512-t4Te6ERzIaC48W3x4hJmBwgNlLhmiEdEE5ViYb02ffw4ignHNHa5IBtPjmbKstmtKa8X6C35iWwK4HaqvrzG9w==}
+  hono@4.9.8:
+    resolution: {integrity: sha512-JW8Bb4RFWD9iOKxg5PbUarBYGM99IcxFl2FPBo2gSJO11jjUDqlP1Bmfyqt8Z/dGhIQ63PMA9LdcLefXyIasyg==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -8211,13 +8211,13 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/node-server@1.19.3(hono@4.9.7)':
+  '@hono/node-server@1.19.4(hono@4.9.8)':
     dependencies:
-      hono: 4.9.7
+      hono: 4.9.8
 
-  '@hono/zod-validator@0.7.2(hono@4.9.7)(zod@4.1.11)':
+  '@hono/zod-validator@0.7.3(hono@4.9.8)(zod@4.1.11)':
     dependencies:
-      hono: 4.9.7
+      hono: 4.9.8
       zod: 4.1.11
 
   '@img/sharp-darwin-arm64@0.34.1':
@@ -12118,7 +12118,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.28.4
 
-  hono@4.9.7: {}
+  hono@4.9.8: {}
 
   hookable@5.5.3: {}
 
