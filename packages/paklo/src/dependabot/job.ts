@@ -150,11 +150,14 @@ export const DependabotPackageManagerSchema = z.enum([
 ]);
 export type DependabotPackageManager = z.infer<typeof DependabotPackageManagerSchema>;
 
+export const DependabotCommandSchema = z.enum(['graph', 'version', 'recreate']);
+export type DependabotCommand = z.infer<typeof DependabotCommandSchema>;
+
 // See: https://github.com/dependabot/cli/blob/main/internal/model/job.go
 //      https://github.com/dependabot/dependabot-core/blob/main/updater/lib/dependabot/job.rb
 export const DependabotJobConfigSchema = z.object({
   id: z.number().optional(),
-  command: z.enum(['graph']).optional(),
+  command: DependabotCommandSchema.optional(),
   'package-manager': DependabotPackageManagerSchema,
   'allowed-updates': DependabotAllowedSchema.array(),
   debug: z.boolean().nullable(),

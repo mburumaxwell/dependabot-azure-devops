@@ -14,13 +14,14 @@ import { logger } from '../logger';
 import { type HandlerOptions, handlerOptions } from './base';
 
 const MERGE_STRATEGIES = ['squash', 'rebase', 'merge'] as const;
+const COMMANDS = ['graph', 'version', 'recreate'] as const;
 const schema = z.object({
   organisationUrl: z.string(),
   project: z.string(),
   repository: z.string(),
   gitToken: z.string(),
   githubToken: z.string().optional(),
-  command: z.enum(['graph']).optional(),
+  command: z.enum(COMMANDS).optional(),
   jobTokenOverride: z.string().optional(),
   credentialsTokenOverride: z.string().optional(),
   port: z.coerce.number().min(1).max(65535).optional(),
@@ -197,7 +198,7 @@ export const command = new Command('run')
     '--updater-image <UPDATER-IMAGE>',
     'The dependabot-updater docker image to use for updates. e.g. ghcr.io/dependabot/dependabot-updater-{ecosystem}:latest',
   )
-  .addOption(new Option('--command <COMMAND>', 'The command to run for the update.').choices(['graph']))
+  .addOption(new Option('--command <COMMAND>', 'The command to run for the update.').choices(COMMANDS))
   .option('--port <PORT>', 'Port to run the API server on.')
   .option('--debug', 'Whether to enable debug logging.', false)
   .option('--dry-run', 'Whether to enable dry run mode.', false)
