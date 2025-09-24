@@ -1,5 +1,25 @@
 # extension-azure-devops
 
+## 2.59.0
+
+### Minor Changes
+
+- 414b12d: Update [dependabot-action](https://github.com/github/dependabot-action) from `6b07cf6` to `ddc330d` which updates container images version and adds support for invocation of specific commands (graph)
+- 1c9b484: Restore order of finding dependabot config to remote first
+
+### Patch Changes
+
+- f489125: Use dynamic port for API server to avoid conflicts on busy hosts
+- 48f5703: Restructure files into folders by version to allow for other versions smoothly
+- 095be37: Warn the use of proxy cert not migrated
+- Updated dependencies [f489125]
+- Updated dependencies [6367fe1]
+- Updated dependencies [755c770]
+- Updated dependencies [414b12d]
+- Updated dependencies [93e4044]
+- Updated dependencies [1c9b484]
+  - @paklo/cli@0.9.0
+
 ## 2.58.4
 
 ### Patch Changes
