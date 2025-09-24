@@ -1,5 +1,19 @@
 # paklo
 
+## 0.9.0
+
+### Minor Changes
+
+- 755c770: Migrate to CJS+ESM to ESM-only
+- 414b12d: Update [dependabot-action](https://github.com/github/dependabot-action) from `6b07cf6` to `ddc330d` which updates container images version and adds support for invocation of specific commands (graph)
+- 93e4044: Migrate from tsup to tsdown
+- 1c9b484: Restore order of finding dependabot config to remote first
+
+### Patch Changes
+
+- f489125: Use dynamic port for API server to avoid conflicts on busy hosts
+- 6367fe1: Update default experiments as of 24 September 2025
+
 ## 0.8.3
 
 ### Patch Changes
