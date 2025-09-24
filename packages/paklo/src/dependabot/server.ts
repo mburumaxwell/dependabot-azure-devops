@@ -276,7 +276,7 @@ export abstract class LocalDependabotServer {
     });
   }
 
-  start(port: number) {
+  start(port?: number) {
     // listening to 'localhost' will result to IpV6 only but we need it to be all local
     // interfaces, otherwise containers cannot reach it using host.docker.internal
     this.server.listen(port, '0.0.0.0', () => {
@@ -292,6 +292,11 @@ export abstract class LocalDependabotServer {
   get url() {
     const info = this.server.address() as AddressInfo;
     return `http://${this.hostname}:${info.port}`;
+  }
+
+  get port() {
+    const info = this.server.address() as AddressInfo;
+    return info.port;
   }
 
   get jobs() {

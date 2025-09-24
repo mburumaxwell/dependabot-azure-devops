@@ -23,7 +23,7 @@ const schema = z.object({
   command: z.enum(['graph']).optional(),
   jobTokenOverride: z.string().optional(),
   credentialsTokenOverride: z.string().optional(),
-  port: z.coerce.number().min(1).max(65535),
+  port: z.coerce.number().min(1).max(65535).optional(),
   securityAdvisoriesFile: z.string().optional(),
   autoApprove: z.boolean(),
   autoApproveToken: z.string().optional(),
@@ -198,7 +198,7 @@ export const command = new Command('run')
     'The dependabot-updater docker image to use for updates. e.g. ghcr.io/dependabot/dependabot-updater-{ecosystem}:latest',
   )
   .addOption(new Option('--command <COMMAND>', 'The command to run for the update.').choices(['graph']))
-  .option('--port <PORT>', 'Port to run the API server on.', '3000')
+  .option('--port <PORT>', 'Port to run the API server on.')
   .option('--debug', 'Whether to enable debug logging.', false)
   .option('--dry-run', 'Whether to enable dry run mode.', false)
   .action(

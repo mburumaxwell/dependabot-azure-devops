@@ -47,7 +47,7 @@ async function run() {
     const runnerOptions: AzureLocalJobsRunnerOptions = {
       ...remainingInputs,
       config,
-      port: inputs.dependabotApiPort || 3001,
+      port: inputs.dependabotApiPort,
       url,
       secretMasker,
       gitToken: inputs.systemAccessToken,

@@ -32,7 +32,7 @@ export type AzureLocalJobsRunnerOptions = LocalJobsRunnerOptions &
     AzureLocalDependabotServerOptions,
     'authorClient' | 'approverClient' | 'existingBranchNames' | 'existingPullRequests'
   > & {
-    port: number;
+    port?: number;
     securityAdvisoriesFile?: string;
     gitToken: string;
     githubToken?: string;
@@ -99,7 +99,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
     // The API urls is constant when working in this CLI. Asking people to setup NGROK or similar just to get
     // HTTPS for the job token to be used is too much hassle.
     // Using same value for dependabotApiUrl and dependabotApiDockerUrl so as to capture /record_metrics calls.
-    const dependabotApiUrl = `http://host.docker.internal:${port}/api`;
+    const dependabotApiUrl = `http://host.docker.internal:${server.port}/api`;
     const dependabotApiDockerUrl = dependabotApiUrl;
 
     // If update identifiers are specified, select them; otherwise handle all
