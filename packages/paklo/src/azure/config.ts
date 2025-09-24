@@ -23,11 +23,16 @@ import type { AzureDevOpsUrl } from './url-parts';
 export async function getDependabotConfig({
   url,
   token,
+  remote,
   rootDir = process.cwd(),
   variableFinder,
 }: {
   url: AzureDevOpsUrl;
   token: string;
+  /**
+   * Whether to fetch the configuration file via the REST API (true) or look for it locally (false).
+   */
+  remote: boolean;
   rootDir?: string;
   variableFinder: VariableFinderFn;
 }): Promise<DependabotConfig> {
@@ -41,19 +46,7 @@ export async function getDependabotConfig({
    * 2. Running a single pipeline to update multiple repositories https://github.com/mburumaxwell/dependabot-azure-devops/issues/328
    */
 
-  for (const fp of POSSIBLE_CONFIG_FILE_PATHS) {
-    const filePath = path.join(rootDir, fp);
-    if (existsSync(filePath)) {
-      logger.debug(`Found configuration file cloned at ${filePath}`);
-      configContents = await readFile(filePath, 'utf-8');
-      configPath = filePath;
-      break;
-    } else {
-      logger.trace(`No configuration file cloned at ${filePath}`);
-    }
-  }
-
-  if (!configContents) {
+  if (remote) {
     logger.debug(`Attempting to fetch configuration file via REST API ...`);
     for (const fp of POSSIBLE_CONFIG_FILE_PATHS) {
       // make HTTP request
@@ -88,6 +81,18 @@ export async function getDependabotConfig({
         } else {
           throw error;
         }
+      }
+    }
+  } else {
+    for (const fp of POSSIBLE_CONFIG_FILE_PATHS) {
+      const filePath = path.join(rootDir, fp);
+      if (existsSync(filePath)) {
+        logger.debug(`Found configuration file cloned at ${filePath}`);
+        configContents = await readFile(filePath, 'utf-8');
+        configPath = filePath;
+        break;
+      } else {
+        logger.trace(`No configuration file cloned at ${filePath}`);
       }
     }
   }

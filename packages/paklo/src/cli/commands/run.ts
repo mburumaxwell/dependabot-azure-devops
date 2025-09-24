@@ -109,6 +109,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
   const config = await getDependabotConfig({
     url,
     token: gitToken,
+    remote: true, // not supporting local mode in CLI yet
     variableFinder,
   });
   rl.close();

@@ -27,6 +27,7 @@ async function run() {
     const config = await getDependabotConfig({
       url,
       token: inputs.systemAccessToken,
+      remote: inputs.repositoryOverridden, // fetch remotely if the repository is overridden
       rootDir: tl.getVariable('Build.SourcesDirectory')!,
       variableFinder: tl.getVariable,
     });

@@ -34,6 +34,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     config = await getDependabotConfig({
       url,
       token: gitToken,
+      remote: true, // not supporting local mode in CLI yet
       variableFinder,
     });
   } catch (e) {
