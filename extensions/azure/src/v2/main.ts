@@ -1,7 +1,3 @@
-import { existsSync } from 'node:fs';
-import { rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import { AzureLocalJobsRunner, type AzureLocalJobsRunnerOptions, getDependabotConfig } from '@paklo/cli/azure';
 import {
   DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
@@ -14,7 +10,6 @@ import { setSecrets } from '../formatting';
 import { getTaskInputs } from './inputs';
 
 async function run() {
-  const outDir = join(tmpdir(), 'dependabot-azure-devops');
   try {
     // Check if required tools are installed
     tl.debug('Checking for `docker` install...');
@@ -52,7 +47,6 @@ async function run() {
     const runnerOptions: AzureLocalJobsRunnerOptions = {
       ...remainingInputs,
       config,
-      outDir,
       port: inputs.dependabotApiPort || 3001,
       url,
       secretMasker,
@@ -104,9 +98,6 @@ async function run() {
     tl.error(`An unhandled exception occurred: ${e}`);
     console.debug(e); // Dump the stack trace to help with debugging
   } finally {
-    if (existsSync(outDir)) {
-      await rm(outDir, { recursive: true, force: true });
-    }
   }
 }
 

@@ -154,6 +154,7 @@ export type DependabotPackageManager = z.infer<typeof DependabotPackageManagerSc
 //      https://github.com/dependabot/dependabot-core/blob/main/updater/lib/dependabot/job.rb
 export const DependabotJobConfigSchema = z.object({
   id: z.number().optional(),
+  command: z.enum(['graph']).optional(),
   'package-manager': DependabotPackageManagerSchema,
   'allowed-updates': DependabotAllowedSchema.array(),
   debug: z.boolean().nullable(),

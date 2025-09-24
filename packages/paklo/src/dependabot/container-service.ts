@@ -31,7 +31,7 @@ export const ContainerService = {
     await container.putArchive(tar, { path });
   },
 
-  async run(container: Container): Promise<boolean> {
+  async run(container: Container, command?: string): Promise<boolean> {
     try {
       // Start the container
       await container.start();
@@ -49,8 +49,13 @@ export const ContainerService = {
         const dependabotCommands = [
           'mkdir -p /home/dependabot/dependabot-updater/output',
           '$DEPENDABOT_HOME/dependabot-updater/bin/run fetch_files',
-          '$DEPENDABOT_HOME/dependabot-updater/bin/run update_files',
         ];
+
+        if (command === 'graph') {
+          dependabotCommands.push('$DEPENDABOT_HOME/dependabot-updater/bin/run update_graph');
+        } else {
+          dependabotCommands.push('$DEPENDABOT_HOME/dependabot-updater/bin/run update_files');
+        }
 
         for (const cmd of dependabotCommands) {
           await this.execCommand(container, ['/bin/sh', '-c', cmd], 'dependabot');

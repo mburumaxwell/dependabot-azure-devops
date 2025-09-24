@@ -8,7 +8,6 @@ export class JobParameters {
     readonly dependabotApiUrl: string,
     readonly dependabotApiDockerUrl: string,
     readonly updaterImage: string,
-    readonly workingDirectory: string,
   ) {}
 }
 
@@ -19,7 +18,6 @@ export function getJobParameters(input: {
   dependabotApiUrl?: string;
   dependabotApiDockerUrl?: string;
   updaterImage?: string;
-  workingDirectory?: string;
 }): JobParameters | null {
   return new JobParameters(
     parseInt(input.jobId as string, 10),
@@ -28,6 +26,5 @@ export function getJobParameters(input: {
     input.dependabotApiUrl as string,
     input.dependabotApiDockerUrl as string,
     input.updaterImage as string,
-    input.workingDirectory as string,
   );
 }

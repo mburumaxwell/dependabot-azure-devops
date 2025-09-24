@@ -62,7 +62,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
     await super.run(); // common logic
 
     const {
-      options: { url, port, config, targetUpdateIds, outDir },
+      options: { url, port, config, targetUpdateIds, command },
       authorClient,
       approverClient,
     } = this;
@@ -129,12 +129,12 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
 
       // Perform updates for each of the [targeted] update blocks in dependabot.yaml
       return await this.performUpdates(
-        outDir,
         server,
         updates,
         existingPullRequests,
         dependabotApiUrl,
         dependabotApiDockerUrl,
+        command,
       );
     } finally {
       server.stop();
@@ -195,12 +195,12 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
    * @param existingPullRequests The existing pull requests.
    */
   private async performUpdates(
-    outDir: string,
     server: AzureLocalDependabotServer,
     updates: DependabotUpdate[],
     existingPullRequests: IPullRequestProperties[],
     dependabotApiUrl: string,
     dependabotApiDockerUrl?: string,
+    command?: DependabotJobConfig['command'],
   ): Promise<RunJobsResult> {
     const {
       options: { url, gitToken, githubToken, experiments, config, dryRun, securityAdvisoriesFile, secretMasker },
@@ -246,11 +246,10 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       const securityUpdatesOnly = update['open-pull-requests-limit'] === 0;
       if (securityUpdatesOnly) {
         // Run an update job to discover all dependencies
-        ({ jobId, job, credentials } = builder.forDependenciesList({}));
+        ({ jobId, job, credentials } = builder.forDependenciesList({ command }));
         ({ jobToken, credentialsToken } = this.makeTokens());
         server.add({ id: jobId, update, job, jobToken, credentialsToken, credentials });
         await runJob({
-          outDir,
           dependabotApiUrl,
           dependabotApiDockerUrl,
           jobId,
@@ -321,6 +320,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
         const dependenciesHaveVulnerabilities = dependencyNamesToUpdate.length && securityVulnerabilities.length;
         if (!securityUpdatesOnly || dependenciesHaveVulnerabilities) {
           ({ jobId, job, credentials } = builder.forUpdate({
+            command,
             dependencyNamesToUpdate,
             existingPullRequests: existingPullRequestDependenciesForPackageManager,
             securityVulnerabilities,
@@ -328,7 +328,6 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
           ({ jobToken, credentialsToken } = this.makeTokens());
           server.add({ id: jobId, update, job, jobToken, credentialsToken, credentials });
           const { success, message } = await runJob({
-            outDir,
             dependabotApiUrl,
             dependabotApiDockerUrl,
             jobId,
@@ -355,6 +354,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
         if (!dryRun) {
           for (const pullRequestId in existingPullRequestsForPackageManager) {
             ({ jobId, job, credentials } = builder.forUpdate({
+              command,
               existingPullRequests: existingPullRequestDependenciesForPackageManager,
               pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
               securityVulnerabilities,
@@ -362,7 +362,6 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
             ({ jobToken, credentialsToken } = this.makeTokens());
             server.add({ id: jobId, update, job, jobToken, credentialsToken, credentials });
             const { success, message } = await runJob({
-              outDir,
               dependabotApiUrl,
               dependabotApiDockerUrl,
               jobId,

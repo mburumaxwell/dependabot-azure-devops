@@ -46,7 +46,6 @@ class TestableAzureLocalJobsRunner extends AzureLocalJobsRunner {
   }
 
   public async testPerformUpdates(
-    outDir: string,
     server: any,
     updates: DependabotUpdate[],
     existingPullRequests: IPullRequestProperties[],
@@ -54,7 +53,6 @@ class TestableAzureLocalJobsRunner extends AzureLocalJobsRunner {
     dependabotApiDockerUrl?: string,
   ): Promise<any> {
     return (this as any).performUpdates(
-      outDir,
       server,
       updates,
       existingPullRequests,
@@ -113,7 +111,6 @@ describe('AzureLocalJobsRunner', () => {
         ],
         registries: {},
       } as DependabotConfig,
-      outDir: '/tmp/dependabot',
       experiments: DEFAULT_EXPERIMENTS,
     };
 
@@ -225,7 +222,6 @@ describe('AzureLocalJobsRunner', () => {
 
     it('should perform "update all" job successfully', async () => {
       const result = await jobsRunner.testPerformUpdates(
-        '/tmp/dependabot',
         mockServer,
         options.config.updates,
         [],
@@ -262,7 +258,6 @@ describe('AzureLocalJobsRunner', () => {
 
       jobsRunner = new TestableAzureLocalJobsRunner(options);
       const result = await jobsRunner.testPerformUpdates(
-        '/tmp/dependabot',
         mockServer,
         options.config.updates,
         existingPRs,
@@ -301,7 +296,6 @@ describe('AzureLocalJobsRunner', () => {
 
       jobsRunner = new TestableAzureLocalJobsRunner(options);
       const result = await jobsRunner.testPerformUpdates(
-        '/tmp/dependabot',
         mockServer,
         options.config.updates,
         [],
@@ -333,7 +327,6 @@ describe('AzureLocalJobsRunner', () => {
 
       jobsRunner = new TestableAzureLocalJobsRunner(options);
       const result = await jobsRunner.testPerformUpdates(
-        '/tmp/dependabot',
         mockServer,
         options.config.updates,
         existingPRs,
@@ -354,7 +347,6 @@ describe('AzureLocalJobsRunner', () => {
       vi.mocked(runJob).mockResolvedValue({ success: true, message: 'Job completed successfully' });
 
       const result = await jobsRunner.testPerformUpdates(
-        '/tmp/dependabot',
         mockServer,
         options.config.updates,
         [],
@@ -374,7 +366,6 @@ describe('AzureLocalJobsRunner', () => {
       vi.mocked(runJob).mockResolvedValue({ success: false, message: 'Job failed' });
 
       const result = await jobsRunner.testPerformUpdates(
-        '/tmp/dependabot',
         mockServer,
         options.config.updates,
         [],
@@ -411,7 +402,6 @@ describe('AzureLocalJobsRunner', () => {
 
       jobsRunner = new TestableAzureLocalJobsRunner(options);
       const result = await jobsRunner.testPerformUpdates(
-        '/tmp/dependabot',
         mockServer,
         options.config.updates,
         [],
@@ -442,7 +432,6 @@ describe('AzureLocalJobsRunner', () => {
 
       jobsRunner = new TestableAzureLocalJobsRunner(options);
       const result = await jobsRunner.testPerformUpdates(
-        '/tmp/dependabot',
         mockServer,
         options.config.updates,
         existingPRs,
@@ -480,7 +469,6 @@ describe('AzureLocalJobsRunner', () => {
 
       jobsRunner = new TestableAzureLocalJobsRunner(options);
       const result = await jobsRunner.testPerformUpdates(
-        '/tmp/dependabot',
         mockServer,
         options.config.updates,
         [],
@@ -518,7 +506,6 @@ describe('AzureLocalJobsRunner', () => {
 
       jobsRunner = new TestableAzureLocalJobsRunner(options);
       const result = await jobsRunner.testPerformUpdates(
-        '/tmp/dependabot',
         mockServer,
         options.config.updates,
         [],
@@ -551,7 +538,6 @@ describe('AzureLocalJobsRunner', () => {
 
       jobsRunner = new TestableAzureLocalJobsRunner(options);
       const result = await jobsRunner.testPerformUpdates(
-        '/tmp/dependabot',
         mockServer,
         options.config.updates,
         [],

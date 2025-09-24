@@ -20,7 +20,7 @@ const schema = z.object({
   repository: z.string(),
   gitToken: z.string(),
   githubToken: z.string().optional(),
-  outDir: z.string(),
+  command: z.enum(['graph']).optional(),
   jobTokenOverride: z.string().optional(),
   credentialsTokenOverride: z.string().optional(),
   port: z.coerce.number().min(1).max(65535),
@@ -50,6 +50,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     authorEmail,
     experiments: rawExperiments,
     updaterImage,
+    command,
     ...remainingOptions
   } = options;
 
@@ -124,6 +125,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
       author: { email: authorEmail, name: authorName },
       experiments,
       updaterImage,
+      command,
       ...remainingOptions,
     };
     const runner = new AzureLocalJobsRunner(runnerOptions);
@@ -152,7 +154,6 @@ export const command = new Command('run')
     '--github-token <GITHUB-TOKEN>',
     'GitHub token to use for authentication. If not specified, you may get rate limited.',
   )
-  .option('--out-dir', 'Working directory.', 'work')
   .option(
     '--job-token-override <JOB-TOKEN-OVERRIDE>',
     'Override for the job token. This should be used for testing only.',
@@ -196,6 +197,7 @@ export const command = new Command('run')
     '--updater-image <UPDATER-IMAGE>',
     'The dependabot-updater docker image to use for updates. e.g. ghcr.io/dependabot/dependabot-updater-{ecosystem}:latest',
   )
+  .addOption(new Option('--command <COMMAND>', 'The command to run for the update.').choices(['graph']))
   .option('--port <PORT>', 'Port to run the API server on.', '3000')
   .option('--debug', 'Whether to enable debug logging.', false)
   .option('--dry-run', 'Whether to enable dry run mode.', false)

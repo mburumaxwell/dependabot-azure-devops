@@ -1,8 +1,5 @@
 // biome-ignore-all lint/suspicious/noShadowRestrictedNames: Proxy is okay
 
-import { existsSync } from 'node:fs';
-import { mkdir, rm } from 'node:fs/promises';
-import path from 'node:path';
 import Docker, { type Container } from 'dockerode';
 
 import { ContainerService } from './container-service';
@@ -15,8 +12,6 @@ import { UpdaterBuilder } from './updater-builder';
 
 export class Updater {
   docker: Docker;
-  outputHostPath: string;
-  repoHostPath: string;
 
   constructor(
     private readonly updaterImage: string,
@@ -26,8 +21,6 @@ export class Updater {
     private readonly credentials: DependabotCredential[],
   ) {
     this.docker = new Docker();
-    this.outputHostPath = path.join(params.workingDirectory, 'output');
-    this.repoHostPath = path.join(params.workingDirectory, 'repo');
     this.job['credentials-metadata'] = this.generateCredentialsMetadata();
   }
 
@@ -35,9 +28,6 @@ export class Updater {
    * Execute an update job and report the result to Dependabot API.
    */
   async runUpdater(): Promise<boolean> {
-    // Create required folders in the workingDirectory
-    await mkdir(this.outputHostPath);
-
     const cachedMode = Object.hasOwn(this.job.experiments, 'proxy-cached') === true;
 
     const proxyBuilder = new ProxyBuilder(this.docker, this.proxyImage, cachedMode);
@@ -150,7 +140,7 @@ export class Updater {
       job: this.job,
     });
 
-    await ContainerService.run(container);
+    await ContainerService.run(container, this.job.command);
   }
 
   private async createContainer(
@@ -158,19 +148,11 @@ export class Updater {
     containerName: string,
     input: FileFetcherInput | FileUpdaterInput,
   ): Promise<Container> {
-    const builder = new UpdaterBuilder(this.docker, this.params, input, this.outputHostPath, proxy, this.updaterImage);
+    const builder = new UpdaterBuilder(this.docker, this.params, input, proxy, this.updaterImage);
     return builder.run(containerName);
   }
 
   private async cleanup(proxy: Proxy): Promise<void> {
     await proxy.shutdown();
-
-    if (existsSync(this.outputHostPath)) {
-      await rm(this.outputHostPath, { recursive: true });
-    }
-
-    if (existsSync(this.repoHostPath)) {
-      await rm(this.repoHostPath, { recursive: true });
-    }
   }
 }

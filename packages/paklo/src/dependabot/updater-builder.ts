@@ -1,5 +1,4 @@
 // biome-ignore-all lint/suspicious/noShadowRestrictedNames: Proxy is okay
-// biome-ignore-all lint/correctness/noUnusedPrivateClassMembers: imported code
 
 import type Docker from 'dockerode';
 import type { Container } from 'dockerode';
@@ -26,7 +25,6 @@ export class UpdaterBuilder {
     private readonly docker: Docker,
     private readonly jobParams: JobParameters,
     private readonly input: FileFetcherInput | FileUpdaterInput,
-    private readonly outputHostPath: string,
     private readonly proxy: Proxy,
 
     private readonly updaterImage: string,

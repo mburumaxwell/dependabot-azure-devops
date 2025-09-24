@@ -89,12 +89,19 @@ export class DependabotJobBuilder {
   /**
    * Create a dependabot update job that updates nothing, but will discover the dependency list for a package ecosystem
    */
-  public forDependenciesList({ id }: { id?: number }): DependabotJobBuilderOutput {
+  public forDependenciesList({
+    id,
+    command,
+  }: {
+    id?: number;
+    command: DependabotJobConfig['command'];
+  }): DependabotJobBuilderOutput {
     id ??= makeRandomJobId();
     return {
       jobId: id,
       job: {
         id: id,
+        command: command,
         'package-manager': this.packageManager,
         'updating-a-pull-request': false,
         dependencies: null,
@@ -127,12 +134,14 @@ export class DependabotJobBuilder {
    */
   public forUpdate({
     id,
+    command,
     dependencyNamesToUpdate,
     existingPullRequests,
     pullRequestToUpdate,
     securityVulnerabilities,
   }: {
     id?: number;
+    command: DependabotJobConfig['command'];
     dependencyNamesToUpdate?: string[];
     existingPullRequests: (DependabotExistingPR[] | DependabotExistingGroupPR)[];
     pullRequestToUpdate?: DependabotExistingPR[] | DependabotExistingGroupPR;
@@ -169,6 +178,7 @@ export class DependabotJobBuilder {
       jobId: id,
       job: {
         id: id,
+        command: command,
         'package-manager': this.packageManager,
         'updating-a-pull-request': updatingPullRequest || false,
         'dependency-group-to-refresh': updateDependencyGroupName,

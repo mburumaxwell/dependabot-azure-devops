@@ -1,7 +1,3 @@
-import { existsSync } from 'node:fs';
-import { mkdir } from 'node:fs/promises';
-import { join } from 'node:path';
-
 import { InnerApiClient } from '@/core';
 import { ApiClient, CredentialFetchingError, type SecretMasker } from './api-client';
 import { PROXY_IMAGE_NAME, updaterImageName } from './docker-tags';
@@ -30,12 +26,8 @@ export class JobRunner {
     this.options = options;
   }
 
-  async run(outDir: string) {
+  async run() {
     const { dependabotApiUrl, dependabotApiDockerUrl, jobId, jobToken, credentialsToken, secretMasker } = this.options;
-
-    // create working directory if it does not exist
-    const workingDirectory = join(outDir, `${jobId}`);
-    if (!existsSync(workingDirectory)) await mkdir(workingDirectory, { recursive: true });
 
     const params = getJobParameters({
       jobId,
@@ -44,7 +36,6 @@ export class JobRunner {
       dependabotApiUrl,
       dependabotApiDockerUrl: dependabotApiDockerUrl ?? dependabotApiUrl,
       updaterImage: this.options.updaterImage,
-      workingDirectory,
     })!;
 
     // if dependabotApiUrl contains "host.docker.internal", we need to replace it with "localhost" for local calls
@@ -100,16 +91,10 @@ export class JobRunner {
 
 export type RunJobResult = { success: true; message?: string } | { success: false; message: string };
 
-export async function runJob({
-  outDir,
-  jobId,
-  ...options
-}: JobRunnerOptions & {
-  outDir: string;
-}): Promise<RunJobResult> {
+export async function runJob({ jobId, ...options }: JobRunnerOptions): Promise<RunJobResult> {
   try {
     const runner = new JobRunner({ jobId, ...options });
-    await runner.run(outDir);
+    await runner.run();
   } catch (err) {
     if (err instanceof JobRunnerImagingError) {
       return { success: false, message: `Error fetching updater images: ${err.message}` };
