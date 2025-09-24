@@ -30,15 +30,16 @@
     "fumadocs-core": "15.7.13",
     "fumadocs-mdx": "12.0.0",
     "fumadocs-ui": "15.7.13",
-    "next": "15.5.3",
+    "next": "15.5.4",
     "react": "19.1.1",
     "react-dom": "19.1.1",
-    "sharp": "0.34.3",
+    "sharp": "0.34.4",
     "zod": "4.1.11"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.1.13",
     "@types/mdx": "2.0.13",
+    "@types/node": "24.5.2",
     "@types/react": "19.1.13",
     "@types/react-dom": "19.1.9",
     "postcss": "8.5.6",
