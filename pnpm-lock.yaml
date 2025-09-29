@@ -295,10 +295,10 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: 1.19.4
-        version: 1.19.4(hono@4.9.8)
+        version: 1.19.4(hono@4.9.9)
       '@hono/zod-validator':
         specifier: 0.7.3
-        version: 0.7.3(hono@4.9.8)(zod@4.1.11)
+        version: 0.7.3(hono@4.9.9)(zod@4.1.11)
       commander:
         specifier: 14.0.1
         version: 14.0.1
@@ -306,8 +306,8 @@ importers:
         specifier: 4.0.8
         version: 4.0.8
       hono:
-        specifier: 4.9.8
-        version: 4.9.8
+        specifier: 4.9.9
+        version: 4.9.9
       js-yaml:
         specifier: 4.1.0
         version: 4.1.0
@@ -4570,8 +4570,8 @@ packages:
   history@5.3.0:
     resolution: {integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==}
 
-  hono@4.9.8:
-    resolution: {integrity: sha512-JW8Bb4RFWD9iOKxg5PbUarBYGM99IcxFl2FPBo2gSJO11jjUDqlP1Bmfyqt8Z/dGhIQ63PMA9LdcLefXyIasyg==}
+  hono@4.9.9:
+    resolution: {integrity: sha512-Hxw4wT6zjJGZJdkJzAx9PyBdf7ZpxaTSA0NfxqjLghwMrLBX8p33hJBzoETRakF3UJu6OdNQBZAlNSkGqKFukw==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -8027,13 +8027,13 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/node-server@1.19.4(hono@4.9.8)':
+  '@hono/node-server@1.19.4(hono@4.9.9)':
     dependencies:
-      hono: 4.9.8
+      hono: 4.9.9
 
-  '@hono/zod-validator@0.7.3(hono@4.9.8)(zod@4.1.11)':
+  '@hono/zod-validator@0.7.3(hono@4.9.9)(zod@4.1.11)':
     dependencies:
-      hono: 4.9.8
+      hono: 4.9.9
       zod: 4.1.11
 
   '@img/colour@1.0.0': {}
@@ -11877,7 +11877,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.28.4
 
-  hono@4.9.8: {}
+  hono@4.9.9: {}
 
   hookable@5.5.3: {}
 
