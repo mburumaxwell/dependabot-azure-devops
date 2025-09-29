@@ -87,11 +87,11 @@ importers:
         specifier: 1.2.8
         version: 1.2.8(@types/react-dom@19.1.9(@types/react@19.1.13))(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@react-email/components':
-        specifier: 0.5.4
-        version: 0.5.4(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+        specifier: 0.5.5
+        version: 0.5.5(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@react-email/render':
-        specifier: 1.3.0
-        version: 1.3.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+        specifier: 1.3.1
+        version: 1.3.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@vercel/analytics':
         specifier: 1.5.0
         version: 1.5.0(next@15.5.4(@opentelemetry/api@1.9.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1)
@@ -124,7 +124,7 @@ importers:
         version: 19.1.1(react@19.1.1)
       resend:
         specifier: 6.1.0
-        version: 6.1.0(@react-email/render@1.3.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))
+        version: 6.1.0(@react-email/render@1.3.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))
       tailwind-merge:
         specifier: 3.3.1
         version: 3.3.1
@@ -133,8 +133,8 @@ importers:
         version: 4.1.11
     devDependencies:
       '@react-email/preview-server':
-        specifier: 4.2.11
-        version: 4.2.11(@opentelemetry/api@1.9.0)(postcss@8.5.6)
+        specifier: 4.2.12
+        version: 4.2.12(@opentelemetry/api@1.9.0)(postcss@8.5.6)
       '@tailwindcss/postcss':
         specifier: 4.1.13
         version: 4.1.13
@@ -160,8 +160,8 @@ importers:
         specifier: 6.16.2
         version: 6.16.2(typescript@5.9.2)
       react-email:
-        specifier: 4.2.11
-        version: 4.2.11
+        specifier: 4.2.12
+        version: 4.2.12
       shadcn:
         specifier: 3.3.1
         version: 3.3.1(@types/node@24.5.2)(typescript@5.9.2)
@@ -2482,8 +2482,8 @@ packages:
     peerDependencies:
       react: ^18.0 || ^19.0 || ^19.0.0-rc
 
-  '@react-email/components@0.5.4':
-    resolution: {integrity: sha512-y9aa/na9pEJ4uXVxX2E0QuiDLES8CIghkUOHJsRdKXbN9pGdgtPz5tjfMrNFe1x00S/kq2/VNaGidFYfZTnrTA==}
+  '@react-email/components@0.5.5':
+    resolution: {integrity: sha512-+utnip1DiXTq5TQKvL8qztWy0EC3L+qdRIeJkBZXJA4WGIukbaqimWCTBGIMW19Pj+1iKvDYk2JQHEQDLiq7uQ==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^18.0 || ^19.0 || ^19.0.0-rc
@@ -2541,8 +2541,8 @@ packages:
     peerDependencies:
       react: ^18.0 || ^19.0 || ^19.0.0-rc
 
-  '@react-email/preview-server@4.2.11':
-    resolution: {integrity: sha512-0eoBZt/AXEuymYCgnPBaovipFbKT58gbREVsVpIT5HNmr9t84w7vFT+2b18w9Bi4eBy5dyoewnX5Oc4N61Jzww==}
+  '@react-email/preview-server@4.2.12':
+    resolution: {integrity: sha512-FVM3h6vJQdjk5E3P8ts8zAPeZSyefcIDWGmy/Tnwl9zVlwiGcQSjGVPmAHlw1DdJnkK79OeC/VYisMlq0w6W8Q==}
 
   '@react-email/preview@0.0.13':
     resolution: {integrity: sha512-F7j9FJ0JN/A4d7yr+aw28p4uX7VLWs7hTHtLo7WRyw4G+Lit6Zucq4UWKRxJC8lpsUdzVmG7aBJnKOT+urqs/w==}
@@ -2550,8 +2550,8 @@ packages:
     peerDependencies:
       react: ^18.0 || ^19.0 || ^19.0.0-rc
 
-  '@react-email/render@1.3.0':
-    resolution: {integrity: sha512-AuKT93RJO+eBg9FIo5+QzVCUTB62sBcKewtDwoKS46KMTRSHeLH0oi3k8+B3ag51zgxAmk6Dda2630KVKNaggg==}
+  '@react-email/render@1.3.1':
+    resolution: {integrity: sha512-BOc/kanieEVyiuldFFvceriiBGBBVhe4JWWXCXE2ehLIqz+gSWD4rgCoXAGbJRnnVyyp4joPqK62bSfa88yonA==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^18.0 || ^19.0 || ^19.0.0-rc
@@ -3541,6 +3541,9 @@ packages:
   caniuse-lite@1.0.30001743:
     resolution: {integrity: sha512-e6Ojr7RV14Un7dz6ASD0aZDmQPT/A+eZU+nuTNfjqmRrmkmQlnTNWH0SKmqagx9PeW87UVqapSurtAXifmtdmw==}
 
+  caniuse-lite@1.0.30001745:
+    resolution: {integrity: sha512-ywt6i8FzvdgrrrGbr1jZVObnVv6adj+0if2/omv9cmR2oiZs30zL4DIyaptKcbOrBdOIc74QTMoJvSE2QHh5UQ==}
+
   ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
 
@@ -3887,6 +3890,10 @@ packages:
 
   detect-libc@2.1.0:
     resolution: {integrity: sha512-vEtk+OcP7VBRtQZ1EJ3bdgzSfBjgnEalLTp5zjJrS+2Z1w2KZly4SBdac/WDU3hhsNAZ9E8SC96ME4Ey8MZ7cg==}
+    engines: {node: '>=8'}
+
+  detect-libc@2.1.1:
+    resolution: {integrity: sha512-ecqj/sy1jcK1uWrwpR67UhYrIFQ+5WlGxth34WquCbamhFA6hkkwiu37o6J5xCHdo1oixJRfVRw+ywV+Hq/0Aw==}
     engines: {node: '>=8'}
 
   detect-node-es@1.1.0:
@@ -5398,8 +5405,8 @@ packages:
   module-details-from-path@1.0.4:
     resolution: {integrity: sha512-EGWKgxALGMgzvxYF1UyGTy0HXX/2vHLkw6+NvDKW2jypWbHpjQuj4UMcqQWXHERJhVGKikolT06G3bcKe4fi7w==}
 
-  motion-dom@12.23.20:
-    resolution: {integrity: sha512-0eFXthY9L6F1trIu/9q99DkBfpAjrdqsw+pZQVEEl6IvS4QiF7Nz9HSbQ5HrXVdE0Xsm72ZDmmoGAivATxEJqg==}
+  motion-dom@12.23.21:
+    resolution: {integrity: sha512-5xDXx/AbhrfgsQmSE7YESMn4Dpo6x5/DTZ4Iyy4xqDvVHWvFVoV+V2Ri2S/ksx+D40wrZ7gPYiMWshkdoqNgNQ==}
 
   motion-utils@12.23.6:
     resolution: {integrity: sha512-eAWoPgr4eFEOFfg2WjIsMoqJTW6Z8MTUCgn/GZ3VRpClWBdnbjryiA3ZSNLyxCTmCQx4RmYX6jX1iWHbenUPNQ==}
@@ -5986,8 +5993,8 @@ packages:
     peerDependencies:
       react: ^19.1.1
 
-  react-email@4.2.11:
-    resolution: {integrity: sha512-/7TXRgsTrXcV1u7kc5ZXDVlPvZqEBaYcflMhE2FgWIJh3OHLjj2FqctFTgYcp0iwzbR59a7gzJLmSKyD0wYJEQ==}
+  react-email@4.2.12:
+    resolution: {integrity: sha512-Cp6nYAG9uL4//X/96wDSKxGqVTXsaRMuD1ub0G0iBcfTqLel4VVre3kicq7RraplDuj+ATlqSZu47d7P2ULP5w==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -7382,9 +7389,9 @@ snapshots:
       '@babel/helper-compilation-targets': 7.27.2
       '@babel/helper-module-transforms': 7.28.3(@babel/core@7.26.10)
       '@babel/helpers': 7.28.4
-      '@babel/parser': 7.27.0
+      '@babel/parser': 7.28.4
       '@babel/template': 7.27.2
-      '@babel/traverse': 7.27.0
+      '@babel/traverse': 7.28.4
       '@babel/types': 7.28.4
       convert-source-map: 2.0.0
       debug: 4.4.3
@@ -7574,7 +7581,7 @@ snapshots:
     dependencies:
       '@babel/code-frame': 7.27.1
       '@babel/generator': 7.28.3
-      '@babel/parser': 7.27.0
+      '@babel/parser': 7.28.4
       '@babel/template': 7.27.2
       '@babel/types': 7.28.4
       debug: 4.4.3
@@ -9595,7 +9602,7 @@ snapshots:
     dependencies:
       react: 19.1.1
 
-  '@react-email/components@0.5.4(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
+  '@react-email/components@0.5.5(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
     dependencies:
       '@react-email/body': 0.1.0(react@19.1.1)
       '@react-email/button': 0.2.0(react@19.1.1)
@@ -9612,7 +9619,7 @@ snapshots:
       '@react-email/link': 0.0.12(react@19.1.1)
       '@react-email/markdown': 0.0.15(react@19.1.1)
       '@react-email/preview': 0.0.13(react@19.1.1)
-      '@react-email/render': 1.3.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      '@react-email/render': 1.3.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@react-email/row': 0.0.12(react@19.1.1)
       '@react-email/section': 0.0.16(react@19.1.1)
       '@react-email/tailwind': 1.2.2(react@19.1.1)
@@ -9658,7 +9665,7 @@ snapshots:
       md-to-react-email: 5.0.5(react@19.1.1)
       react: 19.1.1
 
-  '@react-email/preview-server@4.2.11(@opentelemetry/api@1.9.0)(postcss@8.5.6)':
+  '@react-email/preview-server@4.2.12(@opentelemetry/api@1.9.0)(postcss@8.5.6)':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/parser': 7.27.0
@@ -9721,7 +9728,7 @@ snapshots:
     dependencies:
       react: 19.1.1
 
-  '@react-email/render@1.3.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
+  '@react-email/render@1.3.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
     dependencies:
       html-to-text: 9.0.5
       prettier: 3.6.2
@@ -10477,7 +10484,7 @@ snapshots:
   autoprefixer@10.4.21(postcss@8.5.6):
     dependencies:
       browserslist: 4.26.2
-      caniuse-lite: 1.0.30001743
+      caniuse-lite: 1.0.30001745
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.1.1
@@ -10669,6 +10676,8 @@ snapshots:
   camelcase-css@2.0.1: {}
 
   caniuse-lite@1.0.30001743: {}
+
+  caniuse-lite@1.0.30001745: {}
 
   ccount@2.0.1: {}
 
@@ -10964,6 +10973,8 @@ snapshots:
   detect-indent@6.1.0: {}
 
   detect-libc@2.1.0: {}
+
+  detect-libc@2.1.1: {}
 
   detect-node-es@1.1.0: {}
 
@@ -11521,7 +11532,7 @@ snapshots:
 
   framer-motion@12.23.12(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
-      motion-dom: 12.23.20
+      motion-dom: 12.23.21
       motion-utils: 12.23.6
       tslib: 2.8.1
     optionalDependencies:
@@ -12867,7 +12878,7 @@ snapshots:
 
   module-details-from-path@1.0.4: {}
 
-  motion-dom@12.23.20:
+  motion-dom@12.23.21:
     dependencies:
       motion-utils: 12.23.6
 
@@ -12935,7 +12946,7 @@ snapshots:
     dependencies:
       '@next/env': 15.5.2
       '@swc/helpers': 0.5.15
-      caniuse-lite: 1.0.30001743
+      caniuse-lite: 1.0.30001745
       postcss: 8.4.31
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
@@ -13476,7 +13487,7 @@ snapshots:
       react: 19.1.1
       scheduler: 0.26.0
 
-  react-email@4.2.11:
+  react-email@4.2.12:
     dependencies:
       '@babel/parser': 7.28.4
       '@babel/traverse': 7.28.4
@@ -13760,9 +13771,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  resend@6.1.0(@react-email/render@1.3.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)):
+  resend@6.1.0(@react-email/render@1.3.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)):
     optionalDependencies:
-      '@react-email/render': 1.3.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      '@react-email/render': 1.3.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
 
   resolve-from@4.0.0: {}
 
@@ -14038,7 +14049,7 @@ snapshots:
   sharp@0.34.1:
     dependencies:
       color: 4.2.3
-      detect-libc: 2.1.0
+      detect-libc: 2.1.1
       semver: 7.7.2
     optionalDependencies:
       '@img/sharp-darwin-arm64': 0.34.1
