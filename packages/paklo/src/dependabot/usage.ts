@@ -25,12 +25,12 @@ import { DependabotPackageManagerSchema, DependabotSourceProviderSchema } from '
  */
 export const UsageTelemetryRequestDataSchema = z.object({
   host: z.object({
-    platform: z.string(), // e.g. linux, darwin, win32
-    release: z.string(), // e.g. 26.0.0, 10.0.19043
-    arch: z.string(), // e.g. x64, arm64
-    'machine-hash': z.string(), // e.g. "d3bbb66be2ad9dfab10af69b450f7e7e814ef7bbf1277a6d0df9e1db44ba4f5c" for "Maxwells-MacBook-Pro.local"
+    platform: z.string().max(50), // e.g. linux, darwin, win32
+    release: z.string().max(100), // e.g. 26.0.0, 10.0.19043
+    arch: z.string().max(50), // e.g. x64, arm64
+    'machine-hash': z.string().max(250), // e.g. "d3bbb66be2ad9dfab10af69b450f7e7e814ef7bbf1277a6d0df9e1db44ba4f5c" for "Maxwells-MacBook-Pro.local"
   }),
-  version: z.string(),
+  version: z.string().max(50),
   trigger: z.enum(['user', 'service']),
   provider: DependabotSourceProviderSchema,
   owner: z.url(),
