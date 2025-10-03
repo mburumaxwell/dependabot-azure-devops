@@ -1,4 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/cleanup/usage-telemetry",
+      "schedule": "0 2 * * *"
+    }
+  ],
   "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_AUTHOR_LOGIN\" == \"dependabot[bot]\" ]"
 }

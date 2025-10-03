@@ -20,11 +20,12 @@ export const config = {
     /*
      * Match all paths except for:
      * 1. /api/update_jobs/ routes
-     * 2. /_next/ (Next.js internals)
-     * 3. /_static (inside /public)
-     * 4. /_vercel (Vercel internals)
-     * 5. Static files (e.g. /favicon.ico, /sitemap.xml, /robots.txt, etc.)
+     * 2. /api/usage-telemetry (public usage telemetry endpoint)
+     * 3. /_next/ (Next.js internals)
+     * 4. /_static (inside /public)
+     * 5. /_vercel (Vercel internals)
+     * 6. Static files (e.g. /favicon.ico, /sitemap.xml, /robots.txt, etc.)
      */
-    '/((?!api/update_jobs/|_next/|_static|_vercel|[\\w-]+\\.\\w+).*)',
+    '/((?!api/update_jobs/|api/usage-telemetry|_next/|_static|_vercel|[\\w-]+\\.\\w+).*)',
   ],
 };

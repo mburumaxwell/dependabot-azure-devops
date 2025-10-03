@@ -9,6 +9,7 @@ import {
   LocalJobsRunner,
   type LocalJobsRunnerOptions,
   mapPackageEcosystemToPackageManager,
+  type RunJobOptions,
   type RunJobsResult,
   runJob,
 } from '@/dependabot';
@@ -208,6 +209,15 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
 
     const results: RunJobsResult = [];
 
+    function makeUsageData(job: DependabotJobConfig): RunJobOptions['usage'] {
+      return {
+        trigger: 'user',
+        provider: job.source.provider,
+        owner: url.url.toString(),
+        'package-manager': job['package-manager'],
+      };
+    }
+
     for (const update of updates) {
       const packageEcosystem = update['package-ecosystem'];
       const packageManager = mapPackageEcosystemToPackageManager(packageEcosystem);
@@ -257,6 +267,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
           credentialsToken,
           updaterImage,
           secretMasker,
+          usage: makeUsageData(job),
         });
 
         const outputs = server.requests(jobId);
@@ -335,6 +346,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
             credentialsToken,
             updaterImage,
             secretMasker,
+            usage: makeUsageData(job),
           });
           const affectedPrs = server.allAffectedPrs(jobId);
           server.clear(jobId);
@@ -369,6 +381,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
               credentialsToken,
               updaterImage,
               secretMasker,
+              usage: makeUsageData(job),
             });
             const affectedPrs = server.allAffectedPrs(jobId);
             server.clear(jobId);

@@ -5,6 +5,8 @@ export type {
   Organization,
   Passkey,
   Session,
+  SourceProvider,
+  UsageTelemetry,
   User,
   Verification,
 } from '@prisma/client';

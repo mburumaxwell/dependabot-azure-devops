@@ -1,10 +1,15 @@
+import crypto from 'node:crypto';
+import os from 'node:os';
+
 import { InnerApiClient } from '@/core';
+import packageJson from '../../package.json';
 import { ApiClient, CredentialFetchingError, type SecretMasker } from './api-client';
 import { PROXY_IMAGE_NAME, updaterImageName } from './docker-tags';
 import { ImageService, type MetricReporter } from './image-service';
 import { logger } from './logger';
 import { getJobParameters } from './params';
 import { Updater } from './updater';
+import type { UsageTelemetryRequestData } from './usage';
 
 export class JobRunnerImagingError extends Error {}
 export class JobRunnerUpdaterError extends Error {}
@@ -89,23 +94,62 @@ export class JobRunner {
   }
 }
 
+export type RunJobOptions = JobRunnerOptions & {
+  usage: Pick<UsageTelemetryRequestData, 'trigger' | 'provider' | 'owner' | 'package-manager'>;
+};
 export type RunJobResult = { success: true; message?: string } | { success: false; message: string };
 
-export async function runJob({ jobId, ...options }: JobRunnerOptions): Promise<RunJobResult> {
+export async function runJob({ jobId, usage, ...options }: RunJobOptions): Promise<RunJobResult> {
+  const started = new Date();
+  let success = false;
+  let message: string | undefined;
   try {
     const runner = new JobRunner({ jobId, ...options });
     await runner.run();
+    success = true;
   } catch (err) {
     if (err instanceof JobRunnerImagingError) {
-      return { success: false, message: `Error fetching updater images: ${err.message}` };
+      message = `Error fetching updater images: ${err.message}`;
     } else if (err instanceof JobRunnerUpdaterError) {
-      return { success: false, message: `Error running updater: ${err.message}` };
+      message = `Error running updater: ${err.message}`;
     } else if (err instanceof CredentialFetchingError) {
-      return { success: false, message: `Dependabot was unable to retrieve job credentials: ${err.message}` };
+      message = `Dependabot was unable to retrieve job credentials: ${err.message}`;
     } else {
-      return { success: false, message: `Unknown error: ${(err as Error).message}` };
+      message = `Unknown error: ${(err as Error).message}`;
     }
   }
+
+  const duration = Date.now() - started.getTime();
+  const data: UsageTelemetryRequestData = {
+    ...usage,
+    host: {
+      platform: os.platform(),
+      release: os.release(),
+      arch: os.arch(),
+      'machine-hash': crypto.createHash('sha256').update(os.hostname()).digest('hex'),
+    },
+    version: packageJson.version,
+    id: jobId,
+    started,
+    duration,
+    success,
+  };
+  try {
+    const json = JSON.stringify(data);
+    logger.debug(`Usage telemetry data: ${json}`);
+    const resp = await fetch('https://dashboard.paklo.app/api/usage-telemetry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: json,
+    });
+    if (!resp.ok) {
+      logger.debug(`Failed to send usage telemetry data: ${resp.status} ${resp.statusText}`);
+    }
+  } catch (err) {
+    logger.debug(`Failed to send usage telemetry data: ${(err as Error).message}`);
+    // ignore
+  }
+
   logger.info(`Update job ${jobId} completed`);
-  return { success: true };
+  return { success, message: message! };
 }
