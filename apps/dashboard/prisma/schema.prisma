@@ -41,6 +41,12 @@ model UsageTelemetry {
   duration          Int
   success           Boolean
 
+  @@index([trigger])
+  @@index([owner])
+  @@index([packageManager])
+  @@index([started(sort: Desc)])
+  @@index([duration])
+  @@index([success])
   @@map("usage_telemetry")
 }
 
