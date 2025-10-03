@@ -27,19 +27,19 @@ enum SourceProvider {
 }
 
 model UsageTelemetry {
-  id                BigInt         @id
-  hostPlatform      String
-  hostRelease       String
-  hostArch          String
-  hostMachineHash   String
-  version           String
-  trigger           JobTrigger
-  provider          SourceProvider
-  owner             String
-  packageManager    String
-  started           DateTime
-  duration          Int
-  success           Boolean
+  id              BigInt         @id
+  hostPlatform    String         @db.VarChar(50)
+  hostRelease     String         @db.VarChar(100)
+  hostArch        String         @db.VarChar(50)
+  hostMachineHash String         @db.VarChar(250)
+  version         String         @db.VarChar(50)
+  trigger         JobTrigger
+  provider        SourceProvider
+  owner           String         @db.VarChar(250)
+  packageManager  String         @db.VarChar(50)
+  started         DateTime
+  duration        Int
+  success         Boolean
 
   @@index([trigger])
   @@index([owner])
