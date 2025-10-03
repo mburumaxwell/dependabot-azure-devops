@@ -18,3 +18,4 @@ export * from './server';
 export * from './update';
 export * from './updater';
 export * from './updater-builder';
+export * from './usage';

@@ -13,6 +13,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum JobTrigger {
+  user
+  service
+
+  @@map("job_trigger")
+}
+
+enum SourceProvider {
+  azure
+
+  @@map("source_provider")
+}
+
+model UsageTelemetry {
+  id                BigInt         @id
+  hostPlatform      String
+  hostRelease       String
+  hostArch          String
+  hostMachineHash   String
+  version           String
+  trigger           JobTrigger
+  provider          SourceProvider
+  owner             String
+  packageManager    String
+  started           DateTime
+  duration          Int
+  success           Boolean
+
+  @@map("usage_telemetry")
+}
+
 model User {
   id            String       @id
   name          String
