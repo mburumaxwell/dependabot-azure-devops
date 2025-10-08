@@ -18,7 +18,7 @@
     "prebuild": "pnpm prisma-gen",
     "predev": "pnpm prisma-gen",
     "build": "next build",
-    "dev": "next dev --turbo",
+    "dev": "next dev --turbo --port 3003",
     "start": "next start --turbo",
     "lint": "biome check",
     "test": "vitest",
