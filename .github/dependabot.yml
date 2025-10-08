@@ -144,6 +144,9 @@ updates:
         patterns:
           - '@types/tar-stream'
           - 'tar-stream'
+    ignore:
+      - dependency-name: recharts
+        update-types: [version-update:semver-major] # shadcn still doesn't support (https://github.com/shadcn-ui/ui/issues/7669)
 
   - package-ecosystem: 'gitsubmodule'
     directory: '/'
