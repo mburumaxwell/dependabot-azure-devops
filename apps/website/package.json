@@ -34,7 +34,7 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "sharp": "0.34.4",
-    "zod": "4.1.11"
+    "zod": "4.1.12"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.1.14",
