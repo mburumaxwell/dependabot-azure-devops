@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { type TimeRange, timeRangeOptions } from '@/lib/aggregation';
 import type { UsageTelemetry } from '@/lib/prisma/client';
 import { MetricCard } from './part-metric-card';
 import { PackageManagerChart } from './part-package-manager-chart';
@@ -24,10 +25,10 @@ export function TelemetryDashboard({ initialData }: TelemetryDashboardProps) {
   const [ownerSearch, setOwnerSearch] = useState('');
   const [showOwnerSuggestions, setShowOwnerSuggestions] = useState(false);
 
-  const timeRange = searchParams.get('timeRange') || '24h';
-  const selectedOwner = searchParams.get('owner') || '';
-  const selectedPackageManager = searchParams.get('packageManager') || 'all';
-  const successFilter = searchParams.get('success') || 'all';
+  const timeRange = (searchParams.get('timeRange') as TimeRange) ?? '24h';
+  const selectedOwner = searchParams.get('owner') ?? '';
+  const selectedPackageManager = searchParams.get('packageManager') ?? 'all';
+  const successFilter = searchParams.get('success') ?? 'all';
 
   const updateFilters = (updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -125,13 +126,11 @@ export function TelemetryDashboard({ initialData }: TelemetryDashboardProps) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='4h'>Last 4 hours</SelectItem>
-              <SelectItem value='6h'>Last 6 hours</SelectItem>
-              <SelectItem value='12h'>Last 12 hours</SelectItem>
-              <SelectItem value='24h'>Last 24 hours</SelectItem>
-              <SelectItem value='7d'>Last 7 days</SelectItem>
-              <SelectItem value='30d'>Last 30 days</SelectItem>
-              <SelectItem value='90d'>Last 90 days</SelectItem>
+              {timeRangeOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 

@@ -1,13 +1,15 @@
-export type TimeRange = '1h' | '4h' | '6h' | '24h' | '7d' | '30d' | '3M' | '12M';
+export type TimeRange = '1h' | '4h' | '6h' | '12h' | '24h' | '7d' | '30d' | '90d' | '3M' | '12M';
 export type Granularity = '5m' | '15m' | '30m' | '1h' | '6h' | '12h' | '1d' | '1w' | '1M';
 
 export const timeRangeOptions: { value: TimeRange; label: string }[] = [
   { value: '1h', label: 'Last 1 Hour' },
   { value: '4h', label: 'Last 4 Hours' },
   { value: '6h', label: 'Last 6 Hours' },
+  { value: '12h', label: 'Last 12 Hours' },
   { value: '24h', label: 'Last 24 Hours' },
   { value: '7d', label: 'Last 7 Days' },
   { value: '30d', label: 'Last 30 Days' },
+  { value: '90d', label: 'Last 90 Days' },
   { value: '3M', label: 'Last 3 Months' },
   { value: '12M', label: 'Last 12 Months' },
 ];
@@ -30,9 +32,11 @@ export function getDateTimeRange(value: TimeRange): { start: Date; end: Date } {
     '1h': 1 * 60 * 60 * 1000,
     '4h': 4 * 60 * 60 * 1000,
     '6h': 6 * 60 * 60 * 1000,
+    '12h': 12 * 60 * 60 * 1000,
     '24h': 24 * 60 * 60 * 1000,
     '7d': 7 * 24 * 60 * 60 * 1000,
     '30d': 30 * 24 * 60 * 60 * 1000,
+    '90d': 90 * 24 * 60 * 60 * 1000,
     '3M': 3 * 30 * 24 * 60 * 60 * 1000,
     '12M': 12 * 30 * 24 * 60 * 60 * 1000,
   };
@@ -56,4 +60,8 @@ export function granularityToMilliseconds(value: Granularity): number {
   const ms = map[value];
   if (!ms) throw new Error(`Unsupported granularity: ${value}`);
   return ms;
+}
+
+export function isHourlyRange(timeRange: TimeRange) {
+  return ['1h', '4h', '6h', '12h', '24h'].includes(timeRange);
 }

@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Card } from '@/components/ui/card';
+import { isHourlyRange, type TimeRange } from '@/lib/aggregation';
 
 interface UsageTelemetry {
   id: bigint;
@@ -17,17 +18,15 @@ interface UsageTelemetry {
 
 interface RunsChartProps {
   data: UsageTelemetry[];
-  timeRange: string;
+  timeRange: TimeRange;
 }
 
 export function RunsChart({ data, timeRange }: RunsChartProps) {
   const chartData = useMemo(() => {
-    const isHourlyRange = ['4h', '6h', '12h', '24h'].includes(timeRange);
-
     const grouped = data.reduce(
       (acc, item) => {
         let key: string;
-        if (isHourlyRange) {
+        if (isHourlyRange(timeRange)) {
           // Group by hour for short time ranges
           const date = new Date(item.started);
           key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:00`;
@@ -54,8 +53,7 @@ export function RunsChart({ data, timeRange }: RunsChartProps) {
   }, [data, timeRange]);
 
   const xAxisFormatter = (value: string) => {
-    const isHourlyRange = ['4h', '6h', '12h', '24h'].includes(timeRange);
-    if (isHourlyRange) {
+    if (isHourlyRange(timeRange)) {
       // Show time for hourly ranges
       const parts = value.split(' ');
       return parts[1] || value; // Return just the time part (HH:00)
@@ -66,8 +64,7 @@ export function RunsChart({ data, timeRange }: RunsChartProps) {
   };
 
   const tooltipLabelFormatter = (value: string) => {
-    const isHourlyRange = ['4h', '6h', '12h', '24h'].includes(timeRange);
-    if (isHourlyRange) {
+    if (isHourlyRange(timeRange)) {
       return new Date(value).toLocaleString('en-US', {
         month: 'short',
         day: 'numeric',

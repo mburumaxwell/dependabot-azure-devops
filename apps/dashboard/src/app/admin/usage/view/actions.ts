@@ -7,8 +7,8 @@ export async function fetchTelemetryData({
   start,
   end,
   owner,
-  packageManager,
-  success,
+  packageManager: selectedPackageManager,
+  success: successFilter,
 }: {
   start: Date;
   end: Date;
@@ -16,6 +16,10 @@ export async function fetchTelemetryData({
   packageManager?: string;
   success?: string;
 }): Promise<UsageTelemetry[]> {
+  const success = successFilter === 'success' ? true : successFilter === 'failure' ? false : undefined;
+  const packageManager =
+    selectedPackageManager && selectedPackageManager !== 'all' ? selectedPackageManager : undefined;
+
   const data = await prisma.usageTelemetry.findMany({
     where: {
       started: { gte: start, lte: end },
