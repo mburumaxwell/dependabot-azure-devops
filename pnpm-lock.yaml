@@ -298,10 +298,10 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: 1.19.5
-        version: 1.19.5(hono@4.9.10)
+        version: 1.19.5(hono@4.9.11)
       '@hono/zod-validator':
-        specifier: 0.7.3
-        version: 0.7.3(hono@4.9.10)(zod@4.1.12)
+        specifier: 0.7.4
+        version: 0.7.4(hono@4.9.11)(zod@4.1.12)
       commander:
         specifier: 14.0.1
         version: 14.0.1
@@ -309,8 +309,8 @@ importers:
         specifier: 4.0.9
         version: 4.0.9
       hono:
-        specifier: 4.9.10
-        version: 4.9.10
+        specifier: 4.9.11
+        version: 4.9.11
       js-yaml:
         specifier: 4.1.0
         version: 4.1.0
@@ -893,8 +893,8 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hono/zod-validator@0.7.3':
-    resolution: {integrity: sha512-uYGdgVib3RlGD698WR5dVM0zB3UuPY5vHKXffGUbUh7r4xY+mFIhF3/v4AcQVLrU5CQdBso8BJr4wuVoCrjTuQ==}
+  '@hono/zod-validator@0.7.4':
+    resolution: {integrity: sha512-biKGn3BRJVaftZlIPMyK+HCe/UHAjJ6sH0UyXe3+v0OcgVr9xfImDROTJFLtn9e3XEEAHGZIM9U6evu85abm8Q==}
     peerDependencies:
       hono: '>=3.9.0'
       zod: ^3.25.0 || ^4.0.0
@@ -4202,8 +4202,8 @@ packages:
   history@5.3.0:
     resolution: {integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==}
 
-  hono@4.9.10:
-    resolution: {integrity: sha512-AlI15ijFyKTXR7eHo7QK7OR4RoKIedZvBuRjO8iy4zrxvlY5oFCdiRG/V/lFJHCNXJ0k72ATgnyzx8Yqa5arug==}
+  hono@4.9.11:
+    resolution: {integrity: sha512-MyJ4xop3boTyXl8bJBh4i20AAZTLM3AXUJphyrUb0CpgTKYb1N703z53XiKUKchGUpcPqiiYkiLOXA3kqK3icA==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -7626,13 +7626,13 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/node-server@1.19.5(hono@4.9.10)':
+  '@hono/node-server@1.19.5(hono@4.9.11)':
     dependencies:
-      hono: 4.9.10
+      hono: 4.9.11
 
-  '@hono/zod-validator@0.7.3(hono@4.9.10)(zod@4.1.12)':
+  '@hono/zod-validator@0.7.4(hono@4.9.11)(zod@4.1.12)':
     dependencies:
-      hono: 4.9.10
+      hono: 4.9.11
       zod: 4.1.12
 
   '@img/colour@1.0.0': {}
@@ -11443,7 +11443,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.28.4
 
-  hono@4.9.10: {}
+  hono@4.9.11: {}
 
   hookable@5.5.3: {}
 
