@@ -203,6 +203,8 @@ export class ProxyBuilder {
         `JOB_TOKEN=${jobToken}`,
         `PROXY_CACHE=${this.cachedMode ? 'true' : 'false'}`,
         `DEPENDABOT_API_URL=${dependabotApiUrl}`,
+        `ACTIONS_ID_TOKEN_REQUEST_TOKEN=${process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN || ''}`,
+        `ACTIONS_ID_TOKEN_REQUEST_URL=${process.env.ACTIONS_ID_TOKEN_REQUEST_URL || ''}`,
       ],
       Entrypoint: ['sh', '-c', '/usr/sbin/update-ca-certificates && /update-job-proxy'],
 
