@@ -32,6 +32,8 @@ export const DependabotRegistrySchema = z
     'public-key-fingerprint': z.string().optional(), // for hex-repository only
     'index-url': z.string().optional(), // for python-index only
     'auth-key': z.string().optional(), // used by composer-repository, docker-registry, etc
+    'tenant-id': z.string().optional(), // can only be for azure related stuff, not sure
+    'client-id': z.string().optional(), // can only be for azure related stuff, not sure
   })
   // change underscore to dash in the registry key/type
   .transform((value) => ({ ...value, type: value.type.replace('-', '_') }));
