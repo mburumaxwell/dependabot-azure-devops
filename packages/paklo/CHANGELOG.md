@@ -1,5 +1,17 @@
 # paklo
 
+## 0.10.1
+
+### Patch Changes
+
+- 5523b63: Bump dependabot-action from c8de751 to 6ec8998.
+  - Bump github/dependabot-update-job-proxy/dependabot-update-job-proxy from v2.0.20251014173146 to v2.0.20251015175503
+  - Bump github/dependabot-update-job-proxy/dependabot-update-job-proxy from v2.0.20251010195543 to v2.0.20251014173146
+  - allow tenant-id and client-id in api information
+- 14374e1: Bump dependabot-action from ddc330d to c8de751
+  - Bump github/dependabot-update-job-proxy/dependabot-update-job-proxy from v2.0.20250826205840 to v2.0.20251003180402
+  - Pass OIDC environment variables to proxy
+
 ## 0.10.0
 
 ### Minor Changes
