@@ -41,6 +41,18 @@ const config: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      // inspired by https://stackoverflow.com/a/70184067
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'paklo.app' }],
+        destination: `https://www.paklo.app/:path*`,
+        permanent: true,
+      },
+      { source: '/legal', destination: '/legal/terms', permanent: false },
+    ];
+  },
 };
 
 const withMDX = createMDX();
