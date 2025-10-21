@@ -7,13 +7,13 @@ on:
     tags: ['extension*']
     paths:
       - 'extensions/**'
-      - 'packages/paklo/**'
+      - 'packages/cli/**'
       - '.github/workflows/extensions.yml'
   pull_request:
     branches: [main]
     paths:
       - 'extensions/**'
-      - 'packages/paklo/**'
+      - 'packages/cli/**'
       - '.github/workflows/extensions.yml'
 
 permissions:
