@@ -345,3 +345,4 @@ out
 next-env.d.ts
 .env*.local
 .react-email
+bruno/.env

@@ -1,0 +1,20 @@
+meta {
+  name: azdo-connection-data
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://dev.azure.com/tingle/_apis/connectiondata?api-version=5.0-preview
+  body: none
+  auth: basic
+}
+
+params:query {
+  api-version: 5.0-preview
+}
+
+auth:basic {
+  username: 
+  password: {{AZURE_DEVOPS_PAT}}
+}

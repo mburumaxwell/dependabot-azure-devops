@@ -1,0 +1,31 @@
+meta {
+  name: dashboard-usage-telemetry
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3003/api/usage-telemetry
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "host": {
+      "platform": "darwin",
+      "arch": "arm64",
+      "release": "26.0",
+      "machine-hash": "complex"
+    },
+    "version": "0",
+    "trigger": "service",
+    "provider": "azure",
+    "owner": "https://dev.azure.com",
+    "package-manager": "nuget",
+    "id": 0,
+    "started": "1980-01-01",
+    "duration": 0,
+    "success": false
+  }
+}
