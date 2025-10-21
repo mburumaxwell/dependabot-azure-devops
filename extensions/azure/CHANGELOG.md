@@ -1,5 +1,15 @@
 # extension-azure-devops
 
+## 2.59.3
+
+### Patch Changes
+
+- f8fc3fb: Split CLI package into focused modules
+- Updated dependencies [f8fc3fb]
+- Updated dependencies [8798722]
+  - @paklo/core@0.1.0
+  - @paklo/runner@0.1.0
+
 ## 2.59.2
 
 ### Patch Changes

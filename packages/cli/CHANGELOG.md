@@ -1,5 +1,19 @@
 # paklo
 
+## 0.11.0
+
+### Minor Changes
+
+- f8fc3fb: Split CLI package into focused modules
+
+### Patch Changes
+
+- 1118859: Include project in usage telemetry
+- Updated dependencies [f8fc3fb]
+- Updated dependencies [8798722]
+  - @paklo/core@0.1.0
+  - @paklo/runner@0.1.0
+
 ## 0.10.1
 
 ### Patch Changes
