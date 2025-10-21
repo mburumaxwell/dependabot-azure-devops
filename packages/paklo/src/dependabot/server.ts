@@ -175,7 +175,8 @@ export function createApiServerApp({
   // Handle endpoints:
   // - GET request to /details
   // - GET request to /credentials
-  app.get(
+  app.on(
+    'get',
     '/:id/details',
     zValidator('param', z.object({ id: z.coerce.number() })),
     async (context, next) => {
@@ -193,7 +194,8 @@ export function createApiServerApp({
       return context.json(job);
     },
   );
-  app.get(
+  app.on(
+    'get',
     '/:id/credentials',
     zValidator('param', z.object({ id: z.coerce.number() })),
     async (context, next) => {
