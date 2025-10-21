@@ -48,6 +48,8 @@ jobs:
           node-version: 22
           cache: 'pnpm'
 
+      # IMPORTANT: install also runs postinstall which builds the packages we
+      # need to publish hence where there are no build steps
       - name: Download deps
         run: pnpm install
 

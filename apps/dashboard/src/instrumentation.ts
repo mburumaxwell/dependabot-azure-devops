@@ -1,11 +1,11 @@
 import type { SpanExporter } from '@opentelemetry/sdk-trace-base';
+import { environment } from '@paklo/core/environment';
 import { registerOTel } from '@vercel/otel';
 
 export async function register() {
   let traceExporter: SpanExporter | undefined;
 
   if (process.env.NEXT_RUNTIME !== 'edge') {
-    const { environment } = await import('@paklo/cli/environment');
     const isVercelDeployment = Boolean(process.env.VERCEL_DEPLOYMENT_ID);
     if (environment.production && !isVercelDeployment) {
       const { AzureMonitorTraceExporter } = await import('@azure/monitor-opentelemetry-exporter');

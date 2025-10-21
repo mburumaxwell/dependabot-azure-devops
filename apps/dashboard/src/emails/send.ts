@@ -52,19 +52,19 @@ export type EmailRequest = {
   /**
    * Email address of the sender.
    * To include a friendly name, use the format `"Your Name <sender@domain.com>"`
-   * @example `support@falu.io`
-   * @example `Feedback <feedback@falu.io>`
+   * @example `support@paklo.app`
+   * @example `Feedback <feedback@paklo.app>`
    * @remarks
    * This email address or its domain must be verified with the chosen provider.
-   * Common email addresses can be found in the `emails` object in the `shared-data` module.
+   * Common email addresses can be found in the `emails` object in the `@paklo/core/shared-/data` module.
    *
-   * `import { emails } from '@falu/utils/shared-data';`
+   * `import { emails } from '@paklo/core/shared-data';`
    */
   from: string;
 
   /**
    * Email address to reply to.
-   * @example `support@falu.io`
+   * @example `support@paklo.app`
    * @remarks
    * Set this when you want to replies to be sent to an address different from the sender specified in `from`.
    */
@@ -85,7 +85,7 @@ export type EmailRequest = {
 
   /**
    * Subject of the email.
-   * @example `Welcome to Falu!`
+   * @example `Welcome to Paklo!`
    */
   subject: string;
 

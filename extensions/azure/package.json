@@ -35,7 +35,8 @@
   },
   "homepage": "https://github.com/mburumaxwell/dependabot-azure-devops#readme",
   "dependencies": {
-    "@paklo/cli": "workspace:*",
+    "@paklo/core": "workspace:*",
+    "@paklo/runner": "workspace:*",
     "azure-pipelines-task-lib": "5.2.1",
     "semver": "7.7.3"
   },

@@ -4,7 +4,7 @@ import {
   type DependabotJobConfig,
   type DependabotRequest,
   type DependabotTokenType,
-} from '@paklo/cli/dependabot';
+} from '@paklo/core/dependabot';
 import { handle } from 'hono/vercel';
 
 export const dynamic = 'force-dynamic';

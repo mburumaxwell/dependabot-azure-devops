@@ -1,4 +1,3 @@
-import { environment } from '@paklo/cli/environment';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata, Viewport } from 'next';
@@ -46,7 +45,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
   return (
     <html lang='en' className={inter.className} suppressHydrationWarning>
       <body className='flex flex-col min-h-screen'>
-        <Provider environment={environment}>{children}</Provider>
+        <Provider>{children}</Provider>
         <Analytics />
         <SpeedInsights />
       </body>
