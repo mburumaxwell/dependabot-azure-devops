@@ -8,7 +8,7 @@
   "scripts": {
     "ui": "shadcn",
     "ui-diff": "pnpm ui diff",
-    "ui-gen": "pnpm ui add --overwrite alert-dialog badge button card chart input label select separator skeleton table tabs textarea tooltip",
+    "ui-gen": "pnpm ui add --overwrite alert-dialog badge button card chart field input label select separator skeleton table tabs textarea tooltip",
     "prisma": "dotenv -e .env.development.local -e .env.local -- pnpm exec prisma",
     "prisma-gen": "pnpm prisma generate",
     "prisma-push": "pnpm prisma db push",

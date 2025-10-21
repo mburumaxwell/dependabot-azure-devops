@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
   });
 
   if (!session) {
-    return NextResponse.redirect(new URL('/sign-in', request.url));
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   return NextResponse.next();
@@ -19,14 +19,17 @@ export const config = {
   matcher: [
     /*
      * Match all paths except for:
-     * 1. /api/update_jobs/ routes
-     * 2. /api/usage-telemetry (public usage telemetry endpoint)
-     * 3. /admin/usage (only for me)
-     * 4. /_next/ (Next.js internals)
-     * 5. /_static (inside /public)
-     * 6. /_vercel (Vercel internals)
-     * 7. Static files (e.g. /favicon.ico, /sitemap.xml, /robots.txt, etc.)
+     * 01. /api/update_jobs/ routes
+     * 02. /api/usage-telemetry (public usage telemetry endpoint)
+     * 03. /api/auth (obviously)
+     * 04. /signup (obviously)
+     * 05. /login (obviously)
+     * 06. /admin/usage (only for me)
+     * 07. /_next/ (Next.js internals)
+     * 08. /_static (inside /public)
+     * 09. /_vercel (Vercel internals)
+     * 10. Static files (e.g. /favicon.ico, /sitemap.xml, /robots.txt, etc.)
      */
-    '/((?!api/update_jobs/|api/usage-telemetry|admin/usage|_next/|_static|_vercel|[\\w-]+\\.\\w+).*)',
+    '/((?!api/update_jobs/|api/usage-telemetry|api/auth|signup|login|admin/usage|_next/|_static|_vercel|[\\w-]+\\.\\w+).*)',
   ],
 };

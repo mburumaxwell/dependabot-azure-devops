@@ -10,7 +10,7 @@ type SimpleOptions = Omit<EmailRequest, 'from' | 'body' | 'subject'>;
 export function sendMagicLinkEmail({ token, url, ...remaining }: SimpleOptions & MagicLinkProps) {
   return send({
     from: FROM_NO_REPLY,
-    subject: 'Your sign-in link',
+    subject: 'Your login link',
     body: <MagicLink url={url} token={token} />,
     ...remaining,
   });

@@ -8,15 +8,22 @@ import {
 import { createAuthClient } from 'better-auth/react';
 import type { auth } from '@/lib/auth.ts';
 
-import { config } from '@/site-config';
+import type { SiteConfig } from '@/site-config';
 
-export const authClient = createAuthClient({
-  baseURL: config.siteUrl,
-  plugins: [
-    inferAdditionalFields<typeof auth>(),
-    magicLinkClient(),
-    passkeyClient(),
-    organizationClient(),
-    adminClient(),
-  ],
-});
+// for some reason getting the baseUrl from site-config has wrong port in
+// development if this file loaded on browser. Hence why a factory method is used.
+
+function createAuthClientInstance(config: SiteConfig) {
+  return createAuthClient({
+    baseURL: config.siteUrl,
+    plugins: [
+      inferAdditionalFields<typeof auth>(),
+      magicLinkClient(),
+      passkeyClient(),
+      organizationClient(),
+      adminClient(),
+    ],
+  });
+}
+
+export { createAuthClientInstance as createAuthClient };
