@@ -29,6 +29,7 @@ app.post('/', zValidator('json', UsageTelemetryRequestDataSchema), async (contex
     version: payload.version,
     provider: payload.provider,
     owner: payload.owner,
+    project: payload.project ?? null,
     packageManager: payload['package-manager'],
     started: payload.started,
     duration: payload.duration,

@@ -45,6 +45,7 @@ model UsageTelemetry {
   trigger         JobTrigger
   provider        SourceProvider
   owner           String          @db.VarChar(250)
+  project         String?         @db.VarChar(512) // TODO: remove nullable after older records are cleared (90 days after 2025-Oct-21 i.e. 2026-Jan-19)
   packageManager  String          @db.VarChar(50)
   started         DateTime
   duration        Int
