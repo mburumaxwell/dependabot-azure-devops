@@ -1,5 +1,5 @@
 import { z } from 'zod/v4';
-import { DependabotPackageManagerSchema, DependabotSourceProviderSchema } from '@/dependabot';
+import { DependabotPackageManagerSchema, DependabotSourceProviderSchema } from '@/dependabot/job';
 
 /**
  * @example

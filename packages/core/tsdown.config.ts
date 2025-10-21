@@ -1,15 +1,11 @@
-import { defineConfig } from 'tsdown';
+import { defineConfig, type UserConfig } from 'tsdown';
 
-export default defineConfig({
+const config: UserConfig = {
   format: ['esm'],
-  target: 'node22',
-  platform: 'node',
   clean: true,
   dts: true,
   sourcemap: true,
   entry: {
-    azure: 'src/azure/index.ts',
-    dependabot: 'src/dependabot/index.ts',
     environment: 'src/environment/index.ts',
     github: 'src/github/index.ts',
     http: 'src/http/index.ts',
@@ -17,5 +13,23 @@ export default defineConfig({
     'shared-data': 'src/shared-data/index.ts',
     usage: 'src/usage.ts',
   },
-  outDir: 'dist',
-});
+};
+export default defineConfig([
+  {
+    ...config,
+    target: 'node22',
+    platform: 'node',
+    outDir: 'dist/node',
+    entry: {
+      ...(config.entry as Record<string, string>),
+      azure: 'src/azure/index.ts',
+      dependabot: 'src/dependabot/index.ts',
+    },
+  },
+  {
+    ...config,
+    target: 'es2020',
+    platform: 'browser',
+    outDir: 'dist/browser',
+  },
+]);

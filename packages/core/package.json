@@ -7,36 +7,42 @@
   "license": "AGPL-3.0-later",
   "exports": {
     "./azure": {
-      "types": "./dist/azure.d.ts",
-      "import": "./dist/azure.js"
+      "types": "./dist/node/azure.d.ts",
+      "node": "./dist/node/azure.js"
     },
     "./dependabot": {
-      "types": "./dist/dependabot.d.ts",
-      "import": "./dist/dependabot.js"
+      "types": "./dist/node/dependabot.d.ts",
+      "node": "./dist/node/dependabot.js"
     },
     "./environment": {
-      "types": "./dist/environment.d.ts",
-      "import": "./dist/environment.js"
+      "types": "./dist/node/environment.d.ts",
+      "node": "./dist/node/environment.js",
+      "browser": "./dist/browser/environment.js"
     },
     "./github": {
-      "types": "./dist/github.d.ts",
-      "import": "./dist/github.js"
+      "types": "./dist/node/github.d.ts",
+      "node": "./dist/node/github.js",
+      "browser": "./dist/browser/github.js"
     },
     "./http": {
-      "types": "./dist/http.d.ts",
-      "import": "./dist/http.js"
+      "types": "./dist/node/http.d.ts",
+      "node": "./dist/node/http.js",
+      "browser": "./dist/browser/http.js"
     },
     "./logger": {
-      "types": "./dist/logger.d.ts",
-      "import": "./dist/logger.js"
+      "types": "./dist/node/logger.d.ts",
+      "node": "./dist/node/logger.js",
+      "browser": "./dist/browser/logger.js"
     },
     "./shared-data": {
-      "types": "./dist/shared-data.d.ts",
-      "import": "./dist/shared-data.js"
+      "types": "./dist/node/shared-data.d.ts",
+      "node": "./dist/node/shared-data.js",
+      "browser": "./dist/browser/shared-data.js"
     },
     "./usage": {
-      "types": "./dist/usage.d.ts",
-      "import": "./dist/usage.js"
+      "types": "./dist/node/usage.d.ts",
+      "node": "./dist/node/usage.js",
+      "browser": "./dist/browser/usage.js"
     }
   },
   "files": [

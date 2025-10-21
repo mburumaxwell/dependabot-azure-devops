@@ -1,4 +1,3 @@
-import { URL } from 'node:url';
 import * as yaml from 'js-yaml';
 import { z } from 'zod/v4';
 
