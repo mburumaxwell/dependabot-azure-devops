@@ -9,7 +9,7 @@
     "ui": "shadcn",
     "ui-diff": "pnpm ui diff",
     "ui-gen": "pnpm ui add --overwrite alert-dialog badge button card chart input label select separator skeleton table tabs textarea tooltip",
-    "prisma": "dotenv -e .env.local -e .env.development.local -- pnpm exec prisma",
+    "prisma": "dotenv -e .env.development.local -e .env.local -- pnpm exec prisma",
     "prisma-gen": "pnpm prisma generate",
     "prisma-push": "pnpm prisma db push",
     "prisma-format": "pnpm prisma format",
