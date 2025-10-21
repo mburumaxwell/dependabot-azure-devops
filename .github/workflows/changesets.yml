@@ -48,10 +48,14 @@ jobs:
           node-version: 22
           cache: 'pnpm'
 
-      # IMPORTANT: install also runs postinstall which builds the packages we
-      # need to publish hence where there are no build steps
       - name: Download deps
         run: pnpm install
+
+      # IMPORTANT: building CLI using turbo also builds its dependencies
+      # hence where there are no additional build steps
+      - name: Build
+        run: pnpm turbo build
+        working-directory: '${{ github.workspace }}/packages/cli'
 
       # Change git info to match the token
       - name: Setup git info

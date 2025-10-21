@@ -24,7 +24,6 @@
     "package.json"
   ],
   "scripts": {
-    "postinstall": "tsdown",
     "dev": "tsdown --watch",
     "prebuild": "tsc",
     "build": "tsdown",
