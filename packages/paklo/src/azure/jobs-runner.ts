@@ -214,6 +214,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
         trigger: 'user',
         provider: job.source.provider,
         owner: url.url.toString(),
+        project: `${url.url.toString().replace(/\/$/, '')}/${url.project}`,
         'package-manager': job['package-manager'],
       };
     }

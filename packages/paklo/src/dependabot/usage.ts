@@ -34,6 +34,7 @@ export const UsageTelemetryRequestDataSchema = z.object({
   trigger: z.enum(['user', 'service']),
   provider: DependabotSourceProviderSchema,
   owner: z.url(),
+  project: z.url().optional(), // was added later hence optional for backward compatibility
   'package-manager': DependabotPackageManagerSchema,
   id: z.number(), // job identifier, for correlation
   started: z.coerce.date(),

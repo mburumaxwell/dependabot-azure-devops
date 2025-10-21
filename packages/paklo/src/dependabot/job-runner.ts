@@ -95,7 +95,7 @@ export class JobRunner {
 }
 
 export type RunJobOptions = JobRunnerOptions & {
-  usage: Pick<UsageTelemetryRequestData, 'trigger' | 'provider' | 'owner' | 'package-manager'>;
+  usage: Pick<UsageTelemetryRequestData, 'trigger' | 'provider' | 'owner' | 'project' | 'package-manager'>;
 };
 export type RunJobResult = { success: true; message?: string } | { success: false; message: string };
 
