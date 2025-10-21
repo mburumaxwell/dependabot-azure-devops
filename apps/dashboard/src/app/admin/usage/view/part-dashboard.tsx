@@ -209,7 +209,7 @@ export function TelemetryDashboard({ initialData }: TelemetryDashboardProps) {
               variant='ghost'
               size='sm'
               onClick={() => {
-                router.push('/');
+                router.push('/admin/usage');
                 setOwnerSearch('');
               }}
             >
