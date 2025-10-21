@@ -1,10 +1,11 @@
-import { AzureLocalJobsRunner, type AzureLocalJobsRunnerOptions, getDependabotConfig } from '@paklo/cli/azure';
+import { getDependabotConfig } from '@paklo/core/azure';
 import {
   DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
   DEPENDABOT_DEFAULT_AUTHOR_NAME,
   type GitAuthor,
-  type SecretMasker,
-} from '@paklo/cli/dependabot';
+} from '@paklo/core/dependabot';
+import type { SecretMasker } from '@paklo/runner';
+import { AzureLocalJobsRunner, type AzureLocalJobsRunnerOptions } from '@paklo/runner/local/azure';
 import * as tl from 'azure-pipelines-task-lib/task';
 import { setSecrets } from '../formatting';
 import { getTaskInputs } from './inputs';

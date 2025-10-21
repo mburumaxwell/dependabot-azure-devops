@@ -1,4 +1,4 @@
-import { getSiteUrl } from '@paklo/cli/environment';
+import { getSiteUrl } from '@paklo/core/environment';
 
 const siteUrl = getSiteUrl({ defaultValue: 'https://dashboard.paklo.app' });
 
@@ -9,4 +9,4 @@ export const config = {
   description: 'Dependabot-like automation on Azure DevOps',
 };
 
-export { socials } from '@paklo/cli/shared-data';
+export { socials } from '@paklo/core/shared-data';

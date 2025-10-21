@@ -1,5 +1,5 @@
 import { zValidator } from '@hono/zod-validator';
-import { UsageTelemetryRequestDataSchema } from '@paklo/cli/dependabot';
+import { UsageTelemetryRequestDataSchema } from '@paklo/core/usage';
 import { geolocation } from '@vercel/functions';
 import { Hono } from 'hono';
 import { handle } from 'hono/vercel';

@@ -1,5 +1,5 @@
-import { type AzureDevOpsUrl, extractUrlParts } from '@paklo/cli/azure';
-import { DEFAULT_EXPERIMENTS, type DependabotExperiments, parseExperiments } from '@paklo/cli/dependabot';
+import { type AzureDevOpsUrl, extractUrlParts } from '@paklo/core/azure';
+import { DEFAULT_EXPERIMENTS, type DependabotExperiments, parseExperiments } from '@paklo/core/dependabot';
 import * as tl from 'azure-pipelines-task-lib/task';
 import { setSecrets } from '../formatting';
 

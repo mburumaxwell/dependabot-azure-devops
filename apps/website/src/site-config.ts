@@ -1,4 +1,4 @@
-import { environment, getSiteUrl } from '@paklo/cli/environment';
+import { environment, getSiteUrl } from '@paklo/core/environment';
 
 const { development, main } = environment;
 const siteUrl = getSiteUrl({ defaultValue: 'https://www.paklo.app' });
@@ -13,4 +13,4 @@ export const config = {
   showDrafts: development || !main,
 };
 
-export { socials } from '@paklo/cli/shared-data';
+export { socials } from '@paklo/core/shared-data';

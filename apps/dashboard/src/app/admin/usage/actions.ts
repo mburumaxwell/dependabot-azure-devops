@@ -1,6 +1,6 @@
 'use server';
 
-import { environment } from '@paklo/cli/environment';
+import { environment } from '@paklo/core/environment';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 

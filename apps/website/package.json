@@ -23,7 +23,7 @@
     "@opentelemetry/api-logs": "0.206.0",
     "@opentelemetry/instrumentation": "0.206.0",
     "@opentelemetry/sdk-logs": "0.206.0",
-    "@paklo/cli": "workspace:*",
+    "@paklo/core": "workspace:*",
     "@vercel/analytics": "1.5.0",
     "@vercel/otel": "2.0.1",
     "@vercel/speed-insights": "1.2.0",
