@@ -19,3 +19,6 @@ export function GoogleLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
     </svg>
   );
 }
+
+// this is only temporary until I can convert the logo into a proper svg component
+export { GalleryVerticalEnd as PakloLogo } from 'lucide-react';

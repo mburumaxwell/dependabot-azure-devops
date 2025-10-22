@@ -1,8 +1,9 @@
 'use client';
 
-import { GalleryVerticalEnd, Loader2, Mail } from 'lucide-react';
+import { Loader2, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { PakloLogo } from '@/components/logos';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -48,7 +49,7 @@ export function SignupForm({ className, config, ...props }: SignupFormProps) {
         <div className='flex flex-col items-center gap-2 text-center'>
           <a href={config.websiteUrl} className='flex flex-col items-center gap-2 font-medium'>
             <div className='flex size-8 items-center justify-center rounded-md'>
-              <GalleryVerticalEnd className='size-6' />
+              <PakloLogo className='size-6' />
             </div>
             <span className='sr-only'>Paklo</span>
           </a>
