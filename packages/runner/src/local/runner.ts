@@ -4,7 +4,7 @@ import {
   type DependabotJobConfig,
   makeRandomJobToken,
 } from '@paklo/core/dependabot';
-import type { SecretMasker } from '@paklo/runner';
+import type { SecretMasker } from '../api-client';
 
 export type RunJobsResult = { id: number; success: boolean; message?: string; affectedPrs: number[] }[];
 
