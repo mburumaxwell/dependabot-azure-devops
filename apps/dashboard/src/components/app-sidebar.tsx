@@ -44,7 +44,7 @@ const groups: MenuGroup[] = [
       { label: 'Users', href: '/users' as Route },
       { label: 'Settings', href: '/settings' as Route },
     ],
-  }
+  },
 ];
 
 export function AppSidebar({ config, ...props }: React.ComponentProps<typeof Sidebar> & { config: SiteConfig }) {
