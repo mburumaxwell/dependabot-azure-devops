@@ -41,7 +41,7 @@
     "commander": "14.0.1"
   },
   "devDependencies": {
-    "@types/node": "24.8.1",
+    "@types/node": "24.9.1",
     "tsdown": "0.15.9"
   },
   "publishConfig": {
