@@ -3,7 +3,7 @@ import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/page
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { docs } from '@/lib/source';
+import { docs, getPageImage } from '@/lib/source';
 import { getMDXComponents } from '@/mdx-components';
 
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
@@ -11,14 +11,14 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const page = docs.getPage(params.slug);
   if (!page) notFound();
 
-  const MDXContent = page.data.body;
+  const MDX = page.data.body;
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
-        <MDXContent
+        <MDX
           components={getMDXComponents({
             // this allows you to link to other pages with relative file paths
             a: createRelativeLink(docs, page),
@@ -41,5 +41,8 @@ export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): P
   return {
     title: page.data.title,
     description: page.data.description,
+    openGraph: {
+      images: getPageImage(page).url,
+    },
   };
 }

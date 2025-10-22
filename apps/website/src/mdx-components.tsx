@@ -5,6 +5,16 @@ import type { MDXComponents } from 'mdx/types';
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
     ...defaultMdxComponents,
+    // a: ({ href = '', ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) => {
+    //   if (href.startsWith('/') || href.startsWith('#')) {
+    //     return <Link href={href as Route} {...props} />;
+    //   }
+
+    //   return <a href={href} target='_blank' rel='noopener noreferrer' {...props} />;
+    // },
+    // img: ({ className, alt, ...props }: ImageProps) => {
+    //   return <Image className={cn('rounded-md border', className)} alt={alt} {...props} />;
+    // },
     ...components,
   };
 }

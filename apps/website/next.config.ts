@@ -53,6 +53,14 @@ const config: NextConfig = {
       { source: '/legal', destination: '/legal/terms', permanent: false },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: '/docs/:slug*.md',
+        destination: '/api/docs/raw/:slug*', // API route for raw docs content
+      },
+    ];
+  },
 };
 
 const withMDX = createMDX();

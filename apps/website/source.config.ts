@@ -7,6 +7,9 @@ import { z } from '@/fumadocs/zod';
 export const legal = defineCollections({
   type: 'doc',
   dir: 'content/legal',
+  postprocess: {
+    includeProcessedMarkdown: true,
+  },
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
@@ -19,6 +22,9 @@ export const legal = defineCollections({
 export const docs = defineDocs({
   dir: 'content/docs',
   docs: {
+    postprocess: {
+      includeProcessedMarkdown: true,
+    },
     schema: ({ path, source }) =>
       z.object({
         title: z.string(),
@@ -38,7 +44,6 @@ export default defineConfig({
   mdxOptions: {
     rehypeCodeOptions: {
       lazy: true,
-      experimentalJSEngine: true,
       inline: 'tailing-curly-colon',
       themes: {
         light: 'catppuccin-latte', // 'github-light',

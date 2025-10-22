@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Markdown } from '@/components/markdown';
 import { legal } from '@/lib/source';
 import { formatDate } from '@/lib/utils';
 
@@ -24,6 +23,8 @@ export default async function LegalDocPage(props: PageProps<'/legal/[slug]'>) {
     notFound();
   }
 
+  const MDX = doc.data.body;
+
   return (
     <article>
       <div className='py-16 sm:py-32'>
@@ -37,7 +38,7 @@ export default async function LegalDocPage(props: PageProps<'/legal/[slug]'>) {
         )}
       </div>
       <div className='mx-auto flex w-full max-w-(--breakpoint-lg) flex-col items-center p-10 px-2.5 sm:pt-20 lg:px-20'>
-        <Markdown body={doc.data.body} />
+        <MDX />
       </div>
     </article>
   );

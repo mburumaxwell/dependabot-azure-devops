@@ -1,6 +1,6 @@
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import { RootProvider } from 'fumadocs-ui/provider';
+import { RootProvider } from 'fumadocs-ui/provider/next';
 import type { Metadata, Viewport } from 'next';
 import type { TemplateString } from 'next/dist/lib/metadata/types/metadata-types';
 import { Inter } from 'next/font/google';
