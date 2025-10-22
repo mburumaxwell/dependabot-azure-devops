@@ -26,7 +26,7 @@
     "@opentelemetry/sdk-logs": "0.207.0",
     "@paklo/core": "workspace:*",
     "@vercel/analytics": "1.5.0",
-    "@vercel/otel": "2.0.1",
+    "@vercel/otel": "2.1.0",
     "@vercel/speed-insights": "1.2.0",
     "fumadocs-core": "16.0.1",
     "fumadocs-mdx": "13.0.0",
