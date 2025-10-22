@@ -7,7 +7,7 @@ import { AppleLogo, GoogleLogo, PakloLogo } from '@/components/logos';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { createAuthClient } from '@/lib/auth-client';
+import { createAuthClient, magicLinkLogin } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 import type { SiteConfig } from '@/site-config';
 
@@ -45,12 +45,7 @@ export function LoginForm({ className, config, ...props }: LoginFormProps) {
 
     setIsLoading(true);
     try {
-      // https://www.better-auth.com/docs/plugins/magic-link
-      await authClient.signIn.magicLink({
-        email,
-        callbackURL: `${config.siteUrl}/`,
-        newUserCallbackURL: `${config.siteUrl}/welcome`,
-      });
+      await magicLinkLogin({ authClient, email });
       setMagicLinkSent(true);
     } catch (error) {
       console.error('Magic link error:', error);

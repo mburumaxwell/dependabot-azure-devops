@@ -7,7 +7,7 @@ import { PakloLogo } from '@/components/logos';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { createAuthClient } from '@/lib/auth-client';
+import { magicLinkLogin } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 import type { SiteConfig } from '@/site-config';
 
@@ -17,8 +17,6 @@ interface SignupFormProps extends React.ComponentProps<'div'> {
 }
 
 export function SignupForm({ className, config, ...props }: SignupFormProps) {
-  const authClient = createAuthClient(config);
-
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
@@ -29,13 +27,7 @@ export function SignupForm({ className, config, ...props }: SignupFormProps) {
 
     setIsLoading(true);
     try {
-      // https://www.better-auth.com/docs/plugins/magic-link
-      await authClient.signIn.magicLink({
-        email,
-        name: email.split('@')[0], // use part of email as name suggestion
-        callbackURL: `${config.siteUrl}/`,
-        newUserCallbackURL: `${config.siteUrl}/welcome`,
-      });
+      await magicLinkLogin({ config, email });
       setMagicLinkSent(true);
     } catch (error) {
       console.error('Signup error:', error);
@@ -43,6 +35,7 @@ export function SignupForm({ className, config, ...props }: SignupFormProps) {
       setIsLoading(false);
     }
   }
+
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <FieldGroup>

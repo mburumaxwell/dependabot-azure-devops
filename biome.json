@@ -25,6 +25,7 @@
       "!public",
       "!static",
       "!**/src/components/ui",
+      "!**/src/hooks/use-mobile.ts",
       "!dependabot-action/**",
       "!extensions/azure/tasks/*/task.json",
       "!extensions/azure/vss-extension.json",
