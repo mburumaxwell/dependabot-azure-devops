@@ -23,7 +23,7 @@ import {
   SecurityVulnerabilitySchema,
 } from '@paklo/core/github';
 import { logger } from '@/logger';
-import { type RunJobOptions, runJob } from '../../job-runner';
+import { type RunJobOptions, runJob } from '../../run';
 import { LocalJobsRunner, type LocalJobsRunnerOptions, type RunJobsResult } from '../runner';
 import { AzureLocalDependabotServer, type AzureLocalDependabotServerOptions } from './server';
 

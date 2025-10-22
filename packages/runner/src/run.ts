@@ -14,7 +14,7 @@ import { Updater } from './updater';
 export class JobRunnerImagingError extends Error {}
 export class JobRunnerUpdaterError extends Error {}
 
-export type JobRunnerOptions = {
+export type RunJobOptions = {
   dependabotApiUrl: string;
   dependabotApiDockerUrl?: string;
   jobId: number;
@@ -22,25 +22,24 @@ export type JobRunnerOptions = {
   credentialsToken: string;
   updaterImage?: string;
   secretMasker: SecretMasker;
+  usage: Pick<UsageTelemetryRequestData, 'trigger' | 'provider' | 'owner' | 'project' | 'package-manager'>;
 };
+export type RunJobResult = { success: true; message?: string } | { success: false; message: string };
 
-export class JobRunner {
-  private readonly options: JobRunnerOptions;
+export async function runJob(options: RunJobOptions): Promise<RunJobResult> {
+  const { jobId, dependabotApiUrl, dependabotApiDockerUrl, jobToken, credentialsToken, secretMasker, usage } = options;
 
-  constructor(options: JobRunnerOptions) {
-    this.options = options;
-  }
-
-  async run() {
-    const { dependabotApiUrl, dependabotApiDockerUrl, jobId, jobToken, credentialsToken, secretMasker } = this.options;
-
+  const started = new Date();
+  let success = false;
+  let message: string | undefined;
+  try {
     const params = getJobParameters({
       jobId,
       jobToken,
       credentialsToken,
       dependabotApiUrl,
       dependabotApiDockerUrl: dependabotApiDockerUrl ?? dependabotApiUrl,
-      updaterImage: this.options.updaterImage,
+      updaterImage: options.updaterImage,
     })!;
 
     // if dependabotApiUrl contains "host.docker.internal", we need to replace it with "localhost" for local calls
@@ -91,21 +90,6 @@ export class JobRunner {
         throw new JobRunnerUpdaterError(err.message);
       }
     }
-  }
-}
-
-export type RunJobOptions = JobRunnerOptions & {
-  usage: Pick<UsageTelemetryRequestData, 'trigger' | 'provider' | 'owner' | 'project' | 'package-manager'>;
-};
-export type RunJobResult = { success: true; message?: string } | { success: false; message: string };
-
-export async function runJob({ jobId, usage, ...options }: RunJobOptions): Promise<RunJobResult> {
-  const started = new Date();
-  let success = false;
-  let message: string | undefined;
-  try {
-    const runner = new JobRunner({ jobId, ...options });
-    await runner.run();
     success = true;
   } catch (err) {
     if (err instanceof JobRunnerImagingError) {

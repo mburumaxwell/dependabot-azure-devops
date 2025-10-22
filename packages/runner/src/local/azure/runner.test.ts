@@ -12,7 +12,7 @@ import { DEFAULT_EXPERIMENTS, type DependabotConfig, type DependabotUpdate } fro
 import { GitHubGraphClient } from '@paklo/core/github';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { SecretMasker } from '../../api-client';
-import { runJob } from '../../job-runner';
+import { runJob } from '../../run';
 import { AzureLocalJobsRunner, type AzureLocalJobsRunnerOptions } from './runner';
 import { AzureLocalDependabotServer } from './server';
 
@@ -28,8 +28,8 @@ vi.mock('@paklo/core/azure', async () => {
     AzureDevOpsWebApiClient: vi.fn(),
   };
 });
-vi.mock('@/job-runner', async () => {
-  const actual = await vi.importActual('@/job-runner');
+vi.mock('@/run', async () => {
+  const actual = await vi.importActual('@/run');
   return {
     ...actual,
     runJob: vi.fn(),
