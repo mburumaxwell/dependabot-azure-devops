@@ -33,7 +33,7 @@ updates:
   - package-ecosystem: 'docker'
     # wildcard will target submodules and cause trouble
     # directories: ['**/*']
-    directories: ['/apps', '/packages', '/server']
+    directories: ['/apps/**', '/packages/**', '/server/**']
     schedule:
       interval: 'weekly'
       time: '02:00'
