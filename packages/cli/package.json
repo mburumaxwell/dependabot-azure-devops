@@ -38,7 +38,7 @@
   "dependencies": {
     "@paklo/core": "workspace:*",
     "@paklo/runner": "workspace:*",
-    "commander": "14.0.1"
+    "commander": "14.0.2"
   },
   "devDependencies": {
     "@types/node": "24.9.1",
