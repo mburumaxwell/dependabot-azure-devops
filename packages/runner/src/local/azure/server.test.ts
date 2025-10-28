@@ -4,7 +4,7 @@ import type { AzureDevOpsWebApiClient } from '@paklo/core/azure';
 import {
   DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
   DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
-  extractUrlParts,
+  extractRepositoryUrl,
   type IPullRequestProperties,
 } from '@paklo/core/azure';
 import type { DependabotJobBuilderOutput, DependabotUpdate } from '@paklo/core/dependabot';
@@ -39,7 +39,7 @@ describe('AzureLocalDependabotServer', () => {
     existingPullRequests = [];
 
     options = {
-      url: extractUrlParts({
+      url: extractRepositoryUrl({
         organisationUrl: 'http://localhost:8081/',
         project: 'testproject',
         repository: 'test-repo',

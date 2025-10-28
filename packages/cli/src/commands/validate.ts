@@ -1,4 +1,4 @@
-import { extractUrlParts, getDependabotConfig } from '@paklo/core/azure';
+import { extractRepositoryUrl, getDependabotConfig } from '@paklo/core/azure';
 import type { DependabotConfig } from '@paklo/core/dependabot';
 import { Command } from 'commander';
 import { z } from 'zod/v4';
@@ -19,7 +19,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
 
   // extract url parts
   if (!organisationUrl.endsWith('/')) organisationUrl = `${organisationUrl}/`; // without trailing slash the extraction fails
-  const url = extractUrlParts({ organisationUrl, project, repository });
+  const url = extractRepositoryUrl({ organisationUrl, project, repository });
 
   // prepare to find variables by asking user for input
   const variables = new Set<string>();

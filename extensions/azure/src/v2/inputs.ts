@@ -1,10 +1,10 @@
-import { type AzureDevOpsUrl, extractUrlParts } from '@paklo/core/azure';
+import { type AzureDevOpsRepositoryUrl, extractRepositoryUrl } from '@paklo/core/azure';
 import { DEFAULT_EXPERIMENTS, type DependabotExperiments, parseExperiments } from '@paklo/core/dependabot';
 import * as tl from 'azure-pipelines-task-lib/task';
 import { setSecrets } from '../formatting';
 
 export type TaskInputs = {
-  url: AzureDevOpsUrl;
+  url: AzureDevOpsRepositoryUrl;
 
   /** Whether the repository was overridden via input */
   repositoryOverridden: boolean;
@@ -81,7 +81,7 @@ export function getTaskInputs(): TaskInputs {
   }
 
   const organisationUrl = tl.getVariable('System.TeamFoundationCollectionUri')!;
-  const urlParts = extractUrlParts({ organisationUrl, project: project!, repository: repository! });
+  const urlParts = extractRepositoryUrl({ organisationUrl, project: project!, repository: repository! });
 
   // Prepare the access credentials
   const githubAccessToken = getGithubAccessToken();

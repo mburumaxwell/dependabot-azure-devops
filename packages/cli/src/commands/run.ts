@@ -1,6 +1,6 @@
 import { stdin, stdout } from 'node:process';
 import readline from 'node:readline/promises';
-import { extractUrlParts, getDependabotConfig } from '@paklo/core/azure';
+import { extractRepositoryUrl, getDependabotConfig } from '@paklo/core/azure';
 import {
   DEFAULT_EXPERIMENTS,
   DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
@@ -81,7 +81,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
 
   // extract url parts
   if (!organisationUrl.endsWith('/')) organisationUrl = `${organisationUrl}/`; // without trailing slash the extraction fails
-  const url = extractUrlParts({ organisationUrl, project, repository });
+  const url = extractRepositoryUrl({ organisationUrl, project, repository });
 
   // prepare to find variables from env or by asking user for input
   const variables = new Map<string, string>();

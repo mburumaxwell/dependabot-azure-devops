@@ -3,12 +3,12 @@ import { HttpRequestError, isErrorTemporaryFailure } from '@/http';
 import { AzureDevOpsWebApiClient, sendRestApiRequestWithRetry } from './client';
 import type { ICreatePullRequest } from './models';
 import { VersionControlChangeType } from './types';
-import { extractUrlParts } from './url-parts';
+import { extractRepositoryUrl } from './url-parts';
 
 global.fetch = vi.fn();
 
 describe('AzureDevOpsWebApiClient', () => {
-  const url = extractUrlParts({
+  const url = extractRepositoryUrl({
     organisationUrl: 'https://dev.azure.com/mock-organization',
     project: 'project',
     repository: 'repository',

@@ -1,6 +1,6 @@
-export type AzureDevOpsUrl = {
+export type AzureDevOpsOrganizationUrl = {
   /** URL of the organisation. This may lack the project name */
-  url: URL;
+  url: URL; // TODO: rename to value
 
   /** Organisation URL hostname */
   hostname: string;
@@ -8,9 +8,19 @@ export type AzureDevOpsUrl = {
   /** Organisation API endpoint URL */
   'api-endpoint': string;
 
+  /** Organisation name/slug */
+  organisation: string;
+
+  /** Virtual directory if present (on-premises only) */
+  'virtual-directory'?: string;
+};
+
+export type AzureDevOpsProjectUrl = AzureDevOpsOrganizationUrl & {
   /** Project ID or Name */
   project: string;
+};
 
+export type AzureDevOpsRepositoryUrl = AzureDevOpsProjectUrl & {
   /** Repository ID or Name */
   repository: string;
 
@@ -18,15 +28,7 @@ export type AzureDevOpsUrl = {
   'repository-slug': string;
 };
 
-export function extractUrlParts({
-  organisationUrl,
-  project,
-  repository,
-}: {
-  organisationUrl: string;
-  project: string;
-  repository: string;
-}): AzureDevOpsUrl {
+export function extractOrganizationUrl({ organisationUrl }: { organisationUrl: string }): AzureDevOpsOrganizationUrl {
   // convert url string into a valid JS URL object
   const url = new URL(organisationUrl);
   const protocol = url.protocol.slice(0, -1);
@@ -39,16 +41,48 @@ export function extractUrlParts({
   const virtualDirectory = extractVirtualDirectory(url);
   const apiEndpoint = `${protocol}://${hostname}${url.port ? `:${url.port}` : ''}/${virtualDirectory ? `${virtualDirectory}/` : ''}`;
 
-  const escapedProject = encodeURI(project); // encode special characters like spaces
-  const escapedRepository = encodeURI(repository); // encode special characters like spaces
-  const repoSlug = `${virtualDirectory ? `${virtualDirectory}/` : ''}${organisation}/${escapedProject}/_git/${escapedRepository}`;
-
   return {
     url,
     hostname,
     'api-endpoint': apiEndpoint,
+    organisation,
+    'virtual-directory': virtualDirectory,
+  };
+}
 
+export function extractProjectUrl({
+  organisationUrl,
+  project,
+}: {
+  organisationUrl: string;
+  project: string;
+}): AzureDevOpsProjectUrl {
+  const extracted = extractOrganizationUrl({ organisationUrl });
+  const escapedProject = encodeURI(project); // encode special characters like spaces
+
+  return {
+    ...extracted,
     project: escapedProject,
+  };
+}
+
+export function extractRepositoryUrl({
+  organisationUrl,
+  project,
+  repository,
+}: {
+  organisationUrl: string;
+  project: string;
+  repository: string;
+}): AzureDevOpsRepositoryUrl {
+  const extracted = extractProjectUrl({ organisationUrl, project });
+  const { organisation, 'virtual-directory': virtualDirectory, project: escapedProject } = extracted;
+
+  const escapedRepository = encodeURI(repository); // encode special characters like spaces
+  const repoSlug = `${virtualDirectory ? `${virtualDirectory}/` : ''}${organisation}/${escapedProject}/_git/${escapedRepository}`;
+
+  return {
+    ...extracted,
     repository: escapedRepository,
     'repository-slug': repoSlug,
   };

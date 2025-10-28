@@ -1,4 +1,4 @@
-import type { AzureDevOpsUrl, AzureDevOpsWebApiClient, IPullRequestProperties } from '@paklo/core/azure';
+import type { AzureDevOpsRepositoryUrl, AzureDevOpsWebApiClient, IPullRequestProperties } from '@paklo/core/azure';
 import {
   buildPullRequestProperties,
   GitPullRequestMergeStrategy,
@@ -14,7 +14,7 @@ import { logger } from '@/logger';
 import { LocalDependabotServer, type LocalDependabotServerOptions } from '../server';
 
 export type AzureLocalDependabotServerOptions = LocalDependabotServerOptions & {
-  url: AzureDevOpsUrl;
+  url: AzureDevOpsRepositoryUrl;
   authorClient: AzureDevOpsWebApiClient;
   autoApprove: boolean;
   approverClient?: AzureDevOpsWebApiClient;

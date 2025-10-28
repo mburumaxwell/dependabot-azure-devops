@@ -5,7 +5,7 @@ import {
   DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
   DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
   DEVOPS_PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
-  extractUrlParts,
+  extractRepositoryUrl,
   type IPullRequestProperties,
 } from '@paklo/core/azure';
 import { DEFAULT_EXPERIMENTS, type DependabotConfig, type DependabotUpdate } from '@paklo/core/dependabot';
@@ -90,7 +90,7 @@ describe('AzureLocalJobsRunner', () => {
     ];
 
     options = {
-      url: extractUrlParts({
+      url: extractRepositoryUrl({
         organisationUrl: 'https://dev.azure.com/test-org/',
         project: 'test-project',
         repository: 'test-repo',

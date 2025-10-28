@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { extractUrlParts } from './url-parts';
+import { extractRepositoryUrl } from './url-parts';
 
-describe('extractUrlParts', () => {
+describe('extractRepositoryUrl', () => {
   it('works for old style devops url', () => {
-    const url = extractUrlParts({
+    const url = extractRepositoryUrl({
       organisationUrl: 'https://contoso.visualstudio.com/',
       project: 'prj1',
       repository: 'repo1',
@@ -17,7 +17,7 @@ describe('extractUrlParts', () => {
   });
 
   it('works for azure devops domain', () => {
-    const url = extractUrlParts({
+    const url = extractRepositoryUrl({
       organisationUrl: 'https://dev.azure.com/contoso/',
       project: 'prj1',
       repository: 'repo1',
@@ -30,7 +30,7 @@ describe('extractUrlParts', () => {
   });
 
   it('works for on-premise domain', () => {
-    const url = extractUrlParts({
+    const url = extractRepositoryUrl({
       organisationUrl: 'https://server.domain.com/tfs/contoso/',
       project: 'prj1',
       repository: 'repo1',
@@ -43,7 +43,7 @@ describe('extractUrlParts', () => {
   });
 
   it('works for on-premise domain with port', () => {
-    const url = extractUrlParts({
+    const url = extractRepositoryUrl({
       organisationUrl: 'https://server.domain.com:8081/tfs/contoso/',
       project: 'prj1',
       repository: 'repo1',
@@ -56,7 +56,7 @@ describe('extractUrlParts', () => {
   });
 
   it('works for localhost', () => {
-    const url = extractUrlParts({
+    const url = extractRepositoryUrl({
       organisationUrl: 'http://localhost:8080/contoso/',
       project: 'prj1',
       repository: 'repo1',
@@ -69,7 +69,7 @@ describe('extractUrlParts', () => {
   });
 
   it('works for project Uri', () => {
-    const url = extractUrlParts({
+    const url = extractRepositoryUrl({
       organisationUrl: 'https://dev.azure.com/contoso/Core',
       project: 'prj1',
       repository: 'repo1',
@@ -82,7 +82,7 @@ describe('extractUrlParts', () => {
   });
 
   it('works for project or repository with spaces', () => {
-    const url = extractUrlParts({
+    const url = extractRepositoryUrl({
       organisationUrl: 'https://dev.azure.com/contoso/',
       project: 'prj 1',
       repository: 'repo 1',

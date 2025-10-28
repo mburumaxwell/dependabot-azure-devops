@@ -15,8 +15,11 @@ import {
   PullRequestAsyncStatus,
   PullRequestStatus,
 } from './types';
-import type { AzureDevOpsUrl } from './url-parts';
+import type { AzureDevOpsOrganizationUrl } from './url-parts';
 import { normalizeBranchName, normalizeFilePath } from './utils';
+
+/** Returned from AzureDevOpsWebApiClient.getUserId() when no user is authenticated */
+export const ANONYMOUS_USER_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 
 /** Azure DevOps REST API client. */
 export class AzureDevOpsWebApiClient {
@@ -31,7 +34,7 @@ export class AzureDevOpsWebApiClient {
   public static API_VERSION = '5.0'; // this is the same version used by dependabot-core
   public static API_VERSION_PREVIEW = '5.0-preview';
 
-  constructor(url: AzureDevOpsUrl, accessToken: string, debug: boolean = false) {
+  constructor(url: AzureDevOpsOrganizationUrl, accessToken: string, debug: boolean = false) {
     const organisationApiUrl = url.url.toString();
     this.organisationApiUrl = organisationApiUrl.replace(/\/$/, ''); // trim trailing slash
     this.identityApiUrl = getIdentityApiUrl(organisationApiUrl).replace(/\/$/, ''); // trim trailing slash

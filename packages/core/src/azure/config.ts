@@ -9,7 +9,7 @@ import {
   type VariableFinderFn,
 } from '@/dependabot';
 import { logger } from '@/logger';
-import type { AzureDevOpsUrl } from './url-parts';
+import type { AzureDevOpsRepositoryUrl } from './url-parts';
 
 /**
  * Parse the dependabot config YAML file to specify update configuration.
@@ -27,7 +27,7 @@ export async function getDependabotConfig({
   rootDir = process.cwd(),
   variableFinder,
 }: {
-  url: AzureDevOpsUrl;
+  url: AzureDevOpsRepositoryUrl;
   token: string;
   /**
    * Whether to fetch the configuration file via the REST API (true) or look for it locally (false).
