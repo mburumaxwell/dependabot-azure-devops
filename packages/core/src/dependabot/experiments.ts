@@ -11,7 +11,6 @@ export const DEFAULT_EXPERIMENTS: DependabotExperiments = {
   'dependency-change-validation': true,
   'enable-file-parser-python-local': true,
   'npm-fallback-version-above-v6': true,
-  'lead-security-dependency': true,
   'enable-record-ecosystem-meta': true,
   'enable-corepack-for-npm-and-yarn': true,
   'enable-shared-helpers-command-timeout': true,
@@ -25,6 +24,11 @@ export const DEFAULT_EXPERIMENTS: DependabotExperiments = {
   'gradle-lockfile-updater': true,
   'enable-exclude-paths-subdirectory-manifest-files': true,
   'group-membership-enforcement': true,
+  'deprecate-close-command': true,
+  'deprecate-reopen-command': true,
+  'deprecate-merge-command': true,
+  'deprecate-cancel-merge-command': true,
+  'deprecate-squash-merge-command': true,
 };
 
 /**
