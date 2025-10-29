@@ -137,6 +137,9 @@ const DependabotPullRequestBranchNameSchema = z.object({
 export type DependabotPullRequestBranchName = z.infer<typeof DependabotPullRequestBranchNameSchema>;
 
 export const PackageEcosystemSchema = z.enum([
+  // order matches
+  // https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#package-ecosystem-
+
   'bun',
   'bundler',
   'cargo',
@@ -146,7 +149,6 @@ export const PackageEcosystemSchema = z.enum([
   'docker-compose',
   'dotnet-sdk',
   'helm',
-  'julia',
   'mix',
   'elm',
   'gitsubmodule',
@@ -157,17 +159,16 @@ export const PackageEcosystemSchema = z.enum([
   'npm',
   'nuget',
   'pip',
+  'pip-compile', // alias mapped to 'pip'
+  'pipenv', // alias mapped to 'pip'
+  'pnpm', // alias mapped to 'npm'
+  'poetry', // alias mapped to 'pip'
   'pub',
   'swift',
   'terraform',
   'uv',
-
-  // Additional aliases, sometimes used for convenience
-  'pipenv',
-  'pip-compile',
-  'poetry',
-  'pnpm',
-  'yarn',
+  'julia',
+  'yarn', // alias mapped to 'npm'
 ]);
 export type PackageEcosystem = z.infer<typeof PackageEcosystemSchema>;
 
