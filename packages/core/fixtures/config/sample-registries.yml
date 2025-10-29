@@ -4,6 +4,11 @@ updates:
     directory: '/' # Location of package manifests
     open-pull-requests-limit: 10
 registries:
+  cargo:
+    type: cargo-registry
+    registry: "private-registry"
+    url: https://cargo.cloudsmith.io/foobaruser/test/
+    token: "tkn_1234567890"
   composer:
     type: composer-repository
     url: https://repo.packagist.com/example-company/

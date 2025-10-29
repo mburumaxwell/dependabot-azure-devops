@@ -174,10 +174,27 @@ describe('Parse registries', () => {
       yaml.load(await readFile('fixtures/config/sample-registries.yml', 'utf-8')),
     );
     const registries = await parseRegistries(config, () => undefined);
-    expect(Object.keys(registries).length).toBe(11);
+    expect(Object.keys(registries).length).toBe(12);
+
+    // cargo-registry
+    let registry = registries.cargo!;
+    expect(registry.type).toBe('cargo_registry');
+    expect(registry.url).toBe('https://cargo.cloudsmith.io/foobaruser/test/');
+    expect(registry['index-url']).toBeUndefined();
+    expect(registry.registry).toBe('private-registry');
+    expect(registry.host).toBeUndefined();
+    expect(registry.key).toBeUndefined();
+    expect(registry.token).toBe('tkn_1234567890');
+    expect(registry.organization).toBeUndefined();
+    expect(registry.repo).toBeUndefined();
+    expect(registry['auth-key']).toBeUndefined();
+    expect(registry['public-key-fingerprint']).toBeUndefined();
+    expect(registry.username).toBeUndefined();
+    expect(registry.password).toBeUndefined();
+    expect(registry['replaces-base']).toBeUndefined();
 
     // composer-repository
-    let registry = registries.composer!;
+    registry = registries.composer!;
     expect(registry.type).toBe('composer_repository');
     expect(registry.url).toBe('https://repo.packagist.com/example-company/');
     expect(registry['index-url']).toBeUndefined();

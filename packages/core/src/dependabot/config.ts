@@ -6,6 +6,10 @@ import { convertPlaceholder, type VariableFinderFn } from './placeholder';
 export const DependabotRegistrySchema = z
   .object({
     type: z.enum([
+      // order matches
+      // https://docs.github.com/en/enterprise-cloud@latest/code-security/dependabot/working-with-dependabot/configuring-access-to-private-registries-for-dependabot#supported-private-registries
+
+      'cargo-registry',
       'composer-repository',
       'docker-registry',
       'git',
