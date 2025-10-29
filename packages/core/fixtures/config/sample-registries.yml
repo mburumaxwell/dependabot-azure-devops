@@ -25,6 +25,11 @@ registries:
     url: https://github.com
     username: x-access-token
     password: 'pwd_1234567890'
+  goproxy:
+    type: goproxy-server
+    url: https://acme.jfrog.io/artifactory/api/go/my-repo
+    username: octocat
+    password: 'pwd_1234567890'
   github-hex-org:
     type: hex-organization
     organization: github
