@@ -67,6 +67,14 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       approverClient,
     } = this;
 
+    // Print a warning about multi-ecosystem updates not being fully supported
+    // TODO: Implement full support for multi-ecosystem updates (not sure this will be possible on the local model)
+    if (config['multi-ecosystem-groups'] || config.updates?.some((u) => u['multi-ecosystem-group'])) {
+      logger.warn(
+        'Multi-ecosystem updates are not working yet. Only parsing and validation is supported at this time.',
+      );
+    }
+
     // Print a warning about the required workarounds for security-only updates, if any update is configured as such
     // TODO: If and when Dependabot supports a better way to do security-only updates, remove this.
     if (config.updates?.some((u) => u['open-pull-requests-limit'] === 0)) {

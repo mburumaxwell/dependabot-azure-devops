@@ -207,6 +207,8 @@ export const DependabotUpdateSchema = z
     'target-branch': z.string().optional(),
     vendor: z.boolean().optional(),
     'versioning-strategy': VersioningStrategySchema.optional(),
+    patterns: z.string().array().optional(),
+    'multi-ecosystem-group': z.string().optional(),
   })
   .transform((value, { addIssue }) => {
     // either 'directory' or 'directories' must be specified
@@ -221,40 +223,86 @@ export const DependabotUpdateSchema = z
 
     value['open-pull-requests-limit'] ??= 5; // default to 5 if not specified
 
+    // The patterns key is required when using multi-ecosystem-group.
+    // You can specify dependency patterns to include only certain dependencies in the group,
+    // or use ["*"] to include all dependencies.
+    if (value['multi-ecosystem-group'] && (!value.patterns || value.patterns.length === 0)) {
+      addIssue(
+        "The 'patterns' field must be specified and contain at least one pattern when using 'multi-ecosystem-group'.",
+      );
+    }
+
     return value;
   });
 export type DependabotUpdate = z.infer<typeof DependabotUpdateSchema>;
+
+export const DependabotMultiEcosystemGroupSchema = z.object({
+  schedule: DependabotScheduleSchema,
+  labels: z.string().array().optional(), // behaviour: additive
+  milestone: z.coerce.string().optional(), // behaviour: group-only
+  assignees: z.string().array().optional(), // behaviour: additive
+  'target-branch': z.string().optional(), // behaviour: group-only
+  'commit-message': DependabotCommitMessageSchema.optional(), // behaviour: group-only
+  'pull-request-branch-name': DependabotPullRequestBranchNameSchema.optional(), // behaviour: group-only
+});
+export type DependabotMultiEcosystemGroup = z.infer<typeof DependabotMultiEcosystemGroupSchema>;
 
 /**
  * Represents the dependabot.yaml configuration file options.
  * See: https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates#configuration-options-for-dependabotyml
  */
-export const DependabotConfigSchema = z.object({
-  /**
-   * Mandatory. configuration file version.
-   **/
-  version: z.number().refine((v) => v === 2, { message: 'Only version 2 of dependabot is supported' }),
+export const DependabotConfigSchema = z
+  .object({
+    /**
+     * Mandatory. configuration file version.
+     **/
+    version: z.number().refine((v) => v === 2, { message: 'Only version 2 of dependabot is supported' }),
 
-  /**
-   * Mandatory. Configure how Dependabot updates the versions or project dependencies.
-   * Each entry configures the update settings for a particular package manager.
-   */
-  updates: DependabotUpdateSchema.array().check(
-    z.minLength(1, { message: 'At least one update configuration is required' }),
-  ),
+    /**
+     * Optional. Configure groups of ecosystems to update together in a single pull request.
+     */
+    'multi-ecosystem-groups': z.record(z.string(), DependabotMultiEcosystemGroupSchema).optional(),
 
-  /**
-   * Optional.
-   * Specify authentication details to access private package registries.
-   */
-  registries: z.record(z.string(), DependabotRegistrySchema).optional(),
+    /**
+     * Mandatory. Configure how Dependabot updates the versions or project dependencies.
+     * Each entry configures the update settings for a particular package manager.
+     */
+    updates: DependabotUpdateSchema.array().check(
+      z.minLength(1, { message: 'At least one update configuration is required' }),
+    ),
 
-  /**
-   * Optional. Enables updates for ecosystems that are not yet generally available.
-   * https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#enable-beta-ecosystems-
-   */
-  'enable-beta-ecosystems': z.boolean().optional(),
-});
+    /**
+     * Optional.
+     * Specify authentication details to access private package registries.
+     */
+    registries: z.record(z.string(), DependabotRegistrySchema).optional(),
+
+    /**
+     * Optional. Enables updates for ecosystems that are not yet generally available.
+     * https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#enable-beta-ecosystems-
+     */
+    'enable-beta-ecosystems': z.boolean().optional(),
+  })
+  .transform((value, { addIssue }) => {
+    // If you attempt to set group-only keys at the ecosystem level (in updates entries),
+    // Dependabot will throw a configuration error and fail to process your dependabot.yml file.
+    // These keys must only be specified in the multi-ecosystem-groups section.
+    // https://docs.github.com/en/code-security/dependabot/working-with-dependabot/configuring-multi-ecosystem-updates#group-only-keys
+    const groupOnlyKeys = ['milestone', 'target-branch', 'commit-message', 'pull-request-branch-name'] as const;
+    if (value['multi-ecosystem-groups']) {
+      for (const update of value.updates) {
+        for (const key of groupOnlyKeys) {
+          if (key in update) {
+            addIssue(
+              `The '${key}' field must not be specified in the 'updates' section when using 'multi-ecosystem-groups'. It is a group-only field.`,
+            );
+          }
+        }
+      }
+    }
+
+    return value;
+  });
 
 export type DependabotConfig = z.infer<typeof DependabotConfigSchema>;
 
