@@ -254,6 +254,8 @@ export function mapPackageEcosystemToPackageManager(ecosystem: PackageEcosystem)
       return 'pip';
     case 'pnpm':
       return 'npm_and_yarn';
+    case 'rust-toolchain':
+      return 'rust_toolchain';
     case 'yarn':
       return 'npm_and_yarn';
     default:

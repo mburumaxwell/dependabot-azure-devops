@@ -141,6 +141,7 @@ export const DependabotPackageManagerSchema = z.enum([
   'nuget',
   'npm_and_yarn', // ecosystem(s): 'npm', 'pnpm', 'yarn'
   'pip', // ecosystem(s): 'pipenv', 'pip-compile', 'poetry'
+  'rust_toolchain', // ecosystem(s): 'rust-toolchain'
   'swift',
   'terraform',
   'devcontainers',

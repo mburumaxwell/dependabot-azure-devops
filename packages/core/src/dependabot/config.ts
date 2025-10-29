@@ -165,6 +165,7 @@ export const PackageEcosystemSchema = z.enum([
   'pnpm', // alias mapped to 'npm'
   'poetry', // alias mapped to 'pip'
   'pub',
+  'rust-toolchain',
   'swift',
   'terraform',
   'uv',
