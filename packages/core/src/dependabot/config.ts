@@ -146,6 +146,7 @@ export const PackageEcosystemSchema = z.enum([
   'docker-compose',
   'dotnet-sdk',
   'helm',
+  'julia',
   'mix',
   'elm',
   'gitsubmodule',
