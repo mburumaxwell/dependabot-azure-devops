@@ -51,6 +51,10 @@ registries:
     url: https://pkgs.dev.azure.com/contoso/_packaging/My_Feed/nuget/v3/index.json
     username: octocat@example.com
     password: 'pwd_1234567890'
+  my-pub-registry:
+    type: pub-repository
+    url: https://example-private-pub-repo.dev/optional-path
+    token: 'tkn_1234567890'
   python-azure:
     type: python-index
     url: https://pkgs.dev.azure.com/octocat/_packaging/my-feed/pypi/example

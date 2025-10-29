@@ -174,7 +174,7 @@ describe('Parse registries', () => {
       yaml.load(await readFile('fixtures/config/sample-registries.yml', 'utf-8')),
     );
     const registries = await parseRegistries(config, () => undefined);
-    expect(Object.keys(registries).length).toBe(12);
+    expect(Object.keys(registries).length).toBe(13);
 
     // cargo-registry
     let registry = registries.cargo!;
@@ -326,6 +326,23 @@ describe('Parse registries', () => {
     expect(registry['public-key-fingerprint']).toBeUndefined();
     expect(registry.username).toBe('octocat@example.com');
     expect(registry.password).toBe('pwd_1234567890');
+    expect(registry['replaces-base']).toBeUndefined();
+
+    // pub-repository
+    registry = registries['my-pub-registry']!;
+    expect(registry.type).toBe('pub_repository');
+    expect(registry.url).toBe('https://example-private-pub-repo.dev/optional-path');
+    expect(registry['index-url']).toBeUndefined();
+    expect(registry.registry).toBeUndefined();
+    expect(registry.host).toBeUndefined();
+    expect(registry.key).toBeUndefined();
+    expect(registry.token).toBe('tkn_1234567890');
+    expect(registry.organization).toBeUndefined();
+    expect(registry.repo).toBeUndefined();
+    expect(registry['auth-key']).toBeUndefined();
+    expect(registry['public-key-fingerprint']).toBeUndefined();
+    expect(registry.username).toBeUndefined();
+    expect(registry.password).toBeUndefined();
     expect(registry['replaces-base']).toBeUndefined();
 
     // python-index

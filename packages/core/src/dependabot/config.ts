@@ -18,6 +18,7 @@ export const DependabotRegistrySchema = z
       'maven-repository',
       'npm-registry',
       'nuget-feed',
+      'pub-repository',
       'python-index',
       'rubygems-server',
       'terraform-registry',
