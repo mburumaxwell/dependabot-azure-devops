@@ -1,6 +1,6 @@
 {
   "name": "@paklo/runner",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "sideEffects": false,
   "type": "module",
   "author": "mburumaxwell",
