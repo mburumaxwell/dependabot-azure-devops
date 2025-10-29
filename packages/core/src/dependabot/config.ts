@@ -305,6 +305,10 @@ export async function parseRegistries(
     updated.key = await convertPlaceholder({ input: updated.key, variableFinder: variableFinder });
     updated.token = await convertPlaceholder({ input: updated.token, variableFinder: variableFinder });
 
+    // TODO: include sources for this logic, otherwise it looks like magic.
+    // Initially, this was based on reading through the dependabot-core logic
+    // but much has since changed.
+
     // parse the url
     const url = updated.url;
     if (!url && type !== 'hex_organization') {
@@ -329,7 +333,7 @@ export async function parseRegistries(
         const addRegistry = type === 'docker_registry' || type === 'npm_registry';
         if (addRegistry) updated.registry = url.replace('https://', '').replace('http://', '');
 
-        const addHost = type === 'terraform_registry' || type === 'composer_repository';
+        const addHost = type === 'composer_repository' || type === 'terraform_registry';
         if (addHost) updated.host = parsedUrl.hostname;
       }
 

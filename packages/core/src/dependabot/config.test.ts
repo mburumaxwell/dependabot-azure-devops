@@ -245,7 +245,7 @@ describe('Parse registries', () => {
     expect(registry['replaces-base']).toBeUndefined();
 
     // goproxy-server
-    registry = registries['goproxy']!;
+    registry = registries.goproxy!;
     expect(registry.type).toBe('goproxy_server');
     expect(registry.url).toBe('https://acme.jfrog.io/artifactory/api/go/my-repo');
     expect(registry['index-url']).toBeUndefined();
