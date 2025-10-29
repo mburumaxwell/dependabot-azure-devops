@@ -174,7 +174,7 @@ describe('Parse registries', () => {
       yaml.load(await readFile('fixtures/config/sample-registries.yml', 'utf-8')),
     );
     const registries = await parseRegistries(config, () => undefined);
-    expect(Object.keys(registries).length).toBe(14);
+    expect(Object.keys(registries).length).toBe(15);
 
     // cargo-registry
     let registry = registries.cargo!;
@@ -248,6 +248,23 @@ describe('Parse registries', () => {
     registry = registries['goproxy']!;
     expect(registry.type).toBe('goproxy_server');
     expect(registry.url).toBe('https://acme.jfrog.io/artifactory/api/go/my-repo');
+    expect(registry['index-url']).toBeUndefined();
+    expect(registry.registry).toBeUndefined();
+    expect(registry.host).toBeUndefined();
+    expect(registry.key).toBeUndefined();
+    expect(registry.token).toBeUndefined();
+    expect(registry.organization).toBeUndefined();
+    expect(registry.repo).toBeUndefined();
+    expect(registry['auth-key']).toBeUndefined();
+    expect(registry['public-key-fingerprint']).toBeUndefined();
+    expect(registry.username).toBe('octocat');
+    expect(registry.password).toBe('pwd_1234567890');
+    expect(registry['replaces-base']).toBeUndefined();
+
+    // helm-registry
+    registry = registries.helm!;
+    expect(registry.type).toBe('helm_registry');
+    expect(registry.url).toBe('https://registry.example.com');
     expect(registry['index-url']).toBeUndefined();
     expect(registry.registry).toBeUndefined();
     expect(registry.host).toBeUndefined();

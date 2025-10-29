@@ -30,6 +30,11 @@ registries:
     url: https://acme.jfrog.io/artifactory/api/go/my-repo
     username: octocat
     password: 'pwd_1234567890'
+  helm:
+    type: helm-registry
+    url: https://registry.example.com
+    username: octocat
+    password: 'pwd_1234567890'
   github-hex-org:
     type: hex-organization
     organization: github

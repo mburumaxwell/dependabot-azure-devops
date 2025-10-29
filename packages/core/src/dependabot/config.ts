@@ -14,6 +14,7 @@ export const DependabotRegistrySchema = z
       'docker-registry',
       'git',
       'goproxy-server',
+      'helm-registry',
       'hex-organization',
       'hex-repository',
       'maven-repository',
