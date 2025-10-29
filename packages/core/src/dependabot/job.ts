@@ -124,30 +124,32 @@ export const DependabotExperimentsSchema = z.record(z.string(), z.union([z.strin
 export type DependabotExperiments = z.infer<typeof DependabotExperimentsSchema>;
 
 export const DependabotPackageManagerSchema = z.enum([
-  'bun',
+  // order matches dependabot-action/src/update-containers.ts
+
   'bundler',
   'cargo',
   'composer',
-  'devcontainers',
+  'pub',
   'docker',
-  'docker_compose', //  // ecosystem(s): 'docker-compose',
-  'dotnet_sdk', // ecosystem(s): 'dotnet-sdk'
-  'helm',
-  'julia',
-  'hex', // ecosystem(s): 'mix'
   'elm',
-  'submodules', // ecosystem(s): 'gitsubmodule'
   'github_actions', // ecosystem(s): 'github-actions'
+  'submodules', // ecosystem(s): 'gitsubmodule'
   'go_modules', // ecosystem(s): 'gomod'
   'gradle',
   'maven',
-  'npm_and_yarn', // ecosystem(s): 'npm', 'pnpm', 'yarn'
+  'hex', // ecosystem(s): 'mix'
   'nuget',
+  'npm_and_yarn', // ecosystem(s): 'npm', 'pnpm', 'yarn'
   'pip', // ecosystem(s): 'pipenv', 'pip-compile', 'poetry'
-  'pub',
   'swift',
   'terraform',
+  'devcontainers',
+  'dotnet_sdk', // ecosystem(s): 'dotnet-sdk'
+  'bun',
+  'docker_compose', //  // ecosystem(s): 'docker-compose',
   'uv',
+  'helm',
+  'julia',
 ]);
 export type DependabotPackageManager = z.infer<typeof DependabotPackageManagerSchema>;
 
