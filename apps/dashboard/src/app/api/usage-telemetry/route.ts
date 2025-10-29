@@ -19,7 +19,7 @@ app.post('/', zValidator('json', UsageTelemetryRequestDataSchema), async (contex
 
   const values: Omit<UsageTelemetry, 'id'> = {
     country: geo?.country ?? null,
-    region: fromExternalRegion(geo?.region) ?? null, // may be undefined for non-Vercel providers
+    region: fromExternalRegion(geo?.region) ?? geo.region ?? null, // may be undefined for non-Vercel providers
     hostPlatform: payload.host.platform,
     hostRelease: payload.host.release,
     hostArch: payload.host.arch,
