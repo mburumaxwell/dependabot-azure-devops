@@ -9,7 +9,8 @@
     "DATABASE_URL_UNPOOLED",
     "RESEND_API_KEY",
     "ADMIN_DASHBOARD_PASSWORD",
-    "POLAR_ACCESS_TOKEN"
+    "POLAR_ACCESS_TOKEN",
+    "POLAR_WEBHOOK_SECRET"
   ],
   "globalPassThroughEnv": ["GOPATH"],
   "tasks": {

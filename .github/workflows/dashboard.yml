@@ -133,6 +133,8 @@ jobs:
       #       BETTER_AUTH_SECRET="${{ secrets.BETTER_AUTH_SECRET }}"
       #       RESEND_API_KEY="${{ secrets.RESEND_API_KEY }}"
       #       ADMIN_DASHBOARD_PASSWORD="${{ secrets.ADMIN_DASHBOARD_PASSWORD }}"
+      #       POLAR_ACCESS_TOKEN="${{ secrets.POLAR_ACCESS_TOKEN }}"
+      #       POLAR_WEBHOOK_SECRET="${{ secrets.POLAR_WEBHOOK_SECRET }}"
 
       # - name: Publish review app URLs
       #   uses: thollander/actions-comment-pull-request@v3
