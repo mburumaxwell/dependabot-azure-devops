@@ -31,9 +31,8 @@ updates:
         update-types: ['version-update:semver-patch']
 
   - package-ecosystem: 'docker'
-    # wildcard will target submodules and cause trouble
-    # directories: ['**/*']
-    directories: ['/apps/**', '/packages/**', '/server/**']
+    directories: ['**/*']
+    exclude-paths: ['dependabot-action/**']
     schedule:
       interval: 'weekly'
       time: '02:00'
