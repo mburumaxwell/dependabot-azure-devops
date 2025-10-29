@@ -132,8 +132,15 @@ model Organization {
   metadata    String?
   members     Member[]
   invitations Invitation[]
+  type        String       @db.VarChar(20)
+  url         String       @db.VarChar(100)
+  token       String       @db.VarChar(512)
+  region      String       @db.VarChar(10)
 
   @@unique([slug])
+  @@unique([url])
+  @@index([type])
+  @@index([region])
   @@map("organization")
 }
 

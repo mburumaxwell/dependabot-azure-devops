@@ -114,12 +114,13 @@ updates:
           - '@types/node-forge'
           - 'node-forge'
       opentelemetry:
-        patterns:
-          - '@opentelemetry/*'
+        patterns: ['@opentelemetry/*']
       pino:
         patterns:
           - 'pino'
           - 'pino-*'
+      polar-sh:
+        patterns: ['@polar-sh/*']
       prisma:
         patterns:
           - 'prisma'
@@ -135,6 +136,10 @@ updates:
         patterns:
           - '@react-email/*'
           - 'react-email'
+      validator:
+        patterns:
+          - '@types/validator'
+          - 'validator'
       vercel:
         patterns:
           - '@vercel/*'

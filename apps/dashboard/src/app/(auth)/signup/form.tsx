@@ -9,14 +9,12 @@ import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from 
 import { Input } from '@/components/ui/input';
 import { magicLinkLogin } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
-import type { SiteConfig } from '@/site-config';
+import { config } from '@/site-config';
 
-interface SignupFormProps extends React.ComponentProps<'div'> {
-  // config is passed here to bridge server and client components
-  config: SiteConfig;
-}
+interface SignupFormProps extends React.ComponentProps<'div'> {}
 
-export function SignupForm({ className, config, ...props }: SignupFormProps) {
+export function SignupForm({ className, ...props }: SignupFormProps) {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
@@ -27,7 +25,7 @@ export function SignupForm({ className, config, ...props }: SignupFormProps) {
 
     setIsLoading(true);
     try {
-      await magicLinkLogin({ config, email });
+      await magicLinkLogin({ email, name });
       setMagicLinkSent(true);
     } catch (error) {
       console.error('Signup error:', error);
@@ -77,11 +75,23 @@ export function SignupForm({ className, config, ...props }: SignupFormProps) {
       ) : (
         <form className='space-y-4' onSubmit={handleSignup}>
           <Field>
+            <FieldLabel htmlFor='name'>Name</FieldLabel>
+            <Input
+              id='name'
+              type='text'
+              placeholder='Chris Johnson'
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={isLoading}
+            />
+          </Field>
+          <Field>
             <FieldLabel htmlFor='email'>Email</FieldLabel>
             <Input
               id='email'
               type='email'
-              placeholder='chris@contoso.com'
+              placeholder='chris.johnson@contoso.com'
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -89,7 +99,7 @@ export function SignupForm({ className, config, ...props }: SignupFormProps) {
             />
           </Field>
           <Field>
-            <Button type='submit' disabled={isLoading || !email} size='lg'>
+            <Button type='submit' disabled={isLoading || !name || !email} size='lg'>
               {isLoading ? (
                 <Loader2 className='size-5 animate-spin' />
               ) : (

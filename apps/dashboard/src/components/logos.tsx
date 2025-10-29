@@ -20,5 +20,38 @@ export function GoogleLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
   );
 }
 
+export function AzureDevOpsLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
+  return (
+    <svg viewBox='0 0 16 16' aria-hidden='true' {...props}>
+      <path
+        fill='currentColor'
+        d='M15 3.622v8.512L11.5 15l-5.425-1.975v1.958L3.004 10.97l8.951.7V4.005L15 3.622zm-2.984.428L6.994 1v2.001L2.382 4.356 1 6.13v4.029l1.978.873V5.869l9.038-1.818z'
+      />
+    </svg>
+  );
+}
+
+export function BitbucketLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
+  return (
+    <svg viewBox='0 0 24 24' aria-hidden='true' {...props}>
+      <path
+        d='M.778 1.213a.768.768 0 00-.768.892l3.263 19.81c.084.5.515.868 1.022.873H19.95a.772.772 0 00.77-.646l3.27-20.03a.768.768 0 00-.768-.891zM14.52 15.53H9.522L8.17 8.466h7.561z'
+        fill='currentColor'
+      />
+    </svg>
+  );
+}
+
+export function GitlabLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
+  return (
+    <svg viewBox='0 0 24 24' aria-hidden='true' {...props}>
+      <path
+        d='M23.955 13.587l-1.342-4.135-2.664-8.189a.455.455 0 00-.867 0L16.418 9.45H7.582L4.919 1.263a.455.455 0 00-.867 0L1.388 9.452.046 13.587a.924.924 0 00.331 1.023L12 23.054l11.623-8.443a.92.92 0 00.332-1.024'
+        fill='currentColor'
+      />
+    </svg>
+  );
+}
+
 // this is only temporary until I can convert the logo into a proper svg component
 export { GalleryVerticalEnd as PakloLogo } from 'lucide-react';

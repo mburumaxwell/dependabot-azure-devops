@@ -1,13 +1,18 @@
+import { headers as requestHeaders } from 'next/headers';
 import { AppSidebar } from '@/components/app-sidebar';
 import { Breadcrumb, BreadcrumbList } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { config } from '@/site-config';
+import { auth } from '@/lib/auth';
 
-export default function Layout({ children }: LayoutProps<'/'>) {
+export default async function Layout({ children }: LayoutProps<'/'>) {
+  const headers = await requestHeaders();
+  const session = (await auth.api.getSession({ headers }))!;
+  const organizations = await auth.api.listOrganizations({ headers });
+
   return (
     <SidebarProvider>
-      <AppSidebar config={config} />
+      <AppSidebar session={session} organizations={organizations} />
       <SidebarInset>
         <header className='flex h-16 shrink-0 items-center gap-2 border-b px-4'>
           <SidebarTrigger className='-ml-1' />

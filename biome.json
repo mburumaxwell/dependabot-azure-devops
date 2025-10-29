@@ -26,6 +26,7 @@
       "!static",
       "!**/src/components/ui",
       "!**/src/hooks/use-mobile.ts",
+      "!**/src/components/stepper.tsx",
       "!dependabot-action/**",
       "!extensions/azure/tasks/*/task.json",
       "!extensions/azure/vss-extension.json",

@@ -7,18 +7,14 @@ import { AppleLogo, GoogleLogo, PakloLogo } from '@/components/logos';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { createAuthClient, magicLinkLogin } from '@/lib/auth-client';
+import { authClient, magicLinkLogin } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
-import type { SiteConfig } from '@/site-config';
+import { config } from '@/site-config';
 
-interface LoginFormProps extends React.ComponentProps<'div'> {
-  // config is passed here to bridge server and client components
-  config: SiteConfig;
-}
+interface LoginFormProps extends React.ComponentProps<'div'> {}
 
-export function LoginForm({ className, config, ...props }: LoginFormProps) {
+export function LoginForm({ className, ...props }: LoginFormProps) {
   const thirdPartyLogins = false; // Might add 3rd-party login but not now!
-  const authClient = createAuthClient(config);
 
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +41,7 @@ export function LoginForm({ className, config, ...props }: LoginFormProps) {
 
     setIsLoading(true);
     try {
-      await magicLinkLogin({ authClient, email });
+      await magicLinkLogin({ email });
       setMagicLinkSent(true);
     } catch (error) {
       console.error('Magic link error:', error);
@@ -118,7 +114,7 @@ export function LoginForm({ className, config, ...props }: LoginFormProps) {
               <Input
                 id='email'
                 type='email'
-                placeholder='chris@contoso.com'
+                placeholder='chris.johnson@contoso.com'
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

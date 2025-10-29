@@ -20,7 +20,7 @@ export type MagicLinkProps = {
 };
 
 export function MagicLink({
-  email = 'chris@contoso.com',
+  email = 'chris.johnson@contoso.com',
   url = 'https://dashboard.paklo.app/login/123',
   token = '123',
 }: MagicLinkProps) {

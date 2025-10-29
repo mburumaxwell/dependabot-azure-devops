@@ -8,7 +8,8 @@
     "DATABASE_URL",
     "DATABASE_URL_UNPOOLED",
     "RESEND_API_KEY",
-    "ADMIN_DASHBOARD_PASSWORD"
+    "ADMIN_DASHBOARD_PASSWORD",
+    "POLAR_ACCESS_TOKEN"
   ],
   "globalPassThroughEnv": ["GOPATH"],
   "tasks": {
