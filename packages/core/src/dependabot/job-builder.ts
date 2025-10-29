@@ -220,6 +220,7 @@ export class DependabotJobBuilder {
         // It needs to merged in the core repo first before we support it
         // However, to match current job configs and to prevent surprises, we disable it
         'multi-ecosystem-update': false,
+        'exclude-paths': this.update['exclude-paths'],
       },
       credentials: this.credentials,
     };

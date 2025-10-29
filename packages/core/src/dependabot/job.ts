@@ -190,6 +190,7 @@ export const DependabotJobConfigSchema = z.object({
   'proxy-log-response-body-on-auth-failure': z.boolean().nullish(),
   'enable-beta-ecosystems': z.boolean().nullish(),
   'multi-ecosystem-update': z.boolean().nullish(),
+  'exclude-paths': z.string().array().optional(),
 });
 export type DependabotJobConfig = z.infer<typeof DependabotJobConfigSchema>;
 

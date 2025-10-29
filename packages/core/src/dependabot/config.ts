@@ -182,6 +182,7 @@ export const DependabotUpdateSchema = z
     'package-ecosystem': PackageEcosystemSchema,
     directory: z.string().optional(),
     directories: z.string().array().optional(),
+    'exclude-paths': z.string().array().optional(),
     allow: DependabotAllowConditionSchema.array().optional(),
     assignees: z.string().array().optional(),
     'commit-message': DependabotCommitMessageSchema.optional(),
