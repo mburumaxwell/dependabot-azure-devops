@@ -26,15 +26,8 @@ enum SourceProvider {
   @@map("source_provider")
 }
 
-enum RegionProvider {
-  vercel
-
-  @@map("region_provider")
-}
-
 model UsageTelemetry {
   id              BigInt          @id
-  regionProvider  RegionProvider? // TODO: remove nullable after older records are cleared (90 days after 2025-Oct-21 i.e. 2026-Jan-19)
   country         String?         @db.VarChar(10) // TODO: remove nullable after older records are cleared (90 days after 2025-Oct-21 i.e. 2026-Jan-19)
   region          String?         @db.VarChar(50)
   hostPlatform    String          @db.VarChar(50)
@@ -57,6 +50,7 @@ model UsageTelemetry {
   @@index([started(sort: Desc)])
   @@index([duration])
   @@index([success])
+  @@index([region])
   @@map("usage_telemetry")
 }
 
