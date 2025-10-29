@@ -28,14 +28,12 @@ vi.mock('@paklo/core/azure', async () => {
     AzureDevOpsWebApiClient: vi.fn(),
   };
 });
-vi.mock('@/run', async () => {
-  const actual = await vi.importActual('@/run');
-  return {
-    ...actual,
-    runJob: vi.fn(),
-  };
-});
-vi.mock('./server');
+vi.mock('../../run', () => ({
+  runJob: vi.fn(),
+}));
+vi.mock('./server', () => ({
+  AzureLocalDependabotServer: vi.fn(),
+}));
 
 // Helper function to create a partial jobs runner that allows testing private methods
 class TestableAzureLocalJobsRunner extends AzureLocalJobsRunner {
@@ -125,7 +123,9 @@ describe('AzureLocalJobsRunner', () => {
       abandonPullRequest: vi.fn().mockResolvedValue(true),
     } as unknown as AzureDevOpsWebApiClient;
 
-    vi.mocked(AzureDevOpsWebApiClient).mockImplementation(() => mockAuthorClient);
+    vi.mocked(AzureDevOpsWebApiClient).mockImplementation(function MockAzureDevOpsWebApiClient() {
+      return mockAuthorClient as AzureDevOpsWebApiClient;
+    } as any);
 
     // Mock AzureLocalDependabotServer
     mockServer = {
@@ -135,10 +135,12 @@ describe('AzureLocalJobsRunner', () => {
       clear: vi.fn(),
       requests: vi.fn().mockReturnValue([]),
       allAffectedPrs: vi.fn().mockReturnValue([]),
-      url: 'http://localhost:3000',
+      port: 3000,
     };
 
-    vi.mocked(AzureLocalDependabotServer).mockImplementation(() => mockServer);
+    vi.mocked(AzureLocalDependabotServer).mockImplementation(function MockAzureLocalDependabotServer() {
+      return mockServer as AzureLocalDependabotServer;
+    } as any);
 
     jobsRunner = new TestableAzureLocalJobsRunner(options);
   });
@@ -288,7 +290,9 @@ describe('AzureLocalJobsRunner', () => {
       const mockGhsaClient = {
         getSecurityVulnerabilitiesAsync: vi.fn().mockResolvedValue([]),
       };
-      vi.mocked(GitHubGraphClient).mockImplementation(() => mockGhsaClient as any);
+      vi.mocked(GitHubGraphClient).mockImplementation(function MockGitHubGraphClient() {
+        return mockGhsaClient as any;
+      } as any);
 
       mockServer.requests = vi.fn().mockReturnValue([
         {
@@ -398,7 +402,9 @@ describe('AzureLocalJobsRunner', () => {
       const mockGhsaClient = {
         getSecurityVulnerabilitiesAsync: vi.fn().mockResolvedValue([]),
       };
-      vi.mocked(GitHubGraphClient).mockImplementation(() => mockGhsaClient as any);
+      vi.mocked(GitHubGraphClient).mockImplementation(function MockGitHubGraphClient() {
+        return mockGhsaClient as any;
+      } as any);
 
       mockServer.requests = vi.fn().mockReturnValue([
         {

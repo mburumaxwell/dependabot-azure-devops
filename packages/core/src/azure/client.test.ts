@@ -1,3 +1,4 @@
+// biome-ignore-all lint/suspicious/noExplicitAny: tests
 import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vitest';
 import { HttpRequestError, isErrorTemporaryFailure } from '@/http';
 import { AzureDevOpsWebApiClient, sendRestApiRequestWithRetry } from './client';
@@ -55,29 +56,27 @@ describe('AzureDevOpsWebApiClient', () => {
       vi.spyOn(client, 'resolveIdentityId').mockImplementation(async (identity?: string) => {
         return identity || '';
       });
-      const mockRestApiPost = vi
-        .spyOn(client as never, 'restApiPost')
-        .mockResolvedValueOnce({
-          commits: [{ commitId: 'new-commit-id' }],
-        })
-        .mockResolvedValueOnce({
-          pullRequestId: 1,
-        });
-      vi.spyOn(client as never, 'restApiPatch').mockResolvedValueOnce({
-        count: 1,
+      const mockRestApiPost = vi.spyOn(client, 'restApiPost' as any).mockImplementation((...args: any[]) => {
+        const url = args[0] as string;
+        if (url.includes('/pushes')) {
+          return Promise.resolve({ commits: [{ commitId: 'new-commit-id' }] });
+        }
+        if (url.includes('/pullrequests')) {
+          return Promise.resolve({ pullRequestId: 1 });
+        }
+        return Promise.resolve({});
       });
+      vi.spyOn(client, 'restApiPatch' as any).mockImplementation(() => Promise.resolve({ count: 1 }));
 
       // Act
       pr.assignees = ['user1', 'user2'];
       const pullRequestId = await client.createPullRequest(pr);
 
       // Assert
-      // biome-ignore-start lint/suspicious/noExplicitAny: tests
       expect(mockRestApiPost).toHaveBeenCalledTimes(2);
       expect((mockRestApiPost.mock.calls[1] as any)[1].reviewers.length).toBe(2);
       expect((mockRestApiPost.mock.calls[1] as any)[1].reviewers).toContainEqual({ id: 'user1' });
       expect((mockRestApiPost.mock.calls[1] as any)[1].reviewers).toContainEqual({ id: 'user2' });
-      // biome-ignore-end lint/suspicious/noExplicitAny: tests
       expect(pullRequestId).toBe(1);
     });
   });
