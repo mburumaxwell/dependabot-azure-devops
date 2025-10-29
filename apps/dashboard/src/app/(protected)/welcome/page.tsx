@@ -1,3 +1,11 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Welcome',
+  description: 'Welcome to the Paklo Dashboard',
+  openGraph: { url: `/welcome` },
+};
+
 export default function WelcomePage() {
   return (
     <main className='flex flex-1 flex-col justify-center text-center'>

@@ -1,3 +1,11 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Stats',
+  description: 'View your activity',
+  openGraph: { url: `/stats` },
+};
+
 export default function StatsPage() {
   return (
     <div className='flex flex-1 flex-col gap-4 p-4'>

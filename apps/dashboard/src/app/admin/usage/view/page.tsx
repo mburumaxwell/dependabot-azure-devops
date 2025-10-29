@@ -1,8 +1,15 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getDateTimeRange, type TimeRange } from '@/lib/aggregation';
 import { loggedIn } from '../actions';
 import { fetchTelemetryData } from './actions';
 import { TelemetryDashboard } from './part-dashboard';
+
+export const metadata: Metadata = {
+  title: 'Usage Statistics',
+  description: 'View usage statistics',
+  openGraph: { url: `/admin/usage/view` },
+};
 
 export default async function Page(props: PageProps<'/admin/usage/view'>) {
   const isLoggedIn = await loggedIn();

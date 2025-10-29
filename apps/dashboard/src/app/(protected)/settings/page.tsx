@@ -1,6 +1,14 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Settings',
+  description: 'Manage your organization settings',
+  openGraph: { url: `/settings` },
+};
+
 // incoming searchparams from /organization/create [tab=billing, new=true]
 
-export default function StatsPage() {
+export default function SettingsPage() {
   return (
     <div className='flex flex-1 flex-col gap-4 p-4'>
       <div className='grid auto-rows-min gap-4 md:grid-cols-3'>

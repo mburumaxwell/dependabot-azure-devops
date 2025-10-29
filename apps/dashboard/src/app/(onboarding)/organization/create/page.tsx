@@ -1,4 +1,11 @@
+import type { Metadata } from 'next';
 import { CreateOrganizationPage } from './client';
+
+export const metadata: Metadata = {
+  title: 'Create Organization',
+  description: 'Set up your organization to start managing projects',
+  openGraph: { url: `/organization/create` },
+};
 
 export default function OrgCreatePage() {
   return (
