@@ -155,6 +155,7 @@ export const PackageEcosystemSchema = z.enum([
   'github-actions',
   'gomod',
   'gradle',
+  'julia',
   'maven',
   'npm',
   'nuget',
@@ -168,7 +169,6 @@ export const PackageEcosystemSchema = z.enum([
   'terraform',
   'uv',
   'vcpkg',
-  'julia',
   'yarn', // alias mapped to 'npm'
 ]);
 export type PackageEcosystem = z.infer<typeof PackageEcosystemSchema>;
