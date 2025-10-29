@@ -75,6 +75,17 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       );
     }
 
+    // Print a warning about missing schedules
+    // TODO: remove this and enforce schedules on or after 2025-Nov-30
+    if (config.updates?.some((u) => !u.schedule)) {
+      logger.warn(
+        `
+        Some updates are missing a schedule configuration.
+        This tool will require all updates to have a schedule on or after 2025-Nov-30.
+        `,
+      );
+    }
+
     // Print a warning about the required workarounds for security-only updates, if any update is configured as such
     // TODO: If and when Dependabot supports a better way to do security-only updates, remove this.
     if (config.updates?.some((u) => u['open-pull-requests-limit'] === 0)) {
