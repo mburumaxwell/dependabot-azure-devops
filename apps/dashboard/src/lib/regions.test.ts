@@ -10,7 +10,13 @@ import {
   toVercelRegion,
 } from './regions';
 
-const EXPECTED_CODES = ['lhr', 'sfo', 'dub', 'syd'] as const;
+// biome-ignore format: the array should not be formatted
+const EXPECTED_CODES = [
+  'arn', 'bom', 'cdg', 'cle', 'cpt',
+  'dub', 'dxb', 'fra', 'gru', 'hkg',
+  'hnd', 'iad', 'icn', 'kix', 'lhr',
+  'pdx', 'sfo', 'sin', 'syd'
+] as const;
 
 // these tests were generated using copilot!
 
