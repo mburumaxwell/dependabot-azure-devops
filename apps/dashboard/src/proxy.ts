@@ -20,14 +20,15 @@ export const config = {
      * 01. /api/update_jobs/ routes
      * 02. /api/usage-telemetry (public usage telemetry endpoint)
      * 03. /api/auth (obviously)
-     * 04. /signup (obviously)
-     * 05. /login (obviously)
-     * 06. /admin/usage (only for me)
-     * 07. /_next/ (Next.js internals)
-     * 08. /_static (inside /public)
-     * 09. /_vercel (Vercel internals)
-     * 10. Static files (e.g. /favicon.ico, /sitemap.xml, /robots.txt, etc.)
+     * 04. /api/crons (cron jobs)
+     * 05. /signup (obviously)
+     * 06. /login (obviously)
+     * 07. /admin/usage (only for me)
+     * 08. /_next/ (Next.js internals)
+     * 09. /_static (inside /public)
+     * 10. /_vercel (Vercel internals)
+     * 11. Static files (e.g. /favicon.ico, /sitemap.xml, /robots.txt, etc.)
      */
-    '/((?!api/update_jobs/|api/usage-telemetry|api/auth|signup|login|admin/usage|_next/|_static|_vercel|[\\w-]+\\.\\w+).*)',
+    '/((?!api/update_jobs/|api/usage-telemetry|api/auth|api/crons|signup|login|admin/usage|_next/|_static|_vercel|[\\w-]+\\.\\w+).*)',
   ],
 };
