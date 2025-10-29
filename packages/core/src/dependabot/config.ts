@@ -167,6 +167,7 @@ export const PackageEcosystemSchema = z.enum([
   'swift',
   'terraform',
   'uv',
+  'vcpkg',
   'julia',
   'yarn', // alias mapped to 'npm'
 ]);

@@ -148,6 +148,7 @@ export const DependabotPackageManagerSchema = z.enum([
   'bun',
   'docker_compose', //  // ecosystem(s): 'docker-compose',
   'uv',
+  'vcpkg',
   'helm',
   'julia',
 ]);
