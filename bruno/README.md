@@ -31,6 +31,6 @@ The environment variables are automatically loaded and available in your request
 Requests are organized by prefix:
 
 - `azdo-*` - Azure DevOps related API calls
-- `dashboard-*` - Dashboard application API calls
+- `web-*` - Web application API calls
 
 Browse the collection to see all available requests and their documentation.
