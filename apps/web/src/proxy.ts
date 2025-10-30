@@ -1,4 +1,4 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse, type ProxyConfig } from 'next/server';
 import { auth } from '@/lib/auth';
 
 export async function proxy(request: NextRequest) {
@@ -13,13 +13,8 @@ export async function proxy(request: NextRequest) {
   return NextResponse.next({ headers });
 }
 
-export const config = {
-  // TODO: change to only match /dashboard/:path* after admin is incorporated into auth system
+export const config: ProxyConfig = {
   matcher: [
-    /*
-     * Match all dashboard paths except for:
-     * /admin/usage (only for me, handles its own auth for now)
-     */
-    '/((?!admin/usage$)dashboard/.*)',
+    { source: '/dashboard/:path*' }, // Match all /dashboard routes
   ],
 };
