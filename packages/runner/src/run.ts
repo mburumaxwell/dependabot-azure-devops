@@ -121,7 +121,7 @@ export async function runJob(options: RunJobOptions): Promise<RunJobResult> {
   try {
     const json = JSON.stringify(data);
     logger.debug(`Usage telemetry data: ${json}`);
-    const resp = await fetch('https://dashboard.paklo.app/api/usage-telemetry', {
+    const resp = await fetch('https://www.paklo.app/api/usage-telemetry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: json,

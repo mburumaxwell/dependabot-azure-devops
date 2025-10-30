@@ -12,19 +12,14 @@
     "packages:version": "changeset version && turbo run packages:version",
     "packages:publish": "changeset publish",
 
-    "dashboard:start": "turbo run start --filter=dashboard...",
-    "dashboard:dev": "turbo run dev --filter=dashboard...",
-    "dashboard:build": "turbo run build --filter=dashboard...",
-    "dashboard:clean": "turbo run clean --filter=dashboard...",
+    "web:start": "turbo run start --filter=web...",
+    "web:dev": "turbo run dev --filter=web...",
+    "web:build": "turbo run build --filter=web...",
+    "web:clean": "turbo run clean --filter=web...",
 
     "extensions-azure:start": "turbo run start --filter=extension-azure-devops...",
     "extensions-azure:build": "turbo run build --filter=extension-azure-devops...",
     "extensions-azure:lint": "turbo run lint --filter=extension-azure-devops...",
-
-    "website:start": "turbo run start --filter=website...",
-    "website:dev": "turbo run dev --filter=website...",
-    "website:build": "turbo run build --filter=website...",
-    "website:clean": "turbo run clean --filter=website...",
 
     "build": "turbo run build",
     "lint": "turbo run lint",
