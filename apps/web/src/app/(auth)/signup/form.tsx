@@ -37,12 +37,12 @@ export function SignupForm({ className, ...props }: SignupFormProps) {
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <FieldGroup>
         <div className='flex flex-col items-center gap-2 text-center'>
-          <a href='/' className='flex flex-col items-center gap-2 font-medium'>
+          <Link href='/' className='flex flex-col items-center gap-2 font-medium'>
             <div className='flex size-8 items-center justify-center rounded-md'>
               <PakloLogo className='size-6' />
             </div>
             <span className='sr-only'>Paklo</span>
-          </a>
+          </Link>
           <h1 className='text-xl font-bold'>Welcome to Paklo Dashboard</h1>
           <FieldDescription>
             Already have an account? <Link href='/login'>Login</Link>

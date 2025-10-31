@@ -27,19 +27,19 @@ enum SourceProvider {
 }
 
 model UsageTelemetry {
-  id              BigInt          @id
-  country         String?         @db.VarChar(10) // TODO: remove nullable after older records are cleared (90 days after 2025-Oct-21 i.e. 2026-Jan-19)
-  region          String?         @db.VarChar(50)
-  hostPlatform    String          @db.VarChar(50)
-  hostRelease     String          @db.VarChar(100)
-  hostArch        String          @db.VarChar(50)
-  hostMachineHash String          @db.VarChar(250)
-  version         String          @db.VarChar(50)
+  id              BigInt         @id
+  country         String?        @db.VarChar(10) // TODO: remove nullable after older records are cleared (90 days after 2025-Oct-21 i.e. 2026-Jan-19)
+  region          String?        @db.VarChar(50)
+  hostPlatform    String         @db.VarChar(50)
+  hostRelease     String         @db.VarChar(100)
+  hostArch        String         @db.VarChar(50)
+  hostMachineHash String         @db.VarChar(250)
+  version         String         @db.VarChar(50)
   trigger         JobTrigger
   provider        SourceProvider
-  owner           String          @db.VarChar(250)
-  project         String?         @db.VarChar(512) // TODO: remove nullable after older records are cleared (90 days after 2025-Oct-21 i.e. 2026-Jan-19)
-  packageManager  String          @db.VarChar(50)
+  owner           String         @db.VarChar(250)
+  project         String?        @db.VarChar(512) // TODO: remove nullable after older records are cleared (90 days after 2025-Oct-21 i.e. 2026-Jan-19)
+  packageManager  String         @db.VarChar(50)
   started         DateTime
   duration        Int
   success         Boolean

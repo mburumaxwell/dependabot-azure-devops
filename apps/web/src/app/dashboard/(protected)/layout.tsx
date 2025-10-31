@@ -1,9 +1,29 @@
+import type { Metadata } from 'next';
+import type { TemplateString } from 'next/dist/lib/metadata/types/metadata-types';
 import { headers as requestHeaders } from 'next/headers';
 import { AppSidebar } from '@/components/app-sidebar';
 import { Breadcrumb, BreadcrumbList } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { auth } from '@/lib/auth';
+import { config } from '@/site-config';
+
+const titleTemplate: TemplateString = {
+  default: config.dashboard.title,
+  template: `%s | ${config.dashboard.title}`,
+};
+
+export const metadata: Metadata = {
+  title: titleTemplate,
+  description: config.description,
+  metadataBase: new URL(config.siteUrl),
+  openGraph: {
+    type: 'website',
+    title: titleTemplate,
+    description: config.description,
+    url: config.siteUrl,
+  },
+};
 
 export default async function Layout({ children }: LayoutProps<'/'>) {
   const headers = await requestHeaders();

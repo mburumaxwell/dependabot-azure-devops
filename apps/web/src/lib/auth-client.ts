@@ -1,3 +1,4 @@
+import { polarClient } from '@polar-sh/better-auth';
 import {
   adminClient,
   inferAdditionalFields,
@@ -18,6 +19,7 @@ export const authClient = createAuthClient({
     passkeyClient(),
     organizationClient({ schema: inferOrgAdditionalFields<typeof auth>() }),
     adminClient(),
+    polarClient(),
   ],
 });
 

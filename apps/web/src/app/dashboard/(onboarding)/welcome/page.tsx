@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   openGraph: { url: `/dashboard/welcome` },
 };
 
+// TODO: implement this page
 export default function WelcomePage() {
   return (
     <main className='flex flex-1 flex-col justify-center text-center'>

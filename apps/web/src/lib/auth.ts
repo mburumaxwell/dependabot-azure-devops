@@ -1,5 +1,5 @@
 import { environment } from '@paklo/core/environment';
-import { polar, webhooks } from '@polar-sh/better-auth';
+import { polar, usage, webhooks } from '@polar-sh/better-auth';
 import { Polar } from '@polar-sh/sdk';
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
@@ -7,11 +7,11 @@ import { nextCookies } from 'better-auth/next-js';
 import { admin, magicLink, organization } from 'better-auth/plugins';
 import { passkey } from 'better-auth/plugins/passkey';
 import { sendMagicLinkEmail } from '@/emails';
+import { logger } from '@/lib/logger';
+import { OrganizationTypeSchema } from '@/lib/organization-types';
 import { PrismaClient } from '@/lib/prisma/client';
+import { RegionCodeSchema } from '@/lib/regions';
 import app from '../../package.json';
-import { logger } from './logger';
-import { OrganizationTypeSchema } from './organization-types';
-import { RegionCodeSchema } from './regions';
 
 const prismaClient = new PrismaClient();
 const polarClient = new Polar({
@@ -71,6 +71,7 @@ export const auth = betterAuth({
       client: polarClient,
       createCustomerOnSignUp: false, // customers are created from organizations
       use: [
+        usage(),
         webhooks({
           secret: process.env.POLAR_WEBHOOK_SECRET!,
           // TODO: handle webhooks here

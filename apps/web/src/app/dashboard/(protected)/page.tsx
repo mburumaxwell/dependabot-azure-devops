@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Stats',
-  description: 'View your activity',
+  title: 'Home',
+  description: 'Your Paklo dashboard overview',
   openGraph: { url: `/dashboard` },
 };
 
-export default function StatsPage() {
+// TODO: implement this page
+export default function DashboardPage() {
   return (
     <div className='flex flex-1 flex-col gap-4 p-4'>
       <div className='grid auto-rows-min gap-4 md:grid-cols-3'>
