@@ -39,7 +39,7 @@ export async function magicLinkLogin({
   callbackURL?: string;
 }) {
   // https://www.better-auth.com/docs/plugins/magic-link
-  await authClient.signIn.magicLink({
+  return await authClient.signIn.magicLink({
     email,
     name,
     callbackURL,

@@ -1,8 +1,11 @@
 'use client';
 
 import { Fingerprint, Loader2, Mail } from 'lucide-react';
+import type { Route } from 'next';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { AppleLogo, GoogleLogo, PakloLogo } from '@/components/logos';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
@@ -17,23 +20,33 @@ interface LoginFormProps extends React.ComponentProps<'div'> {
 export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
   const thirdPartyLogins = false; // Might add 3rd-party login but not now!
 
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
 
   async function handlePasskeyLogin() {
     setIsLoading(true);
+    let error: { code?: string; message?: string } | null = null;
     try {
       // https://www.better-auth.com/docs/plugins/passkey
-      await authClient.signIn.passkey({
+      ({ error } = await authClient.signIn.passkey({
         // autoFill enables conditional UI but lots more needs to be done
         // autoFill: true,
-      });
-    } catch (error) {
-      console.error('Passkey login error:', error);
-    } finally {
-      setIsLoading(false);
+      }));
+    } catch (err) {
+      error = { message: (err as Error).message };
     }
+
+    setIsLoading(false);
+
+    if (error) {
+      toast.error('Passkey sign-in failed.', { description: error.message || 'Please try again.' });
+      return;
+    }
+
+    // Redirect to dashboard or specified redirect URL after successful login
+    router.push((redirectTo || '/dashboard') as Route);
   }
 
   async function handleMagicLinkLogin(e: React.FormEvent) {
@@ -41,14 +54,23 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
     if (!email) return;
 
     setIsLoading(true);
+    let error: { code?: string; message?: string } | null = null;
+    let data: { status: boolean } | null = null;
     try {
-      await magicLinkLogin({ email, callbackURL: redirectTo });
-      setMagicLinkSent(true);
-    } catch (error) {
-      console.error('Magic link error:', error);
-    } finally {
-      setIsLoading(false);
+      ({ data, error } = await magicLinkLogin({ email, callbackURL: redirectTo }));
+    } catch (err) {
+      error = { message: (err as Error).message };
     }
+
+    setIsLoading(false);
+
+    if (error || !data?.status) {
+      toast.error('Failed to send magic link.', { description: error?.message || 'Please try again.' });
+      setMagicLinkSent(false);
+      return;
+    }
+
+    setMagicLinkSent(true);
   }
 
   return (

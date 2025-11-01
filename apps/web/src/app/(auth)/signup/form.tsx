@@ -3,6 +3,7 @@
 import { Loader2, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { PakloLogo } from '@/components/logos';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
@@ -25,14 +26,23 @@ export function SignupForm({ className, redirectTo, ...props }: SignupFormProps)
     if (!email) return;
 
     setIsLoading(true);
+    let error: { code?: string; message?: string } | null = null;
+    let data: { status: boolean } | null = null;
     try {
-      await magicLinkLogin({ email, name, callbackURL: redirectTo });
-      setMagicLinkSent(true);
-    } catch (error) {
-      console.error('Signup error:', error);
-    } finally {
-      setIsLoading(false);
+      ({ data, error } = await magicLinkLogin({ email, name, callbackURL: redirectTo }));
+    } catch (err) {
+      error = { message: (err as Error).message };
     }
+
+    setIsLoading(false);
+
+    if (error || !data?.status) {
+      toast.error('Failed to send magic link.', { description: error?.message || 'Please try again.' });
+      setMagicLinkSent(false);
+      return;
+    }
+
+    setMagicLinkSent(true);
   }
 
   return (

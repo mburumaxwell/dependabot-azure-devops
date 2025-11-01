@@ -18,6 +18,7 @@ import {
 import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { UAParser } from 'ua-parser-js';
 import { TimeAgo } from '@/components/time-ago';
 import {
@@ -59,8 +60,15 @@ export function ProfileSection({ user }: { user: { id: string; name: string; ema
 
   async function handleSave() {
     setIsNameSaving(true);
-    await authClient.updateUser({ name });
+    const { data, error } = await authClient.updateUser({ name });
     setIsNameSaving(false);
+
+    if (error || !data?.status) {
+      toast.error('Failed to update profile.', { description: error?.message });
+      return;
+    }
+
+    toast.success('Profile updated successfully.');
   }
 
   return (
@@ -498,7 +506,14 @@ export function OrganizationsSection({
 export function DangerSection({ hasOrganizations }: { hasOrganizations: boolean }) {
   async function handleDeleteAccount() {
     // this will trigger the delete account flow (sends a verification email, with a link)
-    await authClient.deleteUser({ callbackURL: '/login' });
+    const response = await authClient.deleteUser({ callbackURL: '/login' });
+    if (response.error) {
+      toast.error('Failed to initiate account deletion.', { description: response.error.message });
+      return;
+    }
+
+    // inform the user to check their email
+    toast('Account deletion requested.', { description: 'Please check your email to confirm account deletion.' });
   }
 
   return (
