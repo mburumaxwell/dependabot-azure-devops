@@ -6,12 +6,35 @@ param location string = resourceGroup().location
 @description('Name of the resources.')
 param name string = 'paklo'
 
+var administratorLoginPasswordMongo = '${skip(uniqueString(resourceGroup().id), 5)}^${uniqueString('mongo-password', resourceGroup().id)}' // e.g. abcde%zecnx476et7xm (19 characters)
+
 /* Managed Identity */
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' = {
   name: name
   location: location
   #disable-next-line BCP073
   properties: { isolationScope: 'None' } // 'None' is the default, but this is required to avoid a bug in TTK
+}
+
+/* Key Vault */
+resource keyVault 'Microsoft.KeyVault/vaults@2025-05-01' = {
+  name: name
+  location: location
+  properties: {
+    tenantId: subscription().tenantId
+    sku: { name: 'standard', family: 'A' }
+    enabledForDeployment: true
+    enabledForDiskEncryption: true
+    enabledForTemplateDeployment: true
+    enableRbacAuthorization: true
+    enableSoftDelete: true
+    softDeleteRetentionInDays: 90
+  }
+
+  resource mongoPasswordSecret 'secrets' = {
+    name: 'mongo-password'
+    properties: { contentType: 'text/plain', value: administratorLoginPasswordMongo }
+  }
 }
 
 /* LogAnalytics */
@@ -25,25 +48,42 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02
   }
 }
 
-// /* AppConfiguration */
-// resource appConfiguration 'Microsoft.AppConfiguration/configurationStores@2024-06-01' = {
-//   name: name
-//   location: location
-//   properties: {
-//     dataPlaneProxy: { authenticationMode: 'Local', privateLinkDelegation: 'Disabled' }
-//     softDeleteRetentionInDays: 0 /* Free does not support this */
-//     defaultKeyValueRevisionRetentionPeriodInSeconds: 604800 /* 7 days */
-//   }
-//   sku: { name: 'free' }
-//   identity: {
-//     type: 'UserAssigned'
-//     userAssignedIdentities: {
-//       '${managedIdentity.id}': {
-//         /*ttk bug*/
-//       }
-//     }
-//   }
-// }
+/* MongoDB Cluster */
+resource mongoCluster 'Microsoft.DocumentDB/mongoClusters@2024-07-01' = {
+  name: name
+  location: location
+  properties: {
+    #disable-next-line use-secure-value-for-secure-inputs
+    administrator: { userName: 'puppy', password: administratorLoginPasswordMongo }
+    serverVersion: '8.0'
+    compute: { tier: 'Free' } // we remain free until, there are paying users :)
+    storage: { sizeGb: 32 }
+    sharding: { shardCount: 1 }
+    highAvailability: { targetMode: 'Disabled' }
+    publicNetworkAccess: 'Enabled'
+  }
+
+  resource allowAzure 'firewallRules' = {
+    name: 'AllowAllAzureServicesAndResourcesWithinAzureIps'
+    properties: { endIpAddress: '0.0.0.0', startIpAddress: '0.0.0.0' }
+  }
+}
+
+/* AppConfiguration */
+resource appConfiguration 'Microsoft.AppConfiguration/configurationStores@2024-06-01' = {
+  name: name
+  location: location
+  properties: {
+    dataPlaneProxy: { authenticationMode: 'Local', privateLinkDelegation: 'Disabled' }
+    softDeleteRetentionInDays: 0 /* Free does not support this */
+    defaultKeyValueRevisionRetentionPeriodInSeconds: 604800 /* 7 days */
+  }
+  sku: { name: 'free' }
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: { '${managedIdentity.id}': {} }
+  }
+}
 
 // /* AppService Plan */
 // resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {
@@ -75,13 +115,13 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02
 //   }
 // }
 
-// /* Application Insights */
-// resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
-//   name: name
-//   location: location
-//   kind: 'web'
-//   properties: { Application_Type: 'web', WorkspaceResourceId: logAnalyticsWorkspace.id }
-// }
+/* Application Insights */
+resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
+  name: name
+  location: location
+  kind: 'web'
+  properties: { Application_Type: 'web', WorkspaceResourceId: logAnalyticsWorkspace.id }
+}
 
 // /** WebApp */
 // resource webApp 'Microsoft.Web/sites@2024-04-01' = {
@@ -121,3 +161,8 @@ resource roleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = 
 ]
 
 output managedIdentityPrincipalId string = managedIdentity.properties.principalId
+output mongoConnectionString string = replace(
+  mongoCluster.properties.connectionString,
+  '<user>',
+  mongoCluster.properties.administrator.userName
+)

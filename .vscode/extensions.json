@@ -6,10 +6,10 @@
     "bruno-api-client.bruno",
     "DavidAnson.vscode-markdownlint",
     "github.vscode-github-actions",
+    "mongodb.mongodb-vscode",
     "ms-azuretools.vscode-bicep",
     "ms-azuretools.vscode-containers",
     "ms-dotnettools.csdevkit",
-    "ms-ossdata.vscode-pgsql",
     "Prisma.prisma",
     "redhat.vscode-yaml",
     "streetsidesoftware.code-spell-checker"

@@ -35,7 +35,7 @@ export function CreateOrganizationPage() {
     type: 'azure',
     url: '',
     token: '',
-    region: 'lhr',
+    region: 'dub', // default to Dublin (most popular region)
   });
 
   // Step 1: Slug verification state

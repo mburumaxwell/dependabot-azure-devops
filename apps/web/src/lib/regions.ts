@@ -45,9 +45,9 @@ export const REGIONS: RegionInfo[] = [
   // Europe
   { code: 'arn', vercel: 'arn1', azure: 'swedencentral',      visible: false, available: false, label: 'Stockholm (SE)', }, // Azure city: Stockholm
   { code: 'cdg', vercel: 'cdg1', azure: 'francecentral',      visible: false, available: false, label: 'Paris (FR)', },
-  { code: 'dub', vercel: 'dub1', azure: 'northeurope',        visible: true,  available: false, label: 'Dublin (IE)', },
+  { code: 'dub', vercel: 'dub1', azure: 'northeurope',        visible: true,  available: true,  label: 'Dublin (IE)', },
   { code: 'fra', vercel: 'fra1', azure: 'germanywestcentral', visible: false, available: false, label: 'Frankfurt (DE)', },
-  { code: 'lhr', vercel: 'lhr1', azure: 'uksouth',            visible: true,  available: true,  label: 'London (UK)', },
+  { code: 'lhr', vercel: 'lhr1', azure: 'uksouth',            visible: true,  available: false, label: 'London (UK)', },
 
   // Middle East & Africa
   { code: 'cpt', vercel: 'cpt1', azure: 'southafricawest',    visible: false, available: false, label: 'Cape Town (ZA)', }, // ZA West = Cape Town

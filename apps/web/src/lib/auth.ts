@@ -21,7 +21,7 @@ import app from '../../package.json';
 
 export const auth = betterAuth({
   database: prismaAdapter(prismaClient, {
-    provider: 'postgresql',
+    provider: 'mongodb',
   }),
   appName: app.name,
   user: {
@@ -92,7 +92,6 @@ export const auth = betterAuth({
         await sendMagicLinkEmail({ recipient: email, url });
       },
     }),
-    nextCookies(),
     polar({
       client: polarClient,
       createCustomerOnSignUp: true,
@@ -114,6 +113,7 @@ export const auth = betterAuth({
         }),
       ],
     }),
+    nextCookies(), // must be last to work with server actions/components
   ],
 });
 
