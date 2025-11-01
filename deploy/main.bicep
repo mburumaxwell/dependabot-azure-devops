@@ -63,9 +63,16 @@ resource mongoCluster 'Microsoft.DocumentDB/mongoClusters@2024-07-01' = {
     publicNetworkAccess: 'Enabled'
   }
 
-  resource allowAzure 'firewallRules' = {
-    name: 'AllowAllAzureServicesAndResourcesWithinAzureIps'
-    properties: { endIpAddress: '0.0.0.0', startIpAddress: '0.0.0.0' }
+  // resource allowAzure 'firewallRules' = {
+  //   name: 'AllowAllAzureServicesAndResourcesWithinAzureIps'
+  //   properties: { endIpAddress: '0.0.0.0', startIpAddress: '0.0.0.0' }
+  // }
+
+  // allowing all IPs for now, because we deploy the web on Vercel and it needs to access the database
+  // no fixed IPs are provided by Vercel
+  resource allowAll 'firewallRules' = {
+    name: 'AllowAll_IPs'
+    properties: { startIpAddress: '0.0.0.0', endIpAddress: '255.255.255.255' }
   }
 }
 
