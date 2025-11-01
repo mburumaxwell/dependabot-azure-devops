@@ -89,6 +89,7 @@
     "@types/validator": "13.15.4",
     "dotenv-cli": "11.0.0",
     "postcss": "8.5.6",
+    "prettier": "3.6.2",
     "prisma": "6.18.0",
     "react-email": "4.3.2",
     "reading-time": "1.5.0",
