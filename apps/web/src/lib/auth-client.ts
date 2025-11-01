@@ -29,12 +29,19 @@ export type Invitation = typeof authClient.$Infer.Invitation;
 export type Member = typeof authClient.$Infer.Member;
 export type { Organization, Passkey } from '@/lib/auth';
 
-export async function magicLinkLogin({ email, name }: { email: string; name?: string }) {
+export async function magicLinkLogin({
+  email,
+  callbackURL = '/dashboard',
+  name,
+}: {
+  email: string;
+  name?: string;
+  callbackURL?: string;
+}) {
   // https://www.better-auth.com/docs/plugins/magic-link
   await authClient.signIn.magicLink({
     email,
     name,
-    callbackURL: `/dashboard`,
-    newUserCallbackURL: `/dashboard/welcome`,
+    callbackURL,
   });
 }

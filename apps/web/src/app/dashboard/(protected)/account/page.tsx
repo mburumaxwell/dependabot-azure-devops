@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { headers as requestHeaders } from 'next/headers';
 import { auth } from '@/lib/auth';
-import { DangerSection, OrganizationsSection, PasskeysSection, ProfileSection, SessionsSection } from './client';
+import { DangerSection, OrganizationsSection, PasskeysSection, ProfileSection, SessionsSection } from './page.client';
 
 export const metadata: Metadata = {
   title: 'Account',

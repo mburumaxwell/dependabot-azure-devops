@@ -1,11 +1,10 @@
 'use client';
 
-import { betterFetch } from '@better-fetch/fetch';
 import { CheckCircle2, Eye, EyeOff, Globe, Loader2, XCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import validator from 'validator';
-import { z } from 'zod/v4';
+import { validateOrganizationCredentials } from '@/actions/organizations';
 import { Stepper } from '@/components/stepper';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -18,25 +17,25 @@ import { ORGANIZATION_TYPES_INFO, type OrganizationType } from '@/lib/organizati
 import { REGIONS, type RegionCode } from '@/lib/regions';
 import { cn } from '@/lib/utils';
 
-interface FormData {
+type CreationData = {
   name: string;
   slug: string;
   type: OrganizationType;
   url: string;
   token: string;
   region: RegionCode;
-}
+};
 
 export function CreateOrganizationPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<FormData>({
+  const [data, setData] = useState<CreationData>({
     name: '',
     slug: '',
     type: 'azure',
     url: '',
     token: '',
-    region: 'lhr', // TODO: figure out how to find the best region
+    region: 'lhr',
   });
 
   // Step 1: Slug verification state
@@ -62,7 +61,7 @@ export function CreateOrganizationPage() {
 
   // Auto-generate slug from name
   function handleNameChange(name: string) {
-    setFormData((prev) => ({
+    setData((prev) => ({
       ...prev,
       name,
       slug: name
@@ -77,7 +76,7 @@ export function CreateOrganizationPage() {
 
   // Verify slug availability
   async function verifySlug() {
-    if (!formData.slug) {
+    if (!data.slug) {
       setSlugError('Slug is required');
       return;
     }
@@ -85,13 +84,13 @@ export function CreateOrganizationPage() {
     setSlugVerifying(true);
     setSlugError('');
 
-    if (['test', 'admin', 'api'].includes(formData.slug)) {
+    if (['test', 'admin', 'api'].includes(data.slug)) {
       setSlugVerifying(false);
       setSlugError('This slug is not allowed');
       return;
     }
 
-    const response = await authClient.organization.checkSlug({ slug: formData.slug });
+    const response = await authClient.organization.checkSlug({ slug: data.slug });
     if (response.error) {
       setSlugVerifying(false);
       setSlugError(`${response.error.code}: ${response.error.message}`);
@@ -119,16 +118,16 @@ export function CreateOrganizationPage() {
   }
 
   function handleUrlChange(url: string) {
-    setFormData((prev) => ({ ...prev, url }));
+    setData((prev) => ({ ...prev, url }));
     setCredentialsVerified(false);
     setCredentialsError('');
 
     if (url && !validateUrl(url)) {
       setUrlError(
         `Please enter a valid URL (e.g., ${
-          (formData.type === 'azure' && 'https://dev.azure.com/your-org') ||
-          (formData.type === 'bitbucket' && 'https://bitbucket.org/your-workspace') ||
-          (formData.type === 'gitlab' && 'https://gitlab.com/your-group')
+          (data.type === 'azure' && 'https://dev.azure.com/your-org') ||
+          (data.type === 'bitbucket' && 'https://bitbucket.org/your-workspace') ||
+          (data.type === 'gitlab' && 'https://gitlab.com/your-group')
         })`,
       );
     } else {
@@ -138,44 +137,32 @@ export function CreateOrganizationPage() {
 
   // Verify integration credentials
   async function verifyCredentials() {
-    if (!formData.url || !formData.token) {
+    if (!data.url || !data.token) {
       setCredentialsError('URL and token are required');
       return;
     }
 
-    const normalizedUrl = formData.url.replace(/\/+$/, '');
+    const normalizedUrl = data.url.replace(/\/+$/, '');
     if (!validateUrl(normalizedUrl)) {
       setUrlError('Please enter a valid URL');
       return;
     }
-    setFormData((prev) => ({ ...prev, url: normalizedUrl }));
+    setData((prev) => ({ ...prev, url: normalizedUrl }));
 
     setCredentialsVerifying(true);
     setCredentialsError('');
 
-    if (formData.type !== 'azure') {
+    if (data.type !== 'azure') {
       setCredentialsVerifying(false);
       setCredentialsError('Only Azure DevOps is supported at this time');
       return;
     }
 
-    // Call API to validate credentials
-    const { data, error } = await betterFetch('/api/organizations/validate-creds', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        type: formData.type,
-        url: formData.url,
-        token: formData.token,
-      }),
-      output: z.object({ valid: z.boolean(), message: z.string().optional() }),
-    });
-
-    if (error || !data.valid) {
+    // validate credentials
+    const { valid, message } = await validateOrganizationCredentials(data);
+    if (!valid) {
       setCredentialsVerifying(false);
-      setCredentialsError(error?.message || data?.message || 'Failed to verify credentials');
+      setCredentialsError(message || 'Failed to verify credentials');
       return;
     }
 
@@ -189,12 +176,12 @@ export function CreateOrganizationPage() {
 
     // Call API to create organization
     const response = await authClient.organization.create({
-      name: formData.name,
-      slug: formData.slug,
-      type: formData.type,
-      url: formData.url,
-      token: formData.token,
-      region: formData.region,
+      name: data.name,
+      slug: data.slug,
+      type: data.type,
+      url: data.url,
+      token: data.token,
+      region: data.region,
 
       // change current active organization to the new one
       keepCurrentActiveOrganization: false,
@@ -209,11 +196,11 @@ export function CreateOrganizationPage() {
     }
 
     // Redirect to organization settings for billing setup
-    router.push('/dashboard/settings?tab=billing&new=true');
+    router.push('/dashboard/settings/billing?new=true');
   }
 
-  const canProceedStep1 = formData.name && formData.slug && slugVerified;
-  const canProceedStep2 = formData.url && !urlError && formData.token && credentialsVerified;
+  const canProceedStep1 = data.name && data.slug && slugVerified;
+  const canProceedStep2 = data.url && !urlError && data.token && credentialsVerified;
 
   // filter regions allowed to be shown, sort by available the label
   const regions = REGIONS.filter((region) => region.visible).sort(
@@ -234,7 +221,7 @@ export function CreateOrganizationPage() {
                 <Input
                   id='name'
                   placeholder='Acme Inc'
-                  value={formData.name}
+                  value={data.name}
                   onChange={(e) => handleNameChange(e.target.value)}
                 />
               </div>
@@ -245,19 +232,15 @@ export function CreateOrganizationPage() {
                   <Input
                     id='slug'
                     placeholder='acme-inc'
-                    value={formData.slug}
+                    value={data.slug}
                     onChange={(e) => {
-                      setFormData((prev) => ({ ...prev, slug: e.target.value }));
+                      setData((prev) => ({ ...prev, slug: e.target.value }));
                       setSlugVerified(false);
                       setSlugError('');
                     }}
                     className={slugError ? 'border-destructive' : ''}
                   />
-                  <Button
-                    onClick={verifySlug}
-                    disabled={!formData.slug || slugVerifying || slugVerified}
-                    variant='outline'
-                  >
+                  <Button onClick={verifySlug} disabled={!data.slug || slugVerifying || slugVerified} variant='outline'>
                     {slugVerifying ? (
                       <>
                         <Loader2 className='animate-spin' />
@@ -310,13 +293,13 @@ export function CreateOrganizationPage() {
                       key={provider.type}
                       type='button'
                       onClick={() => {
-                        setFormData((prev) => ({ ...prev, type: provider.type }));
+                        setData((prev) => ({ ...prev, type: provider.type }));
                         setCredentialsVerified(false);
                         setCredentialsError('');
                       }}
                       className={cn(
                         'relative flex flex-col items-center justify-center gap-4 rounded-lg border-2 p-4 transition-all hover:border-primary/50',
-                        formData.type === provider.type ? 'border-primary bg-primary/5' : 'border-border bg-card',
+                        data.type === provider.type ? 'border-primary bg-primary/5' : 'border-border bg-card',
                       )}
                     >
                       <div
@@ -328,7 +311,7 @@ export function CreateOrganizationPage() {
                         <div className='font-semibold'>{provider.name}</div>
                         <div className='text-sm text-muted-foreground'>{provider.vendor}</div>
                       </div>
-                      {formData.type === provider.type && (
+                      {data.type === provider.type && (
                         <div className='absolute top-3 right-3'>
                           <CheckCircle2 className='size-5 text-primary' />
                         </div>
@@ -340,20 +323,20 @@ export function CreateOrganizationPage() {
 
               <div className='space-y-2'>
                 <Label htmlFor='url'>
-                  {(formData.type === 'azure' && 'Azure DevOps Organization') ||
-                    (formData.type === 'bitbucket' && 'Bitbucket Workspace') ||
-                    (formData.type === 'gitlab' && 'GitLab Group')}{' '}
+                  {(data.type === 'azure' && 'Azure DevOps Organization') ||
+                    (data.type === 'bitbucket' && 'Bitbucket Workspace') ||
+                    (data.type === 'gitlab' && 'GitLab Group')}{' '}
                   URL
                 </Label>
                 <Input
                   id='url'
                   placeholder={
-                    (formData.type === 'azure' && 'https://dev.azure.com/your-org') ||
-                    (formData.type === 'bitbucket' && 'https://bitbucket.org/your-workspace') ||
-                    (formData.type === 'gitlab' && 'https://gitlab.com/your-group') ||
+                    (data.type === 'azure' && 'https://dev.azure.com/your-org') ||
+                    (data.type === 'bitbucket' && 'https://bitbucket.org/your-workspace') ||
+                    (data.type === 'gitlab' && 'https://gitlab.com/your-group') ||
                     'https://my-git-platform.com/your-path'
                   }
-                  value={formData.url}
+                  value={data.url}
                   onChange={(e) => handleUrlChange(e.target.value)}
                   className={urlError ? 'border-destructive' : ''}
                 />
@@ -372,9 +355,9 @@ export function CreateOrganizationPage() {
                     id='token'
                     type={showToken ? 'text' : 'password'}
                     placeholder='Enter your access token'
-                    value={formData.token}
+                    value={data.token}
                     onChange={(e) => {
-                      setFormData((prev) => ({ ...prev, token: e.target.value }));
+                      setData((prev) => ({ ...prev, token: e.target.value }));
                       setCredentialsVerified(false);
                       setCredentialsError('');
                     }}
@@ -397,9 +380,9 @@ export function CreateOrganizationPage() {
                 </div>
                 <p className='text-sm text-muted-foreground'>
                   We'll use this to connect to your{' '}
-                  {(formData.type === 'azure' && 'Azure DevOps Organization') ||
-                    (formData.type === 'bitbucket' && 'Bitbucket Workspace') ||
-                    (formData.type === 'gitlab' && 'GitLab Group')}
+                  {(data.type === 'azure' && 'Azure DevOps Organization') ||
+                    (data.type === 'bitbucket' && 'Bitbucket Workspace') ||
+                    (data.type === 'gitlab' && 'GitLab Group')}
                 </p>
               </div>
 
@@ -420,7 +403,7 @@ export function CreateOrganizationPage() {
               <div className='flex gap-2'>
                 <Button
                   onClick={verifyCredentials}
-                  disabled={!formData.url || !formData.token || credentialsVerifying || credentialsVerified}
+                  disabled={!data.url || !data.token || credentialsVerifying || credentialsVerified}
                   variant='outline'
                   className='flex-1 bg-transparent'
                 >
@@ -458,8 +441,8 @@ export function CreateOrganizationPage() {
                 <Label>Select Execution Region</Label>
                 <p className='text-sm text-muted-foreground'>Choose where your organization's jobs will be run.</p>
                 <RadioGroup
-                  value={formData.region}
-                  onValueChange={(value) => setFormData((prev) => ({ ...prev, region: value as RegionCode }))}
+                  value={data.region}
+                  onValueChange={(value) => setData((prev) => ({ ...prev, region: value as RegionCode }))}
                   className='grid grid-cols-2 gap-4'
                 >
                   {regions.map((region) => (
@@ -469,7 +452,7 @@ export function CreateOrganizationPage() {
                         className={cn(
                           'flex items-center gap-4 rounded-lg border-2 p-4 transition-all cursor-pointer',
                           !region.available && 'opacity-50 cursor-not-allowed',
-                          region.available && formData.region === region.code
+                          region.available && data.region === region.code
                             ? 'border-primary bg-primary/5'
                             : 'border-border bg-card hover:border-primary/50',
                         )}

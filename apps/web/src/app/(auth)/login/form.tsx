@@ -10,9 +10,11 @@ import { Input } from '@/components/ui/input';
 import { authClient, magicLinkLogin } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 
-interface LoginFormProps extends React.ComponentProps<'div'> {}
+interface LoginFormProps extends React.ComponentProps<'div'> {
+  redirectTo?: string;
+}
 
-export function LoginForm({ className, ...props }: LoginFormProps) {
+export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
   const thirdPartyLogins = false; // Might add 3rd-party login but not now!
 
   const [email, setEmail] = useState('');
@@ -40,7 +42,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
 
     setIsLoading(true);
     try {
-      await magicLinkLogin({ email });
+      await magicLinkLogin({ email, callbackURL: redirectTo });
       setMagicLinkSent(true);
     } catch (error) {
       console.error('Magic link error:', error);

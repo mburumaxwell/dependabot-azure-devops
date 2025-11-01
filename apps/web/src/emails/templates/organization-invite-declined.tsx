@@ -1,53 +1,35 @@
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Hr,
-  Html,
-  Preview,
-  Row,
-  Section,
-  Tailwind,
-  Text,
-} from '@react-email/components';
+import { Body, Container, Head, Hr, Html, Preview, Row, Section, Tailwind, Text } from '@react-email/components';
 
-export type MagicLinkProps = {
+export type OrganizationInviteDeclinedProps = {
+  organization: string;
+  invitee: string;
   recipient: string;
-  url: string;
 };
 
-export function MagicLink({
+export function OrganizationInviteDeclined({
+  organization = 'Contoso Ltd',
+  invitee = 'alice.smith@contoso.com',
   recipient = 'chris.johnson@contoso.com',
-  url = 'https://www.paklo.app/login/123',
-}: MagicLinkProps) {
+}: OrganizationInviteDeclinedProps) {
   return (
     <Html lang='en' dir='ltr'>
       <Head />
       <Tailwind>
         <Body className='mx-auto my-auto bg-white px-2 font-sans'>
-          <Preview>Your login link for Paklo Dashboard is inside</Preview>
+          <Preview>Invitation to {organization} was declined</Preview>
           <Container className='mx-auto my-10 max-w-[465px] p-5'>
             <Section>
               <Row>
+                <Text className='text-[24px] font-bold text-black mb-4'>Invitation Declined</Text>
+              </Row>
+              <Row>
                 <Text>
-                  Click the link below to login to your account or create an account. This link will expire in 5
-                  minutes.
+                  <strong>{invitee}</strong> has declined your invitation to join <strong>{organization}</strong>.
                 </Text>
               </Row>
               <Row>
-                <Button
-                  className='rounded bg-[#000000] px-5 py-3 text-center font-semibold text-[12px] text-white no-underline'
-                  href={url}
-                >
-                  Continue
-                </Button>
-              </Row>
-              <Row>
-                <Text>
-                  If you cannot click the button, copy and paste the URL below into your web browser:
-                  <br />
-                  {url}
+                <Text className='text-[14px] text-[#666666] mt-4'>
+                  You can send another invitation at any time if needed.
                 </Text>
               </Row>
             </Section>
@@ -64,4 +46,4 @@ export function MagicLink({
   );
 }
 
-export default MagicLink;
+export default OrganizationInviteDeclined;

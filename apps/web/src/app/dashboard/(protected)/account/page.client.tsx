@@ -19,7 +19,7 @@ import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { UAParser } from 'ua-parser-js';
-import type { DeviceType } from 'ua-parser-js/enums';
+import { TimeAgo } from '@/components/time-ago';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -110,8 +110,7 @@ export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[]
     });
     setIsModifyingPasskeys(false);
     if (response?.data) {
-      // Update UI
-      setPasskeys([...passkeys, response.data]);
+      setPasskeys((prev) => [...prev, response.data!]);
     }
   }
 
@@ -120,8 +119,7 @@ export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[]
     const response = await authClient.passkey.deletePasskey({ id });
     setIsModifyingPasskeys(false);
     if (!response?.error) {
-      // Update UI
-      setPasskeys(passkeys.filter((p) => p.id !== id));
+      setPasskeys((prev) => prev.filter((p) => p.id !== id));
     }
   }
 
@@ -141,7 +139,7 @@ export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[]
 
     // Update passkey name in state
     if (!response?.error) {
-      setPasskeys(passkeys.map((p) => (p.id === editingPasskey.id ? { ...p, name: editedPasskeyName } : p)));
+      setPasskeys((prev) => prev.map((p) => (p.id === editingPasskey.id ? { ...p, name: editedPasskeyName } : p)));
     }
 
     setIsSavingPasskey(false);
@@ -204,8 +202,7 @@ export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[]
                     <div>
                       <p className='font-medium'>{passkey.name || 'unknown'}</p>
                       <p className='text-sm text-muted-foreground'>
-                        Added{' '}
-                        <time dateTime={passkey.createdAt.toISOString()}>{passkey.createdAt.toLocaleString()}</time>
+                        Added <TimeAgo date={passkey.createdAt} />
                       </p>
                     </div>
                   </div>
@@ -302,8 +299,7 @@ export function SessionsSection({
     setIsModifyingSessions(true);
     const response = await authClient.revokeSession({ token });
     if (response?.data?.status) {
-      // Update UI
-      setSessions(sessions.filter((s) => s.token !== token));
+      setSessions((prev) => prev.filter((s) => s.token !== token));
     }
     setIsModifyingSessions(false);
   }
@@ -318,24 +314,17 @@ export function SessionsSection({
         <div className='space-y-3'>
           {sessions.map((session) => {
             const isCurrent = session.id === activeSessionId;
-            const location = session.ipAddress || 'Unknown Location'; // TODO: use IP geolocation for better location info
-            function inferDevice(input: string): {
-              name: string;
-              type?: (typeof DeviceType)[keyof typeof DeviceType];
-            } {
-              const uar = UAParser(input);
-              let name = '';
-              if (uar.device.model) {
-                name = `${uar.device.vendor || ''} ${uar.device.model}`;
-              } else if (uar.browser.name && uar.os.name) {
-                name = `${uar.browser.name} on ${uar.os.name}`;
-              } else {
-                name = input || 'Unknown Device';
-              }
-              return { name, type: uar.device.type };
+            function getDevice(input: string): [mobile: boolean, name: string] {
+              const parser = UAParser(input);
+              return [
+                parser.device.type === 'mobile',
+                parser.os.name && parser.browser.name
+                  ? `${parser.os.name}, ${parser.browser.name}`
+                  : parser.os.name || parser.browser.name || input || 'Unknown Device',
+              ];
             }
-            const { name: deviceName, type: deviceType } = inferDevice(session.userAgent || '');
-            const Icon = deviceType === 'mobile' ? Smartphone : Monitor;
+            const [isMobile, deviceName] = getDevice(session.userAgent || '');
+            const Icon = isMobile ? Smartphone : Monitor;
 
             return (
               <div key={session.id} className='flex items-center justify-between p-3 border rounded-lg'>
@@ -354,8 +343,7 @@ export function SessionsSection({
                       )}
                     </div>
                     <p className='text-sm text-muted-foreground'>
-                      {location} •{' '}
-                      <time dateTime={session.updatedAt.toISOString()}>{session.updatedAt.toLocaleString()}</time>
+                      {session.ipAddress} • <TimeAgo date={session.updatedAt} />
                     </p>
                   </div>
                 </div>
@@ -376,9 +364,7 @@ export function SessionsSection({
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={async () => await handleRevokeSession(session.token)}>
-                          Revoke
-                        </AlertDialogAction>
+                        <AlertDialogAction onClick={() => handleRevokeSession(session.token)}>Revoke</AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
@@ -415,8 +401,7 @@ export function OrganizationsSection({
 
     const response = await authClient.organization.leave({ organizationId: orgToLeave.id });
     if (!response?.error) {
-      // Update UI
-      setOrganizations(organizations.filter((org) => org.id !== orgToLeave.id));
+      setOrganizations((prev) => prev.filter((org) => org.id !== orgToLeave.id));
     }
 
     setOrgToLeave(null);
@@ -464,7 +449,7 @@ export function OrganizationsSection({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
-                      <DropdownMenuItem onClick={() => handleSetActiveAndNavigate(org.id, '/dashboard')}>
+                      <DropdownMenuItem onClick={() => handleSetActiveAndNavigate(org.id, '/dashboard/activity')}>
                         <Home className='h-4 w-4 mr-2' />
                         Home
                       </DropdownMenuItem>
@@ -513,7 +498,7 @@ export function OrganizationsSection({
 export function DangerSection({ hasOrganizations }: { hasOrganizations: boolean }) {
   async function handleDeleteAccount() {
     // this will trigger the delete account flow (sends a verification email, with a link)
-    await authClient.deleteUser();
+    await authClient.deleteUser({ callbackURL: '/login' });
   }
 
   return (
@@ -523,40 +508,38 @@ export function DangerSection({ hasOrganizations }: { hasOrganizations: boolean 
         <CardDescription>Irreversible actions for your account</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='space-y-4'>
-          <div className='flex items-start justify-between py-4'>
-            <div className='space-y-1'>
-              <p className='font-medium'>Delete account</p>
-              <p className='text-sm text-muted-foreground'>Permanently delete your account and all associated data</p>
-              {hasOrganizations && (
-                <p className='text-xs text-destructive mt-1'>
-                  You need to leave all organizations before closing your account.
-                </p>
-              )}
-            </div>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant='destructive' disabled={hasOrganizations}>
-                  Delete account
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete your account and remove all your data
-                    from our servers.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction className='bg-destructive' onClick={handleDeleteAccount}>
-                    Delete account
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+        <div className='flex items-start justify-between py-4'>
+          <div className='space-y-1'>
+            <p className='font-medium'>Delete account</p>
+            <p className='text-sm text-muted-foreground'>Permanently delete your account and all associated data</p>
+            {hasOrganizations && (
+              <p className='text-xs text-destructive mt-1'>
+                You need to leave all organizations before closing your account.
+              </p>
+            )}
           </div>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant='destructive' disabled={hasOrganizations}>
+                Delete account
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete your account and remove all your data from
+                  our servers. If you proceed, you will receive a verification email to confirm this action.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction className='bg-destructive' onClick={handleDeleteAccount}>
+                  Delete account
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </CardContent>
     </Card>

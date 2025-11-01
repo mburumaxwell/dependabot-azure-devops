@@ -1,5 +1,7 @@
 -- AlterTable
-ALTER TABLE "organization" ADD COLUMN     "region" VARCHAR(10) NOT NULL,
+ALTER TABLE "organization" ADD COLUMN     "githubToken" VARCHAR(100),
+ADD COLUMN     "maxProjects" INT,
+ADD COLUMN     "region" VARCHAR(10) NOT NULL,
 ADD COLUMN     "token" VARCHAR(512) NOT NULL,
 ADD COLUMN     "type" VARCHAR(20) NOT NULL,
 ADD COLUMN     "url" VARCHAR(100) NOT NULL;

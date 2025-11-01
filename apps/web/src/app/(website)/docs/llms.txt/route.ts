@@ -6,5 +6,9 @@ export async function GET() {
   const scan = docs.getPages().map(getLLMText);
   const scanned = await Promise.all(scan);
 
-  return new Response(scanned.join('\n\n'));
+  return new Response(`# Paklo
+
+## Docs
+
+${scanned.join('\n\n')}`);
 }

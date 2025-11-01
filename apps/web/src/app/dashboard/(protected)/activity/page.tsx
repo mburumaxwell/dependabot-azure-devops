@@ -1,14 +1,13 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Settings',
-  description: 'Manage your organization settings',
-  openGraph: { url: `/dashboard/settings` },
+  title: 'Activity',
+  description: 'View your activity',
+  openGraph: { url: `/dashboard/activity` },
 };
 
-// incoming searchparams from /dashboard/organization/create [tab=billing, new=true]
-
-export default function SettingsPage() {
+// TODO: implement this page
+export default function ActivityPage() {
   return (
     <div className='flex flex-1 flex-col gap-4 p-4'>
       <div className='grid auto-rows-min gap-4 md:grid-cols-3'>

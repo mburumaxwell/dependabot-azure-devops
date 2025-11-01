@@ -3,8 +3,8 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata, Viewport } from 'next';
 import type { TemplateString } from 'next/dist/lib/metadata/types/metadata-types';
 import { Inter } from 'next/font/google';
-
 import { Provider } from '@/components/provider';
+import { Toaster } from '@/components/ui/sonner';
 import './globals.css';
 
 import { config, socials } from '@/site-config';
@@ -46,6 +46,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
     <html lang='en' className={inter.className} suppressHydrationWarning>
       <body>
         <Provider>{children}</Provider>
+        <Toaster />
         <Analytics />
         <SpeedInsights />
       </body>

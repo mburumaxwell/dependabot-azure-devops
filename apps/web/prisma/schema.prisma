@@ -136,6 +136,8 @@ model Organization {
   url         String       @db.VarChar(100)
   token       String       @db.VarChar(512)
   region      String       @db.VarChar(10)
+  githubToken String?      @db.VarChar(100)
+  maxProjects Int?
 
   @@unique([slug])
   @@unique([url])

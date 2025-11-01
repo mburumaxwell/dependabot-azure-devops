@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   openGraph: { url: `/login` },
 };
 
-export default function LoginPage() {
-  return <LoginForm />;
+export default async function LoginPage(props: PageProps<'/login'>) {
+  const { redirectTo: rawRedirectTo } = await props.searchParams;
+  const redirectTo = Array.isArray(rawRedirectTo) ? rawRedirectTo[0] : rawRedirectTo;
+
+  return <LoginForm redirectTo={redirectTo} />;
 }

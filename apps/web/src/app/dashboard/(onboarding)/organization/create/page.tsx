@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { CreateOrganizationPage } from './client';
+import { CreateOrganizationPage } from './page.client';
 
 export const metadata: Metadata = {
   title: 'Create Organization',

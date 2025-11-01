@@ -5,6 +5,7 @@ import type { Route } from 'next';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -20,12 +21,13 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarRail,
   useSidebar,
 } from '@/components/ui/sidebar';
@@ -34,17 +36,29 @@ import { getOrganizationInfo } from '@/lib/organization-types';
 import { cn } from '@/lib/utils';
 
 type MenuItem = { label: string; href: Route };
-type MenuGroup = { label: string; items: MenuItem[] };
+type MenuGroup = { label: string; href: Route; items?: MenuItem[] };
 
 const groups: MenuGroup[] = [
   {
-    label: 'Main',
+    label: 'Dashboard',
+    href: '/dashboard',
     items: [
       // TODO: remove "as Route" once these routes have been created
+      { label: 'Activity', href: '/dashboard/activity' as Route },
       { label: 'Projects', href: '/dashboard/projects' as Route },
       { label: 'Repositories', href: '/dashboard/repos' as Route },
-      { label: 'Jobs', href: '/dashboard/jobs' as Route },
-      { label: 'Settings', href: '/dashboard/settings' },
+      { label: 'Runs', href: '/dashboard/runs' as Route },
+      { label: 'Private Vulnerabilities', href: '/dashboard/private-vulns' as Route },
+    ],
+  },
+  {
+    label: 'Settings',
+    href: '/dashboard/settings',
+    items: [
+      { label: 'Usage', href: '/dashboard/settings/usage' },
+      { label: 'Team', href: '/dashboard/settings/team' },
+      { label: 'Billing', href: '/dashboard/settings/billing' },
+      { label: 'Integrations', href: '/dashboard/settings/integrations' },
     ],
   },
 ];
@@ -58,15 +72,14 @@ export function AppSidebar({ session: rawSession, organizations: rawOrganization
   const pathname = usePathname();
   const isActive = (href: Route) => pathname === href || (href !== '/' && pathname.startsWith(href));
   const { isMobile } = useSidebar();
-  const [organizations] = useState<Organization[]>(rawOrganizations);
-  const [session] = useState<Session>(rawSession);
+  const [organizations] = useState(rawOrganizations);
+  const [session] = useState(rawSession);
 
   function handleLogout(): void {
     authClient.signOut({
       fetchOptions: {
-        onSuccess: () => {
-          router.push('/login'); // redirect to login page
-        },
+        // redirect to login page
+        onSuccess: () => router.push('/login'),
       },
     });
   }
@@ -82,32 +95,29 @@ export function AppSidebar({ session: rawSession, organizations: rawOrganization
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={isActive('/dashboard')}>
-                  <Link href='/dashboard'>Stats</Link>
+          <SidebarMenu>
+            {groups.map((group) => (
+              <SidebarMenuItem key={group.label}>
+                <SidebarMenuButton asChild isActive={isActive(group.href)}>
+                  <Link href={group.href} className='font-medium'>
+                    {group.label}
+                  </Link>
                 </SidebarMenuButton>
+                {group.items?.length ? (
+                  <SidebarMenuSub key={group.label}>
+                    {group.items.map((item) => (
+                      <SidebarMenuSubItem key={item.label}>
+                        <SidebarMenuSubButton asChild isActive={isActive(item.href)}>
+                          <Link href={item.href}>{item.label}</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                ) : null}
               </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
+            ))}
+          </SidebarMenu>
         </SidebarGroup>
-        {groups.map((group) => (
-          <SidebarGroup key={group.label}>
-            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {group.items.map((item) => (
-                  <SidebarMenuItem key={item.label}>
-                    <SidebarMenuButton asChild isActive={isActive(item.href)}>
-                      <Link href={item.href}>{item.label}</Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
@@ -135,22 +145,10 @@ export function AppSidebar({ session: rawSession, organizations: rawOrganization
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      router.push('/dashboard/account');
-                    }}
-                  >
+                  <DropdownMenuItem onClick={() => router.push('/dashboard/account')}>
                     <BadgeCheck />
                     Account
                   </DropdownMenuItem>
-                  {/* <DropdownMenuItem
-                    onClick={() => {
-                      router.push('/dashboard/billing');
-                    }}
-                  >
-                    <CreditCard />
-                    Billing
-                  </DropdownMenuItem> */}
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
@@ -236,6 +234,19 @@ function OrganizationSwitcher({
   const router = useRouter();
   const activeOrg = organizations.find((org) => org.id === activeOrganizationId)!;
 
+  async function handleOrgChange(organization: Organization) {
+    const response = await authClient.organization.setActive({ organizationId: organization.id });
+    if (response.error) {
+      toast.error('Failed to switch organization', {
+        description: response.error.message,
+      });
+      return;
+    }
+
+    // reload to reflect changes
+    router.refresh();
+  }
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -270,7 +281,7 @@ function OrganizationSwitcher({
             {organizations.map((organization) => (
               <DropdownMenuItem
                 key={organization.name}
-                onClick={async () => await authClient.organization.setActive({ organizationId: organization.id })}
+                onClick={() => handleOrgChange(organization)}
                 className='gap-2 p-2'
               >
                 <div className='flex size-6 items-center justify-center rounded-md border'>
@@ -287,12 +298,7 @@ function OrganizationSwitcher({
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className='gap-2 p-2'
-              onClick={() => {
-                router.push('/dashboard/organization/create');
-              }}
-            >
+            <DropdownMenuItem className='gap-2 p-2' onClick={() => router.push('/dashboard/organization/create')}>
               <div className='flex size-6 items-center justify-center rounded-md border bg-transparent'>
                 <Plus className='size-4' />
               </div>

@@ -10,9 +10,11 @@ import { Input } from '@/components/ui/input';
 import { magicLinkLogin } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 
-interface SignupFormProps extends React.ComponentProps<'div'> {}
+interface SignupFormProps extends React.ComponentProps<'div'> {
+  redirectTo?: string;
+}
 
-export function SignupForm({ className, ...props }: SignupFormProps) {
+export function SignupForm({ className, redirectTo, ...props }: SignupFormProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +26,7 @@ export function SignupForm({ className, ...props }: SignupFormProps) {
 
     setIsLoading(true);
     try {
-      await magicLinkLogin({ email, name });
+      await magicLinkLogin({ email, name, callbackURL: redirectTo });
       setMagicLinkSent(true);
     } catch (error) {
       console.error('Signup error:', error);

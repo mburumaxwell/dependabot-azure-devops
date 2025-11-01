@@ -24,9 +24,9 @@ export function getPageImage(page: InferPageType<typeof docs>) {
 }
 
 export async function getLLMText(page: InferPageType<typeof docs>) {
-  const processed = await page.data.getText('processed');
+  return `# ${page.data.title} (${page.url})`;
+}
 
-  return `# ${page.data.title} (${page.url})
-
-${processed}`;
+export async function getLLMFullText(page: InferPageType<typeof docs>) {
+  return `# ${page.data.title} (${page.url})\n\n${await page.data.getText('processed')}`;
 }

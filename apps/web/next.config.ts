@@ -53,6 +53,7 @@ const config: NextConfig = {
         permanent: true,
       },
       { source: '/legal', destination: '/legal/terms', permanent: false },
+      { source: '/dashboard/settings', destination: '/dashboard/settings/usage', permanent: false },
     ];
   },
 };

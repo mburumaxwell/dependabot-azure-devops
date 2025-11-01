@@ -1,4 +1,4 @@
-import { render } from '@react-email/render';
+import { render, toPlainText } from '@react-email/render';
 import React from 'react';
 import {
   Resend,
@@ -75,7 +75,7 @@ export type EmailRequest = {
    * @example `['alice@gmail.com', 'bob@gmail.com']`
    * @remarks Each recipient will know who the other recipients are.
    */
-  to: string[];
+  to: string[] | string;
 
   /** Email addresses of the CC recipients. */
   cc?: string[];
@@ -178,8 +178,8 @@ export async function send(request: EmailRequest): Promise<EmailResponse> {
 
 async function inferBody(value: EmailRequest['body']): Promise<EmailBody> {
   if (React.isValidElement(value)) {
-    const html = await render(value, { pretty: true });
-    const text = await render(value, { pretty: true, plainText: true });
+    const html = await render(value);
+    const text = toPlainText(html);
     return { html, text };
   }
 
