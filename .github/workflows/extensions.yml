@@ -115,6 +115,7 @@ jobs:
           --auth-type pat
           --token ${{ secrets.AZURE_DEVOPS_EXTENSION_TOKEN }}
           ${{ (github.ref == 'refs/heads/main' && '--share-with tingle rhyskoedijk') || '' }}
+        working-directory: extensions/azure
 
   # Bitbucket:
   #   runs-on: ubuntu-latest
