@@ -129,7 +129,7 @@ jobs:
       #       GITHUB_REF_NAME="${{ github.ref_name }}"
       #       DATABASE_URL="${{ secrets.DATABASE_URL }}"
       #       BETTER_AUTH_SECRET="${{ secrets.BETTER_AUTH_SECRET }}"
-      #       BETTER_AUTH_SECRET="${{ secrets.BETTER_AUTH_SECRET }}"
+      #       CRON_SECRET="${{ secrets.CRON_SECRET }}"
       #       RESEND_API_KEY="${{ secrets.RESEND_API_KEY }}"
       #       ADMIN_DASHBOARD_PASSWORD="${{ secrets.ADMIN_DASHBOARD_PASSWORD }}"
       #       ADMIN_USER_IDS="${{ secrets.ADMIN_USER_IDS }}"
