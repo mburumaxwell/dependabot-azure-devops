@@ -15,8 +15,8 @@
       "import": "./dist/local/index.js"
     },
     "./local/azure": {
-      "types": "./dist/local/azure.d.ts",
-      "import": "./dist/local/azure.js"
+      "types": "./dist/local/azure/index.d.ts",
+      "import": "./dist/local/azure/index.js"
     }
   },
   "files": [
