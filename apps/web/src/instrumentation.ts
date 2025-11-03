@@ -1,5 +1,5 @@
 import { environment } from '@paklo/core/environment';
-import { registerOTel, type Configuration } from '@vercel/otel';
+import { type Configuration, registerOTel } from '@vercel/otel';
 
 export async function register() {
   let traceExporter: Configuration['traceExporter'];
