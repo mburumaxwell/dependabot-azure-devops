@@ -47,6 +47,9 @@
     "tsdown": "0.15.12"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "executableFiles": [
+      "./dist/index.js"
+    ]
   }
 }
