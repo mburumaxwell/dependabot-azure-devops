@@ -1,5 +1,18 @@
 # paklo
 
+## 0.11.2
+
+### Patch Changes
+
+- 9042c4b: Add repository.directory to package.json for easier registry navigation
+- fc95c84: Add `executableFiles` to cli package so that they get `chmod+x` automatically
+- 86eadbf: No longer hoisting packages
+- Updated dependencies [9042c4b]
+- Updated dependencies [e843b12]
+- Updated dependencies [3e9b4aa]
+  - @paklo/runner@0.2.0
+  - @paklo/core@0.3.0
+
 ## 0.11.1
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @paklo/core
 
+## 0.3.0
+
+### Minor Changes
+
+- e843b12: Rename url.url to url.value
+- 3e9b4aa: No longer need browser exports
+
+### Patch Changes
+
+- 9042c4b: Add repository.directory to package.json for easier registry navigation
+
 ## 0.2.0
 
 ### Minor Changes

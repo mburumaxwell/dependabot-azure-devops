@@ -1,5 +1,17 @@
 # extension-azure-devops
 
+## 2.59.5
+
+### Patch Changes
+
+- 9042c4b: Add repository.directory to package.json for easier registry navigation
+- 86eadbf: No longer hoisting packages
+- Updated dependencies [9042c4b]
+- Updated dependencies [e843b12]
+- Updated dependencies [3e9b4aa]
+  - @paklo/runner@0.2.0
+  - @paklo/core@0.3.0
+
 ## 2.59.4
 
 ### Patch Changes
