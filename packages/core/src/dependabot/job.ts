@@ -30,8 +30,6 @@ export const DependabotSourceSchema = z.object({
   commit: z.string().nullish(),
   hostname: z.string().nullish(), // Must be provided if api-endpoint is
   'api-endpoint': z.string().nullish(), // Must be provided if hostname is
-  // TODO: refine to ensure either directory or directories is provided
-  // TODO: refine to ensure either both hostname and api-endpoint have a value or both are undefined
 });
 export type DependabotSource = z.infer<typeof DependabotSourceSchema>;
 
