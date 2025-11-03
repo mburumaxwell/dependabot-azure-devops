@@ -33,7 +33,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mburumaxwell/dependabot-azure-devops.git"
+    "url": "git+https://github.com/mburumaxwell/dependabot-azure-devops.git",
+    "directory": "packages/runner"
   },
   "keywords": [
     "dependabot",
