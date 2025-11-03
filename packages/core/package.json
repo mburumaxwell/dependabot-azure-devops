@@ -6,43 +6,37 @@
   "author": "mburumaxwell",
   "license": "AGPL-3.0-later",
   "exports": {
-    "./azure": {
-      "types": "./dist/node/azure/index.d.ts",
-      "node": "./dist/node/azure/index.js"
-    },
-    "./dependabot": {
-      "types": "./dist/node/dependabot/index.d.ts",
-      "node": "./dist/node/dependabot/index.js"
-    },
     "./environment": {
-      "types": "./dist/node/environment/index.d.ts",
-      "node": "./dist/node/environment/index.js",
-      "browser": "./dist/browser/environment/index.js"
-    },
-    "./github": {
-      "types": "./dist/node/github/index.d.ts",
-      "node": "./dist/node/github/index.js",
-      "browser": "./dist/browser/github/index.js"
+      "types": "./dist/environment/index.d.ts",
+      "import": "./dist/environment/index.js"
     },
     "./http": {
-      "types": "./dist/node/http/index.d.ts",
-      "node": "./dist/node/http/index.js",
-      "browser": "./dist/browser/http/index.js"
+      "types": "./dist/http/index.d.ts",
+      "import": "./dist/http/index.js"
     },
     "./logger": {
-      "types": "./dist/node/logger.d.ts",
-      "node": "./dist/node/logger.js",
-      "browser": "./dist/browser/logger.js"
+      "types": "./dist/logger.d.ts",
+      "import": "./dist/logger.js"
     },
     "./shared-data": {
-      "types": "./dist/node/shared-data/index.d.ts",
-      "node": "./dist/node/shared-data/index.js",
-      "browser": "./dist/browser/shared-data/index.js"
+      "types": "./dist/shared-data/index.d.ts",
+      "import": "./dist/shared-data/index.js"
     },
     "./usage": {
-      "types": "./dist/node/usage.d.ts",
-      "node": "./dist/node/usage.js",
-      "browser": "./dist/browser/usage.js"
+      "types": "./dist/usage.d.ts",
+      "import": "./dist/usage.js"
+    },
+    "./github": {
+      "types": "./dist/github/index.d.ts",
+      "import": "./dist/github/index.js"
+    },
+    "./dependabot": {
+      "types": "./dist/dependabot/index.d.ts",
+      "import": "./dist/dependabot/index.js"
+    },
+    "./azure": {
+      "types": "./dist/azure/index.d.ts",
+      "import": "./dist/azure/index.js"
     }
   },
   "files": [
