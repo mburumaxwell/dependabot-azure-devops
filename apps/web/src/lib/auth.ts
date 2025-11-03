@@ -1,6 +1,7 @@
-import { checkout, polar, portal, usage, webhooks } from '@polar-sh/better-auth';
+import { stripe } from '@better-auth/stripe';
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
+import { APIError } from 'better-auth/api';
 import { nextCookies } from 'better-auth/next-js';
 import { admin, magicLink, organization } from 'better-auth/plugins';
 import { passkey } from 'better-auth/plugins/passkey';
@@ -13,9 +14,9 @@ import {
 } from '@/emails';
 import { logger } from '@/lib/logger';
 import { OrganizationTypeSchema } from '@/lib/organization-types';
-import { polar as polarClient } from '@/lib/polar';
 import { prisma as prismaClient } from '@/lib/prisma';
 import { RegionCodeSchema } from '@/lib/regions';
+import { stripe as stripeClient } from '@/lib/stripe';
 import { config } from '@/site-config';
 import app from '../../package.json';
 
@@ -28,12 +29,20 @@ export const auth = betterAuth({
     deleteUser: {
       enabled: true,
       deleteTokenExpiresIn: 5 * 60, // 5 minutes
-      async afterDelete(user, request) {
-        // does not happen automatically, so we need to delete the customer in Polar
-        logger.debug(`Deleting Polar customer for user ${user.id}`);
-        await polarClient.customers.deleteExternal({
-          externalId: user.id,
+      async beforeDelete(user, request) {
+        // block delete if user owns organizations
+        const ownedOrgs = await prismaClient.organization.count({
+          where: { members: { some: { userId: user.id, role: 'owner' } } },
         });
+        if (ownedOrgs > 0) {
+          throw new APIError('FORBIDDEN', {
+            message:
+              'Cannot delete account while owning organizations. Please transfer ownership or delete organizations first.',
+          });
+        }
+      },
+      async afterDelete(user, request) {
+        // TODO: find out if we need to delete the customer in Stripe
       },
       async sendDeleteAccountVerification({ user, url }, request) {
         logger.debug(`Sending account deletion verification to ${user.email} url: ${url}`);
@@ -90,26 +99,10 @@ export const auth = betterAuth({
         await sendMagicLinkEmail({ recipient: email, url });
       },
     }),
-    polar({
-      client: polarClient,
+    stripe({
+      stripeClient,
+      stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
       createCustomerOnSignUp: true,
-      use: [
-        checkout({
-          products: [
-            { productId: process.env.POLAR_PRODUCT_ID_PROJECT!, slug: 'project' },
-            // { productId: process.env.POLAR_PRODUCT_ID_MINUTES, slug: 'minutes' },
-          ],
-          authenticatedUsersOnly: true,
-          successUrl: `${config.siteUrl}/settings/billing?checkout=success`,
-          returnUrl: `${config.siteUrl}/settings/billing`,
-        }),
-        portal({ returnUrl: `${config.siteUrl}/settings/billing` }),
-        usage(),
-        webhooks({
-          secret: process.env.POLAR_WEBHOOK_SECRET!,
-          // TODO: handle webhooks here
-        }),
-      ],
     }),
     nextCookies(), // must be last to work with server actions/components
   ],

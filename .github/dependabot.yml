@@ -119,8 +119,6 @@ updates:
         patterns:
           - 'pino'
           - 'pino-*'
-      polar-sh:
-        patterns: ['@polar-sh/*']
       prisma:
         patterns:
           - 'prisma'
