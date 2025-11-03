@@ -265,9 +265,6 @@ importers:
       '@types/node':
         specifier: 24.10.0
         version: 24.10.0
-      '@types/q':
-        specifier: 1.5.8
-        version: 1.5.8
       '@types/semver':
         specifier: 7.7.1
         version: 7.7.1
@@ -289,6 +286,9 @@ importers:
       commander:
         specifier: 14.0.2
         version: 14.0.2
+      zod:
+        specifier: 4.1.12
+        version: 4.1.12
     devDependencies:
       '@types/node':
         specifier: 24.10.0
@@ -2963,9 +2963,6 @@ packages:
 
   '@types/prismjs@1.26.5':
     resolution: {integrity: sha512-AUZTa7hQ2KY5L7AmtSiqxlhWxb4ina0yd8hNbl4TWuqnv/pFP0nDMb3YrfSBf4hJVGLh2YEIBfKaBW/9UEl6IQ==}
-
-  '@types/q@1.5.8':
-    resolution: {integrity: sha512-hroOstUScF6zhIi+5+x0dzqrHA1EJi+Irri6b1fxolMTqqHIV/Cg77EtnQcZqZCu8hR3mX2BzIxN4/GzI68Kfw==}
 
   '@types/react-dom@19.0.4':
     resolution: {integrity: sha512-4fSQ8vWFkg+TGhePfUzVmat3eC14TXYSsiiDSLI0dVLsrm9gZFABjPy/Qu6TKgl1tq1Bu1yDsuQgY3A3DOjCcg==}
@@ -10348,8 +10345,6 @@ snapshots:
   '@types/normalize-path@3.0.2': {}
 
   '@types/prismjs@1.26.5': {}
-
-  '@types/q@1.5.8': {}
 
   '@types/react-dom@19.0.4(@types/react@19.0.10)':
     dependencies:

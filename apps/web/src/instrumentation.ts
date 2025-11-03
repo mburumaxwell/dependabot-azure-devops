@@ -1,9 +1,8 @@
-import type { SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { environment } from '@paklo/core/environment';
-import { registerOTel } from '@vercel/otel';
+import { registerOTel, type Configuration } from '@vercel/otel';
 
 export async function register() {
-  let traceExporter: SpanExporter | undefined;
+  let traceExporter: Configuration['traceExporter'];
 
   if (process.env.NEXT_RUNTIME !== 'edge') {
     const isVercelDeployment = Boolean(process.env.VERCEL_DEPLOYMENT_ID);
