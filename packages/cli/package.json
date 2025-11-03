@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@types/node": "24.9.2",
-    "tsdown": "0.15.11"
+    "tsdown": "0.15.12"
   },
   "publishConfig": {
     "access": "public"
