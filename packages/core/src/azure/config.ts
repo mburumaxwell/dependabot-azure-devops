@@ -50,7 +50,7 @@ export async function getDependabotConfig({
     logger.debug(`Attempting to fetch configuration file via REST API ...`);
     for (const fp of POSSIBLE_CONFIG_FILE_PATHS) {
       // make HTTP request
-      const requestUrl = `${url.url}${url.project}/_apis/git/repositories/${url.repository}/items?path=/${fp}`;
+      const requestUrl = `${url.value}${url.project}/_apis/git/repositories/${url.repository}/items?path=/${fp}`;
       logger.debug(`GET ${requestUrl}`);
 
       try {

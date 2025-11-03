@@ -1,6 +1,6 @@
 export type AzureDevOpsOrganizationUrl = {
   /** URL of the organisation. This may lack the project name */
-  url: URL; // TODO: rename to value
+  value: URL;
 
   /** Organisation URL hostname */
   hostname: string;
@@ -30,19 +30,19 @@ export type AzureDevOpsRepositoryUrl = AzureDevOpsProjectUrl & {
 
 export function extractOrganizationUrl({ organisationUrl }: { organisationUrl: string }): AzureDevOpsOrganizationUrl {
   // convert url string into a valid JS URL object
-  const url = new URL(organisationUrl);
-  const protocol = url.protocol.slice(0, -1);
-  let { hostname } = url;
+  const value = new URL(organisationUrl);
+  const protocol = value.protocol.slice(0, -1);
+  let { hostname } = value;
   const visualStudioUrlRegex = /^(?<prefix>\S+)\.visualstudio\.com$/iu;
   if (visualStudioUrlRegex.test(hostname)) hostname = 'dev.azure.com'; // TODO: should we really be converting back to the new hostname?
 
   const organisation: string = extractOrganisation(organisationUrl);
 
-  const virtualDirectory = extractVirtualDirectory(url);
-  const apiEndpoint = `${protocol}://${hostname}${url.port ? `:${url.port}` : ''}/${virtualDirectory ? `${virtualDirectory}/` : ''}`;
+  const virtualDirectory = extractVirtualDirectory(value);
+  const apiEndpoint = `${protocol}://${hostname}${value.port ? `:${value.port}` : ''}/${virtualDirectory ? `${virtualDirectory}/` : ''}`;
 
   return {
-    url,
+    value,
     hostname,
     'api-endpoint': apiEndpoint,
     organisation,

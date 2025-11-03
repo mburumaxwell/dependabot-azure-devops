@@ -35,7 +35,7 @@ export class AzureDevOpsWebApiClient {
   public static API_VERSION_PREVIEW = '5.0-preview';
 
   constructor(url: AzureDevOpsOrganizationUrl, accessToken: string, debug: boolean = false) {
-    const organisationApiUrl = url.url.toString();
+    const organisationApiUrl = url.value.toString();
     this.organisationApiUrl = organisationApiUrl.replace(/\/$/, ''); // trim trailing slash
     this.identityApiUrl = getIdentityApiUrl(organisationApiUrl).replace(/\/$/, ''); // trim trailing slash
     this.accessToken = accessToken;
