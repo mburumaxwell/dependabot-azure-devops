@@ -1,5 +1,19 @@
 # @paklo/runner
 
+## 0.2.0
+
+### Minor Changes
+
+- e843b12: Rename url.url to url.value
+
+### Patch Changes
+
+- 9042c4b: Add repository.directory to package.json for easier registry navigation
+- Updated dependencies [9042c4b]
+- Updated dependencies [e843b12]
+- Updated dependencies [3e9b4aa]
+  - @paklo/core@0.3.0
+
 ## 0.1.1
 
 ### Patch Changes
