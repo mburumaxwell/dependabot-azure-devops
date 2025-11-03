@@ -3,7 +3,7 @@
 import { BadgeCheck, ChevronsUpDown, LogOut, Plus } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { redirect, usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -49,6 +49,7 @@ const groups: MenuGroup[] = [
       { label: 'Repositories', href: '/dashboard/repos' as Route },
       { label: 'Runs', href: '/dashboard/runs' as Route },
       { label: 'Private Vulnerabilities', href: '/dashboard/private-vulns' as Route },
+      { label: 'Secrets', href: '/dashboard/secrets' as Route },
     ],
   },
   {
@@ -68,7 +69,6 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   organizations: Organization[];
 }
 export function AppSidebar({ session: rawSession, organizations: rawOrganizations, ...props }: AppSidebarProps) {
-  const router = useRouter();
   const pathname = usePathname();
   const isActive = (href: Route) => pathname === href || (href !== '/' && pathname.startsWith(href));
   const { isMobile } = useSidebar();
@@ -79,7 +79,7 @@ export function AppSidebar({ session: rawSession, organizations: rawOrganization
     authClient.signOut({
       fetchOptions: {
         // redirect to login page
-        onSuccess: () => router.push('/login'),
+        onSuccess: () => redirect('/login'),
       },
     });
   }
@@ -145,7 +145,7 @@ export function AppSidebar({ session: rawSession, organizations: rawOrganization
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => router.push('/dashboard/account')}>
+                  <DropdownMenuItem onClick={() => redirect('/dashboard/account')}>
                     <BadgeCheck />
                     Account
                   </DropdownMenuItem>
@@ -235,10 +235,10 @@ function OrganizationSwitcher({
   const activeOrg = organizations.find((org) => org.id === activeOrganizationId)!;
 
   async function handleOrgChange(organization: Organization) {
-    const response = await authClient.organization.setActive({ organizationId: organization.id });
-    if (response.error) {
+    const { error } = await authClient.organization.setActive({ organizationId: organization.id });
+    if (error) {
       toast.error('Failed to switch organization', {
-        description: response.error.message,
+        description: error.message,
       });
       return;
     }
@@ -259,14 +259,14 @@ function OrganizationSwitcher({
               <div className='flex aspect-square size-8 items-center justify-center rounded-lg'>
                 <AvatarSnippetHeader
                   title={activeOrg?.name || 'Organization'}
-                  subtitle={getOrganizationInfo(activeOrg?.type)?.name}
+                  subtitle={getOrganizationInfo(activeOrg?.type).name}
                   image={activeOrg?.logo}
                   size={8}
                 />
               </div>
               <AvatarSnippetFooter
                 title={activeOrg?.name || 'Organization'}
-                subtitle={getOrganizationInfo(activeOrg?.type)?.name}
+                subtitle={getOrganizationInfo(activeOrg?.type).name}
               />
               <ChevronsUpDown className='ml-auto' />
             </SidebarMenuButton>
@@ -287,7 +287,7 @@ function OrganizationSwitcher({
                 <div className='flex size-6 items-center justify-center rounded-md border'>
                   <AvatarSnippetHeader
                     title={organization.name}
-                    subtitle={getOrganizationInfo(organization.type)?.name}
+                    subtitle={getOrganizationInfo(organization.type).name}
                     image={organization.logo}
                     size={4}
                     className='shrink-0'
@@ -298,7 +298,7 @@ function OrganizationSwitcher({
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className='gap-2 p-2' onClick={() => router.push('/dashboard/organization/create')}>
+            <DropdownMenuItem className='gap-2 p-2' onClick={() => redirect('/dashboard/organization/create')}>
               <div className='flex size-6 items-center justify-center rounded-md border bg-transparent'>
                 <Plus className='size-4' />
               </div>

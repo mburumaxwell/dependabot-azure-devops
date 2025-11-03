@@ -1,15 +1,16 @@
 'use client';
 
-import { Fingerprint, Loader2, Mail } from 'lucide-react';
+import { Fingerprint, Mail } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { AppleLogo, GoogleLogo, PakloLogo } from '@/components/logos';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
 import { authClient, magicLinkLogin } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 
@@ -20,7 +21,6 @@ interface LoginFormProps extends React.ComponentProps<'div'> {
 export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
   const thirdPartyLogins = false; // Might add 3rd-party login but not now!
 
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
@@ -41,12 +41,14 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
     setIsLoading(false);
 
     if (error) {
-      toast.error('Passkey sign-in failed.', { description: error.message || 'Please try again.' });
+      if (error.code !== 'AUTH_CANCELLED') {
+        toast.error('Passkey sign-in failed.', { description: error.message || 'Please try again.' });
+      }
       return;
     }
 
     // Redirect to dashboard or specified redirect URL after successful login
-    router.push((redirectTo || '/dashboard') as Route);
+    redirect((redirectTo || '/dashboard') as Route);
   }
 
   async function handleMagicLinkLogin(e: React.FormEvent) {
@@ -98,7 +100,7 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
             className='h-12'
           >
             {isLoading ? (
-              <Loader2 className='size-5 animate-spin' />
+              <Spinner className='size-5' />
             ) : (
               <>
                 <Fingerprint className='size-5' />
@@ -114,7 +116,7 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
             <div className='space-y-4 text-center'>
               <div className='flex justify-center'>
                 <div className='rounded-full bg-primary/10 p-3'>
-                  <Mail className='h-6 w-6 text-primary' />
+                  <Mail className='size-6 text-primary' />
                 </div>
               </div>
             </div>
@@ -147,7 +149,7 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
             <Field>
               <Button type='submit' variant='secondary' disabled={isLoading || !email} size='lg'>
                 {isLoading ? (
-                  <Loader2 className='size-5 animate-spin' />
+                  <Spinner className='size-5' />
                 ) : (
                   <>
                     <Mail className='size-5' />

@@ -18,15 +18,6 @@ export function BillingEmailSection() {
   );
 }
 
-export function PaymentMethodsSection() {
-  return (
-    <div>
-      {/* Keep empty */}
-      {/* Keep empty */}
-    </div>
-  );
-}
-
 export function InvoicesSection() {
   return (
     <div>

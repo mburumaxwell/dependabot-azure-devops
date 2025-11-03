@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { headers as requestHeaders } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
+import { NoOrganizationsView, SelectOrganizationView } from './page.client';
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -36,16 +37,6 @@ export default async function DashboardHomePage() {
   // or the view to guiding them to create a new organization.
 
   // Bare in mind that this page does not have the sidebar.
-
-  // TODO: implement this page
-  return (
-    <div className='flex flex-1 flex-col gap-4 p-4'>
-      <div className='grid auto-rows-min gap-4 md:grid-cols-3'>
-        <div className='bg-muted/50 aspect-video rounded-xl' />
-        <div className='bg-muted/50 aspect-video rounded-xl' />
-        <div className='bg-muted/50 aspect-video rounded-xl' />
-      </div>
-      <div className='bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min' />
-    </div>
-  );
+  if (organizations.length === 0) return <NoOrganizationsView />;
+  return <SelectOrganizationView organizations={organizations} />;
 }

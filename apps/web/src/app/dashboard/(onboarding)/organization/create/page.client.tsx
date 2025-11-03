@@ -1,10 +1,11 @@
 'use client';
 
-import { CheckCircle2, Eye, EyeOff, Globe, Loader2, XCircle } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { CheckCircle2, Eye, EyeOff, Globe, XCircle } from 'lucide-react';
+import { redirect, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import validator from 'validator';
 import { validateOrganizationCredentials } from '@/actions/organizations';
+import { createOrganizationWithCredential, type OrganizationCreateOptions } from '@/actions/organizations/create-org';
 import { Stepper } from '@/components/stepper';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -12,24 +13,16 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
-import { ORGANIZATION_TYPES_INFO, type OrganizationType } from '@/lib/organization-types';
+import { ORGANIZATION_TYPES_INFO } from '@/lib/organization-types';
 import { REGIONS, type RegionCode } from '@/lib/regions';
 import { cn } from '@/lib/utils';
-
-type CreationData = {
-  name: string;
-  slug: string;
-  type: OrganizationType;
-  url: string;
-  token: string;
-  region: RegionCode;
-};
 
 export function CreateOrganizationPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
-  const [data, setData] = useState<CreationData>({
+  const [data, setData] = useState<OrganizationCreateOptions>({
     name: '',
     slug: '',
     type: 'azure',
@@ -52,6 +45,7 @@ export function CreateOrganizationPage() {
 
   // Step 3: Creating organization state
   const [creating, setCreating] = useState(false);
+  const [creatingError, setCreatingError] = useState('');
 
   const steps = [
     { title: 'Name & Slug', description: 'Basic information' },
@@ -90,15 +84,15 @@ export function CreateOrganizationPage() {
       return;
     }
 
-    const response = await authClient.organization.checkSlug({ slug: data.slug });
-    if (response.error) {
+    const { data: rd, error } = await authClient.organization.checkSlug({ slug: data.slug });
+    if (error) {
       setSlugVerifying(false);
-      setSlugError(`${response.error.code}: ${response.error.message}`);
+      setSlugError(`${error.code}: ${error.message}`);
       return;
     }
 
     setSlugVerifying(false);
-    if (response.data.status) {
+    if (rd.status) {
       setSlugVerified(true);
     } else {
       setSlugError('This slug is already taken');
@@ -173,30 +167,18 @@ export function CreateOrganizationPage() {
   // Create organization
   async function createOrganization() {
     setCreating(true);
-
-    // Call API to create organization
-    const response = await authClient.organization.create({
-      name: data.name,
-      slug: data.slug,
-      type: data.type,
-      url: data.url,
-      token: data.token,
-      region: data.region,
-
-      // change current active organization to the new one
-      keepCurrentActiveOrganization: false,
-    });
-
+    const response = await createOrganizationWithCredential(data);
     setCreating(false);
 
     if (response.error) {
-      // TODO: show error to user
-      // setCreatingError(`${response.error.code}: ${response.error.message}`);
+      setCreatingError(response.error.message);
       return;
     }
 
+    setCreatingError('');
+
     // Redirect to organization settings for billing setup
-    router.push('/dashboard/settings/billing?new=true');
+    redirect('/dashboard/settings/billing?new=true');
   }
 
   const canProceedStep1 = data.name && data.slug && slugVerified;
@@ -211,7 +193,7 @@ export function CreateOrganizationPage() {
     <>
       <Stepper steps={steps} currentStep={currentStep} className='mb-8' />
 
-      <Card>
+      <Card className='w-full'>
         <CardContent>
           {/* Step 1: Name & Slug */}
           {currentStep === 1 && (
@@ -243,7 +225,7 @@ export function CreateOrganizationPage() {
                   <Button onClick={verifySlug} disabled={!data.slug || slugVerifying || slugVerified} variant='outline'>
                     {slugVerifying ? (
                       <>
-                        <Loader2 className='animate-spin' />
+                        <Spinner />
                         Verifying
                       </>
                     ) : slugVerified ? (
@@ -409,7 +391,7 @@ export function CreateOrganizationPage() {
                 >
                   {credentialsVerifying ? (
                     <>
-                      <Loader2 className='animate-spin' />
+                      <Spinner />
                       Verifying Connection
                     </>
                   ) : credentialsVerified ? (
@@ -487,6 +469,13 @@ export function CreateOrganizationPage() {
                 </RadioGroup>
               </div>
 
+              {creatingError && (
+                <Alert variant='destructive'>
+                  <XCircle className='size-4' />
+                  <AlertDescription>{creatingError}</AlertDescription>
+                </Alert>
+              )}
+
               <div className='flex justify-between pt-4'>
                 <Button variant='outline' onClick={() => setCurrentStep(2)}>
                   Back
@@ -494,7 +483,7 @@ export function CreateOrganizationPage() {
                 <Button onClick={createOrganization} disabled={creating}>
                   {creating ? (
                     <>
-                      <Loader2 className='animate-spin' />
+                      <Spinner />
                       Creating Organization
                     </>
                   ) : (

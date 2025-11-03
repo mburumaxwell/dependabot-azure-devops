@@ -122,7 +122,7 @@ export function TelemetryDashboard({ initialData }: TelemetryDashboardProps) {
         <div className='flex flex-wrap gap-3'>
           <Select value={timeRange} onValueChange={(value) => updateFilters({ timeRange: value })}>
             <SelectTrigger className='w-[180px]'>
-              <Calendar className='w-4 h-4 mr-2' />
+              <Calendar className='size-4 mr-2' />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

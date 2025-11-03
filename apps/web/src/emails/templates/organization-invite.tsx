@@ -24,8 +24,8 @@ export type OrganizationInviteProps = {
 export function OrganizationInvite({
   organization = 'Contoso Ltd',
   inviter = 'Alice Smith',
-  acceptUrl = 'https://www.paklo.app/organization/invite/accept?id=123',
-  declineUrl = 'https://www.paklo.app/organization/invite/decline?id=123',
+  acceptUrl = 'https://www.paklo.app/invite/accept?id=123',
+  declineUrl = 'https://www.paklo.app/invite/decline?id=123',
   recipient = 'chris.johnson@contoso.com',
   expires = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
 }: OrganizationInviteProps) {
@@ -48,12 +48,18 @@ export function OrganizationInvite({
               </Row>
               <Row>
                 <Text className='text-[14px] text-[#666666] mt-2'>
-                  This invitation expires on{' '}
+                  This invitation link expires on{' '}
                   {expires.toLocaleDateString('en-US', {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
+                  })}{' '}
+                  at{' '}
+                  {expires.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    timeZoneName: 'short',
                   })}
                   .
                 </Text>
@@ -71,21 +77,6 @@ export function OrganizationInvite({
                 >
                   Decline
                 </Button>
-              </Row>
-              <Row>
-                <Text className='text-[#666666] mt-4'>
-                  If the buttons don't work, you can copy and paste these links:
-                </Text>
-                <Text>
-                  Accept:
-                  <br />
-                  {acceptUrl}
-                  <br />
-                  <br />
-                  Decline:
-                  <br />
-                  {declineUrl}
-                </Text>
               </Row>
             </Section>
             <Hr className='mx-0 my-[26px] w-full border border-[#eaeaea] border-solid' />

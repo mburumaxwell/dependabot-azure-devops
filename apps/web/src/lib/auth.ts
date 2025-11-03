@@ -51,14 +51,12 @@ export const auth = betterAuth({
             url: { type: 'string', required: true, unique: true },
             region: { type: 'string', required: true, validator: { input: RegionCodeSchema } },
             maxProjects: { type: 'number', required: false, validator: { input: z.int().min(1).max(100).optional() } },
-            token: { type: 'string', required: true, returned: false },
-            githubToken: { type: 'string', required: false, returned: false },
           },
         },
       },
       async sendInvitationEmail(data, request) {
-        const acceptUrl = `${config.siteUrl}/dashboard/organization/invite/accept?id=${data.id}`;
-        const declineUrl = `${config.siteUrl}/dashboard/organization/invite/decline?id=${data.id}`;
+        const acceptUrl = `${config.siteUrl}/invite/accept?id=${data.id}`;
+        const declineUrl = `${config.siteUrl}/invite/decline?id=${data.id}`;
         logger.debug(`Sending invitation to ${data.invitation.email} url: ${acceptUrl}`);
         await sendOrganizationInviteEmail({
           organization: data.organization.name,
@@ -123,3 +121,5 @@ export type ActiveOrganization = typeof auth.$Infer.ActiveOrganization;
 export type Invitation = typeof auth.$Infer.Invitation;
 export type Member = typeof auth.$Infer.Member;
 export type { Passkey } from 'better-auth/plugins/passkey';
+export type OrganizationRole = Member['role'];
+export type AssignableOrganizationRole = Exclude<OrganizationRole, 'owner'>;

@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   openGraph: { url: `/dashboard/organization/leave` },
 };
 
+// TODO: implement this page
 export default function OrgLeavePage() {
   return (
     <div className='flex flex-1 flex-col gap-4 p-4'>

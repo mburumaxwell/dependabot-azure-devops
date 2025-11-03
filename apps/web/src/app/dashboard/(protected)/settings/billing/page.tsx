@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { BillingEmailSection, CapacitySection, InvoicesSection, PaymentMethodsSection } from './page.client';
+import { BillingEmailSection, CapacitySection, InvoicesSection } from './page.client';
 
 export const metadata: Metadata = {
   title: 'Billing',
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 // TODO: implement this page
 // incoming searchparams from /organization/create [new=true]
-export default function BillingPage() {
+export default async function BillingPage() {
   return (
     <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
       <div>
@@ -19,7 +19,6 @@ export default function BillingPage() {
 
       <CapacitySection />
       <BillingEmailSection />
-      <PaymentMethodsSection />
       <InvoicesSection />
     </div>
   );

@@ -18,7 +18,7 @@ export function MetricCard({ title, value, subtitle, trend, trendUp }: MetricCar
           <p className='text-3xl font-semibold text-foreground'>{value}</p>
           {trend && (
             <span className={`text-xs flex items-center gap-1 ${trendUp ? 'text-success' : 'text-destructive'}`}>
-              {trendUp ? <ArrowUp className='w-3 h-3' /> : <ArrowDown className='w-3 h-3' />}
+              {trendUp ? <ArrowUp className='size-3' /> : <ArrowDown className='size-3' />}
               {trend}
             </span>
           )}

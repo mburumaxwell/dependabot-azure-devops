@@ -111,7 +111,7 @@ model Verification {
 }
 
 model Organization {
-  id          String       @id @map("_id")
+  id          String                  @id @map("_id")
   name        String
   slug        String?
   logo        String?
@@ -121,10 +121,9 @@ model Organization {
   invitations Invitation[]
   type        String
   url         String
-  token       String
   region      String
-  githubToken String?
   maxProjects Int?
+  credential  OrganizationCredential?
 
   @@unique([slug])
   @@unique([url])
@@ -174,4 +173,19 @@ model Passkey {
   aaguid       String?
 
   @@map("passkey")
+}
+
+// Credentials are stored in a separate table/collection for security reasons.
+// This way they are only queried when needed and not by accident when pulling
+// organization data.
+// The better-auth plugin is meant to hide this information but it does not work.
+// Even if it did, it is better to keep sensitive information isolated.
+
+model OrganizationCredential {
+  id           String       @id @map("_id")
+  organization Organization @relation(fields: [id], references: [id], onDelete: Cascade)
+  token        String
+  githubToken  String?
+
+  @@map("organization_credential")
 }

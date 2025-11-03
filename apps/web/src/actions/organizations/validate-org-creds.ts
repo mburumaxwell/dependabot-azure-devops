@@ -13,7 +13,7 @@ export async function validateOrganizationCredentials({
   type,
   url: inputUrl,
   token,
-  organizationId,
+  id,
 }: {
   type: OrganizationType;
   url: string;
@@ -21,7 +21,7 @@ export async function validateOrganizationCredentials({
   /**
    * Optional organization ID to exclude from uniqueness check
    */
-  organizationId?: string;
+  id?: string;
 }): Promise<{ valid: boolean; message?: string }> {
   // ensure the URL can be parsed
   let url: AzureDevOpsOrganizationUrl;
@@ -61,7 +61,7 @@ export async function validateOrganizationCredentials({
       type,
       url: inputUrl,
       // exclude current organization from uniqueness check
-      NOT: organizationId ? { id: organizationId } : undefined,
+      NOT: id ? { id } : undefined,
     },
   });
   if (existingOrg) {

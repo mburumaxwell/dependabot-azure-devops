@@ -1,14 +1,20 @@
 'use client';
 
-import { CheckCircle2, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { validateGitHubToken, validateOrganizationCredentials } from '@/actions/organizations';
+import {
+  updateGithubToken,
+  updateOrganizationToken,
+  validateGitHubToken,
+  validateOrganizationCredentials,
+} from '@/actions/organizations';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
 import type { Organization } from '@/lib/auth-client';
 import type { OrganizationType } from '@/lib/organization-types';
 
@@ -16,7 +22,8 @@ export function PrimaryIntegrationSection({ organization }: { organization: Orga
   const [showToken, setShowToken] = useState(false);
   const [token, setToken] = useState('');
   const [isValidating, setIsValidating] = useState(false);
-  const [isTokenValid, setIsTokenValid] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isTokenSaved, setIsTokenSaved] = useState(false);
 
   async function handleValidateToken() {
     if (!token.trim()) return;
@@ -28,18 +35,32 @@ export function PrimaryIntegrationSection({ organization }: { organization: Orga
       type: organization.type as OrganizationType,
       url: organization.url,
       token,
-      organizationId: organization.id,
+      id: organization.id,
     });
     if (!valid) {
       setIsValidating(false);
-      toast.error('Failed to verify credentials', {
+      toast.error('Failed to verify organization credentials', {
         description: message || 'Please check your token and try again.',
       });
       return;
     }
 
-    setIsTokenValid(true);
     setIsValidating(false);
+
+    // update token in database
+    setIsSaving(true);
+    const { success, error } = await updateOrganizationToken({ id: organization.id, token });
+    setIsSaving(false);
+    if (!success) {
+      setIsSaving(false);
+      toast.error('Failed to save organization token', {
+        description: error?.message || 'Please try again later.',
+      });
+      return;
+    }
+
+    toast.success('Organization token saved successfully');
+    setIsTokenSaved(true);
     setToken('');
   }
 
@@ -73,7 +94,7 @@ export function PrimaryIntegrationSection({ organization }: { organization: Orga
                 value={token}
                 onChange={(e) => {
                   setToken(e.target.value);
-                  setIsTokenValid(false);
+                  setIsTokenSaved(false);
                 }}
                 placeholder='Enter new token to update'
                 className='pr-10'
@@ -85,18 +106,18 @@ export function PrimaryIntegrationSection({ organization }: { organization: Orga
                 className='absolute right-0 top-0 h-full px-3'
                 onClick={() => setShowToken(!showToken)}
               >
-                {showToken ? <EyeOff className='h-4 w-4' /> : <Eye className='h-4 w-4' />}
+                {showToken ? <EyeOff className='size-4' /> : <Eye className='size-4' />}
               </Button>
             </div>
-            <Button onClick={handleValidateToken} disabled={!token.trim() || isValidating || isTokenValid}>
-              {isValidating ? (
+            <Button onClick={handleValidateToken} disabled={!token.trim() || isValidating || isSaving || isTokenSaved}>
+              {isValidating || isSaving ? (
                 <>
-                  <Loader2 className='h-4 w-4 animate-spin mr-2' />
-                  Validating...
+                  <Spinner className='mr-2' />
+                  {isValidating ? 'Validating...' : 'Saving...'}
                 </>
-              ) : isTokenValid ? (
+              ) : isTokenSaved ? (
                 <>
-                  <CheckCircle2 className='h-4 w-4 mr-2' />
+                  <CheckCircle2 className='size-4 mr-2' />
                   Saved
                 </>
               ) : (
@@ -117,9 +138,10 @@ export function GitHubSection({ organizationId }: { organizationId: string }) {
   const [showToken, setShowToken] = useState(false);
   const [token, setToken] = useState('');
   const [isValidating, setIsValidating] = useState(false);
-  const [isTokenValid, setIsTokenValid] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isTokenSaved, setIsTokenSaved] = useState(false);
 
-  const handleValidateGithubToken = async () => {
+  const handleValidateToken = async () => {
     if (!token.trim()) return;
 
     setIsValidating(true);
@@ -128,14 +150,28 @@ export function GitHubSection({ organizationId }: { organizationId: string }) {
     const { valid, message } = await validateGitHubToken({ token });
     if (!valid) {
       setIsValidating(false);
-      toast.error('Failed to verify token', {
+      toast.error('Failed to verify GitHub token', {
         description: message || 'Please check your token and try again.',
       });
       return;
     }
 
-    setIsTokenValid(true);
     setIsValidating(false);
+
+    // update token in database
+    setIsSaving(true);
+    const { success, error } = await updateGithubToken({ id: organizationId, token });
+    setIsSaving(false);
+    if (!success) {
+      setIsSaving(false);
+      toast.error('Failed to save GitHub token', {
+        description: error?.message || 'Please try again later.',
+      });
+      return;
+    }
+
+    toast.success('GitHub token saved successfully');
+    setIsTokenSaved(true);
     setToken('');
   };
 
@@ -156,7 +192,7 @@ export function GitHubSection({ organizationId }: { organizationId: string }) {
                 value={token}
                 onChange={(e) => {
                   setToken(e.target.value);
-                  setIsTokenValid(false);
+                  setIsTokenSaved(false);
                 }}
                 placeholder='ghp_xxxxxxxxxxxxxxxxxxxx'
                 className='pr-10'
@@ -168,18 +204,18 @@ export function GitHubSection({ organizationId }: { organizationId: string }) {
                 className='absolute right-0 top-0 h-full px-3'
                 onClick={() => setShowToken(!showToken)}
               >
-                {showToken ? <EyeOff className='h-4 w-4' /> : <Eye className='h-4 w-4' />}
+                {showToken ? <EyeOff className='size-4' /> : <Eye className='size-4' />}
               </Button>
             </div>
-            <Button onClick={handleValidateGithubToken} disabled={!token.trim() || isValidating || isTokenValid}>
-              {isValidating ? (
+            <Button onClick={handleValidateToken} disabled={!token.trim() || isValidating || isSaving || isTokenSaved}>
+              {isValidating || isSaving ? (
                 <>
-                  <Loader2 className='h-4 w-4 animate-spin mr-2' />
-                  Validating...
+                  <Spinner className='mr-2' />
+                  {isValidating ? 'Validating...' : 'Saving...'}
                 </>
-              ) : isTokenValid ? (
+              ) : isTokenSaved ? (
                 <>
-                  <CheckCircle2 className='h-4 w-4 mr-2' />
+                  <CheckCircle2 className='size-4 mr-2' />
                   Saved
                 </>
               ) : (

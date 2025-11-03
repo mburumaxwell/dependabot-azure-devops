@@ -24,5 +24,8 @@ export async function proxy(request: NextRequest) {
 export const config: ProxyConfig = {
   matcher: [
     { source: '/dashboard/:path*' }, // Match all /dashboard routes
+
+    // accepting invites requires authentication
+    { source: '/invite/accept/:path*' },
   ],
 };

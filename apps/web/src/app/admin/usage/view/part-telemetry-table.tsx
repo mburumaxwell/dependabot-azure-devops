@@ -71,7 +71,7 @@ export function TelemetryTable({ data }: TelemetryTableProps) {
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
             >
-              <ChevronLeft className='w-4 h-4' />
+              <ChevronLeft className='size-4' />
             </Button>
             <span className='text-sm text-muted-foreground'>
               Page {currentPage} of {totalPages}
@@ -82,7 +82,7 @@ export function TelemetryTable({ data }: TelemetryTableProps) {
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
             >
-              <ChevronRight className='w-4 h-4' />
+              <ChevronRight className='size-4' />
             </Button>
           </div>
         </div>

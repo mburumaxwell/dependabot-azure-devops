@@ -5,7 +5,6 @@ import {
   Check,
   Fingerprint,
   Home,
-  Loader2,
   LogOut,
   Monitor,
   MoreVertical,
@@ -16,7 +15,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import type { Route } from 'next';
-import { useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { UAParser } from 'ua-parser-js';
@@ -52,6 +51,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
 import { authClient, type Organization, type Passkey, type Session } from '@/lib/auth-client';
 
 export function ProfileSection({ user }: { user: { id: string; name: string; email: string } }) {
@@ -91,7 +91,7 @@ export function ProfileSection({ user }: { user: { id: string; name: string; ema
           <Button onClick={handleSave} disabled={isNameSaving || !name || name === user.name}>
             {isNameSaving ? (
               <>
-                <Loader2 className='h-4 w-4 animate-spin mr-2' />
+                <Spinner className='mr-2' />
                 Saving...
               </>
             ) : (
@@ -113,22 +113,44 @@ export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[]
 
   async function handleAddPasskey() {
     setIsModifyingPasskeys(true);
+    // TODO: fix after https://github.com/better-auth/better-auth/pull/5736 is merged
     const response = await authClient.passkey.addPasskey({
-      // not setting name, as it overrides the default (email)
+      // Not setting name, as it overrides the default (email) which makes it look awkward
+      // in password managers. Instead, we'll let the user edit it afterwards.
     });
     setIsModifyingPasskeys(false);
-    if (response?.data) {
-      setPasskeys((prev) => [...prev, response.data!]);
+    if (response?.error) {
+      if (
+        'code' in response.error &&
+        response.error.code !== 'AUTH_CANCELLED' &&
+        response.error.code !== 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY' // from @simplewebauthn/browser
+      ) {
+        toast.error('Failed to add passkey.', { description: response.error.message || 'Unknown error' });
+      }
+      return;
     }
+
+    const passkey = response?.data as Passkey | null | undefined;
+    if (!passkey) {
+      toast.error('Failed to add passkey.', {
+        description:
+          'No passkey data returned. This should not happen but it has and you may want to refresh the page before trying again.',
+      });
+      return;
+    }
+    setPasskeys((prev) => [...prev, passkey]);
   }
 
   async function handleDeletePasskey(id: string) {
     setIsModifyingPasskeys(true);
-    const response = await authClient.passkey.deletePasskey({ id });
+    const { error } = await authClient.passkey.deletePasskey({ id });
     setIsModifyingPasskeys(false);
-    if (!response?.error) {
-      setPasskeys((prev) => prev.filter((p) => p.id !== id));
+    if (error) {
+      toast.error('Failed to delete passkey.', { description: error.message });
+      return;
     }
+
+    setPasskeys((prev) => prev.filter((p) => p.id !== id));
   }
 
   function handleEditPasskey(passkey: Passkey) {
@@ -140,49 +162,50 @@ export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[]
     if (!editingPasskey || !editedPasskeyName?.trim()) return;
 
     setIsSavingPasskey(true);
-    const response = await authClient.passkey.updatePasskey({
+    const { error } = await authClient.passkey.updatePasskey({
       id: editingPasskey.id,
       name: editedPasskeyName,
     });
-
-    // Update passkey name in state
-    if (!response?.error) {
-      setPasskeys((prev) => prev.map((p) => (p.id === editingPasskey.id ? { ...p, name: editedPasskeyName } : p)));
-    }
-
     setIsSavingPasskey(false);
     setEditingPasskey(null);
     setEditedPasskeyName(undefined);
+
+    if (error) {
+      toast.error('Failed to update passkey name.', { description: error.message });
+      return;
+    }
+
+    setPasskeys((prev) => prev.map((p) => (p.id === editingPasskey.id ? { ...p, name: editedPasskeyName } : p)));
   }
 
   return (
     <>
       <Card>
-        <CardHeader>
-          <div className='flex items-center justify-between'>
-            <div>
-              <CardTitle>Passkeys</CardTitle>
-              <CardDescription>Manage your passkeys for secure authentication</CardDescription>
-            </div>
-            {passkeys.length === 0 ? null : (
+        {passkeys.length === 0 ? null : (
+          <CardHeader>
+            <div className='flex items-center justify-between'>
+              <div>
+                <CardTitle>Passkeys</CardTitle>
+                <CardDescription>Manage your passkeys for secure authentication</CardDescription>
+              </div>
               <Button onClick={handleAddPasskey} disabled={isModifyingPasskeys}>
                 {isModifyingPasskeys ? (
-                  <Loader2 className='h-4 w-4 animate-spin' />
+                  <Spinner />
                 ) : (
                   <>
-                    <Plus className='h-4 w-4 mr-2' />
+                    <Plus className='size-4 mr-2' />
                     Add passkey
                   </>
                 )}
               </Button>
-            )}
-          </div>
-        </CardHeader>
+            </div>
+          </CardHeader>
+        )}
         <CardContent>
           {passkeys.length === 0 ? (
-            <div className='flex flex-col items-center justify-center py-12 text-center'>
+            <div className='flex flex-col items-center justify-center py-3 text-center'>
               <div className='flex size-16 items-center justify-center rounded-full bg-muted mb-4 p-2'>
-                <Fingerprint className='h-8 w-8 text-muted-foreground' />
+                <Fingerprint className='size-8 text-muted-foreground' />
               </div>
               <h3 className='font-medium mb-1'>No passkeys yet</h3>
               <p className='text-sm text-muted-foreground mb-4'>
@@ -190,10 +213,10 @@ export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[]
               </p>
               <Button onClick={handleAddPasskey} disabled={isModifyingPasskeys} size='sm'>
                 {isModifyingPasskeys ? (
-                  <Loader2 className='h-4 w-4 animate-spin' />
+                  <Spinner />
                 ) : (
                   <>
-                    <Plus className='h-4 w-4 mr-2' />
+                    <Plus className='size-4 mr-2' />
                     Add your first passkey
                   </>
                 )}
@@ -205,10 +228,10 @@ export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[]
                 <div key={passkey.id} className='flex items-center justify-between p-3 border rounded-lg'>
                   <div className='flex items-center gap-3'>
                     <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10'>
-                      <Fingerprint className='h-5 w-5 text-primary' />
+                      <Fingerprint className='size-5 text-primary' />
                     </div>
                     <div>
-                      <p className='font-medium'>{passkey.name || 'unknown'}</p>
+                      <p className='font-medium'>{passkey.name || 'no name'}</p>
                       <p className='text-sm text-muted-foreground'>
                         Added <TimeAgo date={passkey.createdAt} />
                       </p>
@@ -216,12 +239,12 @@ export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[]
                   </div>
                   <div className='flex items-center gap-1'>
                     <Button variant='ghost' size='icon' onClick={() => handleEditPasskey(passkey)}>
-                      <Pencil className='h-4 w-4' />
+                      <Pencil className='size-4' />
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant='ghost' size='icon' disabled={isModifyingPasskeys}>
-                          <Trash2 className='h-4 w-4 text-destructive' />
+                          <Trash2 className='size-4 text-destructive' />
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
@@ -273,7 +296,7 @@ export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[]
             >
               {isSavingPasskey ? (
                 <>
-                  <Loader2 className='h-4 w-4 animate-spin mr-2' />
+                  <Spinner className='mr-2' />
                   Saving...
                 </>
               ) : (
@@ -305,11 +328,17 @@ export function SessionsSection({
 
   async function handleRevokeSession(token: string) {
     setIsModifyingSessions(true);
-    const response = await authClient.revokeSession({ token });
-    if (response?.data?.status) {
-      setSessions((prev) => prev.filter((s) => s.token !== token));
-    }
+    const { data, error } = await authClient.revokeSession({ token });
     setIsModifyingSessions(false);
+
+    if (error || !data.status) {
+      toast.error('Failed to revoke session.', {
+        description: error?.message || 'Unknown error',
+      });
+      return;
+    }
+
+    setSessions((prev) => prev.filter((s) => s.token !== token));
   }
 
   return (
@@ -338,14 +367,14 @@ export function SessionsSection({
               <div key={session.id} className='flex items-center justify-between p-3 border rounded-lg'>
                 <div className='flex items-center gap-3'>
                   <div className='flex size-10 items-center justify-center rounded-lg bg-muted'>
-                    <Icon className='h-5 w-5' />
+                    <Icon className='size-5' />
                   </div>
                   <div>
                     <div className='flex items-center gap-2'>
                       <p className='font-medium'>{deviceName}</p>
                       {isCurrent && (
                         <Badge variant='secondary' className='text-xs'>
-                          <Check className='h-3 w-3 mr-1' />
+                          <Check className='size-3 mr-1' />
                           Current
                         </Badge>
                       )}
@@ -393,43 +422,57 @@ export function OrganizationsSection({
   activeOrganizationId?: string | null;
   organizations: Organization[];
 }) {
-  const router = useRouter();
   const [organizations, setOrganizations] = useState(rawOrganizations);
   const [orgToLeave, setOrgToLeave] = useState<Organization | null>(null);
 
   async function handleSetActiveAndNavigate(orgId: string, path: Route) {
-    const response = await authClient.organization.setActive({ organizationId: orgId });
-    if (!response?.error) {
-      router.push(path);
+    const { error } = await authClient.organization.setActive({ organizationId: orgId });
+    if (error) {
+      toast.error('Failed to switch organization', {
+        description: error.message,
+      });
+      return;
     }
+
+    redirect(path);
   }
 
   async function handleLeaveOrg() {
     if (!orgToLeave) return;
 
-    const response = await authClient.organization.leave({ organizationId: orgToLeave.id });
-    if (!response?.error) {
-      setOrganizations((prev) => prev.filter((org) => org.id !== orgToLeave.id));
+    const { error } = await authClient.organization.leave({ organizationId: orgToLeave.id });
+    setOrgToLeave(null);
+    if (error) {
+      toast.error('Failed to leave organization', {
+        description: error.message,
+      });
+      return;
     }
 
-    setOrgToLeave(null);
+    setOrganizations((prev) => prev.filter((org) => org.id !== orgToLeave.id));
   }
 
   return (
     <>
       <Card>
-        <CardHeader>
-          <CardTitle>Organizations</CardTitle>
-          <CardDescription>Organizations you are a member of</CardDescription>
-        </CardHeader>
+        {organizations.length === 0 ? null : (
+          <CardHeader>
+            <CardTitle>Organizations</CardTitle>
+            <CardDescription>Organizations you are a member of</CardDescription>
+          </CardHeader>
+        )}
         <CardContent>
           {organizations.length === 0 ? (
-            <div className='flex flex-col items-center justify-center py-12 text-center'>
+            <div className='flex flex-col items-center justify-center py-3 text-center'>
               <div className='flex size-16 items-center justify-center rounded-full bg-muted mb-4'>
-                <Building2 className='h-8 w-8 text-muted-foreground' />
+                <Building2 className='size-8 text-muted-foreground' />
               </div>
               <h3 className='font-medium mb-1'>No organizations</h3>
-              <p className='text-sm text-muted-foreground'>You are not a member of any organizations yet</p>
+              <p className='text-sm text-muted-foreground'>
+                You are not a member of any organizations yet.
+                <br />
+                Once you join or create an organization, it will appear here.
+              </p>
             </div>
           ) : (
             <div className='space-y-3'>
@@ -437,7 +480,7 @@ export function OrganizationsSection({
                 <div key={org.id} className='flex items-center justify-between p-3 border rounded-lg'>
                   <div className='flex items-center gap-3'>
                     <div className='flex size-10 items-center justify-center rounded-lg bg-muted'>
-                      <Building2 className='h-5 w-5' />
+                      <Building2 className='size-5' />
                     </div>
                     <div>
                       <div className='flex items-center gap-2'>
@@ -453,16 +496,16 @@ export function OrganizationsSection({
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant='ghost' size='icon'>
-                        <MoreVertical className='h-4 w-4' />
+                        <MoreVertical className='size-4' />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
                       <DropdownMenuItem onClick={() => handleSetActiveAndNavigate(org.id, '/dashboard/activity')}>
-                        <Home className='h-4 w-4 mr-2' />
+                        <Home className='size-4 mr-2' />
                         Home
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleSetActiveAndNavigate(org.id, '/dashboard/settings')}>
-                        <Settings className='h-4 w-4 mr-2' />
+                        <Settings className='size-4 mr-2' />
                         Settings
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -470,7 +513,7 @@ export function OrganizationsSection({
                         className='text-destructive focus:text-destructive'
                         onClick={() => setOrgToLeave(org)}
                       >
-                        <LogOut className='h-4 w-4 mr-2' />
+                        <LogOut className='size-4 mr-2' />
                         Leave
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -506,14 +549,18 @@ export function OrganizationsSection({
 export function DangerSection({ hasOrganizations }: { hasOrganizations: boolean }) {
   async function handleDeleteAccount() {
     // this will trigger the delete account flow (sends a verification email, with a link)
-    const response = await authClient.deleteUser({ callbackURL: '/login' });
-    if (response.error) {
-      toast.error('Failed to initiate account deletion.', { description: response.error.message });
+    const { data, error } = await authClient.deleteUser({ callbackURL: '/login' });
+    if (error || !data?.success) {
+      toast.error('Failed to initiate account deletion.', {
+        description: error?.message || data?.message || 'Unknown error',
+      });
       return;
     }
 
     // inform the user to check their email
-    toast('Account deletion requested.', { description: 'Please check your email to confirm account deletion.' });
+    toast('Account deletion requested.', {
+      description: 'Please check your email to confirm account deletion.',
+    });
   }
 
   return (

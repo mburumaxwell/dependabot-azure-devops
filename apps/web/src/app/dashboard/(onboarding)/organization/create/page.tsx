@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function OrgCreatePage() {
   return (
-    <div className='p-6 max-w-4xl mx-auto'>
+    <div className='flex flex-col max-w-4xl mx-auto min-h-screen items-center justify-center p-6'>
       <div className='mb-8 text-center'>
         <h1 className='text-3xl font-semibold mb-2'>Create Organization</h1>
         <p className='text-muted-foreground'>Set up your organization to start managing projects</p>

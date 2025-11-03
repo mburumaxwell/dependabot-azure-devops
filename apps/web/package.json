@@ -8,7 +8,7 @@
     "postinstall": "pnpm typegen",
     "ui": "shadcn",
     "ui-diff": "pnpm ui diff",
-    "ui-gen": "pnpm ui add --overwrite alert alert-dialog avatar badge breadcrumb button dialog card chart dropdown-menu field input label progress radio-group select separator sheet sidebar skeleton sonner table tabs textarea tooltip",
+    "ui-gen": "pnpm ui add --overwrite alert alert-dialog avatar badge breadcrumb button dialog card chart dropdown-menu field input label progress radio-group select separator sheet sidebar skeleton sonner spinner table tabs textarea tooltip",
     "prisma": "dotenv -e .env.development.local -e .env.local -- pnpm exec prisma",
     "prisma-gen": "pnpm prisma generate",
     "prisma-push": "pnpm prisma db push",

@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -8,6 +8,7 @@ import { PakloLogo } from '@/components/logos';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
 import { magicLinkLogin } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 
@@ -66,7 +67,7 @@ export function SignupForm({ className, redirectTo, ...props }: SignupFormProps)
           <div className='space-y-4 text-center'>
             <div className='flex justify-center'>
               <div className='rounded-full bg-primary/10 p-3'>
-                <Mail className='h-6 w-6 text-primary' />
+                <Mail className='size-6 text-primary' />
               </div>
             </div>
           </div>
@@ -112,7 +113,7 @@ export function SignupForm({ className, redirectTo, ...props }: SignupFormProps)
           <Field>
             <Button type='submit' disabled={isLoading || !name || !email} size='lg'>
               {isLoading ? (
-                <Loader2 className='size-5 animate-spin' />
+                <Spinner className='size-5' />
               ) : (
                 <>
                   <Mail className='size-5' />
