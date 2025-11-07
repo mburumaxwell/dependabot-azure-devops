@@ -1,11 +1,11 @@
+import type { Octokit } from 'octokit';
 import * as semver from 'semver';
 import { z } from 'zod/v4';
 
 import { logger } from '@/logger';
+import { createGitHubClient } from './client';
 
 // we use nullish() because it does optional() and allows the value to be set to null
-
-const GHSA_GRAPHQL_API = 'https://api.github.com/graphql';
 
 const GHSA_SECURITY_VULNERABILITIES_QUERY = `
   query($ecosystem: SecurityAdvisoryEcosystem, $package: String) {
@@ -129,6 +129,19 @@ export const SecurityVulnerabilitySchema = z.object({
 });
 export type SecurityVulnerability = z.infer<typeof SecurityVulnerabilitySchema>;
 
+const GitHubSecurityVulnerabilitiesResponseSchema = z.object({
+  securityVulnerabilities: z.object({
+    nodes: z
+      .object({
+        advisory: SecurityAdvisorySchema,
+        vulnerableVersionRange: z.string(),
+        firstPatchedVersion: FirstPatchedVersionSchema.nullish(),
+      })
+      .array(),
+  }),
+});
+type GitHubSecurityVulnerabilitiesResponse = z.infer<typeof GitHubSecurityVulnerabilitiesResponseSchema>;
+
 export function getGhsaPackageEcosystemFromDependabotPackageManager(
   dependabotPackageManager: string,
 ): PackageEcosystem {
@@ -163,13 +176,16 @@ export function getGhsaPackageEcosystemFromDependabotPackageManager(
 }
 
 /**
- * GitHub GraphQL client
+ * GitHub Security Advisory client
  */
-export class GitHubGraphClient {
-  private readonly accessToken: string;
+export class GitHubSecurityAdvisoryClient {
+  private readonly octokit: Octokit;
 
-  constructor(accessToken: string) {
-    this.accessToken = accessToken;
+  /**
+   * @param token GitHub personal access token with access to the GHSA API
+   */
+  constructor(token: string) {
+    this.octokit = createGitHubClient({ token });
   }
 
   /**
@@ -192,29 +208,18 @@ export class GitHubGraphClient {
           ecosystem: packageEcosystem,
           package: pkg.name,
         };
-        const response = await fetch(GHSA_GRAPHQL_API, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${this.accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            query: GHSA_SECURITY_VULNERABILITIES_QUERY,
-            variables: variables,
-          }),
-        });
-        if (!response.ok) {
-          throw new Error(`GHSA GraphQL request failed with response: ${response.status} ${response.statusText}`);
-        }
-        const responseData = await response.json();
-        const errors = responseData?.errors;
-        if (errors) {
-          throw new Error(`GHSA GraphQL request failed with errors: ${JSON.stringify(errors)}`);
-        }
 
-        const vulnerabilities = responseData?.data?.securityVulnerabilities?.nodes;
-        // biome-ignore lint/suspicious/noExplicitAny: generic
-        return vulnerabilities?.filter((v: any) => v?.advisory)?.map((v: any) => ({ package: pkg, ...v }));
+        try {
+          const response = await this.octokit.graphql<GitHubSecurityVulnerabilitiesResponse>(
+            GHSA_SECURITY_VULNERABILITIES_QUERY,
+            variables,
+          );
+          const vulnerabilities = response.securityVulnerabilities.nodes;
+          return vulnerabilities?.filter((v) => v.advisory != null)?.map((v) => ({ package: pkg, ...v })) || [];
+        } catch (error) {
+          logger.warn(`GHSA GraphQL request failed for package ${pkg.name}: ${error}`);
+          throw error;
+        }
       },
     );
 

@@ -16,7 +16,7 @@ import {
 } from '@paklo/core/dependabot';
 import {
   filterVulnerabilities,
-  GitHubGraphClient,
+  GitHubSecurityAdvisoryClient,
   getGhsaPackageEcosystemFromDependabotPackageManager,
   type Package,
   type SecurityVulnerability,
@@ -309,7 +309,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
             }
           }
           if (githubToken) {
-            const ghsaClient = new GitHubGraphClient(githubToken);
+            const ghsaClient = new GitHubSecurityAdvisoryClient(githubToken);
             const githubVulnerabilities = await ghsaClient.getSecurityVulnerabilitiesAsync(
               getGhsaPackageEcosystemFromDependabotPackageManager(packageManager),
               packagesToCheckForVulnerabilities || [],
