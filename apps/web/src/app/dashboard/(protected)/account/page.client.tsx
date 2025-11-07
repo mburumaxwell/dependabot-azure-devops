@@ -49,8 +49,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
+import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { Spinner } from '@/components/ui/spinner';
 import { authClient, type Organization, type Passkey, type Session } from '@/lib/auth-client';
 
@@ -77,28 +79,32 @@ export function ProfileSection({ user }: { user: { id: string; name: string; ema
         <CardTitle>Profile</CardTitle>
         <CardDescription>Update your personal information</CardDescription>
       </CardHeader>
-      <CardContent className='space-y-4'>
-        <div className='space-y-2'>
-          <Label htmlFor='name'>Name</Label>
-          <Input id='name' value={name} onChange={(e) => setName(e.target.value)} />
-        </div>
-        <div className='space-y-2'>
-          <Label htmlFor='email'>Email</Label>
-          <Input id='email' value={user.email} disabled className='bg-muted' />
-          <p className='text-xs text-muted-foreground'>Email cannot be changed</p>
-        </div>
-        <div className='flex justify-end'>
-          <Button onClick={handleSave} disabled={isNameSaving || !name || name === user.name}>
-            {isNameSaving ? (
-              <>
-                <Spinner className='mr-2' />
-                Saving...
-              </>
-            ) : (
-              'Save changes'
-            )}
-          </Button>
-        </div>
+      <CardContent>
+        <FieldSet>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor='name'>Name</FieldLabel>
+              <Input id='name' value={name} onChange={(e) => setName(e.target.value)} />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor='email'>Email</FieldLabel>
+              <Input id='email' value={user.email} disabled className='bg-muted' />
+              <FieldDescription>Email cannot be changed</FieldDescription>
+            </Field>
+            <Field orientation='horizontal'>
+              <Button onClick={handleSave} disabled={isNameSaving || !name || name === user.name}>
+                {isNameSaving ? (
+                  <>
+                    <Spinner className='mr-2' />
+                    Saving...
+                  </>
+                ) : (
+                  'Save changes'
+                )}
+              </Button>
+            </Field>
+          </FieldGroup>
+        </FieldSet>
       </CardContent>
     </Card>
   );
@@ -183,12 +189,16 @@ export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[]
       <Card>
         {passkeys.length === 0 ? null : (
           <CardHeader>
-            <div className='flex items-center justify-between'>
-              <div>
+            <div className='grid grid-cols-1 md:grid-cols-3 items-center justify-center'>
+              <div className='flex flex-col gap-2 md:col-span-2'>
                 <CardTitle>Passkeys</CardTitle>
                 <CardDescription>Manage your passkeys for secure authentication</CardDescription>
               </div>
-              <Button onClick={handleAddPasskey} disabled={isModifyingPasskeys}>
+              <Button
+                onClick={handleAddPasskey}
+                disabled={isModifyingPasskeys}
+                className='mt-4 lg:mt-0 lg:justify-self-end md:w-full lg:w-auto'
+              >
                 {isModifyingPasskeys ? (
                   <Spinner />
                 ) : (
@@ -203,41 +213,41 @@ export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[]
         )}
         <CardContent>
           {passkeys.length === 0 ? (
-            <div className='flex flex-col items-center justify-center py-3 text-center'>
-              <div className='flex size-16 items-center justify-center rounded-full bg-muted mb-4 p-2'>
-                <Fingerprint className='size-8 text-muted-foreground' />
-              </div>
-              <h3 className='font-medium mb-1'>No passkeys yet</h3>
-              <p className='text-sm text-muted-foreground mb-4'>
-                Add a passkey to enable secure, passwordless authentication
-              </p>
-              <Button onClick={handleAddPasskey} disabled={isModifyingPasskeys} size='sm'>
-                {isModifyingPasskeys ? (
-                  <Spinner />
-                ) : (
-                  <>
-                    <Plus className='size-4 mr-2' />
-                    Add your first passkey
-                  </>
-                )}
-              </Button>
-            </div>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant='icon'>
+                  <Fingerprint />
+                </EmptyMedia>
+                <EmptyTitle>No passkeys yet</EmptyTitle>
+                <EmptyDescription>Add a passkey to enable secure, passwordless authentication</EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
+                <Button onClick={handleAddPasskey} disabled={isModifyingPasskeys} size='sm'>
+                  {isModifyingPasskeys ? (
+                    <Spinner />
+                  ) : (
+                    <>
+                      <Plus className='size-4 mr-2' />
+                      Add your first passkey
+                    </>
+                  )}
+                </Button>
+              </EmptyContent>
+            </Empty>
           ) : (
-            <div className='space-y-3'>
+            <ItemGroup className='gap-3'>
               {passkeys.map((passkey) => (
-                <div key={passkey.id} className='flex items-center justify-between p-3 border rounded-lg'>
-                  <div className='flex items-center gap-3'>
-                    <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10'>
-                      <Fingerprint className='size-5 text-primary' />
-                    </div>
-                    <div>
-                      <p className='font-medium'>{passkey.name || 'no name'}</p>
-                      <p className='text-sm text-muted-foreground'>
-                        Added <TimeAgo date={passkey.createdAt} />
-                      </p>
-                    </div>
-                  </div>
-                  <div className='flex items-center gap-1'>
+                <Item key={passkey.id} variant='outline'>
+                  <ItemMedia variant='icon' className='bg-primary/10 size-10'>
+                    <Fingerprint className='text-primary size-5' />
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle>{passkey.name || 'no name'}</ItemTitle>
+                    <ItemDescription>
+                      Added <TimeAgo date={passkey.createdAt} />
+                    </ItemDescription>
+                  </ItemContent>
+                  <ItemActions>
                     <Button variant='ghost' size='icon' onClick={() => handleEditPasskey(passkey)}>
                       <Pencil className='size-4' />
                     </Button>
@@ -262,10 +272,10 @@ export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[]
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
-                  </div>
-                </div>
+                  </ItemActions>
+                </Item>
               ))}
-            </div>
+            </ItemGroup>
           )}
         </CardContent>
       </Card>
@@ -275,16 +285,18 @@ export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[]
             <DialogTitle>Edit passkey</DialogTitle>
             <DialogDescription>Update the name of your passkey to help you identify it.</DialogDescription>
           </DialogHeader>
-          <div className='space-y-4 py-4'>
-            <div className='space-y-2'>
-              <Label htmlFor='passkey-name'>Passkey name</Label>
-              <Input
-                id='passkey-name'
-                value={editedPasskeyName}
-                onChange={(e) => setEditedPasskeyName(e.target.value)}
-                placeholder='e.g., MacBook Pro'
-              />
-            </div>
+          <div className='py-4'>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor='passkey-name'>Passkey name</FieldLabel>
+                <Input
+                  id='passkey-name'
+                  value={editedPasskeyName}
+                  onChange={(e) => setEditedPasskeyName(e.target.value)}
+                  placeholder='e.g., MacBook Pro'
+                />
+              </Field>
+            </FieldGroup>
           </div>
           <DialogFooter>
             <Button variant='outline' onClick={() => setEditingPasskey(null)} disabled={isSavingPasskey}>
@@ -348,7 +360,7 @@ export function SessionsSection({
         <CardDescription>Manage devices where you are currently signed in</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='space-y-3'>
+        <ItemGroup className='gap-3'>
           {sessions.map((session) => {
             const isCurrent = session.id === activeSessionId;
             function getDevice(input: string): [mobile: boolean, name: string] {
@@ -364,52 +376,54 @@ export function SessionsSection({
             const Icon = isMobile ? Smartphone : Monitor;
 
             return (
-              <div key={session.id} className='flex items-center justify-between p-3 border rounded-lg'>
-                <div className='flex items-center gap-3'>
-                  <div className='flex size-10 items-center justify-center rounded-lg bg-muted'>
-                    <Icon className='size-5' />
-                  </div>
-                  <div>
-                    <div className='flex items-center gap-2'>
-                      <p className='font-medium'>{deviceName}</p>
-                      {isCurrent && (
-                        <Badge variant='secondary' className='text-xs'>
-                          <Check className='size-3 mr-1' />
-                          Current
-                        </Badge>
-                      )}
-                    </div>
-                    <p className='text-sm text-muted-foreground'>
-                      {session.ipAddress} • <TimeAgo date={session.updatedAt} />
-                    </p>
-                  </div>
-                </div>
-                {!isCurrent && (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant='ghost' size='sm' disabled={isModifyingSessions}>
-                        Revoke
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Revoke session?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This will sign out the device from your account. You will need to sign in again on that
-                          device.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleRevokeSession(session.token)}>Revoke</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-              </div>
+              <Item key={session.id} variant='outline'>
+                <ItemMedia variant='icon' className='size-10'>
+                  <Icon className='size-5' />
+                </ItemMedia>
+                <ItemContent>
+                  <ItemTitle>
+                    {deviceName}
+                    {isCurrent && (
+                      <Badge variant='secondary' className='text-xs ml-2'>
+                        <Check className='size-3 mr-1' />
+                        Current
+                      </Badge>
+                    )}
+                  </ItemTitle>
+                  <ItemDescription>
+                    {session.ipAddress} • <TimeAgo date={session.updatedAt} />
+                  </ItemDescription>
+                </ItemContent>
+                <ItemActions>
+                  {!isCurrent && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant='ghost' size='sm' disabled={isModifyingSessions}>
+                          Revoke
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Revoke session?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will sign out the device from your account. You will need to sign in again on that
+                            device.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleRevokeSession(session.token)}>
+                            Revoke
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </ItemActions>
+              </Item>
             );
           })}
-        </div>
+        </ItemGroup>
       </CardContent>
     </Card>
   );
@@ -463,64 +477,66 @@ export function OrganizationsSection({
         )}
         <CardContent>
           {organizations.length === 0 ? (
-            <div className='flex flex-col items-center justify-center py-3 text-center'>
-              <div className='flex size-16 items-center justify-center rounded-full bg-muted mb-4'>
-                <Building2 className='size-8 text-muted-foreground' />
-              </div>
-              <h3 className='font-medium mb-1'>No organizations</h3>
-              <p className='text-sm text-muted-foreground'>
-                You are not a member of any organizations yet.
-                <br />
-                Once you join or create an organization, it will appear here.
-              </p>
-            </div>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant='icon'>
+                  <Building2 />
+                </EmptyMedia>
+                <EmptyTitle>No organizations</EmptyTitle>
+                <EmptyDescription>
+                  You are not a member of any organizations yet.
+                  <br />
+                  Once you join or create an organization, it will appear here.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
           ) : (
-            <div className='space-y-3'>
+            <ItemGroup className='gap-3'>
               {organizations.map((org) => (
-                <div key={org.id} className='flex items-center justify-between p-3 border rounded-lg'>
-                  <div className='flex items-center gap-3'>
-                    <div className='flex size-10 items-center justify-center rounded-lg bg-muted'>
-                      <Building2 className='size-5' />
-                    </div>
-                    <div>
-                      <div className='flex items-center gap-2'>
-                        <p className='font-medium'>{org.name}</p>
-                        {org.id === activeOrganizationId && (
-                          <Badge variant='default' className='text-xs'>
-                            Active
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant='ghost' size='icon'>
-                        <MoreVertical className='size-4' />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align='end'>
-                      <DropdownMenuItem onClick={() => handleSetActiveAndNavigate(org.id, '/dashboard/activity')}>
-                        <Home className='size-4 mr-2' />
-                        Home
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleSetActiveAndNavigate(org.id, '/dashboard/settings')}>
-                        <Settings className='size-4 mr-2' />
-                        Settings
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className='text-destructive focus:text-destructive'
-                        onClick={() => setOrgToLeave(org)}
-                      >
-                        <LogOut className='size-4 mr-2' />
-                        Leave
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                <Item key={org.id} variant='outline'>
+                  <ItemMedia variant='icon' className='size-10'>
+                    <Building2 className='size-5' />
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle>
+                      {org.name}
+                      {org.id === activeOrganizationId && (
+                        <Badge variant='default' className='text-xs ml-2'>
+                          Active
+                        </Badge>
+                      )}
+                    </ItemTitle>
+                  </ItemContent>
+                  <ItemActions>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant='ghost' size='icon'>
+                          <MoreVertical className='size-4' />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align='end'>
+                        <DropdownMenuItem onClick={() => handleSetActiveAndNavigate(org.id, '/dashboard/activity')}>
+                          <Home className='size-4 mr-2' />
+                          Home
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleSetActiveAndNavigate(org.id, '/dashboard/settings')}>
+                          <Settings className='size-4 mr-2' />
+                          Settings
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className='text-destructive focus:text-destructive'
+                          onClick={() => setOrgToLeave(org)}
+                        >
+                          <LogOut className='size-4 mr-2' />
+                          Leave
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </ItemActions>
+                </Item>
               ))}
-            </div>
+            </ItemGroup>
           )}
         </CardContent>
       </Card>
@@ -570,8 +586,8 @@ export function DangerSection({ hasOrganizations }: { hasOrganizations: boolean 
         <CardDescription>Irreversible actions for your account</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='flex items-start justify-between py-4'>
-          <div className='space-y-1'>
+        <div className='grid grid-cols-1 md:grid-cols-3 items-start justify-between py-4'>
+          <div className='space-y-1 md:col-span-2'>
             <p className='font-medium'>Delete account</p>
             <p className='text-sm text-muted-foreground'>Permanently delete your account and all associated data</p>
             {hasOrganizations && (
@@ -582,7 +598,11 @@ export function DangerSection({ hasOrganizations }: { hasOrganizations: boolean 
           </div>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant='destructive' disabled={hasOrganizations}>
+              <Button
+                variant='destructive'
+                disabled={hasOrganizations}
+                className='mt-4 lg:mt-0 lg:justify-self-end md:w-full lg:w-auto'
+              >
                 Delete account
               </Button>
             </AlertDialogTrigger>

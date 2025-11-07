@@ -1,13 +1,14 @@
 'use client';
 
 import { CheckCircle2, XCircle } from 'lucide-react';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
 
 export function InviteDeclineView({ invitationId }: { invitationId: string }) {
+  const router = useRouter();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [countdown, setCountdown] = useState(5);
   const [errorMessage, setErrorMessage] = useState('');
@@ -33,7 +34,7 @@ export function InviteDeclineView({ invitationId }: { invitationId: string }) {
         setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(timer);
-            redirect('/');
+            router.push('/');
             return 0;
           }
           return prev - 1;
@@ -42,7 +43,7 @@ export function InviteDeclineView({ invitationId }: { invitationId: string }) {
 
       return () => clearInterval(timer);
     }
-  }, [status]);
+  }, [status, router]);
 
   return (
     <div className='flex min-h-screen items-center justify-center p-4'>

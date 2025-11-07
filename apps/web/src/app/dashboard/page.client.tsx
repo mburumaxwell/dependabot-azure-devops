@@ -2,7 +2,7 @@
 
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { PakloLogo } from '@/components/logos';
@@ -32,7 +32,7 @@ export function NoOrganizationsView() {
           <Button asChild className='w-full' size='lg'>
             <Link href='/dashboard/organization/create'>
               <Plus className='mr-2 size-4' />
-              Create Organization
+              Create your first organization
             </Link>
           </Button>
         </CardContent>
@@ -42,6 +42,7 @@ export function NoOrganizationsView() {
 }
 
 export function SelectOrganizationView({ organizations: rawOrganizations }: { organizations: Organization[] }) {
+  const router = useRouter();
   const [organizations] = useState(rawOrganizations);
   const [selectedOrgId, setSelectedOrgId] = useState<string | undefined>(undefined);
   const [settingDefault, setSettingDefault] = useState(false);
@@ -63,7 +64,7 @@ export function SelectOrganizationView({ organizations: rawOrganizations }: { or
     }
 
     // Redirect to dashboard activity page
-    redirect('/dashboard/activity');
+    router.push('/dashboard/activity');
   }
 
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { CheckCircle2, Eye, EyeOff, Globe, Shield, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import {
@@ -12,20 +12,28 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import type { Organization } from '@/lib/auth-client';
 import type { OrganizationType } from '@/lib/organization-types';
 
-export function PrimaryIntegrationSection({ organization }: { organization: Organization }) {
+export function PrimaryIntegrationSection({
+  organization,
+  hasToken: initialHasToken,
+}: {
+  organization: Organization;
+  hasToken: boolean;
+}) {
   const [showToken, setShowToken] = useState(false);
   const [token, setToken] = useState('');
   const [isValidating, setIsValidating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isTokenSaved, setIsTokenSaved] = useState(false);
+  const [hasToken, setHasToken] = useState(initialHasToken);
 
-  async function handleValidateToken() {
+  async function handleValidateAndSaveToken() {
     if (!token.trim()) return;
 
     setIsValidating(true);
@@ -61,6 +69,7 @@ export function PrimaryIntegrationSection({ organization }: { organization: Orga
 
     toast.success('Organization token saved successfully');
     setIsTokenSaved(true);
+    setHasToken(true);
     setToken('');
   }
 
@@ -70,78 +79,116 @@ export function PrimaryIntegrationSection({ organization }: { organization: Orga
         <CardTitle>Primary Integration</CardTitle>
         <CardDescription>Your organization's main source control integration</CardDescription>
       </CardHeader>
-      <CardContent className='space-y-4'>
-        <div className='space-y-2'>
-          <Label>Integration Type</Label>
-          <div className='flex items-center gap-2'>
-            <Input value={organization.type} disabled className='bg-muted' />
-            <Badge variant='secondary'>Active</Badge>
-          </div>
-        </div>
+      <CardContent>
+        <FieldSet>
+          <FieldGroup>
+            <Field>
+              <FieldLabel>Integration Type</FieldLabel>
+              <div className='flex items-center gap-2'>
+                <Input value={organization.type} disabled className='bg-muted' />
+                <Badge variant='secondary'>Active</Badge>
+              </div>
+            </Field>
 
-        <div className='space-y-2'>
-          <Label>URL</Label>
-          <Input value={organization.url} disabled className='bg-muted' />
-        </div>
+            <Field>
+              <FieldLabel>URL</FieldLabel>
+              <InputGroup data-disabled>
+                <InputGroupAddon>
+                  <Globe className='size-4' />
+                </InputGroupAddon>
+                <InputGroupInput value={organization.url} disabled className='bg-muted' />
+              </InputGroup>
+            </Field>
 
-        <div className='space-y-2'>
-          <Label htmlFor='token'>Access Token</Label>
-          <div className='flex gap-2'>
-            <div className='relative flex-1'>
-              <Input
-                id='token'
-                type={showToken ? 'text' : 'password'}
-                value={token}
-                onChange={(e) => {
-                  setToken(e.target.value);
-                  setIsTokenSaved(false);
-                }}
-                placeholder='Enter new token to update'
-                className='pr-10'
-              />
-              <Button
-                type='button'
-                variant='ghost'
-                size='icon'
-                className='absolute right-0 top-0 h-full px-3'
-                onClick={() => setShowToken(!showToken)}
-              >
-                {showToken ? <EyeOff className='size-4' /> : <Eye className='size-4' />}
-              </Button>
-            </div>
-            <Button onClick={handleValidateToken} disabled={!token.trim() || isValidating || isSaving || isTokenSaved}>
-              {isValidating || isSaving ? (
-                <>
-                  <Spinner className='mr-2' />
-                  {isValidating ? 'Validating...' : 'Saving...'}
-                </>
-              ) : isTokenSaved ? (
-                <>
-                  <CheckCircle2 className='size-4 mr-2' />
-                  Saved
-                </>
-              ) : (
-                'Save'
-              )}
-            </Button>
-          </div>
-          <p className='text-xs text-muted-foreground'>
-            Tokens are not loaded from the server. Enter a new token to update it.
-          </p>
-        </div>
+            <Field>
+              <div className='flex items-center justify-between'>
+                <FieldLabel htmlFor='token'>Access Token</FieldLabel>
+                <div className='flex items-center gap-1.5 text-xs'>
+                  {hasToken ? (
+                    <>
+                      <ShieldCheck className='size-3.5 text-green-600' />
+                      <span className='text-green-600 font-medium'>Token configured</span>
+                    </>
+                  ) : (
+                    <>
+                      <Shield className='size-3.5 text-orange-600' />
+                      <span className='text-orange-600 font-medium'>No token set</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className='flex gap-2'>
+                <InputGroup className='flex-1'>
+                  <InputGroupInput
+                    id='token'
+                    type={showToken ? 'text' : 'password'}
+                    value={token}
+                    onChange={(e) => {
+                      setToken(e.target.value);
+                      setIsTokenSaved(false);
+                    }}
+                    placeholder={hasToken ? 'Enter new token to update' : 'Enter your access token'}
+                  />
+                  <InputGroupAddon align='inline-end'>
+                    <InputGroupButton
+                      type='button'
+                      variant='ghost'
+                      size='icon-xs'
+                      onClick={() => setShowToken(!showToken)}
+                      aria-label={showToken ? 'Hide token' : 'Show token'}
+                    >
+                      {showToken ? <EyeOff className='size-4' /> : <Eye className='size-4' />}
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
+                <Button
+                  onClick={handleValidateAndSaveToken}
+                  disabled={!token.trim() || isValidating || isSaving || isTokenSaved}
+                >
+                  {isValidating || isSaving ? (
+                    <>
+                      <Spinner className='mr-2' />
+                      {isValidating ? 'Validating...' : 'Saving...'}
+                    </>
+                  ) : isTokenSaved ? (
+                    <>
+                      <CheckCircle2 className='size-4 mr-2' />
+                      Saved
+                    </>
+                  ) : hasToken ? (
+                    'Update'
+                  ) : (
+                    'Save'
+                  )}
+                </Button>
+              </div>
+              <FieldDescription>
+                Tokens are stored securely and never displayed after saving. Enter a new token to update your existing
+                configuration.
+              </FieldDescription>
+            </Field>
+          </FieldGroup>
+        </FieldSet>
       </CardContent>
     </Card>
   );
 }
 
-export function GitHubSection({ organizationId }: { organizationId: string }) {
+export function GitHubSection({
+  organizationId,
+  hasToken: initialHasToken,
+}: {
+  organizationId: string;
+  hasToken: boolean;
+}) {
   const [showToken, setShowToken] = useState(false);
   const [token, setToken] = useState('');
   const [isValidating, setIsValidating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isTokenSaved, setIsTokenSaved] = useState(false);
+  const [hasToken, setHasToken] = useState(initialHasToken);
 
-  const handleValidateToken = async () => {
+  async function handleValidateAndSaveToken() {
     if (!token.trim()) return;
 
     setIsValidating(true);
@@ -172,8 +219,9 @@ export function GitHubSection({ organizationId }: { organizationId: string }) {
 
     toast.success('GitHub token saved successfully');
     setIsTokenSaved(true);
+    setHasToken(true);
     setToken('');
-  };
+  }
 
   return (
     <Card>
@@ -181,52 +229,78 @@ export function GitHubSection({ organizationId }: { organizationId: string }) {
         <CardTitle>GitHub Access Token</CardTitle>
         <CardDescription>Optional token to avoid GitHub API rate limiting</CardDescription>
       </CardHeader>
-      <CardContent className='space-y-4'>
-        <div className='space-y-2'>
-          <Label htmlFor='github-token'>Personal Access Token</Label>
-          <div className='flex gap-2'>
-            <div className='relative flex-1'>
-              <Input
-                id='github-token'
-                type={showToken ? 'text' : 'password'}
-                value={token}
-                onChange={(e) => {
-                  setToken(e.target.value);
-                  setIsTokenSaved(false);
-                }}
-                placeholder='ghp_xxxxxxxxxxxxxxxxxxxx'
-                className='pr-10'
-              />
-              <Button
-                type='button'
-                variant='ghost'
-                size='icon'
-                className='absolute right-0 top-0 h-full px-3'
-                onClick={() => setShowToken(!showToken)}
-              >
-                {showToken ? <EyeOff className='size-4' /> : <Eye className='size-4' />}
-              </Button>
-            </div>
-            <Button onClick={handleValidateToken} disabled={!token.trim() || isValidating || isSaving || isTokenSaved}>
-              {isValidating || isSaving ? (
-                <>
-                  <Spinner className='mr-2' />
-                  {isValidating ? 'Validating...' : 'Saving...'}
-                </>
-              ) : isTokenSaved ? (
-                <>
-                  <CheckCircle2 className='size-4 mr-2' />
-                  Saved
-                </>
-              ) : (
-                'Save'
-              )}
-            </Button>
-          </div>
-          <p className='text-xs text-muted-foreground'>
-            This token is used to increase GitHub API rate limits. Requires 'repo' scope.
-          </p>
-        </div>
+      <CardContent>
+        <FieldSet>
+          <FieldGroup>
+            <Field>
+              <div className='flex items-center justify-between'>
+                <FieldLabel htmlFor='github-token'>Personal Access Token</FieldLabel>
+                <div className='flex items-center gap-1.5 text-xs'>
+                  {hasToken ? (
+                    <>
+                      <ShieldCheck className='size-3.5 text-green-600' />
+                      <span className='text-green-600 font-medium'>Token configured</span>
+                    </>
+                  ) : (
+                    <>
+                      <Shield className='size-3.5 text-muted-foreground' />
+                      <span className='text-muted-foreground font-medium'>Optional - not set</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className='flex gap-2'>
+                <InputGroup className='flex-1'>
+                  <InputGroupInput
+                    id='github-token'
+                    type={showToken ? 'text' : 'password'}
+                    value={token}
+                    onChange={(e) => {
+                      setToken(e.target.value);
+                      setIsTokenSaved(false);
+                    }}
+                    placeholder={hasToken ? 'Enter new token to update' : 'ghp_xxxxxxxxxxxxxxxxxxxx'}
+                  />
+                  <InputGroupAddon align='inline-end'>
+                    <InputGroupButton
+                      type='button'
+                      variant='ghost'
+                      size='icon-xs'
+                      onClick={() => setShowToken(!showToken)}
+                      aria-label={showToken ? 'Hide token' : 'Show token'}
+                    >
+                      {showToken ? <EyeOff className='size-4' /> : <Eye className='size-4' />}
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
+                <Button
+                  onClick={handleValidateAndSaveToken}
+                  disabled={!token.trim() || isValidating || isSaving || isTokenSaved}
+                >
+                  {isValidating || isSaving ? (
+                    <>
+                      <Spinner className='mr-2' />
+                      {isValidating ? 'Validating...' : 'Saving...'}
+                    </>
+                  ) : isTokenSaved ? (
+                    <>
+                      <CheckCircle2 className='size-4 mr-2' />
+                      Saved
+                    </>
+                  ) : hasToken ? (
+                    'Update'
+                  ) : (
+                    'Save'
+                  )}
+                </Button>
+              </div>
+              <FieldDescription>
+                This optional token increases GitHub API rate limits and requires "repo" scope. Tokens are stored
+                securely and never displayed after saving.
+              </FieldDescription>
+            </Field>
+          </FieldGroup>
+        </FieldSet>
       </CardContent>
     </Card>
   );

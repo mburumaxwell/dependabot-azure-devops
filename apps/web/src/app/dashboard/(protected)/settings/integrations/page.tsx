@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { headers as requestHeaders } from 'next/headers';
 import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 import { GitHubSection, PrimaryIntegrationSection } from './page.client';
 
 export const metadata: Metadata = {
@@ -13,6 +14,22 @@ export default async function IntegrationsPage() {
   const headers = await requestHeaders();
   const organization = await auth.api.getFullOrganization({ headers });
 
+  if (!organization) {
+    return null;
+  }
+
+  // Get token status directly from database
+  const credential = await prisma.organizationCredential.findUnique({
+    where: { id: organization.id },
+    select: {
+      token: true,
+      githubToken: true,
+    },
+  });
+
+  const hasToken = credential ? !!credential.token : false;
+  const hasGithubToken = credential ? !!credential.githubToken : false;
+
   return (
     <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
       <div>
@@ -20,12 +37,8 @@ export default async function IntegrationsPage() {
         <p className='text-muted-foreground'>Manage your organization's integrations and access tokens</p>
       </div>
 
-      {organization && (
-        <>
-          <PrimaryIntegrationSection organization={organization} />
-          <GitHubSection organizationId={organization.id} />
-        </>
-      )}
+      <PrimaryIntegrationSection organization={organization} hasToken={hasToken} />
+      <GitHubSection organizationId={organization.id} hasToken={hasGithubToken} />
     </div>
   );
 }

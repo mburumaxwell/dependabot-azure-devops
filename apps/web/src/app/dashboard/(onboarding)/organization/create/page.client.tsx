@@ -1,7 +1,7 @@
 'use client';
 
 import { CheckCircle2, Eye, EyeOff, Globe, XCircle } from 'lucide-react';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import validator from 'validator';
 import { validateOrganizationCredentials } from '@/actions/organizations';
@@ -10,8 +10,15 @@ import { Stepper } from '@/components/stepper';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  InputGroupText,
+} from '@/components/ui/input-group';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
@@ -178,7 +185,7 @@ export function CreateOrganizationPage() {
     setCreatingError('');
 
     // Redirect to organization settings for billing setup
-    redirect('/dashboard/settings/billing?new=true');
+    router.push('/dashboard/settings/billing?new=true');
   }
 
   const canProceedStep1 = data.name && data.slug && slugVerified;
@@ -197,301 +204,321 @@ export function CreateOrganizationPage() {
         <CardContent>
           {/* Step 1: Name & Slug */}
           {currentStep === 1 && (
-            <div className='space-y-6'>
-              <div className='space-y-2'>
-                <Label htmlFor='name'>Organization Name</Label>
-                <Input
-                  id='name'
-                  placeholder='Acme Inc'
-                  value={data.name}
-                  onChange={(e) => handleNameChange(e.target.value)}
-                />
-              </div>
-
-              <div className='space-y-2'>
-                <Label htmlFor='slug'>Slug</Label>
-                <div className='flex gap-2'>
+            <FieldSet>
+              <FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor='name'>Organization Name</FieldLabel>
                   <Input
-                    id='slug'
-                    placeholder='acme-inc'
-                    value={data.slug}
-                    onChange={(e) => {
-                      setData((prev) => ({ ...prev, slug: e.target.value }));
-                      setSlugVerified(false);
-                      setSlugError('');
-                    }}
-                    className={slugError ? 'border-destructive' : ''}
+                    id='name'
+                    placeholder='Acme Inc'
+                    value={data.name}
+                    onChange={(e) => handleNameChange(e.target.value)}
                   />
-                  <Button onClick={verifySlug} disabled={!data.slug || slugVerifying || slugVerified} variant='outline'>
-                    {slugVerifying ? (
+                </Field>
+
+                <Field data-invalid={!!slugError}>
+                  <FieldLabel htmlFor='slug'>Slug</FieldLabel>
+                  <div className='flex gap-2'>
+                    <Input
+                      id='slug'
+                      placeholder='acme-inc'
+                      value={data.slug}
+                      onChange={(e) => {
+                        setData((prev) => ({ ...prev, slug: e.target.value }));
+                        setSlugVerified(false);
+                        setSlugError('');
+                      }}
+                      aria-invalid={!!slugError}
+                    />
+                    <Button
+                      onClick={verifySlug}
+                      disabled={!data.slug || slugVerifying || slugVerified}
+                      variant='outline'
+                    >
+                      {slugVerifying ? (
+                        <>
+                          <Spinner />
+                          Verifying
+                        </>
+                      ) : slugVerified ? (
+                        <>
+                          <CheckCircle2 className='text-green-600' />
+                          Verified
+                        </>
+                      ) : (
+                        'Verify'
+                      )}
+                    </Button>
+                  </div>
+                  {slugError && <FieldError>{slugError}</FieldError>}
+                  {slugVerified && (
+                    <p className='text-sm text-green-600 flex items-center gap-1'>
+                      <CheckCircle2 className='size-4' />
+                      Slug is available
+                    </p>
+                  )}
+                  <FieldDescription>This will be used in your organization URL</FieldDescription>
+                </Field>
+
+                <Field>
+                  <div className='flex justify-between pt-4'>
+                    <Button variant='outline' onClick={() => router.back()}>
+                      Cancel
+                    </Button>
+                    <Button onClick={() => setCurrentStep(2)} disabled={!canProceedStep1}>
+                      Continue
+                    </Button>
+                  </div>
+                </Field>
+              </FieldGroup>
+            </FieldSet>
+          )}
+
+          {/* Step 2: Integration Setup */}
+          {currentStep === 2 && (
+            <FieldSet>
+              <FieldGroup>
+                <Field>
+                  <FieldLabel>Integration Type</FieldLabel>
+                  <div className='grid grid-cols-3 gap-4'>
+                    {Object.values(ORGANIZATION_TYPES_INFO).map((provider) => (
+                      <button
+                        key={provider.type}
+                        type='button'
+                        onClick={() => {
+                          setData((prev) => ({ ...prev, type: provider.type }));
+                          setCredentialsVerified(false);
+                          setCredentialsError('');
+                        }}
+                        className={cn(
+                          'relative flex flex-col items-center justify-center gap-4 rounded-lg border-2 p-4 transition-all hover:border-primary/50',
+                          data.type === provider.type ? 'border-primary bg-primary/5' : 'border-border bg-card',
+                        )}
+                      >
+                        <div
+                          className={`size-12 rounded-lg bg-[${provider.logoBackground}] flex items-center justify-center`}
+                        >
+                          <provider.logo className='size-8 text-foreground' />
+                        </div>
+                        <div className='text-center'>
+                          <div className='font-semibold'>{provider.name}</div>
+                          <div className='text-sm text-muted-foreground'>{provider.vendor}</div>
+                        </div>
+                        {data.type === provider.type && (
+                          <div className='absolute top-3 right-3'>
+                            <CheckCircle2 className='size-5 text-primary' />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </Field>
+
+                <Field data-invalid={!!urlError}>
+                  <FieldLabel htmlFor='url'>
+                    {(data.type === 'azure' && 'Azure DevOps Organization') ||
+                      (data.type === 'bitbucket' && 'Bitbucket Workspace') ||
+                      (data.type === 'gitlab' && 'GitLab Group')}{' '}
+                    URL
+                  </FieldLabel>
+                  <InputGroup>
+                    <InputGroupAddon>
+                      <Globe className='size-4' />
+                    </InputGroupAddon>
+                    <InputGroupAddon>
+                      <InputGroupText>https://</InputGroupText>
+                    </InputGroupAddon>
+                    <InputGroupInput
+                      id='url'
+                      placeholder={
+                        (data.type === 'azure' && 'dev.azure.com/your-org') ||
+                        (data.type === 'bitbucket' && 'bitbucket.org/your-workspace') ||
+                        (data.type === 'gitlab' && 'gitlab.com/your-group') ||
+                        'my-git-platform.com/your-path'
+                      }
+                      value={data.url.replace(/^https?:\/\//, '')}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Ensure we always store with https:// prefix
+                        const fullUrl = value.startsWith('http') ? value : `https://${value}`;
+                        handleUrlChange(fullUrl);
+                      }}
+                      className='pl-0.5!'
+                      aria-invalid={!!urlError}
+                    />
+                  </InputGroup>
+                  {urlError && <FieldError>{urlError}</FieldError>}
+                </Field>
+
+                <Field>
+                  <FieldLabel htmlFor='token'>Personal Access Token</FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      id='token'
+                      type={showToken ? 'text' : 'password'}
+                      placeholder='Enter your access token'
+                      value={data.token}
+                      onChange={(e) => {
+                        setData((prev) => ({ ...prev, token: e.target.value }));
+                        setCredentialsVerified(false);
+                        setCredentialsError('');
+                      }}
+                    />
+                    <InputGroupAddon align='inline-end'>
+                      <InputGroupButton
+                        type='button'
+                        variant='ghost'
+                        size='icon-xs'
+                        onClick={() => setShowToken(!showToken)}
+                        aria-label={showToken ? 'Hide token' : 'Show token'}
+                      >
+                        {showToken ? (
+                          <EyeOff className='size-4 text-muted-foreground' />
+                        ) : (
+                          <Eye className='size-4 text-muted-foreground' />
+                        )}
+                      </InputGroupButton>
+                    </InputGroupAddon>
+                  </InputGroup>
+                  <FieldDescription>
+                    We'll use this to connect to your{' '}
+                    {(data.type === 'azure' && 'Azure DevOps Organization') ||
+                      (data.type === 'bitbucket' && 'Bitbucket Workspace') ||
+                      (data.type === 'gitlab' && 'GitLab Group')}
+                  </FieldDescription>
+                </Field>
+
+                {credentialsError && (
+                  <Alert variant='destructive'>
+                    <XCircle className='size-4' />
+                    <AlertDescription>{credentialsError}</AlertDescription>
+                  </Alert>
+                )}
+
+                {credentialsVerified && (
+                  <Alert className='border-green-600/20 bg-green-50 dark:bg-green-950/20'>
+                    <CheckCircle2 className='size-4 text-green-600' />
+                    <AlertDescription className='text-green-600'>Connection verified successfully</AlertDescription>
+                  </Alert>
+                )}
+
+                <Field>
+                  <Button
+                    onClick={verifyCredentials}
+                    disabled={!data.url || !data.token || credentialsVerifying || credentialsVerified}
+                    variant='outline'
+                    className='w-full bg-transparent'
+                  >
+                    {credentialsVerifying ? (
                       <>
                         <Spinner />
-                        Verifying
+                        Verifying Connection
                       </>
-                    ) : slugVerified ? (
+                    ) : credentialsVerified ? (
                       <>
                         <CheckCircle2 className='text-green-600' />
                         Verified
                       </>
                     ) : (
-                      'Verify'
+                      'Verify Connection'
                     )}
                   </Button>
-                </div>
-                {slugError && (
-                  <p className='text-sm text-destructive flex items-center gap-1'>
-                    <XCircle className='size-4' />
-                    {slugError}
-                  </p>
-                )}
-                {slugVerified && (
-                  <p className='text-sm text-green-600 flex items-center gap-1'>
-                    <CheckCircle2 className='size-4' />
-                    Slug is available
-                  </p>
-                )}
-                <p className='text-sm text-muted-foreground'>This will be used in your organization URL</p>
-              </div>
+                </Field>
 
-              <div className='flex justify-between pt-4'>
-                <Button variant='outline' onClick={() => router.back()}>
-                  Cancel
-                </Button>
-                <Button onClick={() => setCurrentStep(2)} disabled={!canProceedStep1}>
-                  Continue
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Step 2: Integration Setup */}
-          {currentStep === 2 && (
-            <div className='space-y-6'>
-              <div className='space-y-4'>
-                <Label>Integration Type</Label>
-                <div className='grid grid-cols-3 gap-4'>
-                  {Object.values(ORGANIZATION_TYPES_INFO).map((provider) => (
-                    <button
-                      key={provider.type}
-                      type='button'
-                      onClick={() => {
-                        setData((prev) => ({ ...prev, type: provider.type }));
-                        setCredentialsVerified(false);
-                        setCredentialsError('');
-                      }}
-                      className={cn(
-                        'relative flex flex-col items-center justify-center gap-4 rounded-lg border-2 p-4 transition-all hover:border-primary/50',
-                        data.type === provider.type ? 'border-primary bg-primary/5' : 'border-border bg-card',
-                      )}
-                    >
-                      <div
-                        className={`size-12 rounded-lg bg-[${provider.logoBackground}] flex items-center justify-center`}
-                      >
-                        <provider.logo className='size-8 text-foreground' />
-                      </div>
-                      <div className='text-center'>
-                        <div className='font-semibold'>{provider.name}</div>
-                        <div className='text-sm text-muted-foreground'>{provider.vendor}</div>
-                      </div>
-                      {data.type === provider.type && (
-                        <div className='absolute top-3 right-3'>
-                          <CheckCircle2 className='size-5 text-primary' />
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className='space-y-2'>
-                <Label htmlFor='url'>
-                  {(data.type === 'azure' && 'Azure DevOps Organization') ||
-                    (data.type === 'bitbucket' && 'Bitbucket Workspace') ||
-                    (data.type === 'gitlab' && 'GitLab Group')}{' '}
-                  URL
-                </Label>
-                <Input
-                  id='url'
-                  placeholder={
-                    (data.type === 'azure' && 'https://dev.azure.com/your-org') ||
-                    (data.type === 'bitbucket' && 'https://bitbucket.org/your-workspace') ||
-                    (data.type === 'gitlab' && 'https://gitlab.com/your-group') ||
-                    'https://my-git-platform.com/your-path'
-                  }
-                  value={data.url}
-                  onChange={(e) => handleUrlChange(e.target.value)}
-                  className={urlError ? 'border-destructive' : ''}
-                />
-                {urlError && (
-                  <p className='text-sm text-destructive flex items-center gap-1'>
-                    <XCircle className='size-4' />
-                    {urlError}
-                  </p>
-                )}
-              </div>
-
-              <div className='space-y-2'>
-                <Label htmlFor='token'>Personal Access Token</Label>
-                <div className='relative'>
-                  <Input
-                    id='token'
-                    type={showToken ? 'text' : 'password'}
-                    placeholder='Enter your access token'
-                    value={data.token}
-                    onChange={(e) => {
-                      setData((prev) => ({ ...prev, token: e.target.value }));
-                      setCredentialsVerified(false);
-                      setCredentialsError('');
-                    }}
-                    className='pr-10'
-                  />
-                  <Button
-                    type='button'
-                    variant='ghost'
-                    size='sm'
-                    className='absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent'
-                    onClick={() => setShowToken(!showToken)}
-                  >
-                    {showToken ? (
-                      <EyeOff className='size-4 text-muted-foreground' />
-                    ) : (
-                      <Eye className='size-4 text-muted-foreground' />
-                    )}
-                    <span className='sr-only'>{showToken ? 'Hide token' : 'Show token'}</span>
-                  </Button>
-                </div>
-                <p className='text-sm text-muted-foreground'>
-                  We'll use this to connect to your{' '}
-                  {(data.type === 'azure' && 'Azure DevOps Organization') ||
-                    (data.type === 'bitbucket' && 'Bitbucket Workspace') ||
-                    (data.type === 'gitlab' && 'GitLab Group')}
-                </p>
-              </div>
-
-              {credentialsError && (
-                <Alert variant='destructive'>
-                  <XCircle className='size-4' />
-                  <AlertDescription>{credentialsError}</AlertDescription>
-                </Alert>
-              )}
-
-              {credentialsVerified && (
-                <Alert className='border-green-600/20 bg-green-50 dark:bg-green-950/20'>
-                  <CheckCircle2 className='size-4 text-green-600' />
-                  <AlertDescription className='text-green-600'>Connection verified successfully</AlertDescription>
-                </Alert>
-              )}
-
-              <div className='flex gap-2'>
-                <Button
-                  onClick={verifyCredentials}
-                  disabled={!data.url || !data.token || credentialsVerifying || credentialsVerified}
-                  variant='outline'
-                  className='flex-1 bg-transparent'
-                >
-                  {credentialsVerifying ? (
-                    <>
-                      <Spinner />
-                      Verifying Connection
-                    </>
-                  ) : credentialsVerified ? (
-                    <>
-                      <CheckCircle2 className='text-green-600' />
-                      Verified
-                    </>
-                  ) : (
-                    'Verify Connection'
-                  )}
-                </Button>
-              </div>
-
-              <div className='flex justify-between pt-4'>
-                <Button variant='outline' onClick={() => setCurrentStep(1)}>
-                  Back
-                </Button>
-                <Button onClick={() => setCurrentStep(3)} disabled={!canProceedStep2}>
-                  Continue
-                </Button>
-              </div>
-            </div>
+                <Field>
+                  <div className='flex justify-between pt-4'>
+                    <Button variant='outline' onClick={() => setCurrentStep(1)}>
+                      Back
+                    </Button>
+                    <Button onClick={() => setCurrentStep(3)} disabled={!canProceedStep2}>
+                      Continue
+                    </Button>
+                  </div>
+                </Field>
+              </FieldGroup>
+            </FieldSet>
           )}
 
           {/* Step 3: Data Residency */}
           {currentStep === 3 && (
-            <div className='space-y-6'>
-              <div className='space-y-4'>
-                <Label>Select Execution Region</Label>
-                <p className='text-sm text-muted-foreground'>Choose where your organization's jobs will be run.</p>
-                <RadioGroup
-                  value={data.region}
-                  onValueChange={(value) => setData((prev) => ({ ...prev, region: value as RegionCode }))}
-                  className='grid grid-cols-2 gap-4'
-                >
-                  {regions.map((region) => (
-                    <div key={region.code} className='relative'>
-                      <label
-                        htmlFor={region.code}
-                        className={cn(
-                          'flex items-center gap-4 rounded-lg border-2 p-4 transition-all cursor-pointer',
-                          !region.available && 'opacity-50 cursor-not-allowed',
-                          region.available && data.region === region.code
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border bg-card hover:border-primary/50',
-                        )}
-                      >
-                        <RadioGroupItem
-                          value={region.code}
-                          id={region.code}
-                          disabled={!region.available}
-                          className='shrink-0'
-                        />
-                        <div className='flex items-center gap-4 flex-1'>
-                          <div className='size-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0'>
-                            <Globe className='size-6 text-primary' />
-                          </div>
-                          <div className='flex-1'>
-                            <div className='font-semibold'>{region.label}</div>
-                            <div className='text-sm text-muted-foreground'>
-                              {region.available ? 'Available now' : 'Coming soon'}
+            <FieldSet>
+              <FieldGroup>
+                <Field>
+                  <FieldLabel>Select Execution Region</FieldLabel>
+                  <FieldDescription>Choose where your organization's jobs will be run.</FieldDescription>
+                  <RadioGroup
+                    value={data.region}
+                    onValueChange={(value) => setData((prev) => ({ ...prev, region: value as RegionCode }))}
+                    className='grid grid-cols-2 gap-4'
+                  >
+                    {regions.map((region) => (
+                      <div key={region.code} className='relative'>
+                        <label
+                          htmlFor={region.code}
+                          className={cn(
+                            'flex items-center gap-4 rounded-lg border-2 p-4 transition-all cursor-pointer',
+                            !region.available && 'opacity-50 cursor-not-allowed',
+                            region.available && data.region === region.code
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border bg-card hover:border-primary/50',
+                          )}
+                        >
+                          <RadioGroupItem
+                            value={region.code}
+                            id={region.code}
+                            disabled={!region.available}
+                            className='shrink-0'
+                          />
+                          <div className='flex items-center gap-4 flex-1'>
+                            <div className='size-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0'>
+                              <Globe className='size-6 text-primary' />
+                            </div>
+                            <div className='flex-1'>
+                              <div className='font-semibold'>{region.label}</div>
+                              <div className='text-sm text-muted-foreground'>
+                                {region.available ? 'Available now' : 'Coming soon'}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        {!region.available && (
-                          <div className='absolute inset-0 backdrop-blur-[2px] rounded-lg flex items-center justify-center'>
-                            <span className='bg-background/90 px-4 py-2 rounded-full text-sm font-medium border'>
-                              Coming Soon
-                            </span>
-                          </div>
-                        )}
-                      </label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
+                          {!region.available && (
+                            <div className='absolute inset-0 backdrop-blur-[2px] rounded-lg flex items-center justify-center'>
+                              <span className='bg-background/90 px-4 py-2 rounded-full text-sm font-medium border'>
+                                Coming Soon
+                              </span>
+                            </div>
+                          )}
+                        </label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </Field>
 
-              {creatingError && (
-                <Alert variant='destructive'>
-                  <XCircle className='size-4' />
-                  <AlertDescription>{creatingError}</AlertDescription>
-                </Alert>
-              )}
+                {creatingError && (
+                  <Alert variant='destructive'>
+                    <XCircle className='size-4' />
+                    <AlertDescription>{creatingError}</AlertDescription>
+                  </Alert>
+                )}
 
-              <div className='flex justify-between pt-4'>
-                <Button variant='outline' onClick={() => setCurrentStep(2)}>
-                  Back
-                </Button>
-                <Button onClick={createOrganization} disabled={creating}>
-                  {creating ? (
-                    <>
-                      <Spinner />
-                      Creating Organization
-                    </>
-                  ) : (
-                    'Continue to Billing'
-                  )}
-                </Button>
-              </div>
-            </div>
+                <Field>
+                  <div className='flex justify-between pt-4'>
+                    <Button variant='outline' onClick={() => setCurrentStep(2)}>
+                      Back
+                    </Button>
+                    <Button onClick={createOrganization} disabled={creating}>
+                      {creating ? (
+                        <>
+                          <Spinner />
+                          Creating Organization
+                        </>
+                      ) : (
+                        'Continue to Billing'
+                      )}
+                    </Button>
+                  </div>
+                </Field>
+              </FieldGroup>
+            </FieldSet>
           )}
         </CardContent>
       </Card>

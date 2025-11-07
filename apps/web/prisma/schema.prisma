@@ -125,6 +125,7 @@ model Organization {
   region      String
   maxProjects Int?
   credential  OrganizationCredential?
+  secrets     OrganizationSecret[]
 
   @@unique([slug])
   @@unique([url])
@@ -189,4 +190,20 @@ model OrganizationCredential {
   githubToken  String?
 
   @@map("organization_credential")
+}
+
+model OrganizationSecret {
+  id             String       @id @map("_id")
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  value          String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  enclaveUrl     String? // Future enclave storage support
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@index([name])
+  @@map("organization_secret")
 }

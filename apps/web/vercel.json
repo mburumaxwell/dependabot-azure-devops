@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
     {
-      "path": "/api/crons/cleanup/usage-telemetry",
+      "path": "/api/crons/cleanup/database",
       "schedule": "0 2 * * *"
     }
   ],

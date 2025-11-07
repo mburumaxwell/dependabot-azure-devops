@@ -14,18 +14,31 @@ const app = new Hono().basePath('/api/crons');
 // https://vercel.com/docs/cron-jobs/manage-cron-jobs?framework=other#securing-cron-jobs
 app.use(bearerAuth({ token: process.env.CRON_SECRET! }));
 
-app.get('/cleanup/usage-telemetry', async (context) => {
-  // Delete records older than 1 year
-  const oneYearAgo = new Date();
-  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+app.get('/cleanup/database', async (context) => {
+  async function deleteUsageTelemetry() {
+    // Delete usage telemetry records older than 1 year
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const result = await prisma.usageTelemetry.deleteMany({
+      where: { started: { lt: oneYearAgo } },
+    });
 
-  const result = await prisma.usageTelemetry.deleteMany({
-    where: { started: { lt: oneYearAgo } },
-  });
+    logger.info(
+      `Usage telemetry cleanup completed: deleted ${result.count} records older than ${oneYearAgo.toISOString()}`,
+    );
+  }
 
-  logger.info(
-    `Usage telemetry cleanup completed: deleted ${result.count} records older than ${oneYearAgo.toISOString()}`,
-  );
+  async function deleteExpiredInvitations() {
+    // Delete organization invitations that have expired (date in the database)
+    const result = await prisma.invitation.deleteMany({
+      where: { expiresAt: { lt: new Date() } },
+    });
+
+    logger.info(`Expired invitations cleanup completed: deleted ${result.count} expired invitations`);
+  }
+
+  await deleteUsageTelemetry();
+  await deleteExpiredInvitations();
 
   return context.body(null, 204);
 });

@@ -3,6 +3,8 @@ export type {
   Invitation,
   Member,
   Organization,
+  OrganizationCredential,
+  OrganizationSecret,
   Passkey,
   Session,
   UsageTelemetry,

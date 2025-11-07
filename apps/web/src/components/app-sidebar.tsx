@@ -3,7 +3,7 @@
 import { BadgeCheck, ChevronsUpDown, LogOut, Plus } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
-import { redirect, usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -44,12 +44,12 @@ const groups: MenuGroup[] = [
     href: '/dashboard',
     items: [
       // TODO: remove "as Route" once these routes have been created
-      { label: 'Activity', href: '/dashboard/activity' as Route },
+      { label: 'Activity', href: '/dashboard/activity' },
       { label: 'Projects', href: '/dashboard/projects' as Route },
       { label: 'Repositories', href: '/dashboard/repos' as Route },
       { label: 'Runs', href: '/dashboard/runs' as Route },
       { label: 'Private Vulnerabilities', href: '/dashboard/private-vulns' as Route },
-      { label: 'Secrets', href: '/dashboard/secrets' as Route },
+      { label: 'Secrets', href: '/dashboard/secrets' },
     ],
   },
   {
@@ -70,6 +70,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 }
 export function AppSidebar({ session: rawSession, organizations: rawOrganizations, ...props }: AppSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const isActive = (href: Route) => pathname === href || (href !== '/' && pathname.startsWith(href));
   const { isMobile } = useSidebar();
   const [organizations] = useState(rawOrganizations);
@@ -79,7 +80,7 @@ export function AppSidebar({ session: rawSession, organizations: rawOrganization
     authClient.signOut({
       fetchOptions: {
         // redirect to login page
-        onSuccess: () => redirect('/login'),
+        onSuccess: () => router.push('/login'),
       },
     });
   }
@@ -145,7 +146,7 @@ export function AppSidebar({ session: rawSession, organizations: rawOrganization
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => redirect('/dashboard/account')}>
+                  <DropdownMenuItem onClick={() => router.push('/dashboard/account')}>
                     <BadgeCheck />
                     Account
                   </DropdownMenuItem>
@@ -259,14 +260,14 @@ function OrganizationSwitcher({
               <div className='flex aspect-square size-8 items-center justify-center rounded-lg'>
                 <AvatarSnippetHeader
                   title={activeOrg?.name || 'Organization'}
-                  subtitle={getOrganizationInfo(activeOrg?.type).name}
+                  subtitle={getOrganizationInfo(activeOrg?.type)?.name}
                   image={activeOrg?.logo}
                   size={8}
                 />
               </div>
               <AvatarSnippetFooter
                 title={activeOrg?.name || 'Organization'}
-                subtitle={getOrganizationInfo(activeOrg?.type).name}
+                subtitle={getOrganizationInfo(activeOrg?.type)?.name}
               />
               <ChevronsUpDown className='ml-auto' />
             </SidebarMenuButton>
@@ -298,7 +299,7 @@ function OrganizationSwitcher({
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className='gap-2 p-2' onClick={() => redirect('/dashboard/organization/create')}>
+            <DropdownMenuItem className='gap-2 p-2' onClick={() => router.push('/dashboard/organization/create')}>
               <div className='flex size-6 items-center justify-center rounded-md border bg-transparent'>
                 <Plus className='size-4' />
               </div>

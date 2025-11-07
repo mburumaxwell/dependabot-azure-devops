@@ -18,9 +18,7 @@ export async function validateOrganizationCredentials({
   type: OrganizationType;
   url: string;
   token: string;
-  /**
-   * Optional organization ID to exclude from uniqueness check
-   */
+  /** Optional organization ID to exclude from uniqueness check */
   id?: string;
 }): Promise<{ valid: boolean; message?: string }> {
   // ensure the URL can be parsed

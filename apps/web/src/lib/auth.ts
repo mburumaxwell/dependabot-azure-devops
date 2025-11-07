@@ -82,7 +82,7 @@ export const auth = betterAuth({
         },
         async afterRejectInvitation({ invitation, user, organization }) {
           // notify inviter of rejection
-          logger.debug(`Sending invitation declined notice for ${invitation.email} to ${user.email}`);
+          logger.debug(`Sending inviter declined notice for ${invitation.email} to ${user.email}`);
           await sendOrganizationInviteDeclinedEmail({
             organization: organization.name,
             invitee: invitation.email,

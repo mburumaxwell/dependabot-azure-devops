@@ -1,7 +1,7 @@
 'use client';
 
 import { Mail, Plus, Trash2 } from 'lucide-react';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { TimeAgo } from '@/components/time-ago';
@@ -20,7 +20,10 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
+import { Field, FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import type { AssignableOrganizationRole, Invitation, Member } from '@/lib/auth-client';
@@ -63,7 +66,7 @@ export function MembersSection({
 
   async function handleResendInvite(invite: Invitation) {
     setLoadingStates((prev) => ({ ...prev, [`resend-${invite.id}`]: true }));
-    const { error } = await authClient.organization.inviteMember({
+    const { data, error } = await authClient.organization.inviteMember({
       email: invite.email,
       role: invite.role,
       resend: true,
@@ -74,6 +77,12 @@ export function MembersSection({
       return;
     }
 
+    invite = data as Invitation;
+    if (invitations.find((inv) => inv.id === invite.id)) {
+      setInvitations((prev) => prev.map((inv) => (inv.id === invite.id ? invite : inv)));
+    } else {
+      setInvitations((prev) => [...prev, invite]);
+    }
     toast('Invite resent', { description: `Invitation resent to ${invite.email}` });
   }
 
@@ -127,65 +136,87 @@ export function MembersSection({
           <CardTitle>Invite Member</CardTitle>
           <CardDescription>Send an invitation to join your organization</CardDescription>
         </CardHeader>
-        <CardContent className='space-y-4'>
-          <div className='flex gap-2'>
-            <Input
-              placeholder='chris.johnson@contoso.com'
-              type='email'
-              className='flex-1'
-              value={inviteEmail}
-              onChange={(e) => setInviteEmail(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendInvite()}
-            />
-            <Select value={inviteRole} onValueChange={(value: AssignableOrganizationRole) => setInviteRole(value)}>
-              <SelectTrigger className='w-[130px]'>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='member'>Member</SelectItem>
-                <SelectItem value='admin'>Admin</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button onClick={handleSendInvite} disabled={!inviteEmail.trim() || isSendingInvite}>
-              {isSendingInvite ? (
-                <>
-                  <Spinner className='mr-2' />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Plus className='size-4 mr-2' />
-                  Send invite
-                </>
-              )}
-            </Button>
-          </div>
+        <CardContent>
+          <FieldGroup>
+            <Field>
+              <div className='grid grid-cols-1 md:grid-cols-6 gap-2'>
+                <Input
+                  placeholder='chris.johnson@contoso.com'
+                  type='email'
+                  className='md:col-span-4'
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSendInvite()}
+                  aria-label='Email address'
+                />
+                <Select value={inviteRole} onValueChange={(value: AssignableOrganizationRole) => setInviteRole(value)}>
+                  <SelectTrigger className='w-full' aria-label='Role'>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='member'>Member</SelectItem>
+                    <SelectItem value='admin'>Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  onClick={handleSendInvite}
+                  disabled={!inviteEmail.trim() || isSendingInvite}
+                  className='mt-4 lg:mt-0'
+                >
+                  {isSendingInvite ? (
+                    <>
+                      <Spinner className='mr-2' />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className='size-4 mr-2' />
+                      Send invite
+                    </>
+                  )}
+                </Button>
+              </div>
+            </Field>
+          </FieldGroup>
         </CardContent>
       </Card>
 
       {/* Pending Invites */}
-      {invitations.length > 0 && (
-        <Card>
+      <Card>
+        {invitations.length === 0 ? null : (
           <CardHeader>
             <CardTitle>Pending Invites</CardTitle>
             <CardDescription>Invitations waiting to be accepted</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className='space-y-3'>
+        )}
+        <CardContent>
+          {invitations.length === 0 ? (
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant='icon'>
+                  <Mail />
+                </EmptyMedia>
+                <EmptyTitle>No pending invites</EmptyTitle>
+                <EmptyDescription>
+                  When you send invitations, they will appear here until they are accepted or expire.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          ) : (
+            <ItemGroup className='gap-3'>
               {invitations.map((invite) => (
-                <div key={invite.id} className='flex items-center justify-between p-3 border rounded-lg'>
-                  <div className='flex items-center gap-3'>
-                    <div className='flex size-10 items-center justify-center rounded-lg bg-muted'>
-                      <Mail className='size-5' />
-                    </div>
-                    <div>
-                      <p className='font-medium'>{invite.email}</p>
-                      <p className='text-sm text-muted-foreground'>
-                        Expires <TimeAgo date={invite.expiresAt} /> • <span className='capitalize'>{invite.role}</span>
-                      </p>
-                    </div>
-                  </div>
-                  <div className='flex items-center gap-2'>
+                <Item key={invite.id} variant='outline'>
+                  <ItemMedia variant='icon' className='size-10'>
+                    <Mail className='size-5' />
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle>{invite.email}</ItemTitle>
+                    <ItemDescription>
+                      {invite.expiresAt < new Date() ? 'Expired' : 'Expires'} <TimeAgo date={invite.expiresAt} /> •{' '}
+                      <span className='capitalize'>{invite.role}</span>
+                    </ItemDescription>
+                  </ItemContent>
+                  <ItemActions>
                     <Button
                       variant='outline'
                       size='sm'
@@ -216,13 +247,13 @@ export function MembersSection({
                         'Revoke'
                       )}
                     </Button>
-                  </div>
-                </div>
+                  </ItemActions>
+                </Item>
               ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </ItemGroup>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Members */}
       <Card>
@@ -231,10 +262,10 @@ export function MembersSection({
           <CardDescription>People who have access to this organization</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className='space-y-3'>
+          <ItemGroup className='gap-3'>
             {members.map((member) => (
-              <div key={member.id} className='flex items-center justify-between p-3 border rounded-lg'>
-                <div className='flex items-center gap-3'>
+              <Item key={member.id} variant='outline'>
+                <ItemMedia>
                   <Avatar className='size-10'>
                     <AvatarFallback className='bg-primary text-primary-foreground text-sm'>
                       {member.user.name
@@ -243,17 +274,17 @@ export function MembersSection({
                         .join('')}
                     </AvatarFallback>
                   </Avatar>
-                  <div>
-                    <div className='flex items-center gap-2'>
-                      <p className='font-medium'>{member.user.name}</p>
-                      <Badge variant='secondary' className='text-xs'>
-                        <span className='capitalize'>{member.role}</span>
-                      </Badge>
-                    </div>
-                    <p className='text-sm text-muted-foreground'>{member.user.email}</p>
-                  </div>
-                </div>
-                <div className='flex items-center gap-2'>
+                </ItemMedia>
+                <ItemContent>
+                  <ItemTitle>
+                    {member.user.name}
+                    <Badge variant='secondary' className='text-xs ml-2'>
+                      <span className='capitalize'>{member.role}</span>
+                    </Badge>
+                  </ItemTitle>
+                  <ItemDescription>{member.user.email}</ItemDescription>
+                </ItemContent>
+                <ItemActions>
                   {member.role !== 'owner' && (
                     <>
                       <Select
@@ -290,10 +321,10 @@ export function MembersSection({
                       </Button>
                     </>
                   )}
-                </div>
-              </div>
+                </ItemActions>
+              </Item>
             ))}
-          </div>
+          </ItemGroup>
         </CardContent>
       </Card>
     </>
@@ -301,6 +332,7 @@ export function MembersSection({
 }
 
 export function DangerSection({ organizationId }: { organizationId: string }) {
+  const router = useRouter();
   const [isDeletingOrg, setIsDeletingOrg] = useState(false);
 
   async function handleDeleteOrganization() {
@@ -312,7 +344,7 @@ export function DangerSection({ organizationId }: { organizationId: string }) {
       return;
     }
 
-    redirect('/dashboard');
+    router.push('/dashboard');
   }
 
   return (
@@ -322,8 +354,8 @@ export function DangerSection({ organizationId }: { organizationId: string }) {
         <CardDescription>Irreversible actions for your organization</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='flex items-start justify-between'>
-          <div className='space-y-1'>
+        <div className='grid grid-cols-1 md:grid-cols-3 items-start justify-between'>
+          <div className='space-y-1 md:col-span-2'>
             <p className='font-medium'>Delete this organization</p>
             <p className='text-sm text-muted-foreground'>
               This action cannot be undone. All projects, data, and team members will be removed.
@@ -331,7 +363,7 @@ export function DangerSection({ organizationId }: { organizationId: string }) {
           </div>
           <AlertDialog>
             <AlertDialogTrigger asChild disabled={isDeletingOrg}>
-              <Button variant='destructive'>
+              <Button variant='destructive' className='mt-4 lg:mt-0 lg:justify-self-end md:w-full lg:w-auto'>
                 {isDeletingOrg ? (
                   <>
                     <Spinner className='mr-2' />
