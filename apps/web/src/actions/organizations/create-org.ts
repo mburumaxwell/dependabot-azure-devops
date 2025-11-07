@@ -2,6 +2,7 @@
 
 import { headers as requestHeaders } from 'next/headers';
 import { auth, type Organization } from '@/lib/auth';
+import { generateKey } from '@/lib/keygen';
 import type { OrganizationType } from '@/lib/organization-types';
 import { prisma } from '@/lib/prisma';
 import type { RegionCode } from '@/lib/regions';
@@ -43,8 +44,12 @@ export async function createOrganizationWithCredential({
     return { error: { message: 'Failed to create organization' } };
   }
 
+  // generate webhook token - using base64url for better security and URL safety
+  const webhooksToken = generateKey({ length: 32, encoding: 'base64url' });
+
+  // create organization credential
   await prisma.organizationCredential.create({
-    data: { id: organization.id, token },
+    data: { id: organization.id, token, webhooksToken },
   });
   return { data: organization };
 }

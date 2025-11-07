@@ -54,7 +54,7 @@ export async function validateOrganizationCredentials({
   // TODO: check for other permissions here so that we ensure it will keep working
 
   // ensure there is no other organization with the same URL
-  const existingOrg = await prisma.organization.findFirst({
+  const existing = await prisma.organization.findFirst({
     where: {
       type,
       url: inputUrl,
@@ -62,7 +62,7 @@ export async function validateOrganizationCredentials({
       NOT: id ? { id } : undefined,
     },
   });
-  if (existingOrg) {
+  if (existing) {
     return {
       valid: false,
       message: 'An organization with the provided URL already exists',

@@ -10,10 +10,9 @@ export async function updateOrganizationToken({
   token: string;
 }): Promise<{ success: boolean; error?: { message: string } }> {
   try {
-    await prisma.organizationCredential.upsert({
+    await prisma.organizationCredential.update({
       where: { id },
-      update: { token },
-      create: { id, token },
+      data: { token },
     });
 
     return { success: true };

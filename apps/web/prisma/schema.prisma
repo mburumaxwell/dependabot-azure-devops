@@ -184,10 +184,18 @@ model Passkey {
 // Even if it did, it is better to keep sensitive information isolated.
 
 model OrganizationCredential {
-  id           String       @id @map("_id")
-  organization Organization @relation(fields: [id], references: [id], onDelete: Cascade)
-  token        String
-  githubToken  String?
+  id                      String       @id @map("_id")
+  organization            Organization @relation(fields: [id], references: [id], onDelete: Cascade)
+  token                   String
+  tokenEnclaveUrl         String? // Future enclave storage support
+  /**
+   * Token (password) for Webhooks, ServiceHooks, and Notifications from the provider.
+   * This is generated on creation and may be shown on demand but cannot be edited.
+   */
+  webhooksToken           String
+  webhooksTokenEnclaveUrl String? // Future enclave storage support
+  githubToken             String?
+  githubTokenEnclaveUrl   String? // Future enclave storage support
 
   @@map("organization_credential")
 }
