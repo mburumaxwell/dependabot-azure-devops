@@ -9,7 +9,7 @@ import {
   type IPullRequestProperties,
 } from '@paklo/core/azure';
 import { DEFAULT_EXPERIMENTS, type DependabotConfig, type DependabotUpdate } from '@paklo/core/dependabot';
-import { GitHubGraphClient } from '@paklo/core/github';
+import { GitHubSecurityAdvisoryClient } from '@paklo/core/github';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { SecretMasker } from '../../api-client';
 import { runJob } from '../../run';
@@ -17,7 +17,7 @@ import { AzureLocalJobsRunner, type AzureLocalJobsRunnerOptions } from './runner
 import { AzureLocalDependabotServer } from './server';
 
 vi.mock('@paklo/core/github', () => ({
-  GitHubGraphClient: vi.fn(),
+  GitHubSecurityAdvisoryClient: vi.fn(),
   filterVulnerabilities: vi.fn((vulns) => vulns || []),
   getGhsaPackageEcosystemFromDependabotPackageManager: vi.fn(() => 'npm'),
 }));
@@ -286,11 +286,11 @@ describe('AzureLocalJobsRunner', () => {
       options.config.updates[0]!['open-pull-requests-limit'] = 0;
       options.githubToken = 'fake-github-token';
 
-      // Mock GitHubGraphClient properly
+      // Mock GitHubSecurityAdvisoryClient properly
       const mockGhsaClient = {
         getSecurityVulnerabilitiesAsync: vi.fn().mockResolvedValue([]),
       };
-      vi.mocked(GitHubGraphClient).mockImplementation(function MockGitHubGraphClient() {
+      vi.mocked(GitHubSecurityAdvisoryClient).mockImplementation(function MockGitHubSecurityAdvisoryClient() {
         return mockGhsaClient as any;
       } as any);
 
@@ -398,11 +398,11 @@ describe('AzureLocalJobsRunner', () => {
       options.config.updates[0]!['open-pull-requests-limit'] = 0;
       options.securityAdvisoriesFile = '/path/to/advisories.json';
 
-      // Mock GitHubGraphClient
+      // Mock GitHubSecurityAdvisoryClient
       const mockGhsaClient = {
         getSecurityVulnerabilitiesAsync: vi.fn().mockResolvedValue([]),
       };
-      vi.mocked(GitHubGraphClient).mockImplementation(function MockGitHubGraphClient() {
+      vi.mocked(GitHubSecurityAdvisoryClient).mockImplementation(function MockGitHubSecurityAdvisoryClient() {
         return mockGhsaClient as any;
       } as any);
 
