@@ -1,5 +1,16 @@
 # @paklo/runner
 
+## 0.2.1
+
+### Patch Changes
+
+- 8c7637d: Make use of [`octokit-js`](https://github.com/octokit/octokit.js) instead of rolling own
+- Updated dependencies [8041438]
+- Updated dependencies [8041438]
+- Updated dependencies [8c7637d]
+- Updated dependencies [8041438]
+  - @paklo/core@0.4.0
+
 ## 0.2.0
 
 ### Minor Changes
