@@ -22,9 +22,15 @@ const GHSA_SECURITY_VULNERABILITIES_QUERY = `
           references {
             url
           }
-          cvss {
-            score
-            vectorString
+          cvssSeverities {
+            cvssV3 {
+              score
+              vectorString
+            }
+            cvssV4 {
+              score
+              vectorString
+            }
           }
           epss {
             percentage
@@ -79,38 +85,37 @@ export type SecurityAdvisoryIdentifierType = z.infer<typeof SecurityAdvisoryIden
 export const SecurityAdvisorySeveritySchema = z.enum(['LOW', 'MODERATE', 'HIGH', 'CRITICAL']);
 export type SecurityAdvisorySeverity = z.infer<typeof SecurityAdvisorySeveritySchema>;
 
+const CweSchema = z.object({
+  cweId: z.string(),
+  name: z.string(),
+  description: z.string(),
+});
+
+const CvssSchema = z.object({
+  score: z.number(),
+  vectorString: z.string().nullish(),
+});
+type Cvss = z.infer<typeof CvssSchema>;
+
 export const SecurityAdvisorySchema = z.object({
-  identifiers: z.array(
-    z.object({
+  identifiers: z
+    .object({
       type: z.union([SecurityAdvisoryIdentifierSchema, z.string()]),
       value: z.string(),
-    }),
-  ),
+    })
+    .array(),
   severity: SecurityAdvisorySeveritySchema.nullish(),
   summary: z.string(),
   description: z.string().nullish(),
-  references: z.array(z.object({ url: z.string() })).nullish(),
-  cvss: z
-    .object({
-      score: z.number(),
-      vectorString: z.string(),
-    })
-    .nullish(),
+  references: z.object({ url: z.string() }).array().nullish(),
+  cvss: CvssSchema.nullish(),
   epss: z
     .object({
-      percentage: z.number(),
-      percentile: z.number(),
+      percentage: z.number().nullish(),
+      percentile: z.number().nullish(),
     })
     .nullish(),
-  cwes: z
-    .array(
-      z.object({
-        cweId: z.string(),
-        name: z.string(),
-        description: z.string(),
-      }),
-    )
-    .nullish(),
+  cwes: CweSchema.array().nullish(),
   publishedAt: z.string().nullish(),
   updatedAt: z.string().nullish(),
   withdrawnAt: z.string().nullish(),
@@ -129,13 +134,22 @@ export const SecurityVulnerabilitySchema = z.object({
 });
 export type SecurityVulnerability = z.infer<typeof SecurityVulnerabilitySchema>;
 
+const CvssSeveritiesSchema = z.object({
+  cvssV3: CvssSchema.nullish(),
+  cvssV4: CvssSchema.nullish(),
+});
+type CvssSeverities = z.infer<typeof CvssSeveritiesSchema>;
+
 const GitHubSecurityVulnerabilitiesResponseSchema = z.object({
   securityVulnerabilities: z.object({
     nodes: z
       .object({
-        advisory: SecurityAdvisorySchema,
-        vulnerableVersionRange: z.string(),
+        advisory: SecurityAdvisorySchema.omit({ cvss: true /* incoming is cvssSeverities */ }).extend({
+          cvssSeverities: CvssSeveritiesSchema,
+          cwes: z.object({ nodes: CweSchema.array() }).nullish(),
+        }),
         firstPatchedVersion: FirstPatchedVersionSchema.nullish(),
+        vulnerableVersionRange: z.string(),
       })
       .array(),
   }),
@@ -209,16 +223,38 @@ export class GitHubSecurityAdvisoryClient {
           package: pkg.name,
         };
 
+        function pickCvss(value: CvssSeverities): Cvss | undefined {
+          // Pick the one with a non-zero score
+          if (value.cvssV4 && value.cvssV4.score > 0) return value.cvssV4;
+          if (value.cvssV3 && value.cvssV3.score > 0) return value.cvssV3;
+        }
+
         try {
           const response = await this.octokit.graphql<GitHubSecurityVulnerabilitiesResponse>(
             GHSA_SECURITY_VULNERABILITIES_QUERY,
             variables,
           );
-          const vulnerabilities = response.securityVulnerabilities.nodes;
-          return vulnerabilities?.filter((v) => v.advisory != null)?.map((v) => ({ package: pkg, ...v })) || [];
+          const parsed = GitHubSecurityVulnerabilitiesResponseSchema.parse(response);
+          const vulnerabilities = parsed.securityVulnerabilities.nodes;
+          return (
+            vulnerabilities
+              ?.filter((v) => v.advisory != null)
+              ?.map(
+                (v) =>
+                  ({
+                    ...v,
+                    package: pkg,
+                    advisory: {
+                      ...v.advisory,
+                      cwes: v.advisory.cwes?.nodes,
+                      cvss: pickCvss(v.advisory.cvssSeverities),
+                    },
+                  }) satisfies SecurityVulnerability,
+              ) || []
+          );
         } catch (error) {
-          logger.warn(`GHSA GraphQL request failed for package ${pkg.name}: ${error}`);
-          throw error;
+          logger.warn(`GHSA GraphQL request failed for package ${pkg.name}: ${error}. Continuing with other packages.`);
+          return [];
         }
       },
     );

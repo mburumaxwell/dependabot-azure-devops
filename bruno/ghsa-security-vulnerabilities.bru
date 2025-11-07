@@ -29,10 +29,16 @@ body:graphql {
           references {
             url
           }
-          cvss {
-            score
-            vectorString
-          }
+          cvssSeverities {
+            cvssV3 {
+              score
+              vectorString
+            },
+            cvssV4 {
+              score
+              vectorString
+            },
+          },
           epss {
             percentage
             percentile
