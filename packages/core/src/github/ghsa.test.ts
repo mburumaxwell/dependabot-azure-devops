@@ -17,9 +17,15 @@ describe('SecurityVulnerabilitySchema', () => {
     expect(value.firstPatchedVersion).toStrictEqual({ identifier: '3.0.1' });
   });
 
-  // when testing the real thing, remove .skip and provide a valid token
-  it.skip('real API (ONLY FOR LOCAL USE)', async () => {
-    const client = new GitHubSecurityAdvisoryClient('YOUR_GITHUB_TOKEN_HERE');
+  it('real API', async () => {
+    // provide a valid token via GITHUB_TOKEN environment variable or replace the placeholder below
+    const token = process.env.GITHUB_TOKEN || 'YOUR_GITHUB_TOKEN_HERE';
+    if (token === 'YOUR_GITHUB_TOKEN_HERE') {
+      console.log('Skipping real API test - set GITHUB_TOKEN environment variable to run this test');
+      return;
+    }
+
+    const client = new GitHubSecurityAdvisoryClient(token);
 
     // Test with a small package that's likely to have vulnerabilities
     const vulnerabilities = await client.getSecurityVulnerabilitiesAsync('NPM', [
@@ -27,14 +33,15 @@ describe('SecurityVulnerabilitySchema', () => {
     ]);
 
     console.log('Found vulnerabilities:', vulnerabilities.length);
-    if (vulnerabilities.length > 0) {
-      console.log('First vulnerability:', vulnerabilities[0]);
-    }
 
     // Basic assertions
     expect(vulnerabilities).toBeDefined();
     expect(Array.isArray(vulnerabilities)).toBe(true);
-    expect(vulnerabilities.length).toBeGreaterThan(1);
-    expect(vulnerabilities[0]!.advisory.permalink).toEqual('https://github.com/advisories/GHSA-29mw-wpgm-hmr9');
+    expect(vulnerabilities.length).toBeGreaterThanOrEqual(7);
+    const vuln = vulnerabilities.find((v) => v.advisory.identifiers.find((id) => id.value === 'GHSA-29mw-wpgm-hmr9'));
+    expect(vuln).toBeDefined();
+    expect(vuln!.advisory.identifiers.find((id) => id.type === 'CVE' && id.value === 'CVE-2020-28500')).toBeDefined();
+    expect(vuln!.advisory.permalink).toEqual('https://github.com/advisories/GHSA-29mw-wpgm-hmr9');
+    expect(vuln!.advisory.cvss?.score).toEqual(5.3);
   }, 2000);
 });

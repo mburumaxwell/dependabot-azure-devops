@@ -1,6 +1,7 @@
 'use server';
 
 import { createGitHubClient } from '@paklo/core/github';
+import { RequestError } from 'octokit';
 
 export async function validateGitHubToken({ token }: { token: string }): Promise<{ valid: boolean; message?: string }> {
   if (!token || token.trim().length === 0) {
@@ -10,14 +11,10 @@ export async function validateGitHubToken({ token }: { token: string }): Promise
   try {
     const octokit = createGitHubClient({ token });
 
-    // Test the token by fetching the authenticated user's information
-    const { status } = await octokit.rest.users.getAuthenticated();
-    if (status < 200 || status >= 300) {
-      return { valid: false, message: 'Unknown error occurred while validating the token.' };
-    }
+    // Ensure the token works by fetching the authenticated user's information
+    await octokit.rest.users.getAuthenticated();
 
     // Check if the token has the required 'repo' scope
-    // We can infer this by trying to access a repository-specific endpoint
     try {
       await octokit.rest.repos.listForAuthenticatedUser({
         per_page: 1,
@@ -32,26 +29,27 @@ export async function validateGitHubToken({ token }: { token: string }): Promise
             'Token is valid but missing required "repo" scope. Please ensure your token has repository access permissions.',
         };
       }
+      throw error;
     }
   } catch (error) {
-    if (error instanceof Error) {
-      // Check for common error scenarios
-      if (error.message.includes('401') || error.message.includes('Bad credentials')) {
+    if (error instanceof RequestError) {
+      if (error.status === 401) {
         return { valid: false, message: 'Invalid token. Please check your GitHub personal access token.' };
       }
-      if (error.message.includes('403')) {
+      if (error.status === 403) {
         return {
           valid: false,
           message: 'Token has insufficient permissions. Please ensure it has the required scopes.',
         };
       }
-      if (error.message.includes('rate limit')) {
+      if (error.status === 429) {
         return { valid: false, message: 'Rate limit exceeded. Please try again later.' };
       }
-      return { valid: false, message: `Token validation failed: ${error.message}` };
+
+      return { valid: false, message: `GitHub API error: ${error.message} (status: ${error.status})` };
     }
 
-    return { valid: false, message: 'An unexpected error occurred while validating the token.' };
+    return { valid: false, message: `Token validation failed: ${(error as Error).message}` };
   }
 
   return { valid: true };
