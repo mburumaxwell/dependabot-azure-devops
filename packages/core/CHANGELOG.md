@@ -1,5 +1,20 @@
 # @paklo/core
 
+## 0.4.0
+
+### Minor Changes
+
+- 8041438: Migrate from deprecated GitHub `cvss` field to `cvssSeverities` with v4.0 support
+
+  Updated GitHub Security Advisory client to use the new `cvssSeverities` API that provides both CVSS v3.1 and v4.0 scores, replacing the deprecated cvss field. The implementation prioritizes CVSS v4.0 when available for enhanced vulnerability scoring accuracy and future compatibility.
+
+- 8041438: Use schema to validate response from GHSA hence update it to correct version
+- 8c7637d: Make use of [`octokit-js`](https://github.com/octokit/octokit.js) instead of rolling own
+
+### Patch Changes
+
+- 8041438: Move to next package after logging vulnerabilities fetch failure
+
 ## 0.3.0
 
 ### Minor Changes
