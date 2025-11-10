@@ -7,6 +7,7 @@ import { logger } from '@/logger';
 import { ContainerService } from './container-service';
 import type { JobParameters } from './params';
 import type { Proxy } from './proxy';
+import { extractUpdaterSha } from './utils';
 
 const JOB_OUTPUT_FILENAME = 'output.json';
 const JOB_OUTPUT_PATH = '/home/dependabot/dependabot-updater/output';
@@ -31,36 +32,45 @@ export class UpdaterBuilder {
 
   async run(containerName: string): Promise<Container> {
     const proxyUrl = await this.proxy.url();
+    const updaterSha = extractUpdaterSha(this.updaterImage);
+
+    const envVars = [
+      `GITHUB_ACTIONS=${process.env.GITHUB_ACTIONS}`,
+      `DEPENDABOT_JOB_ID=${this.jobParams.jobId}`,
+      `DEPENDABOT_JOB_TOKEN=`,
+      `DEPENDABOT_JOB_PATH=${JOB_INPUT_PATH}/${JOB_INPUT_FILENAME}`,
+      `DEPENDABOT_OPEN_TIMEOUT_IN_SECONDS=15`,
+      `DEPENDABOT_OUTPUT_PATH=${JOB_OUTPUT_PATH}/${JOB_OUTPUT_FILENAME}`,
+      `DEPENDABOT_REPO_CONTENTS_PATH=${REPO_CONTENTS_PATH}`,
+      `DEPENDABOT_API_URL=${this.jobParams.dependabotApiDockerUrl}`,
+      `SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt`,
+      `http_proxy=${proxyUrl}`,
+      `HTTP_PROXY=${proxyUrl}`,
+      `https_proxy=${proxyUrl}`,
+      `HTTPS_PROXY=${proxyUrl}`,
+      `UPDATER_ONE_CONTAINER=1`,
+      `ENABLE_CONNECTIVITY_CHECK=${process.env.DEPENDABOT_ENABLE_CONNECTIVITY_CHECK || '1'}`,
+
+      // for updates relying on .NET (e.g. NuGet) and running on macOS (e.g. dev laptop or local MacMini),
+      // we need to disable WriteXorExecute to avoid issues with emulation of Linux containers on macOS hosts
+      // with Apple Silicon (M1/M2) chips
+      // See - https://github.com/dotnet/runtime/issues/103063#issuecomment-2149599940
+      //     - https://github.com/dependabot/dependabot-core/issues/5037
+      ...(process.platform === 'darwin' ? [`DOTNET_EnableWriteXorExecute=0`] : []),
+    ];
+
+    // Add DEPENDABOT_UPDATER_SHA if we successfully extracted a SHA
+    if (updaterSha !== null) {
+      envVars.push(`DEPENDABOT_UPDATER_SHA=${updaterSha}`);
+    }
+
     const container = await this.docker.createContainer({
       Image: this.updaterImage,
       name: containerName,
       AttachStdout: true,
       AttachStderr: true,
       User: 'dependabot',
-      Env: [
-        `GITHUB_ACTIONS=${process.env.GITHUB_ACTIONS}`,
-        `DEPENDABOT_JOB_ID=${this.jobParams.jobId}`,
-        `DEPENDABOT_JOB_TOKEN=`,
-        `DEPENDABOT_JOB_PATH=${JOB_INPUT_PATH}/${JOB_INPUT_FILENAME}`,
-        `DEPENDABOT_OPEN_TIMEOUT_IN_SECONDS=15`,
-        `DEPENDABOT_OUTPUT_PATH=${JOB_OUTPUT_PATH}/${JOB_OUTPUT_FILENAME}`,
-        `DEPENDABOT_REPO_CONTENTS_PATH=${REPO_CONTENTS_PATH}`,
-        `DEPENDABOT_API_URL=${this.jobParams.dependabotApiDockerUrl}`,
-        `SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt`,
-        `http_proxy=${proxyUrl}`,
-        `HTTP_PROXY=${proxyUrl}`,
-        `https_proxy=${proxyUrl}`,
-        `HTTPS_PROXY=${proxyUrl}`,
-        `UPDATER_ONE_CONTAINER=1`,
-        `ENABLE_CONNECTIVITY_CHECK=${process.env.DEPENDABOT_ENABLE_CONNECTIVITY_CHECK || '1'}`,
-
-        // for updates relying on .NET (e.g. NuGet) and running on macOS (e.g. dev laptop or local MacMini),
-        // we need to disable WriteXorExecute to avoid issues with emulation of Linux containers on macOS hosts
-        // with Apple Silicon (M1/M2) chips
-        // See - https://github.com/dotnet/runtime/issues/103063#issuecomment-2149599940
-        //     - https://github.com/dependabot/dependabot-core/issues/5037
-        ...(process.platform === 'darwin' ? [`DOTNET_EnableWriteXorExecute=0`] : []),
-      ],
+      Env: envVars,
       Cmd: ['/bin/sh'],
       Tty: true,
       HostConfig: {
