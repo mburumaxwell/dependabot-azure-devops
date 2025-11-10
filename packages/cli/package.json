@@ -6,7 +6,7 @@
   "author": "mburumaxwell",
   "license": "AGPL-3.0-later",
   "bin": {
-    "paklo": "./dist/index.js"
+    "paklo": "./dist/index.mjs"
   },
   "files": [
     "dist",
@@ -19,7 +19,7 @@
     "lint": "biome check",
     "test": "vitest",
     "clean": "rimraf .turbo dist",
-    "cli": "node dist/index.js"
+    "cli": "node dist/index.mjs"
   },
   "repository": {
     "type": "git",
@@ -49,7 +49,7 @@
   "publishConfig": {
     "access": "public",
     "executableFiles": [
-      "./dist/index.js"
+      "./dist/index.mjs"
     ]
   }
 }

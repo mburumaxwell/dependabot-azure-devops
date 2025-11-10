@@ -7,16 +7,16 @@
   "license": "AGPL-3.0-later",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
     },
     "./local": {
-      "types": "./dist/local/index.d.ts",
-      "import": "./dist/local/index.js"
+      "types": "./dist/local/index.d.mts",
+      "import": "./dist/local/index.mjs"
     },
     "./local/azure": {
-      "types": "./dist/local/azure/index.d.ts",
-      "import": "./dist/local/azure/index.js"
+      "types": "./dist/local/azure/index.d.mts",
+      "import": "./dist/local/azure/index.mjs"
     }
   },
   "files": [
