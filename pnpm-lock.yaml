@@ -192,8 +192,8 @@ importers:
         specifier: 2.0.6
         version: 2.0.6
       validator:
-        specifier: 13.15.20
-        version: 13.15.20
+        specifier: 13.15.22
+        version: 13.15.22
       zod:
         specifier: 4.1.12
         version: 4.1.12
@@ -7264,8 +7264,8 @@ packages:
     deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
     hasBin: true
 
-  validator@13.15.20:
-    resolution: {integrity: sha512-KxPOq3V2LmfQPP4eqf3Mq/zrT0Dqp2Vmx2Bn285LwVahLc+CsxOM0crBHczm8ijlcjZ0Q5Xd6LW3z3odTPnlrw==}
+  validator@13.15.22:
+    resolution: {integrity: sha512-uT/YQjiyLJP7HSrv/dPZqK9L28xf8hsNca01HSz1dfmI0DgMfjopp1rO/z13NeGF1tVystF0Ejx3y4rUKPw+bQ==}
     engines: {node: '>= 0.10'}
 
   vary@1.1.2:
@@ -15189,7 +15189,7 @@ snapshots:
       tracer: 0.7.4
       util.promisify: 1.1.3
       uuid: 3.4.0
-      validator: 13.15.20
+      validator: 13.15.22
       winreg: 0.0.12
       xml2js: 0.5.0
 
@@ -15574,7 +15574,7 @@ snapshots:
 
   uuid@3.4.0: {}
 
-  validator@13.15.20: {}
+  validator@13.15.22: {}
 
   vary@1.1.2: {}
 
