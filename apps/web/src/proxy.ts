@@ -13,12 +13,13 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Make modified headers available upstream not to clients. Using
-  // next({ headers }) instead of next({ request: { headers } })
-  // makes server actions to fail so make sure to edit the request headers.
-  // https://nextjs.org/docs/app/api-reference/file-conventions/proxy#setting-headers
-  headers.set('x-pathname', pathname);
-  return NextResponse.next({ request: { headers } });
+  // // Make modified headers available upstream not to clients. Using
+  // // next({ headers }) instead of next({ request: { headers } })
+  // // makes server actions to fail so make sure to edit the request headers.
+  // // https://nextjs.org/docs/app/api-reference/file-conventions/proxy#setting-headers
+  // headers.set('x-pathname', pathname);
+  // return NextResponse.next({ request: { headers } });
+  return NextResponse.next();
 }
 
 export const config: ProxyConfig = {
