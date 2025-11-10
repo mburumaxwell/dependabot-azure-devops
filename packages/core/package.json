@@ -81,7 +81,7 @@
     "@types/js-yaml": "4.0.9",
     "@types/node": "24.10.0",
     "@types/semver": "7.7.1",
-    "tsdown": "0.15.12"
+    "tsdown": "0.16.1"
   },
   "publishConfig": {
     "access": "public"
