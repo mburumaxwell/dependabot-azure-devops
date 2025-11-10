@@ -6,5 +6,8 @@
       "schedule": "0 2 * * *"
     }
   ],
-  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_AUTHOR_LOGIN\" == \"dependabot[bot]\" ]"
+  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_AUTHOR_LOGIN\" == \"dependabot[bot]\" ]",
+  "github": {
+    "autoJobCancelation": false
+  }
 }
