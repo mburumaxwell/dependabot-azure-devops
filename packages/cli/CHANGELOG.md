@@ -1,5 +1,12 @@
 # paklo
 
+## 0.11.4
+
+### Patch Changes
+
+- Updated dependencies [99d52cb]
+  - @paklo/runner@0.2.2
+
 ## 0.11.3
 
 ### Patch Changes
