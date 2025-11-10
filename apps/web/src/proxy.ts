@@ -1,9 +1,13 @@
+import { getSessionCookie } from 'better-auth/cookies';
 import { type NextRequest, NextResponse, type ProxyConfig } from 'next/server';
-import { auth } from '@/lib/auth';
 
 export async function proxy(request: NextRequest) {
   const headers = new Headers(request.headers);
-  const session = await auth.api.getSession({ headers });
+  // getSessionCookie is sync and faster than calling auth.api.getSession
+  // As of 2025-Nov-10 using Next 16.0.1 (renamed middleware to proxy), auth.api.getSession
+  // makes the request timeout.
+  // const session = await auth.api.getSession({ headers });
+  const session = getSessionCookie(request);
   const { nextUrl: url } = request;
   const { pathname } = url;
 
