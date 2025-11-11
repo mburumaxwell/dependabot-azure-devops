@@ -1,8 +1,8 @@
 'use server';
 
+import { generateKey } from '@paklo/core/keygen';
 import { headers as requestHeaders } from 'next/headers';
 import { auth, type Organization } from '@/lib/auth';
-import { generateKey } from '@/lib/keygen';
 import type { OrganizationType } from '@/lib/organization-types';
 import { prisma } from '@/lib/prisma';
 import type { RegionCode } from '@/lib/regions';

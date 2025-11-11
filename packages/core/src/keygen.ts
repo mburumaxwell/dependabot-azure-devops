@@ -1,19 +1,3 @@
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
-export function formatDate(input: string | number | Date): string {
-  const date = new Date(input);
-  return date.toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
-
 export type GenerateKeyOptions = {
   /** Length in bytes (default: 32) */
   length?: number;
@@ -42,9 +26,7 @@ export type GenerateKeyOptions = {
  * const key = generateKey({ length: 64, encoding: 'base64' });
  * ```
  */
-export function generateKey(options: GenerateKeyOptions = {}): string {
-  const { length = 32, encoding = 'base64url' } = options;
-
+export function generateKey({ length = 32, encoding = 'base64url' }: GenerateKeyOptions = {}): string {
   const bytes = new Uint8Array(length);
   crypto.getRandomValues(bytes);
   const buffer = Buffer.from(bytes);
@@ -86,4 +68,15 @@ export function generateKey(options: GenerateKeyOptions = {}): string {
     default:
       throw new Error(`Unsupported encoding: ${encoding}`);
   }
+}
+
+export type GenerateIdOptions = {
+  /** Length of the ID string (default: 16) */
+  length?: number;
+};
+
+export function generateId({ length = 16 }: GenerateIdOptions = {}): string {
+  const bytes = new Uint8Array(length);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (byte) => (byte % 36).toString(36)).join('');
 }

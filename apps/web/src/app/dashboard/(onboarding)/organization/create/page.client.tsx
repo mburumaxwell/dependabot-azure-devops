@@ -4,8 +4,11 @@ import { CheckCircle2, Eye, EyeOff, Globe, XCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import validator from 'validator';
-import { validateOrganizationCredentials } from '@/actions/organizations';
-import { createOrganizationWithCredential, type OrganizationCreateOptions } from '@/actions/organizations/create-org';
+import {
+  createOrganizationWithCredential,
+  type OrganizationCreateOptions,
+  validateOrganizationCredentials,
+} from '@/actions/organizations';
 import { Stepper } from '@/components/stepper';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';

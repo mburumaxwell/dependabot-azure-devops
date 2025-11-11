@@ -14,6 +14,10 @@
       "types": "./dist/http/index.d.mts",
       "import": "./dist/http/index.mjs"
     },
+    "./keygen": {
+      "types": "./dist/keygen.d.mts",
+      "import": "./dist/keygen.mjs"
+    },
     "./logger": {
       "types": "./dist/logger.d.mts",
       "import": "./dist/logger.mjs"

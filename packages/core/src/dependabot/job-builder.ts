@@ -453,9 +453,3 @@ export function makeRandomJobId(): number {
   crypto.getRandomValues(array);
   return array[0]! % 10000000000; // Limit to 10 digits to match GitHub's job IDs
 }
-
-export function makeRandomJobToken() {
-  const array = new Uint8Array(30);
-  crypto.getRandomValues(array);
-  return Array.from(array, (byte) => (byte % 36).toString(36)).join('');
-}

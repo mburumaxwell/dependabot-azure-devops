@@ -8,6 +8,7 @@ export default defineConfig({
     // base
     'src/environment/index.ts',
     'src/http/index.ts',
+    'src/keygen.ts',
     'src/logger.ts',
     'src/shared-data/index.ts',
     'src/usage.ts',
