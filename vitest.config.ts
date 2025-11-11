@@ -4,9 +4,7 @@ import { configDefaults, defineConfig } from 'vitest/config';
 
 /** @type {import("vitest/config").ViteUserConfig} */
 export default defineConfig({
-  plugins: [
-    tsconfigPaths(),
-  ],
+  plugins: [tsconfigPaths()],
   test: {
     globals: true,
     watch: false,
