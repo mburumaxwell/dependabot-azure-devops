@@ -23,7 +23,7 @@
     "start": "next start",
     "lint": "biome check",
     "test": "vitest",
-    "clean": "rimraf .next .source out .react-email"
+    "clean": "rimraf .next .source .prisma .react-email out"
   },
   "dependencies": {
     "@azure/monitor-opentelemetry-exporter": "1.0.0-beta.32",
