@@ -3,9 +3,7 @@ import { UsageTelemetryRequestDataSchema } from '@paklo/core/usage';
 import { geolocation } from '@vercel/functions';
 import { Hono } from 'hono';
 import { handle } from 'hono/vercel';
-
-import { prisma } from '@/lib/prisma';
-import type { UsageTelemetry } from '@/lib/prisma/client';
+import { prisma, type UsageTelemetry } from '@/lib/prisma';
 import { fromExternalRegion } from '@/lib/regions';
 
 export const dynamic = 'force-dynamic';

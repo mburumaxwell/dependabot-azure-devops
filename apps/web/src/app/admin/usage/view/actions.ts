@@ -1,7 +1,6 @@
 'use server';
 
-import { prisma } from '@/lib/prisma';
-import type { UsageTelemetry } from '@/lib/prisma/client';
+import { prisma, type UsageTelemetry } from '@/lib/prisma';
 
 export async function fetchTelemetryData({
   start,

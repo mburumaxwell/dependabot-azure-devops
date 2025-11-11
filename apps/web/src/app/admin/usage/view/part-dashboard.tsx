@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { type TimeRange, timeRangeOptions } from '@/lib/aggregation';
-import type { UsageTelemetry } from '@/lib/prisma/client';
+import type { UsageTelemetry } from '@/lib/prisma';
 import { MetricCard } from './part-metric-card';
 import { PackageManagerChart } from './part-package-manager-chart';
 import { RunsChart } from './part-runs-chart';

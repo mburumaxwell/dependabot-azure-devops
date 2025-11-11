@@ -1,8 +1,7 @@
 'use server';
 
 import { generateId } from '@paklo/core/keygen';
-import { prisma } from '@/lib/prisma';
-import type { OrganizationSecret } from '@/lib/prisma/client';
+import { type OrganizationSecret, prisma } from '@/lib/prisma';
 import { type SecretValidationResult, validateSecretNameFormat } from '@/lib/secrets';
 
 /** Validates if a secret name and its uniqueness within an organization */
