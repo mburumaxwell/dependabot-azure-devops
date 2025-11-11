@@ -5,11 +5,7 @@ import { configDefaults, defineConfig } from 'vitest/config';
 /** @type {import("vitest/config").ViteUserConfig} */
 export default defineConfig({
   plugins: [
-    tsconfigPaths({
-      // output:standalone and optimizePackageImports: ['@prisma/client'] cause tests to fail
-      // hence we ignore errors from the tsconfig files copied
-      ignoreConfigErrors: true,
-    }),
+    tsconfigPaths(),
   ],
   test: {
     globals: true,
