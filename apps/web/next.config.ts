@@ -10,9 +10,6 @@ const config: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     unoptimized: true, // hoping this improves site performance
   },
-  experimental: {
-    optimizePackageImports: ['@prisma/client'],
-  },
   async headers() {
     return [
       // security headers

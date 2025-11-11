@@ -21,6 +21,7 @@
       "!.turbo",
       "!.vercel",
       "!.source",
+      "!.prisma",
       "!.react-email",
       "!public",
       "!static",

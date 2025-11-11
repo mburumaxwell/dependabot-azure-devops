@@ -342,6 +342,7 @@ out
 .vercel
 .next
 .source
+.prisma
 next-env.d.ts
 .env*.local
 .react-email
