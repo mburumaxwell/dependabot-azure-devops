@@ -145,7 +145,7 @@ export function SecretsView({ organizationId, secrets: initialSecrets }: Secrets
   return (
     <>
       {secrets.length === 0 ? (
-        <div className='p-6 w-full max-w-5xl mx-auto'>
+        <div className='p-6 w-full max-w-5xl mx-auto min-h-screen flex'>
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant='icon'>

@@ -127,6 +127,7 @@ model Organization {
   maxProjects Int?
   credential  OrganizationCredential?
   secrets     OrganizationSecret[]
+  projects    Project[]
 
   @@unique([slug])
   @@unique([url])
@@ -189,9 +190,9 @@ model OrganizationCredential {
   organization            Organization @relation(fields: [id], references: [id], onDelete: Cascade)
   token                   String
   tokenEnclaveUrl         String? // Future enclave storage support
-  /**
-   * Token (password) for Webhooks, ServiceHooks, and Notifications from the provider.
-   * This is generated on creation and may be shown on demand but cannot be edited.
+  /*
+   Token (password) for Webhooks, ServiceHooks, and Notifications from the provider.
+   This is generated on creation and may be shown on demand but cannot be edited.
    */
   webhooksToken           String
   webhooksTokenEnclaveUrl String? // Future enclave storage support
@@ -215,4 +216,56 @@ model OrganizationSecret {
   @@index([organizationId])
   @@index([name])
   @@map("organization_secret")
+}
+
+enum SynchronizationStatus {
+  pending
+  success
+  failed
+
+  @@map("SyncStatus")
+}
+
+model Project {
+  id                    String                @id @map("_id")
+  organizationId        String
+  organization          Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  providerId            String
+  name                  String
+  url                   String
+  /// The link that never changes even if the name changes (only for some providers).
+  // This tends to be the API url for the project.
+  permalink             String
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  synchronizationStatus SynchronizationStatus
+  synchronizedAt        DateTime?
+  repositories          Repository[]
+
+  @@unique([organizationId, providerId])
+  @@index([organizationId])
+  @@map("project")
+}
+
+model Repository {
+  id                    String                @id @map("_id")
+  projectId             String
+  project               Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  providerId            String
+  name                  String
+  url                   String
+  slug                  String?
+  /*
+   Latest commit SHA synchronized for the configuration file.
+   */
+  latestCommit          String?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  synchronizationStatus SynchronizationStatus
+  synchronizedAt        DateTime?
+
+  @@unique([projectId, providerId])
+  @@unique([url])
+  @@index([projectId])
+  @@map("repository")
 }

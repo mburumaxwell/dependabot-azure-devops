@@ -13,3 +13,13 @@ export function formatDate(input: string | number | Date): string {
     year: 'numeric',
   });
 }
+
+export type InitialsType = 'all' | 'first';
+export function getInitials(value: string, type: InitialsType = 'all') {
+  return value
+    .split(/[\s@]+/)
+    .map((p) => p[0])
+    .slice(0, type === 'first' ? 1 : 2)
+    .join('')
+    .toUpperCase();
+}

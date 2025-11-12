@@ -1,0 +1,142 @@
+'use client';
+
+import { Calendar, MoreHorizontalIcon, RefreshCw, Unplug } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { disconnectProject } from '@/actions/projects';
+import { SynchronizationStatusBadge } from '@/components/sync-status-badge';
+import { TimeAgo } from '@/components/time-ago';
+import { Button } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Spinner } from '@/components/ui/spinner';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import type { Project, Repository } from '@/lib/prisma';
+
+type SimpleProject = Pick<
+  Project,
+  'id' | 'name' | 'url' | 'synchronizationStatus' | 'synchronizedAt' | 'organizationId'
+>;
+type SimpleRepository = Pick<Repository, 'id' | 'name' | 'synchronizationStatus' | 'updatedAt' | 'synchronizedAt'>;
+export function RepositoriesView({
+  project,
+  repositories,
+}: {
+  project: SimpleProject;
+  repositories: SimpleRepository[];
+}) {
+  const router = useRouter();
+
+  function handleSync(project: SimpleProject) {
+    // TODO: implement sync logic
+    console.log('Syncing project:', project.id);
+  }
+
+  async function handleDisconnect(project: SimpleProject) {
+    try {
+      await disconnectProject({ organizationId: project.organizationId, projectId: project.id });
+
+      toast.success('Disconnected', {
+        description: `Successfully disconnected project "${project.name}"`,
+      });
+      router.push('/dashboard/projects');
+    } catch (error) {
+      toast.error('Failed to disconnect project', {
+        description: (error as Error).message,
+      });
+    }
+  }
+
+  return (
+    <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
+      <div className='grid gap-4 grid-cols-1 md:grid-cols-3 items-center justify-center'>
+        <div className='md:col-span-2'>
+          <h1 className='text-3xl font-semibold mb-2'>Project: {project.name}</h1>
+          <p className='text-muted-foreground text-sm'>
+            <a href={project.url} target='_blank' rel='noopener noreferrer' className='underline underline-offset-4'>
+              {project.url}
+            </a>
+            {project.synchronizedAt && (
+              <span className='flex items-center gap-1 mt-1'>
+                <Calendar className='size-3' />
+                Last synchronized: <TimeAgo date={project.synchronizedAt} />
+              </span>
+            )}
+          </p>
+        </div>
+        <ButtonGroup className='mt-4 md:w-full lg:mt-0 lg:justify-self-end lg:w-auto'>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='outline' size='icon' aria-label='More Options'>
+                <MoreHorizontalIcon />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end' className='w-52'>
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onClick={() => handleSync(project)}
+                  disabled={project.synchronizationStatus === 'pending'}
+                >
+                  {project.synchronizationStatus === 'pending' ? (
+                    <>
+                      <Spinner />
+                      Syncing...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw />
+                      Sync Now
+                    </>
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem variant='destructive' onClick={() => handleDisconnect(project)}>
+                  <Unplug />
+                  Disconnect
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </ButtonGroup>
+      </div>
+
+      <div className='border rounded-lg overflow-hidden'>
+        <Table>
+          <TableHeader>
+            <TableRow className='hover:bg-transparent'>
+              <TableHead className='font-semibold'>Repository Name</TableHead>
+              <TableHead className='font-semibold w-32 text-right'>Last Updated</TableHead>
+              <TableHead className='font-semibold w-24 text-right'>Sync Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {repositories.map((repo) => (
+              <TableRow
+                key={repo.id}
+                className='group hover:cursor-pointer'
+                onClick={() => router.push(`/dashboard/repositories/${repo.id}`)}
+              >
+                <TableCell>{repo.name}</TableCell>
+                <TableCell className='text-right'>
+                  <TimeAgo date={repo.updatedAt} />
+                </TableCell>
+                <TableCell className='text-right'>
+                  <SynchronizationStatusBadge status={repo.synchronizationStatus} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+}

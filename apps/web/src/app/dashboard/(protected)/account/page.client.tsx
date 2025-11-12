@@ -574,7 +574,7 @@ export function DangerSection({ hasOrganizations }: { hasOrganizations: boolean 
     }
 
     // inform the user to check their email
-    toast('Account deletion requested.', {
+    toast.success('Account deletion requested.', {
       description: 'Please check your email to confirm account deletion.',
     });
   }

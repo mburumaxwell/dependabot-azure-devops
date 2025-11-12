@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export const metadata: Metadata = {
   title: 'Usage',
@@ -14,20 +15,26 @@ export const metadata: Metadata = {
 export default async function UsagePage() {
   const headers = await requestHeaders();
   const organization = await auth.api.getFullOrganization({ headers });
+  if (!organization) return null;
 
-  const usage = {
-    projects: {
-      used: 1, // TODO: get actual projects count
-      provisioned: organization?.maxProjects || 1,
+  const projectsCount = await prisma.project.count({
+    where: { organizationId: organization.id },
+  });
+
+  const values = [
+    {
+      title: 'Projects',
+      description: 'Number of active projects',
+      used: projectsCount,
+      limit: organization.maxProjects || 1, // TODO: remove default once onboarding flow is enforced
     },
-    minutes: {
+    {
+      title: 'Update Runs',
+      description: 'Total runtime in minutes',
       used: 1, // TODO: get actual run minutes
       limit: 50, // TODO: get actual max included minutes
     },
-  };
-
-  const projectsPercentage = (usage.projects.used / usage.projects.provisioned) * 100;
-  const minutesPercentage = (usage.minutes.used / usage.minutes.limit) * 100;
+  ];
 
   return (
     <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
@@ -37,45 +44,30 @@ export default async function UsagePage() {
       </div>
 
       <div className='grid gap-6 md:grid-cols-2'>
-        <Card>
-          <CardHeader>
-            <CardTitle>Projects</CardTitle>
-            <CardDescription>Number of active projects</CardDescription>
-          </CardHeader>
-          <CardContent className='space-y-4'>
-            <div className='flex items-end gap-2'>
-              <span className='text-4xl font-bold'>{usage.projects.used}</span>
-              <span className='text-muted-foreground mb-1'>/ {usage.projects.provisioned} provisioned</span>
-            </div>
-            <Progress value={projectsPercentage} className='h-2' />
-            <div className='flex items-center justify-between text-sm'>
-              <span className='text-muted-foreground'>{projectsPercentage.toFixed(0)}% used</span>
-              <Badge variant={projectsPercentage > 80 ? 'destructive' : 'secondary'}>
-                {usage.projects.provisioned - usage.projects.used} remaining
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Update Runs</CardTitle>
-            <CardDescription>Total runtime in minutes</CardDescription>
-          </CardHeader>
-          <CardContent className='space-y-4'>
-            <div className='flex items-end gap-2'>
-              <span className='text-4xl font-bold'>{usage.minutes.used.toLocaleString()}</span>
-              <span className='text-muted-foreground mb-1'>/ {usage.minutes.limit.toLocaleString()} minutes</span>
-            </div>
-            <Progress value={minutesPercentage} className='h-2' />
-            <div className='flex items-center justify-between text-sm'>
-              <span className='text-muted-foreground'>{minutesPercentage.toFixed(1)}% used</span>
-              <Badge variant={minutesPercentage > 80 ? 'destructive' : 'secondary'}>
-                {(usage.minutes.limit - usage.minutes.used).toLocaleString()} remaining
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
+        {values.map((value) => {
+          const percentage = (value.used / value.limit) * 100;
+          return (
+            <Card key={value.title}>
+              <CardHeader>
+                <CardTitle>{value.title}</CardTitle>
+                <CardDescription>{value.description}</CardDescription>
+              </CardHeader>
+              <CardContent className='space-y-4'>
+                <div className='flex items-end gap-2'>
+                  <span className='text-4xl font-bold'>{value.used}</span>
+                  <span className='text-muted-foreground mb-1'>/ {value.limit} provisioned</span>
+                </div>
+                <Progress value={percentage} className='h-2' />
+                <div className='flex items-center justify-between text-sm'>
+                  <span className='text-muted-foreground'>{percentage.toFixed(0)}% used</span>
+                  <Badge variant={percentage > 80 ? 'destructive' : 'secondary'}>
+                    {(value.limit - value.used).toLocaleString()} remaining
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

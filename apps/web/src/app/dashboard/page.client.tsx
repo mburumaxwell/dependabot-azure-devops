@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import { authClient, type Organization } from '@/lib/auth-client';
-import { getOrganizationInfo } from '@/lib/organization-types';
+import { getOrganizationTypeInfo } from '@/lib/organization-types';
 
 export function NoOrganizationsView() {
   return (
@@ -41,9 +41,8 @@ export function NoOrganizationsView() {
   );
 }
 
-export function SelectOrganizationView({ organizations: rawOrganizations }: { organizations: Organization[] }) {
+export function SelectOrganizationView({ organizations }: { organizations: Organization[] }) {
   const router = useRouter();
-  const [organizations] = useState(rawOrganizations);
   const [selectedOrgId, setSelectedOrgId] = useState<string | undefined>(undefined);
   const [settingDefault, setSettingDefault] = useState(false);
 
@@ -88,7 +87,7 @@ export function SelectOrganizationView({ organizations: rawOrganizations }: { or
               <SelectContent>
                 {organizations.map((org) => (
                   <SelectItem key={org.id} value={org.id}>
-                    {org.name} ({getOrganizationInfo(org.type)!.name})
+                    {org.name} ({getOrganizationTypeInfo(org.type)!.name})
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -90,6 +90,17 @@ export class AzureDevOpsWebApiClient {
     }
   }
 
+  public async getProjects(): Promise<{ id: string; name: string; description: string; url: string }[] | undefined> {
+    try {
+      const projects = await this.restApiGet(`${this.organisationApiUrl}/_apis/projects`);
+      return projects?.value || [];
+    } catch (e) {
+      logger.error(`Failed to get projects: ${e}`);
+      logger.debug(e); // Dump the error stack trace to help with debugging
+      return undefined;
+    }
+  }
+
   /**
    * Get the default branch for a repository.
    * Requires scope "Code (Read)" (vso.code).

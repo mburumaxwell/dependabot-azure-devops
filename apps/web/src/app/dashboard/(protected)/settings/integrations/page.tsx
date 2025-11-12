@@ -13,7 +13,6 @@ export const metadata: Metadata = {
 export default async function IntegrationsPage() {
   const headers = await requestHeaders();
   const organization = await auth.api.getFullOrganization({ headers });
-
   if (!organization) return null;
 
   // Get token status directly from database

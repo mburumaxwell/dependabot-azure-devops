@@ -4,6 +4,15 @@ import { logger } from '@/lib/logger';
 import { getWebhooksUrl, type OrganizationType } from '@/lib/organization-types';
 import { prisma } from '@/lib/prisma';
 
+export async function getWebhooksToken({ organizationId }: { organizationId: string }) {
+  const credential = await prisma.organizationCredential.findUniqueOrThrow({
+    where: { id: organizationId },
+    select: { webhooksToken: true },
+  });
+
+  return credential.webhooksToken;
+}
+
 export async function validateWebhooks({
   id,
   type,

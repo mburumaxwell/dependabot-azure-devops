@@ -37,7 +37,7 @@ export const ORGANIZATION_TYPES_INFO: Record<OrganizationType, OrganizationTypeI
 };
 export const ORGANIZATION_TYPES = Object.keys(ORGANIZATION_TYPES_INFO) as OrganizationType[];
 
-export function getOrganizationInfo(type: OrganizationType | string) {
+export function getOrganizationTypeInfo(type: OrganizationType | string) {
   return ORGANIZATION_TYPES_INFO[type as OrganizationType];
 }
 

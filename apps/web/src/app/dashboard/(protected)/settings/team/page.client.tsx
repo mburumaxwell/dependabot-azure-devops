@@ -28,6 +28,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Spinner } from '@/components/ui/spinner';
 import type { AssignableOrganizationRole, Invitation, Member } from '@/lib/auth-client';
 import { authClient } from '@/lib/auth-client';
+import { getInitials } from '@/lib/utils';
 
 export function MembersSection({
   members: rawMembers,
@@ -61,7 +62,7 @@ export function MembersSection({
     setInviteEmail('');
     setInviteRole('member');
     setIsSendingInvite(false);
-    toast('Invite sent', { description: `Invitation sent to ${inviteEmail}` });
+    toast.success('Invite sent', { description: `Invitation sent to ${inviteEmail}` });
   }
 
   async function handleResendInvite(invite: Invitation) {
@@ -83,7 +84,7 @@ export function MembersSection({
     } else {
       setInvitations((prev) => [...prev, invite]);
     }
-    toast('Invite resent', { description: `Invitation resent to ${invite.email}` });
+    toast.success('Invite resent', { description: `Invitation resent to ${invite.email}` });
   }
 
   async function handleRevokeInvite(invite: Invitation) {
@@ -96,7 +97,7 @@ export function MembersSection({
     }
 
     setInvitations((prev) => prev.filter((inv) => inv.id !== invite.id));
-    toast('Invite revoked', { description: 'The invitation has been revoked.' });
+    toast.success('Invite revoked', { description: 'The invitation has been revoked.' });
   }
 
   async function handleRemoveMember(member: Member) {
@@ -109,7 +110,7 @@ export function MembersSection({
     }
 
     setMembers((prev) => prev.filter((m) => m.id !== member.id));
-    toast('Member removed', { description: `${member.user.name} has been removed from the organization.` });
+    toast.success('Member removed', { description: `${member.user.name} has been removed from the organization.` });
   }
 
   async function handleChangeRole(member: Member, newRole: AssignableOrganizationRole) {
@@ -125,7 +126,7 @@ export function MembersSection({
     }
 
     setMembers((prev) => prev.map((m) => (m.id === member.id ? { ...m, role: newRole } : m)));
-    toast('Team role updated', { description: `${member.user.name}'s role has been changed to ${newRole}` });
+    toast.success('Team role updated', { description: `${member.user.name}'s role has been changed to ${newRole}` });
   }
 
   return (
@@ -268,10 +269,7 @@ export function MembersSection({
                 <ItemMedia>
                   <Avatar className='size-10'>
                     <AvatarFallback className='bg-primary text-primary-foreground text-sm'>
-                      {member.user.name
-                        .split(' ')
-                        .map((n) => n[0])
-                        .join('')}
+                      {getInitials(member.user.name)}
                     </AvatarFallback>
                   </Avatar>
                 </ItemMedia>

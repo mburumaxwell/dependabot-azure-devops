@@ -4,7 +4,6 @@ import { BadgeCheck, ChevronsUpDown, LogOut, Plus } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -32,8 +31,8 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { authClient, type Organization, type Session } from '@/lib/auth-client';
-import { getOrganizationInfo } from '@/lib/organization-types';
-import { cn } from '@/lib/utils';
+import { getOrganizationTypeInfo } from '@/lib/organization-types';
+import { cn, getInitials, type InitialsType } from '@/lib/utils';
 
 type MenuItem = { label: string; href: Route };
 type MenuGroup = { label: string; href: Route; items?: MenuItem[] };
@@ -45,7 +44,7 @@ const groups: MenuGroup[] = [
     items: [
       // TODO: remove "as Route" once these routes have been created
       { label: 'Activity', href: '/dashboard/activity' },
-      { label: 'Projects', href: '/dashboard/projects' as Route },
+      { label: 'Projects', href: '/dashboard/projects' },
       { label: 'Repositories', href: '/dashboard/repos' as Route },
       { label: 'Runs', href: '/dashboard/runs' as Route },
       { label: 'Private Vulnerabilities', href: '/dashboard/private-vulns' as Route },
@@ -68,13 +67,11 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   session: Session;
   organizations: Organization[];
 }
-export function AppSidebar({ session: rawSession, organizations: rawOrganizations, ...props }: AppSidebarProps) {
+export function AppSidebar({ session, organizations, ...props }: AppSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const isActive = (href: Route) => pathname === href || (href !== '/' && pathname.startsWith(href));
   const { isMobile } = useSidebar();
-  const [organizations] = useState(rawOrganizations);
-  const [session] = useState(rawSession);
 
   function handleLogout(): void {
     authClient.signOut({
@@ -166,15 +163,6 @@ export function AppSidebar({ session: rawSession, organizations: rawOrganization
   );
 }
 
-function getInitials(value: string, type: 'all' | 'first' = 'all') {
-  return value
-    .split(/[\s@]+/)
-    .slice(0, type === 'first' ? 1 : 2)
-    .map((p) => p[0])
-    .join('')
-    .toUpperCase();
-}
-
 function UserAvatarSnippet({ session }: Pick<AppSidebarProps, 'session'>) {
   if (!session || !session.user) return null;
 
@@ -186,7 +174,7 @@ type AvatarSnippetProps = {
   title: string;
   subtitle?: string;
   image?: string | null;
-  initialType?: 'all' | 'first';
+  initialsType?: InitialsType;
 };
 
 function AvatarSnippet(props: AvatarSnippetProps) {
@@ -204,10 +192,10 @@ function AvatarSnippetHeader({
   image,
   size,
   className,
-  initialType = 'all',
+  initialsType = 'all',
   ...props
 }: AvatarSnippetProps & { size: 4 | 8 } & React.ComponentProps<typeof Avatar>) {
-  const initials = getInitials(title || subtitle || 'Paklo', initialType);
+  const initials = getInitials(title || subtitle || 'Paklo', initialsType);
 
   return (
     // we override anything present because of size
@@ -260,14 +248,14 @@ function OrganizationSwitcher({
               <div className='flex aspect-square size-8 items-center justify-center rounded-lg'>
                 <AvatarSnippetHeader
                   title={activeOrg?.name || 'Organization'}
-                  subtitle={getOrganizationInfo(activeOrg?.type)?.name}
+                  subtitle={getOrganizationTypeInfo(activeOrg?.type)?.name}
                   image={activeOrg?.logo}
                   size={8}
                 />
               </div>
               <AvatarSnippetFooter
                 title={activeOrg?.name || 'Organization'}
-                subtitle={getOrganizationInfo(activeOrg?.type)?.name}
+                subtitle={getOrganizationTypeInfo(activeOrg?.type)?.name}
               />
               <ChevronsUpDown className='ml-auto' />
             </SidebarMenuButton>
@@ -288,11 +276,11 @@ function OrganizationSwitcher({
                 <div className='flex size-6 items-center justify-center rounded-md border'>
                   <AvatarSnippetHeader
                     title={organization.name}
-                    subtitle={getOrganizationInfo(organization.type).name}
+                    subtitle={getOrganizationTypeInfo(organization.type).name}
                     image={organization.logo}
                     size={4}
                     className='shrink-0'
-                    initialType='first'
+                    initialsType='first'
                   />
                 </div>
                 {organization.name}
