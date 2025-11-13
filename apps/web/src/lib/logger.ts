@@ -1,4 +1,6 @@
-import { create } from '@paklo/core/logger';
-import app from '../../package.json';
+// this file exists in its simplicity because we may need to edit
+// some settings in the logger we use for the web app later on
 
-export const logger = create({ name: app.name });
+import { logger } from '@paklo/core/logger';
+
+export { logger };
