@@ -93,4 +93,18 @@ describe('extractRepositoryUrl', () => {
     expect(url.repository).toBe('repo%201');
     expect(url['repository-slug']).toBe('contoso/prj%201/_git/repo%201');
   });
+
+  it('works for azure devops domain without trailing slash', () => {
+    const url = extractRepositoryUrl({
+      organisationUrl: 'https://dev.azure.com/contoso',
+      project: 'prj1',
+      repository: 'repo1',
+    });
+    expect(url.hostname).toBe('dev.azure.com');
+    expect(url['api-endpoint']).toBe('https://dev.azure.com/');
+    expect(url.organisation).toBe('contoso');
+    expect(url.project).toBe('prj1');
+    expect(url.repository).toBe('repo1');
+    expect(url['repository-slug']).toBe('contoso/prj1/_git/repo1');
+  });
 });

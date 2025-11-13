@@ -34,7 +34,7 @@ export function extractOrganizationUrl({ organisationUrl }: { organisationUrl: s
   const protocol = value.protocol.slice(0, -1);
   let { hostname } = value;
   const visualStudioUrlRegex = /^(?<prefix>\S+)\.visualstudio\.com$/iu;
-  if (visualStudioUrlRegex.test(hostname)) hostname = 'dev.azure.com'; // TODO: should we really be converting back to the new hostname?
+  if (visualStudioUrlRegex.test(hostname)) hostname = 'dev.azure.com';
 
   const organisation: string = extractOrganisation(organisationUrl);
 
@@ -96,17 +96,27 @@ export function extractRepositoryUrl({
  * @returns organisation name
  */
 function extractOrganisation(organisationUrl: string): string {
-  const parts = organisationUrl.split('/');
-
-  // Check for on-premise style: https://server.domain.com/tfs/x/
-  if (parts.length === 6) return parts[4]!;
-
-  // Check for new style: https://dev.azure.com/x/
-  if (parts.length === 5) return parts[3]!;
+  const url = new URL(organisationUrl);
+  const { hostname, pathname } = url;
 
   // Check for old style: https://x.visualstudio.com/
-  // Get x.visualstudio.com part; Return organisation part (x).
-  if (parts.length === 4) return parts[2]!.split('.')[0]!;
+  if (hostname.endsWith('.visualstudio.com')) {
+    return hostname.split('.')[0]!;
+  }
+
+  // For new style and on-premise, parse the pathname
+  // pathname examples: '/contoso/', '/contoso', '/tfs/contoso/', '/tfs/contoso', '/contoso/Core'
+  const pathSegments = pathname.split('/').filter((segment) => segment !== '');
+
+  // Check for on-premise style: https://server.domain.com/tfs/contoso/
+  if (pathSegments.length >= 2 && hostname !== 'dev.azure.com') {
+    return pathSegments[1]!; // Return 'contoso' from '/tfs/contoso/'
+  }
+
+  // Check for new style: https://dev.azure.com/contoso/ or https://dev.azure.com/contoso or https://dev.azure.com/contoso/Core
+  if (pathSegments.length >= 1) {
+    return pathSegments[0]!; // Always return the first path segment for dev.azure.com
+  }
 
   throw new Error(`Error parsing organisation from organisation url: '${organisationUrl}'.`);
 }
