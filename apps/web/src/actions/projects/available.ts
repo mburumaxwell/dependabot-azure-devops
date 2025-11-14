@@ -28,8 +28,13 @@ export async function listAvailableProjects({
   url: inputUrl,
 }: ListAvailableProjectsOptions): Promise<AvailableProject[]> {
   // get available projects from provider
-  const fetcher = providerProjectsFetchers[type as OrganizationType];
-  if (!fetcher) throw new Error(`Unsupported organization type: ${type}`);
+  if (!providerProjectsFetchers.has(type as OrganizationType)) {
+    throw new Error(`Unsupported organization type: ${type}`);
+  }
+  const fetcher = providerProjectsFetchers.get(type as OrganizationType);
+  if (typeof fetcher !== 'function') {
+    throw new Error(`Invalid fetcher for organization type: ${type}`);
+  }
   const available = await fetcher({ id, url: inputUrl });
 
   // get connected projects from our database
@@ -58,10 +63,10 @@ export async function listAvailableProjects({
 type ListProviderProjectsOptions = Omit<ListAvailableProjectsOptions, 'type'>;
 type AvailableProviderProject = Omit<AvailableProject, 'connected'>;
 type ProviderProjectsFetcher = (args: ListProviderProjectsOptions) => Promise<AvailableProviderProject[]>;
-const providerProjectsFetchers: Record<OrganizationType | string, ProviderProjectsFetcher> = {
-  azure: getAvailableForAzure,
+const providerProjectsFetchers = new Map<OrganizationType | string, ProviderProjectsFetcher>([
+  ['azure', getAvailableForAzure],
   // future organization types can be added here
-};
+]);
 
 async function getAvailableForAzure({
   id,
