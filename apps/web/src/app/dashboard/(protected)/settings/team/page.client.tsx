@@ -31,14 +31,14 @@ import { authClient } from '@/lib/auth-client';
 import { getInitials } from '@/lib/utils';
 
 export function MembersSection({
-  members: rawMembers,
-  invitations: rawInvitations,
+  members: initialMembers,
+  invitations: initialInvitations,
 }: {
   members: Member[];
   invitations: Invitation[];
 }) {
-  const [members, setMembers] = useState(rawMembers);
-  const [invitations, setInvitations] = useState(rawInvitations);
+  const [members, setMembers] = useState(initialMembers);
+  const [invitations, setInvitations] = useState(initialInvitations);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<AssignableOrganizationRole>('member');
   const [isSendingInvite, setIsSendingInvite] = useState(false);

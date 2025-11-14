@@ -110,9 +110,9 @@ export function ProfileSection({ user }: { user: { id: string; name: string; ema
   );
 }
 
-export function PasskeysSection({ passkeys: rawPasskeys }: { passkeys: Passkey[] }) {
+export function PasskeysSection({ passkeys: initialPasskeys }: { passkeys: Passkey[] }) {
   const [isModifyingPasskeys, setIsModifyingPasskeys] = useState(false);
-  const [passkeys, setPasskeys] = useState(rawPasskeys);
+  const [passkeys, setPasskeys] = useState(initialPasskeys);
   const [editingPasskey, setEditingPasskey] = useState<Passkey | null>(null);
   const [editedPasskeyName, setEditedPasskeyName] = useState<string | undefined>(undefined);
   const [isSavingPasskey, setIsSavingPasskey] = useState(false);
@@ -430,13 +430,13 @@ export function SessionsSection({
 }
 
 export function OrganizationsSection({
-  organizations: rawOrganizations,
+  organizations: initialOrganizations,
   activeOrganizationId,
 }: {
   activeOrganizationId?: string | null;
   organizations: Organization[];
 }) {
-  const [organizations, setOrganizations] = useState(rawOrganizations);
+  const [organizations, setOrganizations] = useState(initialOrganizations);
   const [orgToLeave, setOrgToLeave] = useState<Organization | null>(null);
 
   async function handleSetActiveAndNavigate(orgId: string, path: Route) {

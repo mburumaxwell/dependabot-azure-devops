@@ -11,6 +11,19 @@ export async function connectProjects({
   organizationId: string;
   projects: AvailableProject[];
 }) {
+  // ensure projects to be connected will not exceed the limit
+  const existingCount = await prisma.project.count({ where: { organizationId } });
+  const maxProjects =
+    (
+      await prisma.organization.findUniqueOrThrow({
+        where: { id: organizationId },
+        select: { maxProjects: true },
+      })
+    ).maxProjects || 1; // TODO: remove default once onboarding flow is enforced
+  if (existingCount + projects.length > maxProjects) {
+    throw new Error(`Connecting these projects would exceed the limit of ${maxProjects} projects provisioned.`);
+  }
+
   const result = await prisma.project.createMany({
     data: projects.map((project) => ({
       id: generateId(), // generate a new ID for the project

@@ -27,7 +27,7 @@ export function OrganizationInvite({
   acceptUrl = 'https://www.paklo.app/invite/accept?id=123',
   declineUrl = 'https://www.paklo.app/invite/decline?id=123',
   recipient = 'chris.johnson@contoso.com',
-  expires = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+  expires = new Date(Date.now() + 2 * 24 * 3600 * 1000),
 }: OrganizationInviteProps) {
   return (
     <Html lang='en' dir='ltr'>
