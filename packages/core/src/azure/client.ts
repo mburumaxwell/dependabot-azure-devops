@@ -8,6 +8,10 @@ import type {
   IUpdatePullRequest,
 } from './models';
 import {
+  type AzdoListResponse,
+  type AzdoProject,
+  type AzdoRepository,
+  type AzdoRepositoryItem,
   CommentThreadStatus,
   CommentType,
   type IdentityRefWithVote,
@@ -90,13 +94,86 @@ export class AzureDevOpsWebApiClient {
     }
   }
 
-  public async getProjects(): Promise<{ id: string; name: string; description: string; url: string }[] | undefined> {
+  public async getProjects(): Promise<AzdoListResponse<AzdoProject> | undefined> {
     try {
       const projects = await this.restApiGet(`${this.organisationApiUrl}/_apis/projects`);
-      return projects?.value || [];
+      return projects;
     } catch (e) {
       logger.error(`Failed to get projects: ${e}`);
       logger.debug(e); // Dump the error stack trace to help with debugging
+      return undefined;
+    }
+  }
+
+  public async getProject(idOrName: string): Promise<AzdoProject | undefined> {
+    try {
+      const project = await this.restApiGet(
+        `${this.organisationApiUrl}/_apis/projects/${encodeURIComponent(idOrName)}`,
+      );
+      return project;
+    } catch (e) {
+      logger.error(`Failed to get project: ${e}`);
+      logger.debug(e); // Dump the error stack trace to help with debugging
+      return undefined;
+    }
+  }
+
+  public async getRepositories(projectIdOrName: string): Promise<AzdoListResponse<AzdoRepository> | undefined> {
+    try {
+      const repos = await this.restApiGet(
+        `${this.organisationApiUrl}/${encodeURIComponent(projectIdOrName)}/_apis/git/repositories`,
+      );
+      return repos;
+    } catch (e) {
+      logger.error(`Failed to get repositories: ${e}`);
+      logger.debug(e); // Dump the error stack trace to help with debugging
+      return undefined;
+    }
+  }
+
+  public async getRepository(projectIdOrName: string, repositoryIdOrName: string): Promise<AzdoRepository | undefined> {
+    try {
+      const repo = await this.restApiGet(
+        `${this.organisationApiUrl}/${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}`,
+      );
+      return repo;
+    } catch (e) {
+      if (e instanceof HttpRequestError && e.code === 404) {
+        // repository no longer exists
+        return undefined;
+      } else {
+        logger.error(`Failed to get repository: ${e}`);
+        logger.debug(e); // Dump the error stack trace to help with debugging
+      }
+      return undefined;
+    }
+  }
+
+  public async getRepositoryItem(
+    projectIdOrName: string,
+    repositoryIdOrName: string,
+    path: string,
+    includeContent: boolean = true,
+    latestProcessedChange: boolean = true,
+  ): Promise<AzdoRepositoryItem | undefined> {
+    try {
+      const item = await this.restApiGet(
+        `${this.organisationApiUrl}/${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/items`,
+        {
+          path,
+          includeContent,
+          latestProcessedChange,
+        },
+      );
+      return item;
+    } catch (e) {
+      if (e instanceof HttpRequestError && e.code === 404) {
+        // item does not exist
+        return undefined;
+      } else {
+        logger.error(`Failed to get repository item: ${e}`);
+        logger.debug(e); // Dump the error stack trace to help with debugging
+      }
       return undefined;
     }
   }

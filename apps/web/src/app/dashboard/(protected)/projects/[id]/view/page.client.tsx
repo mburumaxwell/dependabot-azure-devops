@@ -2,8 +2,10 @@
 
 import { Calendar, MoreHorizontalIcon, RefreshCw, Unplug } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { disconnectProject } from '@/actions/projects';
+import { requestSync } from '@/actions/sync';
 import { SynchronizationStatusBadge } from '@/components/sync-status-badge';
 import { TimeAgo } from '@/components/time-ago';
 import { Button } from '@/components/ui/button';
@@ -19,6 +21,7 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { Project, Repository } from '@/lib/prisma';
+import { getNextSyncTime, isSyncAllowed } from '@/lib/sync';
 
 type SimpleProject = Pick<
   Project,
@@ -26,17 +29,23 @@ type SimpleProject = Pick<
 >;
 type SimpleRepository = Pick<Repository, 'id' | 'name' | 'synchronizationStatus' | 'updatedAt' | 'synchronizedAt'>;
 export function RepositoriesView({
-  project,
+  project: initialProject,
   repositories,
 }: {
   project: SimpleProject;
   repositories: SimpleRepository[];
 }) {
   const router = useRouter();
+  const [project, setProject] = useState(initialProject);
 
-  function handleSync(project: SimpleProject) {
-    // TODO: implement sync logic
-    console.log('Syncing project:', project.id);
+  async function handleSync(project: SimpleProject) {
+    // TODO: pop a dialog to ask if they want to sync repositories as well (false by default) and if to trigger update jobs
+    await requestSync({
+      organizationId: project.organizationId,
+      projectId: project.id,
+      scope: 'project',
+    });
+    setProject((prev) => ({ ...prev, synchronizationStatus: 'pending' }));
   }
 
   async function handleDisconnect(project: SimpleProject) {
@@ -80,10 +89,7 @@ export function RepositoriesView({
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end' className='w-52'>
               <DropdownMenuGroup>
-                <DropdownMenuItem
-                  onClick={() => handleSync(project)}
-                  disabled={project.synchronizationStatus === 'pending'}
-                >
+                <DropdownMenuItem onClick={() => handleSync(project)} disabled={!isSyncAllowed(project)}>
                   {project.synchronizationStatus === 'pending' ? (
                     <>
                       <Spinner />
@@ -92,7 +98,17 @@ export function RepositoriesView({
                   ) : (
                     <>
                       <RefreshCw />
-                      Sync Now
+                      {(() => {
+                        const nextSync = getNextSyncTime(project);
+                        if (nextSync) {
+                          return (
+                            <div className='flex flex-col'>
+                              Project sync recently done. Try again <TimeAgo date={nextSync} />
+                            </div>
+                          );
+                        }
+                        return 'Sync Now';
+                      })()}
                     </>
                   )}
                 </DropdownMenuItem>

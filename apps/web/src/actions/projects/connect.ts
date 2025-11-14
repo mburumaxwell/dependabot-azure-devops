@@ -1,6 +1,7 @@
 'use server';
 
 import { generateId } from '@paklo/core/keygen';
+import { requestSync } from '@/actions/sync';
 import { prisma } from '@/lib/prisma';
 import type { AvailableProject } from './available';
 
@@ -24,9 +25,11 @@ export async function connectProjects({
     throw new Error(`Connecting these projects would exceed the limit of ${maxProjects} projects provisioned.`);
   }
 
+  // create projects
+  const projectIds = projects.map(() => generateId()); // generate a new ID for each project
   const result = await prisma.project.createMany({
-    data: projects.map((project) => ({
-      id: generateId(), // generate a new ID for the project
+    data: projects.map((project, index) => ({
+      id: projectIds[index]!,
       organizationId,
       providerId: project.providerId,
       name: project.name,
@@ -37,7 +40,15 @@ export async function connectProjects({
     })),
   });
 
-  // TODO: schedule synchronization for the newly connected projects
+  // schedule synchronization for the newly connected projects
+  for (const projectId of projectIds) {
+    await requestSync({
+      organizationId,
+      projectId,
+      scope: 'all', // sync all repositories
+      trigger: true, // trigger update jobs
+    });
+  }
 
   return result.count;
 }
