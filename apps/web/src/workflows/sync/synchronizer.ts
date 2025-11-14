@@ -1,6 +1,7 @@
 import { type DependabotConfig, parseDependabotConfig } from '@paklo/core/dependabot';
 import { generateId } from '@paklo/core/keygen';
 import { start } from 'workflow/api';
+import { generateCron } from '@/lib/cron';
 import { logger } from '@/lib/logger';
 import { type Organization, type OrganizationCredential, type Project, prisma, type Repository } from '@/lib/prisma';
 import { type TriggerUpdateJobsWorkflowOptions, triggerUpdateJobs } from '@/workflows/jobs';
@@ -199,7 +200,7 @@ export class Synchronizer {
       commitChanged = commitId !== repository.latestCommit;
     }
 
-    // create repository
+    // create repository, if it does not exist
     if (!repository) {
       repository = await prisma.repository.create({
         data: {
@@ -210,8 +211,6 @@ export class Synchronizer {
           slug: providerInfo.slug,
           url: providerInfo.url,
           permalink: providerInfo.permalink,
-          latestCommit: commitId,
-          configFileContents: providerInfo.content,
           synchronizationStatus: 'pending',
         },
       });
@@ -231,19 +230,26 @@ export class Synchronizer {
     // at this point we know the commit or info changed
     logger.info(`Changes detected for repository '${providerInfo.slug}' in project ${project.id} ...`);
 
-    // update repository info
-    let _config: DependabotConfig;
-    let syncError: string | null = null;
+    // parse the config
+    let config: DependabotConfig | undefined;
+    let syncError: string | undefined;
     try {
-      _config = await parseDependabotConfig({
+      config = await parseDependabotConfig({
         configContents: providerInfo.content!,
         configPath: providerInfo.path!,
         variableFinder: () => undefined,
       });
+      syncError = undefined;
     } catch (error) {
+      config = undefined;
       syncError = (error as Error).message;
     }
 
+    if (!config && !syncError) {
+      throw new Error('Unexpected error: config is undefined but no sync error was reported.');
+    }
+
+    // update repository
     repository = await prisma.repository.update({
       where: { id: repository.id },
       data: {
@@ -252,22 +258,72 @@ export class Synchronizer {
         url: providerInfo.url,
         latestCommit: commitId,
         configFileContents: providerInfo.content,
+        configJson: config ? JSON.stringify(config) : undefined,
+        registriesJson: config ? JSON.stringify(config.registries) : undefined,
         synchronizationStatus: syncError ? 'failed' : 'success',
         synchronizationError: syncError,
         synchronizedAt: new Date(),
       },
     });
 
-    // TODO: save updates from parsed config into own table/collection
+    // if there is no valid config, we stop here
+    if (!config) return { updated: true };
 
+    // get the updates for this repository and check which need to be removed and which added/updated
+    function makeKey(u: { ecosystem: string; directory?: string | null; directories?: string[] }) {
+      return `${u.ecosystem}::${u.directory ?? u.directories!.join(',')}`;
+    }
+    const updates = config.updates;
+    const updatesMap = Object.fromEntries(
+      updates.map((u) => [makeKey({ ...u, ecosystem: u['package-ecosystem'] }), u]),
+    );
+    const repositoryUpdates = await prisma.repositoryUpdate.findMany({
+      where: { repositoryId: repository.id },
+    });
+    const updatesToDelete = repositoryUpdates.filter((u) => !updatesMap[makeKey(u)]);
+    const { count: deleted } = await prisma.repositoryUpdate.deleteMany({
+      where: { id: { in: updatesToDelete.map((u) => u.id) } },
+    });
+    logger.debug(`Deleted ${deleted} updates in repository ${repository.id} that have been removed.`);
+    const updatesToUpsert = updates;
+    for (const update of updatesToUpsert) {
+      const directoryKey = makeKey({ ...update, ecosystem: update['package-ecosystem'] });
+      const schedule = generateCron(update.schedule!); // TODO: remove assertion once schedule is enforced
+      const timezone = update.schedule?.timezone || 'UTC'; // TODO: remove nullable and default once schedule is enforced
+      await prisma.repositoryUpdate.upsert({
+        where: {
+          repositoryId_ecosystem_directoryKey: {
+            repositoryId: repository.id,
+            ecosystem: update['package-ecosystem'],
+            directoryKey,
+          },
+        },
+        create: {
+          id: generateId(),
+          repositoryId: repository.id,
+          ecosystem: update['package-ecosystem'],
+          directory: update.directory,
+          directories: update.directories,
+          schedule,
+          timezone,
+          directoryKey,
+          files: [], // will be populated when running update jobs
+          latestUpdateJobAt: null,
+          latestUpdateJobStatus: null,
+          latestUpdateJobId: null,
+        },
+        update: { schedule, timezone },
+      });
+    }
+
+    // trigger update jobs for the whole repository, if requested
     if (this.trigger) {
-      // trigger update jobs for the whole repository
       await start(triggerUpdateJobs, [
         {
           organizationId: this.organization.id,
           projectId: project.id,
           repositoryId: repository.id,
-          repositoryUpdateId: undefined, // run all
+          repositoryUpdateIds: undefined, // run all updates
           trigger: 'synchronization',
         } satisfies TriggerUpdateJobsWorkflowOptions,
       ]);

@@ -136,6 +136,7 @@ model Organization {
   credential  OrganizationCredential?
   secrets     OrganizationSecret[]
   projects    Project[]
+  jobs        UpdateJob[]
 
   @@unique([slug])
   @@unique([url])
@@ -247,6 +248,7 @@ model Project {
   synchronizationStatus SynchronizationStatus
   synchronizedAt        DateTime?
   repositories          Repository[]
+  jobs                  UpdateJob[]
 
   @@unique([organizationId, providerId])
   @@index([organizationId])
@@ -274,12 +276,42 @@ model Repository {
   synchronizationError  String?
   synchronizationStatus SynchronizationStatus
   synchronizedAt        DateTime?
+  updates               RepositoryUpdate[]
+  /// Parsed JSON of the configuration file.
+  configJson            String?
+  registriesJson        String?
+  jobs                  UpdateJob[]
 
   @@unique([projectId, providerId])
   @@unique([url])
   @@index([projectId])
   @@index([providerId])
   @@map("repository")
+}
+
+model RepositoryUpdate {
+  id                    String           @id @map("_id")
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  repository            Repository       @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repositoryId          String
+  ecosystem             String
+  directory             String?
+  directories           String[]
+  /// Either the original directory or merger of directories.
+  directoryKey          String
+  /// Cron schedule for running this update
+  schedule              String
+  timezone              String
+  files                 String[]
+  jobs                  UpdateJob[]
+  latestUpdateJobId     String?
+  latestUpdateJobStatus UpdateJobStatus?
+  latestUpdateJobAt     DateTime?
+
+  @@unique([repositoryId, ecosystem, directoryKey])
+  @@index([repositoryId])
+  @@map("repository_update")
 }
 
 enum UpdateJobTrigger {
@@ -289,4 +321,76 @@ enum UpdateJobTrigger {
   manual
 
   @@map("update_job_trigger")
+}
+
+enum UpdateJobStatus {
+  scheduled
+  running
+  succeeded
+  failed
+
+  @@map("update_job_status")
+}
+
+enum UpdateJobPlatform {
+  azure_pipelines
+  azure_virtual_machines
+  azure_container_apps
+  azure_container_instances
+}
+
+model UpdateJob {
+  id        String            @id @map("_id")
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  status    UpdateJobStatus
+  trigger   UpdateJobTrigger
+  platform  UpdateJobPlatform
+
+  organizationId     String
+  projectId          String
+  repositoryId       String
+  repositoryUpdateId String
+  // no delete cascade, records here retained for billing and analytics
+  organization       Organization     @relation(fields: [organizationId], references: [id], onDelete: NoAction)
+  project            Project          @relation(fields: [projectId], references: [id], onDelete: NoAction)
+  repository         Repository       @relation(fields: [repositoryId], references: [id], onDelete: NoAction)
+  repositoryUpdate   RepositoryUpdate @relation(fields: [repositoryUpdateId], references: [id], onDelete: NoAction)
+
+  repositorySlug String
+
+  /// Commit SHA of the configuration file used for the update.
+  commit          String
+  /// Ecosystem for the update (e.g., npm, pip, etc.)
+  ecosystem       String
+  directory       String?
+  directories     String[]
+  /// CPU units provisioned. e.g. 0.25
+  resourcesCpu    Float?
+  /// Memory provisioned in GB. e.g. 1.2
+  resourcesMemory Float?
+  secret          UpdateJobSecret?
+  startedAt       DateTime?
+  finishedAt      DateTime?
+  /// Duration in milliseconds.
+  duration        Int?
+  /// URL to view the logs of the job (used when running on customer infra e.g. azure pipelines).
+  externalLogsUrl String?
+  /// URL to download the logs of the job (used when running on our infra).
+  downloadLogsUrl String?
+  errorType       String?
+  errorDetailJson String?
+}
+
+model UpdateJobSecret {
+  id    String    @id @map("_id")
+  jobId String
+  job   UpdateJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  /// Authorization key for the job, used by the updater to make API calls.
+  /// This should never be exposed to the client.
+  value String
+
+  @@unique([jobId])
+  @@unique([value])
+  @@map("update_job_secret")
 }

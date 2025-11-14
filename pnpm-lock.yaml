@@ -140,6 +140,9 @@ importers:
       clsx:
         specifier: 2.1.1
         version: 2.1.1
+      cron-parser:
+        specifier: 5.4.0
+        version: 5.4.0
       fumadocs-core:
         specifier: 16.0.8
         version: 16.0.8(@types/react@19.2.2)(lucide-react@0.553.0(react@19.2.0))(next@16.0.1(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -4469,6 +4472,10 @@ packages:
   crc@3.8.0:
     resolution: {integrity: sha512-iX3mfgcTMIq3ZKLIsVFAbv7+Mc10kxabAGQb8HvjA1o3T1PIYprbakQ65d3I+2HGHt6nSKkM9PYjgoJO2KcFBQ==}
 
+  cron-parser@5.4.0:
+    resolution: {integrity: sha512-HxYB8vTvnQFx4dLsZpGRa0uHp6X3qIzS3ZJgJ9v6l/5TJMgeWQbLkR5yiJ5hOxGbc9+jCADDnydIe15ReLZnJA==}
+    engines: {node: '>=18'}
+
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
@@ -6029,6 +6036,10 @@ packages:
     resolution: {integrity: sha512-BRgX5zrWmNy/lkVAe0dXBgd7XQdZ3HTf+Hwe3c9WK6dqgnj9h+hxV+MDncM88xDWlCq27+TKvHGE70ViODNILw==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  luxon@3.7.2:
+    resolution: {integrity: sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew==}
+    engines: {node: '>=12'}
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -13468,6 +13479,10 @@ snapshots:
     dependencies:
       buffer: 5.7.1
 
+  cron-parser@5.4.0:
+    dependencies:
+      luxon: 3.7.2
+
   cross-spawn@7.0.6:
     dependencies:
       path-key: 3.1.1
@@ -15127,6 +15142,8 @@ snapshots:
   lucide-react@0.553.0(react@19.2.0):
     dependencies:
       react: 19.2.0
+
+  luxon@3.7.2: {}
 
   magic-string@0.30.21:
     dependencies:
@@ -17433,7 +17450,7 @@ snapshots:
       ansi-escapes: 7.2.0
       supports-hyperlinks: 4.3.0
 
-  terser-webpack-plugin@5.3.14(@swc/core@1.11.24)(esbuild@0.25.10)(webpack@5.102.1(@swc/core@1.11.24)):
+  terser-webpack-plugin@5.3.14(@swc/core@1.11.24)(esbuild@0.25.10)(webpack@5.102.1(@swc/core@1.11.24)(esbuild@0.25.10)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
@@ -18043,7 +18060,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.0
-      terser-webpack-plugin: 5.3.14(@swc/core@1.11.24)(esbuild@0.25.10)(webpack@5.102.1(@swc/core@1.11.24))
+      terser-webpack-plugin: 5.3.14(@swc/core@1.11.24)(esbuild@0.25.10)(webpack@5.102.1(@swc/core@1.11.24)(esbuild@0.25.10))
       watchpack: 2.4.4
       webpack-sources: 3.3.3
     transitivePeerDependencies:

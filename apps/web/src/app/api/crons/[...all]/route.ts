@@ -18,6 +18,12 @@ app.get('/cleanup/database', async (context) => {
   return context.body(null, 204);
 });
 
+// app.get('/sync', async (context) => {
+//   // TODO: need to figure out how to group projects to avoid too much load
+//   await start(syncAllProjects, [{}]);
+//   return context.body(null, 204);
+// });
+
 // Additional cron endpoints can be added here
 
 export const GET = handle(app);

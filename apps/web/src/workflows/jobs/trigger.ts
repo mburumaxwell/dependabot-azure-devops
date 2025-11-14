@@ -6,10 +6,10 @@ export type TriggerUpdateJobsWorkflowOptions = {
   projectId: string;
   repositoryId: string;
   /**
-   * Optional identifier of the repository update.
-   * When `undefined` all updates in the repository are scheduled to run.
+   * Optional identifiers of the repository updates.
+   * When `undefined` or an empty array all updates in the repository are scheduled to run.
    */
-  repositoryUpdateId?: number;
+  repositoryUpdateIds?: string[];
   trigger: UpdateJobTrigger;
 };
 
