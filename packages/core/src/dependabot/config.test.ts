@@ -432,6 +432,76 @@ describe('Parse registries', () => {
   });
 });
 
+describe('Duplicate update configuration detection', () => {
+  it('Should reject duplicate configurations with same package-ecosystem and directory', async () => {
+    const configWithDuplicates = {
+      version: 2,
+      updates: [
+        { 'package-ecosystem': 'npm', directory: '/client' },
+        { 'package-ecosystem': 'npm', directory: '/client' },
+      ],
+    };
+
+    await expect(DependabotConfigSchema.parseAsync(configWithDuplicates)).rejects.toThrow(
+      "Duplicate update configuration found for 'npm' and directory: '/client'",
+    );
+  });
+
+  it('Should reject duplicate configurations with same package-ecosystem and directories array', async () => {
+    const configWithDuplicates = {
+      version: 2,
+      updates: [
+        { 'package-ecosystem': 'nuget', directories: ['/src/client', '/src/server'] },
+        { 'package-ecosystem': 'nuget', directories: ['/src/client', '/src/server'] },
+      ],
+    };
+
+    await expect(DependabotConfigSchema.parseAsync(configWithDuplicates)).rejects.toThrow(
+      "Duplicate update configuration found for 'nuget' and directory: '/src/client,/src/server'",
+    );
+  });
+
+  it('Should reject duplicates when mixing directory and directories with same content', async () => {
+    const configWithDuplicates = {
+      version: 2,
+      updates: [
+        { 'package-ecosystem': 'npm', directory: '/src' },
+        { 'package-ecosystem': 'npm', directories: ['/src'] },
+      ],
+    };
+
+    await expect(DependabotConfigSchema.parseAsync(configWithDuplicates)).rejects.toThrow(
+      "Duplicate update configuration found for 'npm' and directory: '/src'",
+    );
+  });
+
+  it('Should allow different package-ecosystems with same directory', async () => {
+    const validConfig = {
+      version: 2,
+      updates: [
+        { 'package-ecosystem': 'npm', directory: '/client' },
+        { 'package-ecosystem': 'docker', directory: '/client' },
+      ],
+    };
+
+    const result = await DependabotConfigSchema.parseAsync(validConfig);
+    expect(result.updates).toHaveLength(2);
+  });
+
+  it('Should allow same package-ecosystem with different directories', async () => {
+    const validConfig = {
+      version: 2,
+      updates: [
+        { 'package-ecosystem': 'npm', directory: '/client' },
+        { 'package-ecosystem': 'npm', directory: '/server' },
+      ],
+    };
+
+    const result = await DependabotConfigSchema.parseAsync(validConfig);
+    expect(result.updates).toHaveLength(2);
+  });
+});
+
 describe('Validate registries', () => {
   it('Validation works as expected', () => {
     // const config = await DependabotConfigSchema.parseAsync(
