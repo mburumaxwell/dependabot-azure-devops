@@ -1,5 +1,18 @@
 # @paklo/core
 
+## 0.5.0
+
+### Minor Changes
+
+- 620e99e: Added detection of duplicate updates by ecosystem and directory/directories
+
+### Patch Changes
+
+- f343e74: Share utility for key generation
+- 8c4f092: Handle organization URLs without trailing slashes.
+  For example `https://dev.azure.com/contoso/` and `https://dev.azure.com/contoso` now result in the same organization.
+- e6f2019: Require `cronjob` to be set when `interval` is set to `cron`
+
 ## 0.4.0
 
 ### Minor Changes

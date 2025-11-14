@@ -1,5 +1,16 @@
 # @paklo/runner
 
+## 0.2.3
+
+### Patch Changes
+
+- f343e74: Share utility for key generation
+- Updated dependencies [f343e74]
+- Updated dependencies [8c4f092]
+- Updated dependencies [620e99e]
+- Updated dependencies [e6f2019]
+  - @paklo/core@0.5.0
+
 ## 0.2.2
 
 ### Patch Changes
