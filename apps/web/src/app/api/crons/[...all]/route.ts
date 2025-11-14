@@ -1,9 +1,8 @@
 import { Hono } from 'hono';
 import { bearerAuth } from 'hono/bearer-auth';
 import { handle } from 'hono/vercel';
-
-import { logger } from '@/lib/logger';
-import { prisma } from '@/lib/prisma';
+import { start } from 'workflow/api';
+import { cleanupDatabase } from '@/workflows/cleanup-database';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,31 +14,7 @@ const app = new Hono().basePath('/api/crons');
 app.use(bearerAuth({ token: process.env.CRON_SECRET! }));
 
 app.get('/cleanup/database', async (context) => {
-  async function deleteUsageTelemetry() {
-    // Delete usage telemetry records older than 1 year
-    const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-    const result = await prisma.usageTelemetry.deleteMany({
-      where: { started: { lt: oneYearAgo } },
-    });
-
-    logger.info(
-      `Usage telemetry cleanup completed: deleted ${result.count} records older than ${oneYearAgo.toISOString()}`,
-    );
-  }
-
-  async function deleteExpiredInvitations() {
-    // Delete organization invitations that have expired (date in the database)
-    const result = await prisma.invitation.deleteMany({
-      where: { expiresAt: { lt: new Date() } },
-    });
-
-    logger.info(`Expired invitations cleanup completed: deleted ${result.count} expired invitations`);
-  }
-
-  await deleteUsageTelemetry();
-  await deleteExpiredInvitations();
-
+  await start(cleanupDatabase, []);
   return context.body(null, 204);
 });
 
