@@ -84,41 +84,50 @@ export const DependabotIgnoreConditionSchema = z
   .and(z.record(z.string(), z.any()));
 export type DependabotIgnoreCondition = z.infer<typeof DependabotIgnoreConditionSchema>;
 
-export const DependabotScheduleSchema = z.object({
-  interval: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'semiannually', 'yearly', 'cron']),
+export const DependabotScheduleSchema = z
+  .object({
+    interval: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'semiannually', 'yearly', 'cron']),
 
-  day: z
-    .enum(['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'])
-    .optional()
-    .default('monday'),
+    day: z
+      .enum(['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'])
+      .optional()
+      .default('monday'),
 
-  time: z
-    .string()
-    .default('02:00')
-    .check(z.regex(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/, { message: 'Time must be in HH:MM format' }))
-    .optional(),
+    time: z
+      .string()
+      .default('02:00')
+      .check(z.regex(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/, { message: 'Time must be in HH:MM format' }))
+      .optional(),
 
-  timezone: z
-    .string()
-    .optional()
-    .default('Etc/UTC')
-    .refine(
-      (value) => {
-        try {
-          // If tz is not a valid IANA name, this throws a RangeError
-          Intl.DateTimeFormat(undefined, { timeZone: value });
-          return true;
-        } catch {
-          return false;
-        }
-      },
-      { message: 'Invalid IANA time zone' },
-    ),
-  cronjob: z
-    .string()
-    .check(z.regex(/^\S+ \S+ \S+ \S+ \S+$/, { message: 'Cronjob must be in standard cron format' }))
-    .optional(),
-});
+    timezone: z
+      .string()
+      .optional()
+      .default('Etc/UTC')
+      .refine(
+        (value) => {
+          try {
+            // If tz is not a valid IANA name, this throws a RangeError
+            Intl.DateTimeFormat(undefined, { timeZone: value });
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        { message: 'Invalid IANA time zone' },
+      ),
+    cronjob: z
+      .string()
+      .check(z.regex(/^\S+ \S+ \S+ \S+ \S+$/, { message: 'Cronjob must be in standard cron format' }))
+      .optional(),
+  })
+  .transform((value, { addIssue }) => {
+    // if interval is 'cron', cronjob must be specified
+    if (value.interval === 'cron' && !value.cronjob) {
+      addIssue("The 'cronjob' field must be specified when the interval is set to 'cron'.");
+    }
+
+    return value;
+  });
 export type DependabotSchedule = z.infer<typeof DependabotScheduleSchema>;
 
 export const DependabotCommitMessageSchema = z.object({
