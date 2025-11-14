@@ -6,8 +6,7 @@ import {
   AzureDevOpsWebApiClient,
   extractOrganizationUrl,
 } from '@paklo/core/azure';
-import type { OrganizationType } from '@/lib/organization-types';
-import { prisma } from '@/lib/prisma';
+import { type OrganizationType, prisma } from '@/lib/prisma';
 
 export async function validateOrganizationCredentials({
   type,

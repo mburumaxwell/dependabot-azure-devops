@@ -56,7 +56,11 @@ export const auth = betterAuth({
       schema: {
         organization: {
           additionalFields: {
-            type: { type: 'string', required: true, validator: { input: OrganizationTypeSchema } },
+            type: {
+              type: ['azure', 'bitbucket', 'gitlab'],
+              required: true,
+              validator: { input: OrganizationTypeSchema },
+            },
             url: { type: 'string', required: true, unique: true },
             region: { type: 'string', required: true, validator: { input: RegionCodeSchema } },
             maxProjects: { type: 'number', required: false, validator: { input: z.int().min(1).max(100).optional() } },

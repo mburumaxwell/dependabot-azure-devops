@@ -3,8 +3,7 @@
 import { generateKey } from '@paklo/core/keygen';
 import { headers as requestHeaders } from 'next/headers';
 import { auth, type Organization } from '@/lib/auth';
-import type { OrganizationType } from '@/lib/organization-types';
-import { prisma } from '@/lib/prisma';
+import { type OrganizationType, prisma } from '@/lib/prisma';
 import type { RegionCode } from '@/lib/regions';
 
 export type OrganizationCreateOptions = {

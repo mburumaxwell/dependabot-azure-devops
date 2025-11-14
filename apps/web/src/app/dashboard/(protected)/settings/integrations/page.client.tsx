@@ -21,7 +21,7 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '
 import { Spinner } from '@/components/ui/spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { Organization } from '@/lib/auth-client';
-import { getGeneralWebhookTypes, getWebhooksUrl, type OrganizationType } from '@/lib/organization-types';
+import { getGeneralWebhookTypes, getWebhooksUrl } from '@/lib/organization-types';
 
 export function PrimaryIntegrationSection({ organization }: { organization: Organization }) {
   const [showToken, setShowToken] = useState(false);
@@ -37,7 +37,7 @@ export function PrimaryIntegrationSection({ organization }: { organization: Orga
 
     // validate credentials
     const { valid, message } = await validateOrganizationCredentials({
-      type: organization.type as OrganizationType,
+      type: organization.type,
       url: organization.url,
       token,
       id: organization.id,

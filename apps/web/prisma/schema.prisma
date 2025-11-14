@@ -112,6 +112,14 @@ model Verification {
   @@map("verification")
 }
 
+enum OrganizationType {
+  azure
+  gitlab
+  bitbucket
+
+  @@map("organization_type")
+}
+
 model Organization {
   id          String                  @id @map("_id")
   name        String
@@ -121,7 +129,7 @@ model Organization {
   metadata    String?
   members     Member[]
   invitations Invitation[]
-  type        String
+  type        OrganizationType
   url         String
   region      String
   maxProjects Int?

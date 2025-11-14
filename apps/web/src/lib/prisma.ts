@@ -13,6 +13,7 @@ export type {
   Organization,
   OrganizationCredential,
   OrganizationSecret,
+  OrganizationType,
   Passkey,
   Project,
   Repository,

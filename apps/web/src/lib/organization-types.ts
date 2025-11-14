@@ -1,8 +1,8 @@
 import { z } from 'zod/v4';
 import { AzureDevOpsLogo, BitbucketLogo, GitlabLogo } from '@/components/logos';
+import type { OrganizationType } from '@/lib/prisma';
 
 export const OrganizationTypeSchema = z.enum(['azure', 'bitbucket', 'gitlab']);
-export type OrganizationType = z.infer<typeof OrganizationTypeSchema>;
 
 export type OrganizationTypeInfo = {
   type: OrganizationType;
@@ -12,33 +12,42 @@ export type OrganizationTypeInfo = {
   logoBackground: string;
 };
 
-export const ORGANIZATION_TYPES_INFO: Record<OrganizationType, OrganizationTypeInfo> = {
-  azure: {
-    type: 'azure',
-    name: 'Azure DevOps',
-    vendor: 'Microsoft',
-    logo: AzureDevOpsLogo,
-    logoBackground: '#0078D4',
-  },
-  bitbucket: {
-    type: 'bitbucket',
-    name: 'Bitbucket',
-    vendor: 'Atlassian',
-    logo: BitbucketLogo,
-    logoBackground: '#0052CC',
-  },
-  gitlab: {
-    type: 'gitlab',
-    name: 'GitLab',
-    vendor: 'GitLab Inc.',
-    logo: GitlabLogo,
-    logoBackground: '#FC6D26',
-  },
-};
-export const ORGANIZATION_TYPES = Object.keys(ORGANIZATION_TYPES_INFO) as OrganizationType[];
+export const ORGANIZATION_TYPES_INFO = new Map<OrganizationType, OrganizationTypeInfo>([
+  [
+    'azure',
+    {
+      type: 'azure',
+      name: 'Azure DevOps',
+      vendor: 'Microsoft',
+      logo: AzureDevOpsLogo,
+      logoBackground: '#0078D4',
+    },
+  ],
+  [
+    'bitbucket',
+    {
+      type: 'bitbucket',
+      name: 'Bitbucket',
+      vendor: 'Atlassian',
+      logo: BitbucketLogo,
+      logoBackground: '#0052CC',
+    },
+  ],
+  [
+    'gitlab',
+    {
+      type: 'gitlab',
+      name: 'GitLab',
+      vendor: 'GitLab Inc.',
+      logo: GitlabLogo,
+      logoBackground: '#FC6D26',
+    },
+  ],
+]);
+export const ORGANIZATION_TYPES = Array.from(ORGANIZATION_TYPES_INFO.keys());
 
-export function getOrganizationTypeInfo(type: OrganizationType | string) {
-  return ORGANIZATION_TYPES_INFO[type as OrganizationType];
+export function getOrganizationTypeInfo(type: OrganizationType) {
+  return ORGANIZATION_TYPES_INFO.get(type)!;
 }
 
 export const AzureDevOpsSubscriptionEventType = z.enum([
@@ -99,11 +108,7 @@ export function getAzureSubscriptionEventInfo(type: AzureDevOpsSubscriptionEvent
   return AZURE_SUBSCRIPTION_EVENT_TYPES_INFO[type as AzureDevOpsSubscriptionEventType];
 }
 
-export function getGeneralWebhookTypes({
-  type,
-}: {
-  type: OrganizationType | string;
-}): { type: string; description: string }[] {
+export function getGeneralWebhookTypes({ type }: { type: OrganizationType }): { type: string; description: string }[] {
   switch (type) {
     case 'azure':
       return Object.values(AZURE_SUBSCRIPTION_EVENT_TYPES_INFO);
@@ -112,6 +117,6 @@ export function getGeneralWebhookTypes({
   }
 }
 
-export function getWebhooksUrl({ id, type }: { id: string; type: OrganizationType | string }): string {
+export function getWebhooksUrl({ id, type }: { id: string; type: OrganizationType }): string {
   return `https://www.paklo.app/api/webhooks/git/${type}/${id}`;
 }

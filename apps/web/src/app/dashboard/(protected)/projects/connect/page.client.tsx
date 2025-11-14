@@ -12,11 +12,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { getOrganizationTypeInfo, type OrganizationType } from '@/lib/organization-types';
+import { getOrganizationTypeInfo } from '@/lib/organization-types';
+import type { OrganizationType } from '@/lib/prisma';
 
 type ProjectViewProps = {
   organizationId: string;
-  type: OrganizationType | string;
+  type: OrganizationType;
   projects: AvailableProject[];
   maxProjects: number;
 };

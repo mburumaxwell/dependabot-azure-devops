@@ -1,8 +1,7 @@
 'use server';
 
 import { AzureDevOpsWebApiClient, extractOrganizationUrl } from '@paklo/core/azure';
-import type { OrganizationType } from '@/lib/organization-types';
-import { prisma } from '@/lib/prisma';
+import { type OrganizationType, prisma } from '@/lib/prisma';
 
 export type AvailableProject = {
   name: string;
@@ -19,7 +18,7 @@ export type AvailableProject = {
 
 type ListAvailableProjectsOptions = {
   id: string;
-  type: OrganizationType | string;
+  type: OrganizationType;
   url: string;
 };
 export async function listAvailableProjects({
@@ -28,10 +27,10 @@ export async function listAvailableProjects({
   url: inputUrl,
 }: ListAvailableProjectsOptions): Promise<AvailableProject[]> {
   // get available projects from provider
-  if (!providerProjectsFetchers.has(type as OrganizationType)) {
+  if (!providerProjectsFetchers.has(type)) {
     throw new Error(`Unsupported organization type: ${type}`);
   }
-  const fetcher = providerProjectsFetchers.get(type as OrganizationType);
+  const fetcher = providerProjectsFetchers.get(type);
   if (typeof fetcher !== 'function') {
     throw new Error(`Invalid fetcher for organization type: ${type}`);
   }
@@ -63,7 +62,7 @@ export async function listAvailableProjects({
 type ListProviderProjectsOptions = Omit<ListAvailableProjectsOptions, 'type'>;
 type AvailableProviderProject = Omit<AvailableProject, 'connected'>;
 type ProviderProjectsFetcher = (args: ListProviderProjectsOptions) => Promise<AvailableProviderProject[]>;
-const providerProjectsFetchers = new Map<OrganizationType | string, ProviderProjectsFetcher>([
+const providerProjectsFetchers = new Map<OrganizationType, ProviderProjectsFetcher>([
   ['azure', getAvailableForAzure],
   // future organization types can be added here
 ]);
