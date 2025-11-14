@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { getOrganizationTypeInfo } from '@/lib/organization-types';
+import { getOrganizationTypeInfo } from '@/lib/organizations';
 import type { OrganizationType } from '@/lib/prisma';
 
 type ProjectViewProps = {

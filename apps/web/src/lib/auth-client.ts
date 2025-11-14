@@ -1,4 +1,3 @@
-import { stripeClient } from '@better-auth/stripe/client';
 import {
   adminClient,
   inferAdditionalFields,
@@ -19,7 +18,6 @@ export const authClient = createAuthClient({
     passkeyClient(),
     organizationClient({ schema: inferOrgAdditionalFields<typeof auth>() }),
     adminClient(),
-    stripeClient(),
   ],
 });
 

@@ -3,6 +3,7 @@
 import { generateKey } from '@paklo/core/keygen';
 import { headers as requestHeaders } from 'next/headers';
 import { auth, type Organization } from '@/lib/auth';
+import { getOrganizationTierInfo } from '@/lib/organizations';
 import { type OrganizationType, prisma } from '@/lib/prisma';
 import type { RegionCode } from '@/lib/regions';
 
@@ -31,8 +32,8 @@ export async function createOrganizationWithCredential({
       slug,
       type,
       url,
-      // token,
       region,
+      tier: 'free', // default to free tier
 
       // change current active organization to the new one
       keepCurrentActiveOrganization: false,
@@ -43,6 +44,12 @@ export async function createOrganizationWithCredential({
     return { error: { message: 'Failed to create organization' } };
   }
 
+  const tierInfo = getOrganizationTierInfo(organization.tier);
+  await prisma.organization.update({
+    where: { id: organization.id },
+    data: { maxProjects: tierInfo.maxProjects },
+  });
+
   // generate webhook token - using base64url for better security and URL safety
   const webhooksToken = generateKey({ length: 32, encoding: 'base64url' });
 
@@ -50,5 +57,8 @@ export async function createOrganizationWithCredential({
   await prisma.organizationCredential.create({
     data: { id: organization.id, token, webhooksToken },
   });
+
+  // no billing to be created for free tier
+
   return { data: organization };
 }

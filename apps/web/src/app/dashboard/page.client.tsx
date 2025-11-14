@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import { authClient, type Organization } from '@/lib/auth-client';
-import { getOrganizationTypeInfo } from '@/lib/organization-types';
+import { getOrganizationTypeInfo } from '@/lib/organizations';
 
 export function NoOrganizationsView() {
   return (

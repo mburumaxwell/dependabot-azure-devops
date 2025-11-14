@@ -1,11 +1,9 @@
-import { stripe } from '@better-auth/stripe';
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { APIError } from 'better-auth/api';
 import { nextCookies } from 'better-auth/next-js';
 import { admin, magicLink, organization } from 'better-auth/plugins';
 import { passkey } from 'better-auth/plugins/passkey';
-import { z } from 'zod/v4';
 import {
   sendMagicLinkEmail,
   sendOrganizationInviteDeclinedEmail,
@@ -13,10 +11,9 @@ import {
   sendUserDeleteVerificationEmail,
 } from '@/emails';
 import { logger } from '@/lib/logger';
-import { OrganizationTypeSchema } from '@/lib/organization-types';
+import { OrganizationTierSchema, OrganizationTypeSchema } from '@/lib/organizations';
 import { prisma as prismaClient } from '@/lib/prisma';
 import { RegionCodeSchema } from '@/lib/regions';
-import { stripe as stripeClient } from '@/lib/stripe';
 import { config } from '@/site-config';
 import app from '../../package.json';
 
@@ -41,9 +38,6 @@ export const auth = betterAuth({
           });
         }
       },
-      async afterDelete(user, request) {
-        // TODO: find out if we need to delete the customer in Stripe
-      },
       async sendDeleteAccountVerification({ user, url }, request) {
         logger.debug(`Sending account deletion verification to ${user.email} url: ${url}`);
         await sendUserDeleteVerificationEmail({ recipient: user.email, url });
@@ -63,7 +57,16 @@ export const auth = betterAuth({
             },
             url: { type: 'string', required: true, unique: true },
             region: { type: 'string', required: true, validator: { input: RegionCodeSchema } },
-            maxProjects: { type: 'number', required: false, validator: { input: z.int().min(1).max(100).optional() } },
+            tier: {
+              type: ['free', 'pro', 'enterprise'],
+              required: true,
+              validator: { input: OrganizationTierSchema },
+            },
+            billingEmail: { type: 'string', required: false, input: false },
+            customerId: { type: 'string', required: false, input: false },
+            subscriptionId: { type: 'string', required: false, input: false },
+            subscriptionStatus: { type: 'string', required: false, input: false },
+            maxProjects: { type: 'number', required: true, input: false },
           },
         },
       },
@@ -82,6 +85,8 @@ export const auth = betterAuth({
       },
       organizationHooks: {
         async afterDeleteOrganization({ organization, user }) {
+          // change this into workflow to be able to retry on failure
+          // TODO: delete customer
           // TODO: cancel subscription
         },
         async afterRejectInvitation({ invitation, user, organization }) {
@@ -102,11 +107,6 @@ export const auth = betterAuth({
         logger.debug(`Sending magic link to ${email} url: ${url}`);
         await sendMagicLinkEmail({ recipient: email, url });
       },
-    }),
-    stripe({
-      stripeClient,
-      stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
-      createCustomerOnSignUp: true,
     }),
     nextCookies(), // must be last to work with server actions/components
   ],

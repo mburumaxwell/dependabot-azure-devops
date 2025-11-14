@@ -20,8 +20,8 @@ import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import type { Organization } from '@/lib/auth-client';
-import { getGeneralWebhookTypes, getWebhooksUrl } from '@/lib/organization-types';
+import { getGeneralWebhookTypes, getWebhooksUrl } from '@/lib/organizations';
+import type { Organization } from '@/lib/prisma';
 
 export function PrimaryIntegrationSection({ organization }: { organization: Organization }) {
   const [showToken, setShowToken] = useState(false);
@@ -370,10 +370,10 @@ export function WebhooksSection({ organization }: { organization: Organization }
 
   async function handleCreateWebhooks() {
     setIsCreating(true);
-    const { success, message } = await createWebhooks(organization);
+    const { success, error } = await createWebhooks(organization);
     setIsCreating(false);
     if (!success) {
-      toast.error('Failed to create webhooks', { description: message });
+      toast.error('Failed to create webhooks', { description: error?.message });
       return;
     }
 

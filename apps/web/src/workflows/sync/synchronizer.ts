@@ -30,7 +30,7 @@ export class Synchronizer {
     }
 
     // update project info
-    logger.info(`Updating info for project ${project.id}.`);
+    logger.debug(`Updating info for project ${project.id}.`);
     await prisma.project.update({
       where: { id: project.id },
       data: {
@@ -79,6 +79,12 @@ export class Synchronizer {
 
       // track for further synchronization
       syncPairs.push([sci, repository]);
+      if (syncPairs.length >= this.project.maxRepositories) {
+        logger.debug(
+          `Reached maximum number of repositories (${this.project.maxRepositories}) for project ${this.project.id}. Stopping further discovery.`,
+        );
+        break;
+      }
 
       // add delay of 30ms to avoid rate limiting, every 10 repositories
       if (syncPairs.length % 10 === 0) {
@@ -94,7 +100,7 @@ export class Synchronizer {
         providerId: { notIn: providerIdsToKeep },
       },
     });
-    logger.info(`Deleted ${deleted} repositories in project ${project.id} that no longer have configuration files.`);
+    logger.debug(`Deleted ${deleted} repositories in project ${project.id} that no longer have configuration files.`);
 
     // synchronize each repository
     let updated = 0;
@@ -123,7 +129,7 @@ export class Synchronizer {
 
     // skip disabled or fork repository
     if (providerRepo.disabled || providerRepo.fork) {
-      logger.info(`Skipping sync for ${providerRepo.name} in ${project.id} because it is disabled or is a fork`);
+      logger.debug(`Skipping sync for ${providerRepo.name} in ${project.id} because it is disabled or is a fork`);
       return { updated: false };
     }
 
@@ -151,7 +157,7 @@ export class Synchronizer {
 
     // skip disabled or fork repository
     if (providerRepo.disabled || providerRepo.fork) {
-      logger.info(`Skipping sync for ${providerRepo.name} in ${project.id} because it is disabled or is a fork`);
+      logger.debug(`Skipping sync for ${providerRepo.name} in ${project.id} because it is disabled or is a fork`);
       return { updated: false };
     }
 
@@ -186,7 +192,7 @@ export class Synchronizer {
     if (!providerInfo.hasConfiguration) {
       // delete repository
       if (repository) {
-        logger.info(`Deleting '${repository.slug}' in ${project.id} as it no longer has a configuration file.`);
+        logger.debug(`Deleting '${repository.slug}' in ${project.id} as it no longer has a configuration file.`);
         await prisma.repository.delete({ where: { id: repository.id } });
       }
 
@@ -202,6 +208,16 @@ export class Synchronizer {
 
     // create repository, if it does not exist
     if (!repository) {
+      // check if adding this repository would exceed the limit
+      const existingCount = await prisma.repository.count({ where: { projectId: project.id } });
+      if (existingCount + 1 > project.maxRepositories) {
+        logger.debug(
+          `Skipping creation of repository '${providerInfo.slug}' in project ${project.id} as it would exceed the maximum limit.`,
+        );
+        return { skipped: true, updated: false };
+      }
+
+      // create repository
       repository = await prisma.repository.create({
         data: {
           id: generateId(),
@@ -228,7 +244,7 @@ export class Synchronizer {
     if (!commitChanged) return { updated: false };
 
     // at this point we know the commit or info changed
-    logger.info(`Changes detected for repository '${providerInfo.slug}' in project ${project.id} ...`);
+    logger.debug(`Changes detected for repository '${providerInfo.slug}' in project ${project.id} ...`);
 
     // parse the config
     let config: DependabotConfig | undefined;

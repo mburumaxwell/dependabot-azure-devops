@@ -31,7 +31,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { authClient, type Organization, type Session } from '@/lib/auth-client';
-import { getOrganizationTypeInfo } from '@/lib/organization-types';
+import { getOrganizationTypeInfo } from '@/lib/organizations';
 import { cn, getInitials, type InitialsType } from '@/lib/utils';
 
 type MenuItem = { label: string; href: Route };
@@ -45,7 +45,6 @@ const groups: MenuGroup[] = [
       // TODO: remove "as Route" once these routes have been created
       { label: 'Activity', href: '/dashboard/activity' },
       { label: 'Projects', href: '/dashboard/projects' },
-      { label: 'Repositories', href: '/dashboard/repos' as Route },
       { label: 'Runs', href: '/dashboard/runs' as Route },
       { label: 'Private Vulnerabilities', href: '/dashboard/private-vulns' as Route },
       { label: 'Secrets', href: '/dashboard/secrets' },
@@ -70,7 +69,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 export function AppSidebar({ session, organizations, ...props }: AppSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const isActive = (href: Route) => pathname === href || (href !== '/' && pathname.startsWith(href));
+  const isActive = (href: Route) => pathname === href;
   const { isMobile } = useSidebar();
 
   function handleLogout(): void {

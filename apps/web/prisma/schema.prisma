@@ -43,23 +43,22 @@ model UsageTelemetry {
 }
 
 model User {
-  id               String       @id @map("_id")
-  name             String
-  email            String
-  emailVerified    Boolean      @default(false)
-  image            String?
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @default(now()) @updatedAt
-  role             String?
-  banned           Boolean?     @default(false)
-  banReason        String?
-  banExpires       DateTime?
-  sessions         Session[]
-  accounts         Account[]
-  members          Member[]
-  invitations      Invitation[]
-  passkeys         Passkey[]
-  stripeCustomerId String?
+  id            String       @id @map("_id")
+  name          String
+  email         String
+  emailVerified Boolean      @default(false)
+  image         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now()) @updatedAt
+  role          String?
+  banned        Boolean?     @default(false)
+  banReason     String?
+  banExpires    DateTime?
+  sessions      Session[]
+  accounts      Account[]
+  members       Member[]
+  invitations   Invitation[]
+  passkeys      Passkey[]
 
   @@unique([email])
   @@map("user")
@@ -120,23 +119,45 @@ enum OrganizationType {
   @@map("organization_type")
 }
 
+enum SubscriptionStatus {
+  active
+  inactive
+  past_due
+  canceled
+
+  @@map("subscription_status")
+}
+
+enum OrganizationTier {
+  free
+  pro
+  enterprise
+
+  @@map("organization_tier")
+}
+
 model Organization {
-  id          String                  @id @map("_id")
-  name        String
-  slug        String?
-  logo        String?
-  createdAt   DateTime
-  metadata    String?
-  members     Member[]
-  invitations Invitation[]
-  type        OrganizationType
-  url         String
-  region      String
-  maxProjects Int?
-  credential  OrganizationCredential?
-  secrets     OrganizationSecret[]
-  projects    Project[]
-  jobs        UpdateJob[]
+  id                 String                  @id @map("_id")
+  name               String
+  slug               String?
+  logo               String?
+  createdAt          DateTime
+  metadata           String?
+  members            Member[]
+  invitations        Invitation[]
+  type               OrganizationType
+  url                String
+  region             String
+  tier               OrganizationTier
+  billingEmail       String?
+  customerId         String?
+  subscriptionId     String?
+  subscriptionStatus SubscriptionStatus?
+  maxProjects        Int                     @default(0) // zero until updated after billing setup
+  credential         OrganizationCredential?
+  secrets            OrganizationSecret[]
+  projects           Project[]
+  jobs               UpdateJob[]
 
   @@unique([slug])
   @@unique([url])
@@ -195,16 +216,16 @@ model Passkey {
 // Even if it did, it is better to keep sensitive information isolated.
 
 model OrganizationCredential {
-  id                      String       @id @map("_id")
-  organization            Organization @relation(fields: [id], references: [id], onDelete: Cascade)
-  token                   String
-  tokenEnclaveUrl         String? // Future enclave storage support
+  id                     String       @id @map("_id")
+  organization           Organization @relation(fields: [id], references: [id], onDelete: Cascade)
+  token                  String
+  tokenSecretUrl         String? // Future secret store support
   /// Token (password) for Webhooks, ServiceHooks, and Notifications from the provider.
   /// This is generated on creation and may be shown on demand but cannot be edited.
-  webhooksToken           String
-  webhooksTokenEnclaveUrl String? // Future enclave storage support
-  githubToken             String?
-  githubTokenEnclaveUrl   String? // Future enclave storage support
+  webhooksToken          String
+  webhooksTokenSecretUrl String? // Future secret store support
+  githubToken            String?
+  githubTokenSecretUrl   String? // Future secret store support
 
   @@map("organization_credential")
 }
@@ -217,7 +238,7 @@ model OrganizationSecret {
   value          String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
-  enclaveUrl     String? // Future enclave storage support
+  secretUrl      String? // Future secret store support
 
   @@unique([organizationId, name])
   @@index([organizationId])
@@ -245,6 +266,7 @@ model Project {
   permalink             String
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
+  maxRepositories       Int                   @default(0) // zero until updated after billing setup
   synchronizationStatus SynchronizationStatus
   synchronizedAt        DateTime?
   repositories          Repository[]

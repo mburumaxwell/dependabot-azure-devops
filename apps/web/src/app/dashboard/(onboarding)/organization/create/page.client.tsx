@@ -25,7 +25,7 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
-import { ORGANIZATION_TYPES_INFO } from '@/lib/organization-types';
+import { ORGANIZATION_TYPES_INFO } from '@/lib/organizations';
 import { REGIONS, type RegionCode } from '@/lib/regions';
 import { cn } from '@/lib/utils';
 
@@ -187,8 +187,7 @@ export function CreateOrganizationPage() {
 
     setCreatingError('');
 
-    // Redirect to organization settings for billing setup
-    router.push('/dashboard/settings/billing?new=true');
+    router.push('/dashboard/projects');
   }
 
   const canProceedStep1 = data.name && data.slug && slugVerified;

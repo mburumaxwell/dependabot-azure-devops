@@ -12,7 +12,13 @@ export const metadata: Metadata = {
 
 export default async function IntegrationsPage() {
   const headers = await requestHeaders();
-  const organization = await auth.api.getFullOrganization({ headers });
+  const session = await auth.api.getSession({ headers });
+  if (!session || !session.session.activeOrganizationId) return null;
+
+  const organizationId = session.session.activeOrganizationId;
+  const organization = await prisma.organization.findUniqueOrThrow({
+    where: { id: organizationId },
+  });
   if (!organization) return null;
 
   // Get token status directly from database

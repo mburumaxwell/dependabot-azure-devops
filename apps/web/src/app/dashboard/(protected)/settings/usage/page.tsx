@@ -14,7 +14,13 @@ export const metadata: Metadata = {
 
 export default async function UsagePage() {
   const headers = await requestHeaders();
-  const organization = await auth.api.getFullOrganization({ headers });
+  const session = await auth.api.getSession({ headers });
+  if (!session || !session.session.activeOrganizationId) return null;
+
+  const organizationId = session.session.activeOrganizationId;
+  const organization = await prisma.organization.findUniqueOrThrow({
+    where: { id: organizationId },
+  });
   if (!organization) return null;
 
   const projectsCount = await prisma.project.count({
@@ -26,7 +32,7 @@ export default async function UsagePage() {
       title: 'Projects',
       description: 'Number of active projects',
       used: projectsCount,
-      limit: organization.maxProjects || 1, // TODO: remove default once onboarding flow is enforced
+      limit: organization.maxProjects,
     },
     {
       title: 'Update Runs',

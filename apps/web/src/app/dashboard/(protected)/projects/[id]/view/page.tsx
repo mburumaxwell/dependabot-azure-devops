@@ -53,6 +53,7 @@ async function getProject({ id }: { id: string }) {
       synchronizationStatus: true,
       synchronizedAt: true,
       organizationId: true,
+      maxRepositories: true,
     },
   });
 

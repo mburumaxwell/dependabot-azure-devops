@@ -1,7 +1,7 @@
 'use server';
 
 import { logger } from '@/lib/logger';
-import { getWebhooksUrl } from '@/lib/organization-types';
+import { getWebhooksUrl } from '@/lib/organizations';
 import { type OrganizationType, prisma } from '@/lib/prisma';
 
 export async function getWebhooksToken({ organizationId }: { organizationId: string }) {
@@ -42,7 +42,7 @@ export async function createWebhooks({
 }: {
   id: string;
   type: OrganizationType;
-}): Promise<{ success: boolean; message?: string }> {
+}): Promise<{ success: boolean; error?: { message: string } }> {
   const credential = await prisma.organizationCredential.findUniqueOrThrow({
     where: { id: id },
     select: { webhooksToken: true },

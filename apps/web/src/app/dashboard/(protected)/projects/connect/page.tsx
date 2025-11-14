@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { headers as requestHeaders } from 'next/headers';
 import { listAvailableProjects } from '@/actions/projects';
 import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 import { ConnectProjectsView } from './page.client';
 
 export const metadata: Metadata = {
@@ -12,10 +13,16 @@ export const metadata: Metadata = {
 
 export default async function ProjectConnectPage() {
   const headers = await requestHeaders();
-  const organization = await auth.api.getFullOrganization({ headers });
+  const session = await auth.api.getSession({ headers });
+  if (!session || !session.session.activeOrganizationId) return null;
+
+  const organizationId = session.session.activeOrganizationId;
+  const organization = await prisma.organization.findUniqueOrThrow({
+    where: { id: organizationId },
+  });
   if (!organization) return null;
 
-  const maxProjects = organization.maxProjects || 1; // TODO: remove default once onboarding flow is enforced
+  const { maxProjects } = organization;
   const projects = await listAvailableProjects(organization);
 
   return (

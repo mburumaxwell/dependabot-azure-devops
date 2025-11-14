@@ -4,6 +4,7 @@ import { Mail, Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { deleteOrganization } from '@/actions/organizations';
 import { TimeAgo } from '@/components/time-ago';
 import {
   AlertDialog,
@@ -335,10 +336,10 @@ export function DangerSection({ organizationId }: { organizationId: string }) {
 
   async function handleDeleteOrganization() {
     setIsDeletingOrg(true);
-    const { error } = await authClient.organization.delete({ organizationId });
+    const { success, error } = await deleteOrganization({ organizationId });
     setIsDeletingOrg(false);
-    if (error) {
-      toast.error('Error deleting organization', { description: error.message });
+    if (!success) {
+      toast.error('Error deleting organization', { description: error?.message });
       return;
     }
 
