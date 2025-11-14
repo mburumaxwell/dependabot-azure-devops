@@ -190,10 +190,8 @@ model OrganizationCredential {
   organization            Organization @relation(fields: [id], references: [id], onDelete: Cascade)
   token                   String
   tokenEnclaveUrl         String? // Future enclave storage support
-  /*
-   Token (password) for Webhooks, ServiceHooks, and Notifications from the provider.
-   This is generated on creation and may be shown on demand but cannot be edited.
-   */
+  /// Token (password) for Webhooks, ServiceHooks, and Notifications from the provider.
+  /// This is generated on creation and may be shown on demand but cannot be edited.
   webhooksToken           String
   webhooksTokenEnclaveUrl String? // Future enclave storage support
   githubToken             String?
@@ -223,7 +221,7 @@ enum SynchronizationStatus {
   success
   failed
 
-  @@map("SyncStatus")
+  @@map("synchronization_status")
 }
 
 model Project {
@@ -234,7 +232,7 @@ model Project {
   name                  String
   url                   String
   /// The link that never changes even if the name changes (only for some providers).
-  // This tends to be the API url for the project.
+  /// This tends to be the API url for the project.
   permalink             String
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
@@ -249,23 +247,38 @@ model Project {
 
 model Repository {
   id                    String                @id @map("_id")
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
   projectId             String
   project               Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
   providerId            String
   name                  String
   url                   String
+  /// The link that never changes even if the name changes (only for some providers).
+  /// This tends to be the API url for the repository.
+  permalink             String
   slug                  String?
-  /*
-   Latest commit SHA synchronized for the configuration file.
-   */
+  /// Latest commit SHA synchronized for the configuration file.
   latestCommit          String?
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @updatedAt
+  /// Contents of the configuration file as of the latest commit.
+  configFileContents    String?
+  /// Error that encountered, if any, when parsing the configuration file.
+  synchronizationError  String?
   synchronizationStatus SynchronizationStatus
   synchronizedAt        DateTime?
 
   @@unique([projectId, providerId])
   @@unique([url])
   @@index([projectId])
+  @@index([providerId])
   @@map("repository")
+}
+
+enum UpdateJobTrigger {
+  scheduled
+  missed_schedule
+  synchronization
+  manual
+
+  @@map("update_job_trigger")
 }

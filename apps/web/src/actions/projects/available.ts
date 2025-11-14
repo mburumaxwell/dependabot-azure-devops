@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma';
 export type AvailableProject = {
   name: string;
   providerId: string;
+  description?: string;
   url: string;
   /**
    * The link that never changes even if the name changes (only for some providers).
@@ -75,10 +76,13 @@ async function getAvailableForAzure({
   ).token;
   const client = new AzureDevOpsWebApiClient(url, token);
 
-  return ((await client.getProjects()) || []).map((project) => ({
-    name: project.name,
-    url: `${url.value}/${project.name}`,
-    permalink: project.url,
-    providerId: project.id,
-  }));
+  return ((await client.getProjects())?.value || [])
+    .filter((project) => project.state === 'wellFormed')
+    .map((project) => ({
+      name: project.name,
+      description: project.description,
+      url: `${url.value}/${project.name}`,
+      permalink: project.url,
+      providerId: project.id,
+    }));
 }

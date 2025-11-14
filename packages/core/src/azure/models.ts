@@ -8,9 +8,7 @@ export const DEVOPS_PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME = 'Microsoft.Git.P
 export const DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER = 'Dependabot.PackageManager';
 export const DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES = 'Dependabot.Dependencies';
 
-/**
- * File change
- */
+/** File change */
 export interface IFileChange {
   changeType: VersionControlChangeType;
   path: string;
@@ -18,9 +16,7 @@ export interface IFileChange {
   encoding: string;
 }
 
-/**
- * Pull request properties
- */
+/** Pull request properties */
 export interface IPullRequestProperties {
   id: number;
   properties?: {
@@ -29,9 +25,7 @@ export interface IPullRequestProperties {
   }[];
 }
 
-/**
- * Pull request creation request
- */
+/** Pull request creation request */
 export interface ICreatePullRequest {
   project: string;
   repository: string;
@@ -63,9 +57,7 @@ export interface ICreatePullRequest {
   }[];
 }
 
-/**
- * Pull request update request
- */
+/** Pull request update request */
 export interface IUpdatePullRequest {
   project: string;
   repository: string;
@@ -81,18 +73,14 @@ export interface IUpdatePullRequest {
   skipIfNotBehindTargetBranch?: boolean;
 }
 
-/**
- * Pull request approval request
- */
+/** Pull request approval request */
 export interface IApprovePullRequest {
   project: string;
   repository: string;
   pullRequestId: number;
 }
 
-/**
- * Pull request abandon request
- */
+/** Pull request abandon request */
 export interface IAbandonPullRequest {
   project: string;
   repository: string;

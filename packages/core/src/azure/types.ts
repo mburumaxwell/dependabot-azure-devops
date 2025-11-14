@@ -57,7 +57,8 @@ export enum PullRequestStatus {
   Completed = 3,
   All = 4,
 }
-export interface IdentityRefWithVote {
+
+export type IdentityRefWithVote = {
   id?: string;
   displayName?: string;
   uniqueName?: string;
@@ -67,4 +68,41 @@ export interface IdentityRefWithVote {
   hasDeclined?: boolean;
   isFlagged?: boolean;
   isRequired?: boolean;
-}
+};
+
+export type AzdoProject = {
+  id: string;
+  name: string;
+  description?: string;
+  url: string;
+  state: 'deleting' | 'new' | 'wellFormed' | 'createPending' | 'all' | 'unchanged' | 'deleted';
+  _links?: {
+    self: { href: string };
+    collection: { href: string };
+    web: { href: string };
+  };
+};
+
+export type AzdoRepository = {
+  id: string;
+  name: string;
+  defaultBranch?: string;
+  project: AzdoProject;
+  isDisabled?: boolean;
+  isFork?: boolean;
+  url: string;
+  remoteUrl: string;
+  webUrl: string;
+};
+
+export type AzdoListResponse<T> = {
+  value: T[];
+  count: number;
+};
+
+export type AzdoRepositoryItem = {
+  latestProcessedChange?: {
+    commitId?: string;
+  };
+  content?: string;
+};

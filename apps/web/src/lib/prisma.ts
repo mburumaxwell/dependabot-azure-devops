@@ -18,6 +18,7 @@ export type {
   Repository,
   Session,
   SynchronizationStatus,
+  UpdateJobTrigger,
   UsageTelemetry,
   User,
   Verification,
