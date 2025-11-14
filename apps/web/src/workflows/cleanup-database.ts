@@ -1,6 +1,17 @@
 import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
+/**
+ * Workflow to periodically clean up the database by removing outdated records.
+ *
+ * Cleans up:
+ * - Usage telemetry records older than one year.
+ * - Expired organization invitations.
+ *
+ * Schedule/Trigger expectations:
+ * This workflow is intended to be run as a scheduled job (e.g., daily or weekly)
+ * or triggered by an external scheduler to maintain database hygiene.
+ */
 export async function cleanupDatabase() {
   'use workflow';
 
@@ -8,6 +19,12 @@ export async function cleanupDatabase() {
   await deleteExpiredInvitations();
 }
 
+/**
+ * Deletes usage telemetry records from the database that are older than 1 year.
+ * This function enforces a data retention policy by removing telemetry data
+ * whose 'started' date is more than one year in the past.
+ * Retention period: 1 year.
+ */
 async function deleteUsageTelemetry() {
   'use step';
 
@@ -23,6 +40,11 @@ async function deleteUsageTelemetry() {
   );
 }
 
+/**
+ * Deletes organization invitations that have expired.
+ * An invitation is considered expired if its `expiresAt` date is earlier than the current date.
+ * This step removes all such expired invitations from the database.
+ */
 async function deleteExpiredInvitations() {
   'use step';
 
