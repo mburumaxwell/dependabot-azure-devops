@@ -9,7 +9,7 @@ import {
 } from '@paklo/core/dependabot';
 import { logger } from '@paklo/core/logger';
 import { handle } from 'hono/vercel';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';

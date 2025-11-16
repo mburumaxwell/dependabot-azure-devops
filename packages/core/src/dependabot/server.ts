@@ -1,6 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { type ZodType, z } from 'zod/v4';
+import { type ZodType, z } from 'zod';
 import { logger } from '@/logger';
 import type { DependabotCredential, DependabotJobConfig } from './job';
 import {

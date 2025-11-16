@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import * as yaml from 'js-yaml';
 import { describe, expect, it } from 'vitest';
-import { ZodError } from 'zod/v4';
+import { ZodError } from 'zod';
 
 import {
   DependabotConfigSchema,

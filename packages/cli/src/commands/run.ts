@@ -10,7 +10,7 @@ import {
 import { logger } from '@paklo/core/logger';
 import { AzureLocalJobsRunner, type AzureLocalJobsRunnerOptions } from '@paklo/runner/local/azure';
 import { Command, Option } from 'commander';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { type HandlerOptions, handlerOptions } from './base';
 
 const MERGE_STRATEGIES = ['squash', 'rebase', 'merge'] as const;

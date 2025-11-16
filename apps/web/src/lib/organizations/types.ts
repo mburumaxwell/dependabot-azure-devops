@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { AzureDevOpsLogo, BitbucketLogo, GitlabLogo } from '@/components/logos';
 import type { OrganizationType } from '@/lib/prisma';
 

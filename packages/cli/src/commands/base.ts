@@ -1,6 +1,6 @@
 import { logger } from '@paklo/core/logger';
 import type { Command, ErrorOptions } from 'commander';
-import type { ZodType } from 'zod/v4';
+import type { ZodType } from 'zod';
 
 export type HandlerErrorOptions = ErrorOptions & {
   /** The error message. */

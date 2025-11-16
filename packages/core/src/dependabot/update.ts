@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { DependabotDependencySchema } from './job';
 
 // we use nullish() because it does optional() and allows the value to be set to null

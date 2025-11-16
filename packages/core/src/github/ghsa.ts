@@ -1,6 +1,6 @@
 import type { Octokit } from 'octokit';
 import * as semver from 'semver';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 import { logger } from '@/logger';
 import { createGitHubClient } from './client';

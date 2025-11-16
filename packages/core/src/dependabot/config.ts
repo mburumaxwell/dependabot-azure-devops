@@ -1,5 +1,5 @@
 import * as yaml from 'js-yaml';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 import { convertPlaceholder, type VariableFinderFn } from './placeholder';
 

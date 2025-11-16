@@ -1,4 +1,4 @@
-import type { ZodType } from 'zod/v4';
+import type { ZodType } from 'zod';
 
 import { environment } from '@/environment';
 
