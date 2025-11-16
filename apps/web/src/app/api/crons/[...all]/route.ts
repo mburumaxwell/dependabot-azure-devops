@@ -18,11 +18,13 @@ const app = new Hono().basePath('/api/crons');
 // https://vercel.com/docs/cron-jobs/manage-cron-jobs?framework=other#securing-cron-jobs
 app.use(bearerAuth({ token: process.env.CRON_SECRET! }));
 
+// CRON: 0 2 * * *
 app.get('/cleanup/database', async (context) => {
   await start(cleanupDatabase, []);
   return context.body(null, 204);
 });
 
+// CRON: 23 */6 * * *
 app.get('/trigger-sync-projects', async (context) => {
   // find projects that are eligible for sync
   const lastSyncTime = Date.now() - MIN_AUTO_SYNC_INTERVAL_PROJECT;
@@ -46,6 +48,7 @@ app.get('/trigger-sync-projects', async (context) => {
   return context.body(null, 204);
 });
 
+// CRON: */30 * * * *
 app.get('/trigger-update-jobs', async (context) => {
   // find all repository updates that are due
   const dueRepositoryUpdates = await prisma.repositoryUpdate.findMany({
