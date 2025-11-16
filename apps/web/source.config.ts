@@ -2,7 +2,7 @@ import { rehypeCodeDefaultOptions, remarkAdmonition, remarkSteps } from 'fumadoc
 import { defineCollections, defineConfig, defineDocs, metaSchema } from 'fumadocs-mdx/config';
 import remarkEmoji from 'remark-emoji';
 
-import { z } from '@/fumadocs/zod';
+import { z } from 'zod';
 
 export const legal = defineCollections({
   type: 'doc',
@@ -25,22 +25,20 @@ export const docs = defineDocs({
     postprocess: {
       includeProcessedMarkdown: true,
     },
-    schema: ({ path, source }) =>
-      z.object({
-        title: z.string(),
-        description: z.string().optional(),
-        icon: z.string().optional(),
-        full: z.boolean().optional(),
-        git: z.git({ path }),
-        keywords: z.string().array().default([]),
-        draft: z.boolean().default(false),
-        readtime: z.readtime({ contents: source }),
-      }),
+    schema: z.object({
+      title: z.string(),
+      description: z.string().optional(),
+      icon: z.string().optional(),
+      full: z.boolean().optional(),
+      keywords: z.string().array().default([]),
+      draft: z.boolean().default(false),
+    }),
   },
   meta: { schema: metaSchema },
 });
 
 export default defineConfig({
+  lastModifiedTime: 'git',
   mdxOptions: {
     rehypeCodeOptions: {
       lazy: true,

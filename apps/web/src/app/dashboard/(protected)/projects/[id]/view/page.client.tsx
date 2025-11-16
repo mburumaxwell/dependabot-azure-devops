@@ -23,7 +23,7 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { Project, Repository } from '@/lib/prisma';
-import { getNextSyncTime, isSyncAllowed } from '@/lib/sync';
+import { getNextManualSyncTime, isManualSyncAllowed } from '@/lib/sync';
 
 type SimpleProject = Pick<
   Project,
@@ -107,7 +107,7 @@ export function RepositoriesView({
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end' className='w-52'>
               <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => handleSync(project)} disabled={!isSyncAllowed(project)}>
+                <DropdownMenuItem onClick={() => handleSync(project)} disabled={!isManualSyncAllowed(project)}>
                   {project.synchronizationStatus === 'pending' ? (
                     <>
                       <Spinner />
@@ -117,7 +117,7 @@ export function RepositoriesView({
                     <>
                       <RefreshCw />
                       {(() => {
-                        const nextSync = getNextSyncTime(project);
+                        const nextSync = getNextManualSyncTime(project);
                         if (nextSync) {
                           return (
                             <div className='flex flex-col'>

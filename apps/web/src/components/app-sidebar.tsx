@@ -42,11 +42,10 @@ const groups: MenuGroup[] = [
     label: 'Dashboard',
     href: '/dashboard',
     items: [
-      // TODO: remove "as Route" once these routes have been created
       { label: 'Activity', href: '/dashboard/activity' },
       { label: 'Projects', href: '/dashboard/projects' },
-      { label: 'Runs', href: '/dashboard/runs' as Route },
-      { label: 'Private Vulnerabilities', href: '/dashboard/private-vulns' as Route },
+      { label: 'Runs', href: '/dashboard/runs' },
+      { label: 'Advisories', href: '/dashboard/advisories' },
       { label: 'Secrets', href: '/dashboard/secrets' },
     ],
   },

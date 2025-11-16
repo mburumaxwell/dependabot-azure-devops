@@ -50,8 +50,8 @@ export async function createOrganizationWithCredential({
     data: { maxProjects: tierInfo.maxProjects },
   });
 
-  // generate webhook token - using base64url for better security and URL safety
-  const webhooksToken = generateKey({ length: 32, encoding: 'base64url' });
+  // generate webhook token
+  const webhooksToken = generateKey({ length: 32, encoding: 'base62' });
 
   // create organization credential
   await prisma.organizationCredential.create({

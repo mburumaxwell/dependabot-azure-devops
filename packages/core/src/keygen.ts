@@ -1,8 +1,8 @@
 export type GenerateKeyOptions = {
   /** Length in bytes (default: 32) */
   length?: number;
-  /** Encoding format (default: 'base64url') */
-  encoding?: 'base64' | 'base64url' | 'base32' | 'hex';
+  /** Encoding format (default: 'base62') */
+  encoding?: 'base64' | 'base64url' | 'base62' | 'hex';
 };
 
 /**
@@ -13,20 +13,20 @@ export type GenerateKeyOptions = {
  *
  * @example
  * ```typescript
- * // Generate a 32-byte base64url token (default)
+ * // Generate a 32-byte base62 token (default)
  * const token = generateKey();
  *
  * // Generate a 16-byte hex key
  * const token = generateKey({ length: 16, encoding: 'hex' });
  *
- * // Generate a 20-byte base32 key
- * const token = generateKey({ length: 20, encoding: 'base32' });
+ * // Generate a 20-byte base64url key
+ * const token = generateKey({ length: 20, encoding: 'base64url' });
  *
  * // Generate a 64-byte base64 key with padding
  * const key = generateKey({ length: 64, encoding: 'base64' });
  * ```
  */
-export function generateKey({ length = 32, encoding = 'base64url' }: GenerateKeyOptions = {}): string {
+export function generateKey({ length = 32, encoding = 'base62' }: GenerateKeyOptions = {}): string {
   const bytes = new Uint8Array(length);
   crypto.getRandomValues(bytes);
   const buffer = Buffer.from(bytes);
@@ -38,28 +38,18 @@ export function generateKey({ length = 32, encoding = 'base64url' }: GenerateKey
     case 'base64url':
       return buffer.toString('base64url');
 
-    case 'base32': {
-      // RFC 4648 Base32 encoding
-      const base32Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    case 'base62': {
+      const base62Chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
       let result = '';
-      let bufferValue = 0;
-      let bitsLeft = 0;
+      let value = BigInt(`0x${buffer.toString('hex')}`);
 
-      for (const byte of bytes) {
-        bufferValue = (bufferValue << 8) | byte;
-        bitsLeft += 8;
-
-        while (bitsLeft >= 5) {
-          result += base32Chars[(bufferValue >>> (bitsLeft - 5)) & 31];
-          bitsLeft -= 5;
-        }
+      while (value > 0) {
+        const remainder = value % BigInt(62);
+        result = base62Chars[Number(remainder)] + result;
+        value = value / BigInt(62);
       }
 
-      if (bitsLeft > 0) {
-        result += base32Chars[(bufferValue << (5 - bitsLeft)) & 31];
-      }
-
-      return result;
+      return result || '0';
     }
 
     case 'hex':
@@ -68,15 +58,4 @@ export function generateKey({ length = 32, encoding = 'base64url' }: GenerateKey
     default:
       throw new Error(`Unsupported encoding: ${encoding}`);
   }
-}
-
-export type GenerateIdOptions = {
-  /** Length of the ID string (default: 16) */
-  length?: number;
-};
-
-export function generateId({ length = 16 }: GenerateIdOptions = {}): string {
-  const bytes = new Uint8Array(length);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, (byte) => (byte % 36).toString(36)).join('');
 }

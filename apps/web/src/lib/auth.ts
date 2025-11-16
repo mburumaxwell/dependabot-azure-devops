@@ -12,6 +12,7 @@ import {
 } from '@/emails';
 import { logger } from '@/lib/logger';
 import { OrganizationTierSchema, OrganizationTypeSchema } from '@/lib/organizations';
+import { PakloId } from '@/lib/paklo-id';
 import { prisma as prismaClient } from '@/lib/prisma';
 import { RegionCodeSchema } from '@/lib/regions';
 import { config } from '@/site-config';
@@ -22,6 +23,12 @@ export const auth = betterAuth({
     provider: 'mongodb',
   }),
   appName: app.name,
+  advanced: {
+    database: {
+      generateId: ({ model, size }) =>
+        PakloId.isValidType(model) ? PakloId.generate(model) : PakloId.generateKidOnly(),
+    },
+  },
   user: {
     deleteUser: {
       enabled: true,
@@ -84,11 +91,6 @@ export const auth = betterAuth({
         });
       },
       organizationHooks: {
-        async afterDeleteOrganization({ organization, user }) {
-          // change this into workflow to be able to retry on failure
-          // TODO: delete customer
-          // TODO: cancel subscription
-        },
         async afterRejectInvitation({ invitation, user, organization }) {
           // notify inviter of rejection
           logger.debug(`Sending inviter declined notice for ${invitation.email} to ${user.email}`);

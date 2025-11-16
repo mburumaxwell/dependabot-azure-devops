@@ -1,24 +1,63 @@
 import {
   createApiServerApp,
   type DependabotCredential,
+  DependabotCredentialSchema,
   type DependabotJobConfig,
+  DependabotJobConfigSchema,
   type DependabotRequest,
   type DependabotTokenType,
 } from '@paklo/core/dependabot';
+import { logger } from '@paklo/core/logger';
 import { handle } from 'hono/vercel';
+import { z } from 'zod/v4';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-function authenticate(type: DependabotTokenType, id: number, value: string): Promise<boolean> {
-  return Promise.resolve(false); // TODO: implement actual logic
+// TODO: change the packages to handle string instead of number
+// We can't use bigint since it cannot be serialized to JSON
+
+async function authenticate(type: DependabotTokenType, id: number, value: string): Promise<boolean> {
+  // if no secret found, authentication fails
+  const secret = await prisma.updateJobSecret.findUnique({ where: { id } });
+  if (!secret) return false;
+
+  const token = type === 'job' ? secret.jobToken : secret.credentialsToken;
+  return token === value;
 }
 
-function getJob(id: number): Promise<DependabotJobConfig | undefined> {
-  return Promise.resolve(undefined); // TODO: implement actual logic
+async function getJob(id: number): Promise<DependabotJobConfig | undefined> {
+  const job = await prisma.updateJob.findUnique({ where: { id } });
+  if (!job) return undefined;
+
+  const { data, success, error } = DependabotJobConfigSchema.safeParse(JSON.parse(job.configJson));
+  if (!success) {
+    logger.error(
+      `
+      Failed to parse DependabotJobConfig for job ID ${id}. This should not happen!
+      \n${z.prettifyError(error)}
+      `,
+    );
+    return undefined;
+  }
+  return data;
 }
 
-function getCredentials(id: number): Promise<DependabotCredential[] | undefined> {
-  return Promise.resolve(undefined); // TODO: implement actual logic
+async function getCredentials(id: number): Promise<DependabotCredential[] | undefined> {
+  const job = await prisma.updateJob.findUnique({ where: { id } });
+  if (!job) return undefined;
+
+  const { data, success, error } = DependabotCredentialSchema.array().safeParse(JSON.parse(job.credentialsJson));
+  if (!success) {
+    logger.error(
+      `
+      Failed to parse DependabotCredential for job ID ${id}. This should not happen!
+      \n${z.prettifyError(error)}
+      `,
+    );
+    return undefined;
+  }
+  return data;
 }
 
 function handleRequest(id: number, request: DependabotRequest): Promise<boolean> {

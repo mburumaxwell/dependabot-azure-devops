@@ -17,8 +17,9 @@ describe('generateKey', () => {
 
     it('uses default values when no options provided', () => {
       const key = generateKey();
-      // 32 bytes in base64url should be around 43 characters (no padding)
-      expect(key.length).toBe(43);
+      // 32 bytes in base62 should be a variable length string (alphanumeric only)
+      expect(key.length).toBeGreaterThan(0);
+      expect(key).toMatch(/^[A-Za-z0-9]+$/);
     });
   });
 
@@ -87,22 +88,22 @@ describe('generateKey', () => {
       });
     });
 
-    describe('base32 encoding', () => {
-      it('generates valid base32 strings', () => {
-        const key = generateKey({ length: 20, encoding: 'base32' });
-        expect(key).toMatch(/^[A-Z2-7]*$/);
+    describe('base62 encoding', () => {
+      it('generates valid base62 strings', () => {
+        const key = generateKey({ length: 20, encoding: 'base62' });
+        expect(key).toMatch(/^[A-Za-z0-9]*$/);
       });
 
-      it('uses correct base32 alphabet', () => {
-        const key = generateKey({ length: 32, encoding: 'base32' });
-        const validChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+      it('uses correct base62 alphabet', () => {
+        const key = generateKey({ length: 32, encoding: 'base62' });
+        const validChars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         for (const char of key) {
           expect(validChars.includes(char)).toBe(true);
         }
       });
 
       it('generates consistent length output', () => {
-        const key = generateKey({ length: 20, encoding: 'base32' });
+        const key = generateKey({ length: 20, encoding: 'base62' });
         expect(key.length).toBeGreaterThan(0);
         expect(key.length).toBeLessThan(40); // Reasonable upper bound
       });
@@ -170,7 +171,8 @@ describe('generateKey', () => {
     it('works with empty options object', () => {
       const key = generateKey({});
       expect(typeof key).toBe('string');
-      expect(key.length).toBe(43); // default 32 bytes base64url
+      expect(key.length).toBeGreaterThan(0); // default 32 bytes base62
+      expect(key).toMatch(/^[A-Za-z0-9]+$/);
     });
 
     it('works with partial options', () => {
@@ -179,8 +181,8 @@ describe('generateKey', () => {
       expect(hexKey).toMatch(/^[0-9a-f]*$/);
 
       const shortKey = generateKey({ length: 8 });
-      expect(shortKey.length).toBe(11); // 8 bytes as base64url
-      expect(shortKey).toMatch(/^[A-Za-z0-9_-]*$/);
+      expect(shortKey.length).toBeGreaterThan(0); // 8 bytes as base62
+      expect(shortKey).toMatch(/^[A-Za-z0-9]+$/);
     });
 
     it('handles zero length gracefully', () => {
@@ -196,7 +198,7 @@ describe('generateKey', () => {
         { length: 16 },
         { encoding: 'hex' },
         { length: 32, encoding: 'base64url' },
-        { length: 20, encoding: 'base32' },
+        { length: 20, encoding: 'base62' },
       ];
 
       for (const options of validOptions) {

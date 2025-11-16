@@ -1,8 +1,8 @@
 'use server';
 
-import { generateId } from '@paklo/core/keygen';
 import { requestSync } from '@/actions/sync';
 import { getOrganizationTierInfo } from '@/lib/organizations/tiers';
+import { PakloId } from '@/lib/paklo-id';
 import { prisma } from '@/lib/prisma';
 import type { AvailableProject } from './available';
 
@@ -26,7 +26,7 @@ export async function connectProjects({
   const tierInfo = getOrganizationTierInfo(organization.tier);
 
   // create projects
-  const projectIds = projects.map(() => generateId()); // generate a new ID for each project
+  const projectIds = projects.map(() => PakloId.generate('project')); // generate a new ID for each project
   const result = await prisma.project.createMany({
     data: projects.map((project, index) => ({
       id: projectIds[index]!,

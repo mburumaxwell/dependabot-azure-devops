@@ -1,10 +1,10 @@
 import { type DependabotConfig, parseDependabotConfig } from '@paklo/core/dependabot';
-import { generateId } from '@paklo/core/keygen';
 import { start } from 'workflow/api';
 import { generateCron } from '@/lib/cron';
 import { logger } from '@/lib/logger';
+import { PakloId } from '@/lib/paklo-id';
 import { type Organization, type OrganizationCredential, type Project, prisma, type Repository } from '@/lib/prisma';
-import { type TriggerUpdateJobsWorkflowOptions, triggerUpdateJobs } from '@/workflows/jobs';
+import { triggerUpdateJobs } from '@/workflows/jobs';
 import { type ISyncProvider, type SynchronizerConfigurationItem, toSynchronizerProject } from './provider';
 
 export type SyncResult = { count: number; deleted: number; updated: number };
@@ -220,7 +220,7 @@ export class Synchronizer {
       // create repository
       repository = await prisma.repository.create({
         data: {
-          id: generateId(),
+          id: PakloId.generate('repository'),
           projectId: project.id,
           providerId: providerInfo.id,
           name: providerInfo.name,
@@ -304,8 +304,8 @@ export class Synchronizer {
     const updatesToUpsert = updates;
     for (const update of updatesToUpsert) {
       const directoryKey = makeKey({ ...update, ecosystem: update['package-ecosystem'] });
-      const schedule = generateCron(update.schedule!); // TODO: remove assertion once schedule is enforced
       const timezone = update.schedule?.timezone || 'UTC'; // TODO: remove nullable and default once schedule is enforced
+      const { cron, next: nextUpdateJobAt } = generateCron(update.schedule!, timezone); // TODO: remove assertion once schedule is enforced
       await prisma.repositoryUpdate.upsert({
         where: {
           repositoryId_ecosystem_directoryKey: {
@@ -315,20 +315,22 @@ export class Synchronizer {
           },
         },
         create: {
-          id: generateId(),
+          id: PakloId.generate('repository_update'),
           repositoryId: repository.id,
+          enabled: true,
           ecosystem: update['package-ecosystem'],
           directory: update.directory,
           directories: update.directories,
-          schedule,
+          cron,
           timezone,
           directoryKey,
           files: [], // will be populated when running update jobs
           latestUpdateJobAt: null,
           latestUpdateJobStatus: null,
           latestUpdateJobId: null,
+          nextUpdateJobAt,
         },
-        update: { schedule, timezone },
+        update: { cron, timezone, nextUpdateJobAt },
       });
     }
 
@@ -341,7 +343,7 @@ export class Synchronizer {
           repositoryId: repository.id,
           repositoryUpdateIds: undefined, // run all updates
           trigger: 'synchronization',
-        } satisfies TriggerUpdateJobsWorkflowOptions,
+        },
       ]);
     }
 

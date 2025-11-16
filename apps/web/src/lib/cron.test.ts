@@ -45,12 +45,14 @@ describe('cron', () => {
           ...(cronjob && { cronjob }),
         });
 
-        const actual = generateCron(schedule);
-        expect(actual).toBe(expected);
+        const result = generateCron(schedule, 'Etc/UTC');
+        expect(result.cron).toBe(expected);
+        expect(result.next).toBeInstanceOf(Date);
+        expect(result.next.getTime()).toBeGreaterThan(Date.now());
 
         // Validate that the generated cron expression is parseable
         expect(() => {
-          const cronParser = CronExpressionParser.parse(actual);
+          const cronParser = CronExpressionParser.parse(result.cron);
           // Verify we can get next execution time
           cronParser.next();
         }).not.toThrow();
@@ -70,22 +72,61 @@ describe('cron', () => {
         ];
 
         for (const { name, schedule } of testCases) {
-          const cronExpression = generateCron(createSchedule(schedule));
-          const parser = CronExpressionParser.parse(cronExpression);
+          const result = generateCron(createSchedule(schedule), 'Etc/UTC');
+          const parser = CronExpressionParser.parse(result.cron);
           const nextExecution = parser.next();
 
           // This is mainly for documentation/debugging purposes
-          console.log(`${name}: ${cronExpression} -> Next: ${nextExecution.toISOString()}`);
+          console.log(`${name}: ${result.cron} -> Next: ${nextExecution.toISOString()}`);
 
           expect(nextExecution.getTime()).toBeGreaterThan(Date.now());
         }
       });
     });
 
+    describe('timezone handling', () => {
+      it('generates same cron expression regardless of timezone', () => {
+        const schedule = createSchedule({
+          interval: 'daily',
+          time: '09:00',
+        });
+
+        const utcResult = generateCron(schedule, 'Etc/UTC');
+        const nyResult = generateCron(schedule, 'America/New_York');
+        const tokyoResult = generateCron(schedule, 'Asia/Tokyo');
+
+        // Cron expression should be the same
+        expect(utcResult.cron).toBe('0 9 * * 1-5');
+        expect(nyResult.cron).toBe(utcResult.cron);
+        expect(tokyoResult.cron).toBe(utcResult.cron);
+      });
+
+      it('calculates different next execution times for different timezones', () => {
+        const schedule = createSchedule({
+          interval: 'daily',
+          time: '12:00',
+        });
+
+        const utcResult = generateCron(schedule, 'Etc/UTC');
+        const nyResult = generateCron(schedule, 'America/New_York');
+        const tokyoResult = generateCron(schedule, 'Asia/Tokyo');
+
+        // All should be valid dates in the future
+        expect(utcResult.next).toBeInstanceOf(Date);
+        expect(nyResult.next).toBeInstanceOf(Date);
+        expect(tokyoResult.next).toBeInstanceOf(Date);
+
+        // But they should be different times due to timezone offset
+        expect(utcResult.next.getTime()).not.toBe(nyResult.next.getTime());
+        expect(utcResult.next.getTime()).not.toBe(tokyoResult.next.getTime());
+        expect(nyResult.next.getTime()).not.toBe(tokyoResult.next.getTime());
+      });
+    });
+
     describe('cron interval handling', () => {
       it('throws error when cronjob is missing', () => {
         const schedule = createSchedule({ interval: 'cron' });
-        expect(() => generateCron(schedule)).toThrow('Cron schedule is required for cron intervals');
+        expect(() => generateCron(schedule, 'Etc/UTC')).toThrow('Cron schedule is required for cron intervals');
       });
 
       it('returns cron expressions unchanged', () => {
@@ -93,7 +134,8 @@ describe('cron', () => {
 
         for (const cronjob of testCases) {
           const schedule = createSchedule({ interval: 'cron', cronjob });
-          expect(generateCron(schedule)).toBe(cronjob);
+          const result = generateCron(schedule, 'Etc/UTC');
+          expect(result.cron).toBe(cronjob);
         }
       });
     });
@@ -115,8 +157,8 @@ describe('cron', () => {
           day: dayName,
         });
 
-        const result = generateCron(schedule);
-        expect(result).toBe(`0 10 * * ${expectedNumber}`);
+        const result = generateCron(schedule, 'Etc/UTC');
+        expect(result.cron).toBe(`0 10 * * ${expectedNumber}`);
       });
     });
 
@@ -127,8 +169,8 @@ describe('cron', () => {
           time: '09:30',
         });
 
-        const result = generateCron(schedule);
-        expect(result).toBe('30 9 * * 1-5');
+        const result = generateCron(schedule, 'Etc/UTC');
+        expect(result.cron).toBe('30 9 * * 1-5');
       });
 
       it('handles midnight time', () => {
@@ -137,8 +179,8 @@ describe('cron', () => {
           time: '00:00',
         });
 
-        const result = generateCron(schedule);
-        expect(result).toBe('0 0 * * 1-5');
+        const result = generateCron(schedule, 'Etc/UTC');
+        expect(result.cron).toBe('0 0 * * 1-5');
       });
 
       it('handles end of day time', () => {
@@ -147,8 +189,8 @@ describe('cron', () => {
           time: '23:59',
         });
 
-        const result = generateCron(schedule);
-        expect(result).toBe('59 23 * * 1-5');
+        const result = generateCron(schedule, 'Etc/UTC');
+        expect(result.cron).toBe('59 23 * * 1-5');
       });
     });
 
@@ -159,7 +201,7 @@ describe('cron', () => {
           interval: 'unsupported',
         });
 
-        expect(() => generateCron(schedule)).toThrow('Unsupported interval: unsupported');
+        expect(() => generateCron(schedule, 'Etc/UTC')).toThrow('Unsupported interval: unsupported');
       });
     });
 
@@ -171,8 +213,8 @@ describe('cron', () => {
           day: 'saturday', // should be ignored
         });
 
-        const result = generateCron(schedule);
-        expect(result).toBe('30 23 * * 1-5'); // Always weekdays, ignores Saturday
+        const result = generateCron(schedule, 'Etc/UTC');
+        expect(result.cron).toBe('30 23 * * 1-5'); // Always weekdays, ignores Saturday
       });
 
       it('ignores day parameter for monthly interval', () => {
@@ -182,8 +224,8 @@ describe('cron', () => {
           day: 'saturday', // should be ignored
         });
 
-        const result = generateCron(schedule);
-        expect(result).toBe('30 17 1 * *'); // Always 1st day of month, ignores Saturday
+        const result = generateCron(schedule, 'Etc/UTC');
+        expect(result.cron).toBe('30 17 1 * *'); // Always 1st day of month, ignores Saturday
       });
 
       it('respects day parameter for weekly interval', () => {
@@ -193,8 +235,8 @@ describe('cron', () => {
           day: 'saturday',
         });
 
-        const result = generateCron(schedule);
-        expect(result).toBe('0 10 * * 6'); // Uses Saturday (6)
+        const result = generateCron(schedule, 'Etc/UTC');
+        expect(result.cron).toBe('0 10 * * 6'); // Uses Saturday (6)
       });
     });
   });

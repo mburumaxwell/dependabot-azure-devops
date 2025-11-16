@@ -317,19 +317,21 @@ model RepositoryUpdate {
   updatedAt             DateTime         @updatedAt
   repository            Repository       @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   repositoryId          String
+  enabled               Boolean
   ecosystem             String
   directory             String?
   directories           String[]
   /// Either the original directory or merger of directories.
   directoryKey          String
   /// Cron schedule for running this update
-  schedule              String
+  cron                  String
   timezone              String
   files                 String[]
   jobs                  UpdateJob[]
   latestUpdateJobId     String?
   latestUpdateJobStatus UpdateJobStatus?
   latestUpdateJobAt     DateTime?
+  nextUpdateJobAt       DateTime?
 
   @@unique([repositoryId, ecosystem, directoryKey])
   @@index([repositoryId])
@@ -338,7 +340,6 @@ model RepositoryUpdate {
 
 enum UpdateJobTrigger {
   scheduled
-  missed_schedule
   synchronization
   manual
 
@@ -362,7 +363,7 @@ enum UpdateJobPlatform {
 }
 
 model UpdateJob {
-  id        String            @id @map("_id")
+  id        BigInt            @id @map("_id")
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
   status    UpdateJobStatus
@@ -387,6 +388,8 @@ model UpdateJob {
   ecosystem       String
   directory       String?
   directories     String[]
+  configJson      String
+  credentialsJson String
   /// CPU units provisioned. e.g. 0.25
   resourcesCpu    Float?
   /// Memory provisioned in GB. e.g. 1.2
@@ -404,15 +407,15 @@ model UpdateJob {
   errorDetailJson String?
 }
 
+/// Secret used to authorize update jobs when they make API calls.
+/// This is stored separately to avoid accidental exposure.
 model UpdateJobSecret {
-  id    String    @id @map("_id")
-  jobId String
-  job   UpdateJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  /// Authorization key for the job, used by the updater to make API calls.
-  /// This should never be exposed to the client.
-  value String
+  id               BigInt    @id @map("_id")
+  job              UpdateJob @relation(fields: [id], references: [id], onDelete: Cascade)
+  jobToken         String
+  credentialsToken String
 
-  @@unique([jobId])
-  @@unique([value])
+  @@unique([jobToken])
+  @@unique([credentialsToken])
   @@map("update_job_secret")
 }

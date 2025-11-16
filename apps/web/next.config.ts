@@ -3,7 +3,6 @@ import type { NextConfig } from 'next';
 import { withWorkflow } from 'workflow/next';
 
 const config: NextConfig = {
-  output: 'standalone',
   reactStrictMode: true,
   typedRoutes: true,
   logging: { fetches: { fullUrl: true } }, // allows us to see cache behavior for fetches
@@ -50,8 +49,6 @@ const config: NextConfig = {
         destination: `https://www.paklo.app/:path*`,
         permanent: true,
       },
-      { source: '/legal', destination: '/legal/terms', permanent: false },
-      { source: '/dashboard/settings', destination: '/dashboard/settings/usage', permanent: false },
     ];
   },
 };

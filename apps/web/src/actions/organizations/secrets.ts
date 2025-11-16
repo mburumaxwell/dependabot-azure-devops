@@ -1,6 +1,6 @@
 'use server';
 
-import { generateId } from '@paklo/core/keygen';
+import { PakloId } from '@/lib/paklo-id';
 import { type OrganizationSecret, prisma } from '@/lib/prisma';
 import { type SecretValidationResult, validateSecretNameFormat } from '@/lib/secrets';
 
@@ -49,7 +49,7 @@ export async function createSecret({
 }): Promise<OrganizationSecretSafe> {
   const secret = await prisma.organizationSecret.create({
     data: {
-      id: generateId(),
+      id: PakloId.generate('organization_secret'),
       organizationId,
       name,
       value,

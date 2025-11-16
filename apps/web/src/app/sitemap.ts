@@ -37,7 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .map(async (doc): Promise<Route> => {
         return {
           url: new URL(doc.url, config.siteUrl).toString(),
-          lastModified: doc.data.git.date,
+          lastModified: doc.data.lastModified,
           changeFrequency: 'daily',
           priority: 0.5,
         };
