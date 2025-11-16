@@ -1,5 +1,5 @@
 import type { DependabotConfig, DependabotExperiments, DependabotJobConfig } from '@paklo/core/dependabot';
-import { generateKey } from '@paklo/core/keygen';
+import { Keygen } from '@paklo/core/keygen';
 import type { SecretMasker } from '../api-client';
 
 export type RunJobsResult = { id: string; success: boolean; message?: string; affectedPrs: number[] }[];
@@ -26,8 +26,8 @@ export abstract class LocalJobsRunner {
   protected makeTokens() {
     const { jobTokenOverride, credentialsTokenOverride } = this.opt;
     return {
-      jobToken: jobTokenOverride ?? generateKey(),
-      credentialsToken: credentialsTokenOverride ?? generateKey(),
+      jobToken: jobTokenOverride ?? Keygen.generate(),
+      credentialsToken: credentialsTokenOverride ?? Keygen.generate(),
     };
   }
 

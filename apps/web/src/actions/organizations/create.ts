@@ -1,6 +1,6 @@
 'use server';
 
-import { generateKey } from '@paklo/core/keygen';
+import { Keygen } from '@paklo/core/keygen';
 import { headers as requestHeaders } from 'next/headers';
 import { auth, type Organization } from '@/lib/auth';
 import { getOrganizationTierInfo } from '@/lib/organizations';
@@ -51,7 +51,7 @@ export async function createOrganizationWithCredential({
   });
 
   // generate webhook token
-  const webhooksToken = generateKey({ length: 32, encoding: 'base62' });
+  const webhooksToken = Keygen.generate({ length: 32, encoding: 'base62' });
 
   // create organization credential
   await prisma.organizationCredential.create({
