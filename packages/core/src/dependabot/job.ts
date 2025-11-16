@@ -161,7 +161,7 @@ export type DependabotCommand = z.infer<typeof DependabotCommandSchema>;
 // See: https://github.com/dependabot/cli/blob/main/internal/model/job.go
 //      https://github.com/dependabot/dependabot-core/blob/main/updater/lib/dependabot/job.rb
 export const DependabotJobConfigSchema = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   command: DependabotCommandSchema.optional(),
   'package-manager': DependabotPackageManagerSchema,
   'allowed-updates': DependabotAllowedSchema.array(),

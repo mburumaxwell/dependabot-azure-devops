@@ -32,7 +32,6 @@ export type DependabotSourceInfo = {
 };
 
 export type DependabotJobBuilderOutput = {
-  jobId: string;
   job: DependabotJobConfig;
   credentials: DependabotCredential[];
 };
@@ -98,7 +97,6 @@ export class DependabotJobBuilder {
   }): DependabotJobBuilderOutput {
     id ??= makeRandomJobId();
     return {
-      jobId: id,
       job: {
         id: id,
         command: command,
@@ -175,7 +173,6 @@ export class DependabotJobBuilder {
     }
 
     return {
-      jobId: id,
       job: {
         id: id,
         command: command,
