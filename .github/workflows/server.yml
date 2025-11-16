@@ -8,11 +8,15 @@ on:
     paths:
       - 'server/**'
       - '.github/workflows/server.yml'
+      - 'global.json'
+      - 'Directory.Build.props'
   pull_request:
     branches: [main]
     paths:
       - 'server/**'
       - '.github/workflows/server.yml'
+      - 'global.json'
+      - 'Directory.Build.props'
 
 permissions:
   contents: write # write required for ncipollo/release-action to create a release
