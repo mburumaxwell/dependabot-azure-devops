@@ -260,7 +260,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
         debug: false,
       });
 
-      let jobId: number | undefined;
+      let jobId: string | undefined;
       let job: DependabotJobConfig | undefined;
       let credentials: DependabotCredential[] | undefined;
       let jobToken: string;

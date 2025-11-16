@@ -56,7 +56,7 @@ export type DependabotTokenType = 'job' | 'credentials';
  * @param value - The authentication value (e.g., API key).
  * @returns A promise that resolves to a boolean indicating whether the authentication was successful.
  */
-type AuthenticatorFunc = (type: DependabotTokenType, id: number, value: string) => Promise<boolean>;
+type AuthenticatorFunc = (type: DependabotTokenType, id: string, value: string) => Promise<boolean>;
 
 /**
  * Handler function for processing dependabot requests.
@@ -64,7 +64,21 @@ type AuthenticatorFunc = (type: DependabotTokenType, id: number, value: string) 
  * @param request - The dependabot request to handle.
  * @returns A promise that resolves to the result of handling the request.
  */
-type HandlerFunc = (id: number, request: DependabotRequest) => Promise<boolean>;
+type HandlerFunc = (id: string, request: DependabotRequest) => Promise<boolean>;
+
+/**
+ * Function for getting a dependabot job config by ID.
+ * @param id - The ID of the dependabot job.
+ * @returns A promise that resolves to the dependabot job config, or undefined if not found.
+ */
+type GetJobFunc = (id: string) => Promise<DependabotJobConfig | undefined>;
+
+/**
+ * Function for getting dependabot credentials by job ID.
+ * @param id - The ID of the dependabot job.
+ * @returns A promise that resolves to an array of dependabot credentials, or undefined if not found.
+ */
+type GetCredentialsFunc = (id: string) => Promise<DependabotCredential[] | undefined>;
 
 export type CreateApiServerAppOptions = {
   /**
@@ -77,10 +91,10 @@ export type CreateApiServerAppOptions = {
   authenticate: AuthenticatorFunc;
 
   /** Function for getting a dependabot job by ID. */
-  getJob: (id: number) => Promise<DependabotJobConfig | undefined>;
+  getJob: GetJobFunc;
 
   /** Function for getting dependabot credentials by job ID. */
-  getCredentials: (id: number) => Promise<DependabotCredential[] | undefined>;
+  getCredentials: GetCredentialsFunc;
 
   /** Handler function for processing the operations. */
   handle: HandlerFunc;
@@ -124,7 +138,7 @@ export function createApiServerApp({
     app.on(
       method || 'post',
       `/:id/${type}`,
-      zValidator('param', z.object({ id: z.coerce.number() })),
+      zValidator('param', z.object({ id: z.string() })),
       async (context, next) => {
         /**
          * Do not authenticate in scenarios where the server is not using HTTPS because the
@@ -173,7 +187,7 @@ export function createApiServerApp({
   app.on(
     'get',
     '/:id/details',
-    zValidator('param', z.object({ id: z.coerce.number() })),
+    zValidator('param', z.object({ id: z.string() })),
     async (context, next) => {
       const { id } = context.req.valid('param');
       const value = context.req.header('Authorization');
@@ -192,7 +206,7 @@ export function createApiServerApp({
   app.on(
     'get',
     '/:id/credentials',
-    zValidator('param', z.object({ id: z.coerce.number() })),
+    zValidator('param', z.object({ id: z.string() })),
     async (context, next) => {
       const { id } = context.req.valid('param');
       const value = context.req.header('Authorization');

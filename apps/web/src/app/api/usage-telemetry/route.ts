@@ -3,6 +3,7 @@ import { UsageTelemetryRequestDataSchema } from '@paklo/core/usage';
 import { geolocation } from '@vercel/functions';
 import { Hono } from 'hono';
 import { handle } from 'hono/vercel';
+import { z } from 'zod';
 import { prisma, type UsageTelemetry } from '@/lib/prisma';
 import { fromExternalRegion } from '@/lib/regions';
 
@@ -10,10 +11,15 @@ export const dynamic = 'force-dynamic';
 
 const app = new Hono().basePath('/api/usage-telemetry');
 
-app.post('/', zValidator('json', UsageTelemetryRequestDataSchema), async (context) => {
+const RequestDataSchema = UsageTelemetryRequestDataSchema.omit({ id: true }).extend({
+  // this supports older versions that send numeric ids
+  // changed from number to string on 2025-11-16
+  id: z.string().or(z.number()),
+});
+app.post('/', zValidator('json', RequestDataSchema), async (context) => {
   const geo = geolocation(context.req.raw);
   const payload = context.req.valid('json');
-  const { id } = payload;
+  const id = String(payload.id);
 
   const values: Omit<UsageTelemetry, 'id'> = {
     country: geo?.country ?? null,
@@ -35,7 +41,7 @@ app.post('/', zValidator('json', UsageTelemetryRequestDataSchema), async (contex
 
   await prisma.usageTelemetry.upsert({
     where: { id },
-    create: { id: payload.id, ...values },
+    create: { id, ...values },
     update: { ...values },
   });
 

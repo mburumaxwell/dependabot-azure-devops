@@ -40,7 +40,7 @@ export class ProxyBuilder {
   ) {}
 
   async run(
-    jobId: number,
+    jobId: string,
     jobToken: string,
     dependabotApiUrl: string,
     credentials: DependabotCredential[],
@@ -181,7 +181,7 @@ export class ProxyBuilder {
   }
 
   private async createContainer(
-    jobId: number,
+    jobId: string,
     jobToken: string,
     dependabotApiUrl: string,
     containerName: string,

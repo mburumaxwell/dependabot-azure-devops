@@ -17,7 +17,7 @@ export class JobRunnerUpdaterError extends Error {}
 export type RunJobOptions = {
   dependabotApiUrl: string;
   dependabotApiDockerUrl?: string;
-  jobId: number;
+  jobId: string;
   jobToken: string;
   credentialsToken: string;
   updaterImage?: string;

@@ -36,7 +36,7 @@ export const UsageTelemetryRequestDataSchema = z.object({
   owner: z.url(),
   project: z.url().optional(), // was added later hence optional for backward compatibility
   'package-manager': DependabotPackageManagerSchema,
-  id: z.number(), // job identifier, for correlation
+  id: z.string(), // job identifier, for correlation
   started: z.coerce.date(),
   duration: z.number().min(0), // in milliseconds
   success: z.boolean(),

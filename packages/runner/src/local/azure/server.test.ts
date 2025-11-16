@@ -40,7 +40,7 @@ describe('AzureLocalDependabotServer', () => {
 
     options = {
       url: extractRepositoryUrl({
-        organisationUrl: 'http://localhost:8081/',
+        organisationUrl: 'http://localhost:8081/contoso/',
         project: 'testproject',
         repository: 'test-repo',
       }),
@@ -66,9 +66,9 @@ describe('AzureLocalDependabotServer', () => {
     beforeEach(() => {
       vi.clearAllMocks();
       jobBuilderOutput = {
-        jobId: 1,
+        jobId: '1',
         job: {
-          id: 1,
+          id: '1',
           'package-manager': 'npm_and_yarn',
           source: {
             hostname: 'localhost:8081',
@@ -105,7 +105,7 @@ describe('AzureLocalDependabotServer', () => {
 
       // Mock the job and update methods
       server.add({
-        id: 1,
+        id: '1',
         update,
         job: jobBuilderOutput.job,
         jobToken: 'test-token',
@@ -130,7 +130,7 @@ describe('AzureLocalDependabotServer', () => {
       options.dryRun = true;
       server = new AzureLocalDependabotServer(options);
       server.add({
-        id: 1,
+        id: '1',
         update,
         job: jobBuilderOutput.job,
         jobToken: 'test-token',
@@ -168,7 +168,7 @@ describe('AzureLocalDependabotServer', () => {
 
       server = new AzureLocalDependabotServer(options);
       server.add({
-        id: 1,
+        id: '1',
         update,
         job: jobBuilderOutput.job,
         jobToken: 'test-token',
@@ -196,7 +196,7 @@ describe('AzureLocalDependabotServer', () => {
       options.autoApprove = true;
       server = new AzureLocalDependabotServer(options);
       server.add({
-        id: 1,
+        id: '1',
         update,
         job: jobBuilderOutput.job,
         jobToken: 'test-token',
@@ -229,7 +229,7 @@ describe('AzureLocalDependabotServer', () => {
       options.dryRun = true;
       server = new AzureLocalDependabotServer(options);
       server.add({
-        id: 1,
+        id: '1',
         update,
         job: jobBuilderOutput.job,
         jobToken: 'test-token',
@@ -287,7 +287,7 @@ describe('AzureLocalDependabotServer', () => {
 
       server = new AzureLocalDependabotServer(options);
       server.add({
-        id: 1,
+        id: '1',
         update,
         job: jobBuilderOutput.job,
         jobToken: 'test-token',
@@ -319,7 +319,7 @@ describe('AzureLocalDependabotServer', () => {
       options.dryRun = true;
       server = new AzureLocalDependabotServer(options);
       server.add({
-        id: 1,
+        id: '1',
         update,
         job: jobBuilderOutput.job,
         jobToken: 'test-token',
@@ -361,7 +361,7 @@ describe('AzureLocalDependabotServer', () => {
 
       server = new AzureLocalDependabotServer(options);
       server.add({
-        id: 1,
+        id: '1',
         update,
         job: jobBuilderOutput.job,
         jobToken: 'test-token',

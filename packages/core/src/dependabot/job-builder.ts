@@ -32,7 +32,7 @@ export type DependabotSourceInfo = {
 };
 
 export type DependabotJobBuilderOutput = {
-  jobId: number;
+  jobId: string;
   job: DependabotJobConfig;
   credentials: DependabotCredential[];
 };
@@ -93,7 +93,7 @@ export class DependabotJobBuilder {
     id,
     command,
   }: {
-    id?: number;
+    id?: string;
     command: DependabotJobConfig['command'];
   }): DependabotJobBuilderOutput {
     id ??= makeRandomJobId();
@@ -140,7 +140,7 @@ export class DependabotJobBuilder {
     pullRequestToUpdate,
     securityVulnerabilities,
   }: {
-    id?: number;
+    id?: string;
     command: DependabotJobConfig['command'];
     dependencyNamesToUpdate?: string[];
     existingPullRequests: (DependabotExistingPR[] | DependabotExistingGroupPR)[];
@@ -448,8 +448,8 @@ export function mapCredentials({
   return credentials;
 }
 
-export function makeRandomJobId(): number {
+export function makeRandomJobId(): string {
   const array = new Uint32Array(1);
   crypto.getRandomValues(array);
-  return array[0]! % 10000000000; // Limit to 10 digits to match GitHub's job IDs
+  return `${array[0]! % 10000000000}`; // Limit to 10 digits to match GitHub's job IDs
 }

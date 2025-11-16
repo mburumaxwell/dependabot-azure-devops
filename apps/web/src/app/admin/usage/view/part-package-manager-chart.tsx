@@ -3,17 +3,7 @@
 import { useMemo } from 'react';
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Card } from '@/components/ui/card';
-
-interface UsageTelemetry {
-  id: bigint;
-  version: string;
-  provider: string;
-  owner: string;
-  packageManager: string;
-  started: Date;
-  duration: number;
-  success: boolean;
-}
+import type { UsageTelemetry } from '@/lib/prisma';
 
 interface PackageManagerChartProps {
   data: UsageTelemetry[];

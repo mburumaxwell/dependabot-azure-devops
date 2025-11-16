@@ -4,17 +4,7 @@ import { useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Card } from '@/components/ui/card';
 import { isHourlyRange, type TimeRange } from '@/lib/aggregation';
-
-interface UsageTelemetry {
-  id: bigint;
-  version: string;
-  provider: string;
-  owner: string;
-  packageManager: string;
-  started: Date;
-  duration: number;
-  success: boolean;
-}
+import type { UsageTelemetry } from '@/lib/prisma';
 
 interface RunsChartProps {
   data: UsageTelemetry[];

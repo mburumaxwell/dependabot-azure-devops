@@ -5,17 +5,7 @@ import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-
-interface UsageTelemetry {
-  id: bigint;
-  version: string;
-  provider: string;
-  owner: string;
-  packageManager: string;
-  started: Date;
-  duration: number;
-  success: boolean;
-}
+import type { UsageTelemetry } from '@/lib/prisma';
 
 interface TelemetryTableProps {
   data: UsageTelemetry[];

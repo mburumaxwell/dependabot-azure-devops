@@ -2,7 +2,7 @@ import type { DependabotConfig, DependabotExperiments, DependabotJobConfig } fro
 import { generateKey } from '@paklo/core/keygen';
 import type { SecretMasker } from '../api-client';
 
-export type RunJobsResult = { id: number; success: boolean; message?: string; affectedPrs: number[] }[];
+export type RunJobsResult = { id: string; success: boolean; message?: string; affectedPrs: number[] }[];
 
 export type LocalJobsRunnerOptions = {
   jobTokenOverride?: string;
@@ -32,6 +32,6 @@ export abstract class LocalJobsRunner {
   }
 
   public run(): Promise<RunJobsResult> {
-    return Promise.resolve([{ id: -1, success: false, affectedPrs: [] }]);
+    return Promise.resolve([{ id: '-1', success: false, affectedPrs: [] }]);
   }
 }

@@ -34,7 +34,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
     this.options = options;
   }
 
-  protected override async handle(id: number, request: DependabotRequest): Promise<boolean> {
+  protected override async handle(id: string, request: DependabotRequest): Promise<boolean> {
     await super.handle(id, request); // common logic
 
     const { options, affectedPullRequestIds } = this;

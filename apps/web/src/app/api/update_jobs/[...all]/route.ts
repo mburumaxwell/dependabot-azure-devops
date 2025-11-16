@@ -14,10 +14,7 @@ import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-// TODO: change the packages to handle string instead of number
-// We can't use bigint since it cannot be serialized to JSON
-
-async function authenticate(type: DependabotTokenType, id: number, value: string): Promise<boolean> {
+async function authenticate(type: DependabotTokenType, id: string, value: string): Promise<boolean> {
   // if no secret found, authentication fails
   const secret = await prisma.updateJobSecret.findUnique({ where: { id } });
   if (!secret) return false;
@@ -26,7 +23,7 @@ async function authenticate(type: DependabotTokenType, id: number, value: string
   return token === value;
 }
 
-async function getJob(id: number): Promise<DependabotJobConfig | undefined> {
+async function getJob(id: string): Promise<DependabotJobConfig | undefined> {
   const job = await prisma.updateJob.findUnique({ where: { id } });
   if (!job) return undefined;
 
@@ -43,7 +40,7 @@ async function getJob(id: number): Promise<DependabotJobConfig | undefined> {
   return data;
 }
 
-async function getCredentials(id: number): Promise<DependabotCredential[] | undefined> {
+async function getCredentials(id: string): Promise<DependabotCredential[] | undefined> {
   const job = await prisma.updateJob.findUnique({ where: { id } });
   if (!job) return undefined;
 
@@ -60,7 +57,7 @@ async function getCredentials(id: number): Promise<DependabotCredential[] | unde
   return data;
 }
 
-function handleRequest(id: number, request: DependabotRequest): Promise<boolean> {
+function handleRequest(id: string, request: DependabotRequest): Promise<boolean> {
   return Promise.resolve(true); // TODO: implement actual logic
 }
 

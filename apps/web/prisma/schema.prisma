@@ -15,7 +15,7 @@ datasource db {
 }
 
 model UsageTelemetry {
-  id              BigInt   @id @map("_id")
+  id              String   @id @map("_id")
   country         String?
   region          String?
   hostPlatform    String
@@ -363,7 +363,7 @@ enum UpdateJobPlatform {
 }
 
 model UpdateJob {
-  id        BigInt            @id @map("_id")
+  id        String            @id @map("_id")
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
   status    UpdateJobStatus
@@ -410,7 +410,7 @@ model UpdateJob {
 /// Secret used to authorize update jobs when they make API calls.
 /// This is stored separately to avoid accidental exposure.
 model UpdateJobSecret {
-  id               BigInt    @id @map("_id")
+  id               String    @id @map("_id")
   job              UpdateJob @relation(fields: [id], references: [id], onDelete: Cascade)
   jobToken         String
   credentialsToken String
