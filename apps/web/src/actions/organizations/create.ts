@@ -1,5 +1,6 @@
 'use server';
 
+import { extractOrganizationUrl } from '@paklo/core/azure';
 import { Keygen } from '@paklo/core/keygen';
 import { headers as requestHeaders } from 'next/headers';
 import { auth, type Organization } from '@/lib/auth';
@@ -16,14 +17,10 @@ export type OrganizationCreateOptions = {
   region: RegionCode;
 };
 
-export async function createOrganizationWithCredential({
-  name,
-  slug,
-  type,
-  url,
-  token,
-  region,
-}: OrganizationCreateOptions): Promise<{ data?: Organization; error?: { message: string } }> {
+export async function createOrganizationWithCredential(
+  options: OrganizationCreateOptions,
+): Promise<{ data?: Organization; error?: { message: string } }> {
+  const { name, slug, type, url, token, region } = options;
   const headers = await requestHeaders();
   const organization = await auth.api.createOrganization({
     headers,
@@ -34,6 +31,7 @@ export async function createOrganizationWithCredential({
       url,
       region,
       tier: 'free', // default to free tier
+      ...getProviderStuff(options),
 
       // change current active organization to the new one
       keepCurrentActiveOrganization: false,
@@ -61,4 +59,23 @@ export async function createOrganizationWithCredential({
   // no billing to be created for free tier
 
   return { data: organization };
+}
+
+type GetProviderStuffResult = Pick<Organization, 'providerHostname' | 'providerApiEndpoint'>;
+function getProviderStuff({ type, url }: OrganizationCreateOptions): GetProviderStuffResult {
+  let hostname: string;
+  let apiEndpoint: string;
+
+  switch (type) {
+    case 'azure': {
+      const extractedUrl = extractOrganizationUrl({ organisationUrl: url });
+      hostname = extractedUrl.hostname;
+      apiEndpoint = extractedUrl['api-endpoint'];
+      break;
+    }
+    default:
+      throw new Error(`Unsupported organization type: ${type}`);
+  }
+
+  return { providerHostname: hostname, providerApiEndpoint: apiEndpoint };
 }

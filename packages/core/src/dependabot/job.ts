@@ -18,7 +18,7 @@ export const DependabotProxyConfigSchema = z.object({
 });
 export type DependabotProxyConfig = z.infer<typeof DependabotProxyConfigSchema>;
 
-export const DependabotSourceProviderSchema = z.enum(['azure']);
+export const DependabotSourceProviderSchema = z.enum(['azure', 'gitlab', 'bitbucket']);
 export type DependabotSourceProvider = z.infer<typeof DependabotSourceProviderSchema>;
 
 export const DependabotSourceSchema = z.object({

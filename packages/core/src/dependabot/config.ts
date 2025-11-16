@@ -1,6 +1,7 @@
 import * as yaml from 'js-yaml';
 import { z } from 'zod';
 
+import { makeDirectoryKey } from './directory-key';
 import { convertPlaceholder, type VariableFinderFn } from './placeholder';
 
 export const DependabotRegistrySchema = z
@@ -315,7 +316,7 @@ export const DependabotConfigSchema = z
     // ensure there is no update with the same package-ecosystem and directory/directories combination
     const seen = new Set<string>();
     for (const update of value.updates) {
-      const key = `${update['package-ecosystem']}:${update.directory ?? update.directories?.join(',')}`;
+      const key = makeDirectoryKey(update);
       if (seen.has(key)) {
         addIssue(
           `Duplicate update configuration found for '${update['package-ecosystem']}' and directory: '${update.directory ?? update.directories?.join(',')}'`,

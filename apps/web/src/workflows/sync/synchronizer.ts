@@ -1,4 +1,4 @@
-import { type DependabotConfig, parseDependabotConfig } from '@paklo/core/dependabot';
+import { type DependabotConfig, makeDirectoryKey, parseDependabotConfig } from '@paklo/core/dependabot';
 import { logger } from '@paklo/core/logger';
 import { start } from 'workflow/api';
 import { generateCron } from '@/lib/cron';
@@ -253,6 +253,7 @@ export class Synchronizer {
       config = await parseDependabotConfig({
         configContents: providerInfo.content!,
         configPath: providerInfo.path!,
+        // no variable replacement as this happens during job creation
         variableFinder: () => undefined,
       });
       syncError = undefined;
@@ -274,36 +275,39 @@ export class Synchronizer {
         url: providerInfo.url,
         latestCommit: commitId,
         configFileContents: providerInfo.content,
-        configJson: config ? JSON.stringify(config) : undefined,
-        registriesJson: config ? JSON.stringify(config.registries) : undefined,
+        configPath: providerInfo.path,
         synchronizationStatus: syncError ? 'failed' : 'success',
         synchronizationError: syncError,
         synchronizedAt: new Date(),
       },
     });
 
-    // if there is no valid config, we stop here
-    if (!config) return { updated: true };
+    // if there is no valid config, we disable existing updates
+    if (!config) {
+      // disable existing updates since we are not deleting them
+      await prisma.repositoryUpdate.updateMany({
+        where: { repositoryId: repository.id },
+        data: { enabled: false },
+      });
+
+      // no further processing
+      return { updated: true };
+    }
 
     // get the updates for this repository and check which need to be removed and which added/updated
-    function makeKey(u: { ecosystem: string; directory?: string | null; directories?: string[] }) {
-      return `${u.ecosystem}::${u.directory ?? u.directories!.join(',')}`;
-    }
     const updates = config.updates;
-    const updatesMap = Object.fromEntries(
-      updates.map((u) => [makeKey({ ...u, ecosystem: u['package-ecosystem'] }), u]),
-    );
+    const updatesMap = Object.fromEntries(updates.map((u) => [makeDirectoryKey(u), u]));
     const repositoryUpdates = await prisma.repositoryUpdate.findMany({
       where: { repositoryId: repository.id },
     });
-    const updatesToDelete = repositoryUpdates.filter((u) => !updatesMap[makeKey(u)]);
+    const updatesToDelete = repositoryUpdates.filter((u) => !updatesMap[makeDirectoryKey(u)]);
     const { count: deleted } = await prisma.repositoryUpdate.deleteMany({
       where: { id: { in: updatesToDelete.map((u) => u.id) } },
     });
     logger.debug(`Deleted ${deleted} updates in repository ${repository.id} that have been removed.`);
     const updatesToUpsert = updates;
     for (const update of updatesToUpsert) {
-      const directoryKey = makeKey({ ...update, ecosystem: update['package-ecosystem'] });
+      const directoryKey = makeDirectoryKey(update);
       const timezone = update.schedule?.timezone || 'UTC'; // TODO: remove nullable and default once schedule is enforced
       const { cron, next: nextUpdateJobAt } = generateCron(update.schedule!, timezone); // TODO: remove assertion once schedule is enforced
       await prisma.repositoryUpdate.upsert({
@@ -330,7 +334,7 @@ export class Synchronizer {
           latestUpdateJobId: null,
           nextUpdateJobAt,
         },
-        update: { cron, timezone, nextUpdateJobAt },
+        update: { enabled: true, cron, timezone, nextUpdateJobAt },
       });
     }
 

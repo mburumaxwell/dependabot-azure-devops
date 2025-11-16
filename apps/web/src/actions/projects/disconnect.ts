@@ -3,7 +3,8 @@
 import { prisma } from '@/lib/prisma';
 
 export async function disconnectProject({ organizationId, projectId }: { organizationId: string; projectId: string }) {
-  // Delete the project if it belongs to the organization
+  // delete the project if it belongs to the organization
+  // cascading deletes will handle related entities
   await prisma.project.deleteMany({
     where: {
       organizationId, // must belong to the organization
@@ -11,12 +12,6 @@ export async function disconnectProject({ organizationId, projectId }: { organiz
     },
   });
 
-  // cascading deletes should be automatic but with MongoDB we need to do it manually
-  await prisma.repository.deleteMany({
-    where: {
-      projectId,
-    },
-  });
-
   // jobs should not be deleted because of billing and analysis purposes
+  // they are modelled with onDelete: NoAction in schema.prisma
 }

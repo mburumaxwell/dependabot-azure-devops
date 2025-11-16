@@ -13,7 +13,6 @@
     "STRIPE_SECRET_KEY",
     "STRIPE_WEBHOOK_SECRET"
   ],
-  "globalPassThroughEnv": ["GOPATH"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

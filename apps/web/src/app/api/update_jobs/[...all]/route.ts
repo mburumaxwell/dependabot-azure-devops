@@ -57,8 +57,21 @@ async function getCredentials(id: string): Promise<DependabotCredential[] | unde
   return data;
 }
 
-function handleRequest(id: string, request: DependabotRequest): Promise<boolean> {
-  return Promise.resolve(true); // TODO: implement actual logic
+async function handleRequest(id: string, request: DependabotRequest): Promise<boolean> {
+  const job = await prisma.updateJob.findUnique({ where: { id } });
+  if (!job) return false;
+
+  // fetch related entities in parallel
+  const [repositoryUpdate, repository, project, organization] = await Promise.all([
+    prisma.repositoryUpdate.findUnique({ where: { id: job.repositoryUpdateId } }),
+    prisma.repository.findUnique({ where: { id: job.repositoryId } }),
+    prisma.project.findUnique({ where: { id: job.projectId } }),
+    prisma.organization.findUnique({ where: { id: job.organizationId } }),
+  ]);
+  if (!repositoryUpdate || !repository || !project || !organization) return false;
+
+  // TODO: implement actual logic
+  return true;
 }
 
 const app = createApiServerApp({
