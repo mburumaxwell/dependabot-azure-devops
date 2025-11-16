@@ -1,8 +1,8 @@
 import { extractRepositoryUrl, getDependabotConfig } from '@paklo/core/azure';
 import type { DependabotConfig } from '@paklo/core/dependabot';
+import { logger } from '@paklo/core/logger';
 import { Command } from 'commander';
 import { z } from 'zod/v4';
-import { logger } from '@/logger';
 import { type HandlerOptions, handlerOptions } from './base';
 
 const schema = z.object({

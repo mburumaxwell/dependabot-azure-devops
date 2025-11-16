@@ -10,7 +10,7 @@ import {
   type DependabotUpdate,
   type GitAuthor,
 } from '@paklo/core/dependabot';
-import { logger } from '@/logger';
+import { logger } from '@paklo/core/logger';
 
 export type LocalDependabotServerAddOptions = {
   /** The ID of the dependabot job. */

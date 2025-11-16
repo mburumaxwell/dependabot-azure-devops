@@ -10,7 +10,7 @@ import {
   parsePullRequestProperties,
 } from '@paklo/core/azure';
 import { type DependabotRequest, getBranchNameForUpdate } from '@paklo/core/dependabot';
-import { logger } from '@/logger';
+import { logger } from '@paklo/core/logger';
 import { LocalDependabotServer, type LocalDependabotServerOptions } from '../server';
 
 export type AzureLocalDependabotServerOptions = LocalDependabotServerOptions & {

@@ -2,8 +2,8 @@ import crypto from 'node:crypto';
 import os from 'node:os';
 
 import { InnerApiClient } from '@paklo/core/http';
+import { logger } from '@paklo/core/logger';
 import type { UsageTelemetryRequestData } from '@paklo/core/usage';
-import { logger } from '@/logger';
 import packageJson from '../package.json';
 import { ApiClient, CredentialFetchingError, type SecretMasker } from './api-client';
 import { PROXY_IMAGE_NAME, updaterImageName } from './docker-tags';

@@ -13,7 +13,7 @@ import {
   isErrorTemporaryFailure,
   type ResourceResponse,
 } from '@paklo/core/http';
-import { logger } from '@/logger';
+import { logger } from '@paklo/core/logger';
 import type { JobParameters } from './params';
 
 export class JobDetailsFetchingError extends Error {}

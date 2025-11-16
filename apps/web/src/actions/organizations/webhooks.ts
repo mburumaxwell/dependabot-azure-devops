@@ -1,6 +1,6 @@
 'use server';
 
-import { logger } from '@/lib/logger';
+import { logger } from '@paklo/core/logger';
 import { getWebhooksUrl } from '@/lib/organizations';
 import { type OrganizationType, prisma } from '@/lib/prisma';
 

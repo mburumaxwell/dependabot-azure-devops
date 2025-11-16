@@ -1,7 +1,7 @@
 import { type DependabotConfig, parseDependabotConfig } from '@paklo/core/dependabot';
+import { logger } from '@paklo/core/logger';
 import { start } from 'workflow/api';
 import { generateCron } from '@/lib/cron';
-import { logger } from '@/lib/logger';
 import { PakloId } from '@/lib/paklo-id';
 import { type Organization, type OrganizationCredential, type Project, prisma, type Repository } from '@/lib/prisma';
 import { triggerUpdateJobs } from '@/workflows/jobs';

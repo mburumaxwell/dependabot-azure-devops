@@ -1,7 +1,6 @@
 import { Readable } from 'node:stream';
+import { logger } from '@paklo/core/logger';
 import Docker from 'dockerode';
-
-import { logger } from '@/logger';
 
 const MAX_RETRIES = 5; // Maximum number of retries
 const INITIAL_DELAY_MS = 2000; // Initial delay in milliseconds for backoff

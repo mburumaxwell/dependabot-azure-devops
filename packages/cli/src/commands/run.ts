@@ -7,10 +7,10 @@ import {
   DEPENDABOT_DEFAULT_AUTHOR_NAME,
   parseExperiments,
 } from '@paklo/core/dependabot';
+import { logger } from '@paklo/core/logger';
 import { AzureLocalJobsRunner, type AzureLocalJobsRunnerOptions } from '@paklo/runner/local/azure';
 import { Command, Option } from 'commander';
 import { z } from 'zod/v4';
-import { logger } from '@/logger';
 import { type HandlerOptions, handlerOptions } from './base';
 
 const MERGE_STRATEGIES = ['squash', 'rebase', 'merge'] as const;

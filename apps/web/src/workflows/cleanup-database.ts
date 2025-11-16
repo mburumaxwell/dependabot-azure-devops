@@ -1,4 +1,4 @@
-import { logger } from '@/lib/logger';
+import { logger } from '@paklo/core/logger';
 import { prisma } from '@/lib/prisma';
 
 /**
