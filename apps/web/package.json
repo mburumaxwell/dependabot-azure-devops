@@ -53,7 +53,7 @@
     "@radix-ui/react-slot": "1.2.4",
     "@radix-ui/react-tabs": "1.1.13",
     "@radix-ui/react-tooltip": "1.2.8",
-    "@react-email/components": "1.0.0",
+    "@react-email/components": "1.0.1",
     "@react-email/render": "2.0.0",
     "@sapphire/snowflake": "3.5.5",
     "@vercel/analytics": "1.5.0",
@@ -86,7 +86,7 @@
     "zod": "4.1.12"
   },
   "devDependencies": {
-    "@react-email/preview-server": "5.0.1",
+    "@react-email/preview-server": "5.0.4",
     "@tailwindcss/postcss": "4.1.17",
     "@types/mdx": "2.0.13",
     "@types/node": "24.10.0",
@@ -97,7 +97,7 @@
     "postcss": "8.5.6",
     "prettier": "3.6.2",
     "prisma": "6.19.0",
-    "react-email": "5.0.1",
+    "react-email": "5.0.4",
     "remark-emoji": "5.0.2",
     "shadcn": "3.5.0",
     "tailwindcss": "4.1.17",
