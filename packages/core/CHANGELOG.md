@@ -1,5 +1,22 @@
 # @paklo/core
 
+## 0.6.0
+
+### Minor Changes
+
+- 3dd9d68: Change job ID type from number to string.
+  This is so as to support all possibilities (bigint/snowflake, ksuid, autoincrement, etc)
+- b0a88f9: Bump dependabot-action from `3ae7b48` to `7f78151`.
+  - Add support for `opentofu`
+  - Bump github/dependabot-update-job-proxy/dependabot-update-job-proxy from v2.0.20251023141128 to v2.0.20251113195050
+- bb6d72b: Make `DependabotJobConfig.id` required hence remove `jobId` from `DependabotJobBuilderOutput` and related references
+- a6af8fd: Replace `generateKey(...)` with `Keygen` class to avoid conflicts with crypto method
+
+### Patch Changes
+
+- b6d749c: Import from `zod` instead of `zod/v4`
+- 4dcf614: Add `bazel` to package ecosystems/managers, only allowed when `enable-beta-ecosystems` is set to `true`.
+
 ## 0.5.0
 
 ### Minor Changes

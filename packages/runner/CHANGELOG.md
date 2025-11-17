@@ -1,5 +1,24 @@
 # @paklo/runner
 
+## 0.3.0
+
+### Minor Changes
+
+- 3dd9d68: Change job ID type from number to string.
+  This is so as to support all possibilities (bigint/snowflake, ksuid, autoincrement, etc)
+- bb6d72b: Make `DependabotJobConfig.id` required hence remove `jobId` from `DependabotJobBuilderOutput` and related references
+
+### Patch Changes
+
+- a6af8fd: Replace `generateKey(...)` with `Keygen` class to avoid conflicts with crypto method
+- Updated dependencies [3dd9d68]
+- Updated dependencies [b0a88f9]
+- Updated dependencies [b6d749c]
+- Updated dependencies [bb6d72b]
+- Updated dependencies [4dcf614]
+- Updated dependencies [a6af8fd]
+  - @paklo/core@0.6.0
+
 ## 0.2.3
 
 ### Patch Changes

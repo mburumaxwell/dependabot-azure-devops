@@ -1,5 +1,21 @@
 # paklo
 
+## 0.11.6
+
+### Patch Changes
+
+- 3dd9d68: Change job ID type from number to string.
+  This is so as to support all possibilities (bigint/snowflake, ksuid, autoincrement, etc)
+- b6d749c: Import from `zod` instead of `zod/v4`
+- Updated dependencies [3dd9d68]
+- Updated dependencies [b0a88f9]
+- Updated dependencies [b6d749c]
+- Updated dependencies [bb6d72b]
+- Updated dependencies [4dcf614]
+- Updated dependencies [a6af8fd]
+  - @paklo/runner@0.3.0
+  - @paklo/core@0.6.0
+
 ## 0.11.5
 
 ### Patch Changes
