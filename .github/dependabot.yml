@@ -105,10 +105,15 @@ updates:
         patterns:
           - '@types/js-yaml'
           - 'js-yaml'
-      next:
+      next-and-react:
         patterns:
           - '@next/*'
+          - '@types/react'
+          - '@types/react-dom'
           - 'next'
+          - 'react'
+          - 'react-dom'
+          - 'react-router-dom'
       node-forge:
         patterns:
           - '@types/node-forge'
@@ -125,13 +130,6 @@ updates:
           - '@prisma/*'
       radix-ui:
         patterns: ['@radix-ui*', 'radix-*']
-      react:
-        patterns:
-          - '@types/react'
-          - '@types/react-dom'
-          - 'react'
-          - 'react-dom'
-          - 'react-router-dom'
       react-email:
         patterns:
           - '@react-email/*'
