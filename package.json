@@ -35,7 +35,7 @@
     "turbo": "2.6.1",
     "typescript": "5.9.3",
     "vite-tsconfig-paths": "5.1.4",
-    "vitest": "4.0.9"
+    "vitest": "4.0.10"
   },
   "engines": {
     "node": ">=22"
