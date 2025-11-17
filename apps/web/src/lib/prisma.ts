@@ -11,6 +11,7 @@ export type {
   Invitation,
   Member,
   Organization,
+  OrganizationBillingInterval,
   OrganizationCredential,
   OrganizationSecret,
   OrganizationTier,

@@ -6,14 +6,28 @@ param location string = resourceGroup().location
 @description('Name of the resources.')
 param name string = 'paklo'
 
+var vercelEnvironments = ['production', 'preview']
 var administratorLoginPasswordMongo = '${skip(uniqueString(resourceGroup().id), 5)}^${uniqueString('mongo-password', resourceGroup().id)}' // e.g. abcde%zecnx476et7xm (19 characters)
+var fileShares = ['jobs']
 
 /* Managed Identity */
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' = {
   name: name
   location: location
-  #disable-next-line BCP073
-  properties: { isolationScope: 'None' } // 'None' is the default, but this is required to avoid a bug in TTK
+  properties: { isolationScope: 'None' }
+
+  // https://vercel.com/docs/oidc/azure
+  @batchSize(1) // anything more than 1 causes an error
+  resource vercelCredentials 'federatedIdentityCredentials' = [
+    for env in vercelEnvironments: {
+      name: 'vercel-mburumaxwell-${env}'
+      properties: {
+        audiences: ['https://vercel.com/mburumaxwell']
+        issuer: 'https://oidc.vercel.com/mburumaxwell'
+        subject: 'owner:mburumaxwell:project:paklo:environment:${env}'
+      }
+    }
+  ]
 }
 
 /* Key Vault */
@@ -34,6 +48,36 @@ resource keyVault 'Microsoft.KeyVault/vaults@2025-05-01' = {
   resource mongoPasswordSecret 'secrets' = {
     name: 'mongo-password'
     properties: { contentType: 'text/plain', value: administratorLoginPasswordMongo }
+  }
+}
+
+/* Storage Account */
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
+  name: name
+  location: location
+  kind: 'StorageV2'
+  sku: { name: 'Standard_LRS' }
+  properties: {
+    accessTier: 'Hot'
+    supportsHttpsTrafficOnly: true
+    allowBlobPublicAccess: false
+    networkAcls: {
+      bypass: 'AzureServices'
+      defaultAction: 'Allow'
+    }
+    minimumTlsVersion: 'TLS1_2'
+  }
+
+  resource fileServices 'fileServices' existing = {
+    name: 'default'
+
+    resource shares 'shares' = [for fs in fileShares: {
+      name: fs
+      properties: {
+        accessTier: 'TransactionOptimized'
+        shareQuota: 1
+      }
+    }]
   }
 }
 
@@ -84,6 +128,7 @@ resource appConfiguration 'Microsoft.AppConfiguration/configurationStores@2024-0
     dataPlaneProxy: { authenticationMode: 'Local', privateLinkDelegation: 'Disabled' }
     softDeleteRetentionInDays: 0 /* Free does not support this */
     defaultKeyValueRevisionRetentionPeriodInSeconds: 604800 /* 7 days */
+    publicNetworkAccess: 'Enabled'
   }
   sku: { name: 'free' }
   identity: {
@@ -92,35 +137,32 @@ resource appConfiguration 'Microsoft.AppConfiguration/configurationStores@2024-0
   }
 }
 
-// /* AppService Plan */
-// resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {
-//   name: name
-//   location: location
-//   kind: 'linux'
-//   properties: {
-//     reserved: true
-//     zoneRedundant: false // only for Premium tiers
-//   }
-//   sku: { name: 'F1' }
-// }
+/* Container App Environment */
+resource appEnvironment 'Microsoft.App/managedEnvironments@2025-01-01' = {
+  name: name
+  location: location
+  properties: {
+    peerAuthentication: { mtls: { enabled: false } }
+    peerTrafficConfiguration: { encryption: { enabled: false } }
+    workloadProfiles: [{ name: 'Consumption', workloadProfileType: 'Consumption' }]
+  }
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: { '${managedIdentity.id}': {} }
+  }
 
-// /* Container App Environment */
-// resource appEnvironment 'Microsoft.App/managedEnvironments@2025-01-01' = {
-//   name: name
-//   location: location
-//   properties: {
-//     appLogsConfiguration: {
-//       destination: 'log-analytics'
-//       logAnalyticsConfiguration: {
-//         customerId: logAnalyticsWorkspace.properties.customerId
-//         sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
-//       }
-//     }
-//     peerAuthentication: { mtls: { enabled: false } }
-//     peerTrafficConfiguration: { encryption: { enabled: false } }
-//     workloadProfiles: [{ name: 'Consumption', workloadProfileType: 'Consumption' }]
-//   }
-// }
+  resource storages 'storages' = [for fs in fileShares: {
+    name: fs
+    properties: {
+      azureFile: {
+        accountName: storageAccount.name
+        accountKey: storageAccount.listKeys().keys[0].value
+        shareName: fs
+        accessMode: 'ReadOnly'
+      }
+    }
+  }]
+}
 
 /* Application Insights */
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
@@ -130,30 +172,12 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   properties: { Application_Type: 'web', WorkspaceResourceId: logAnalyticsWorkspace.id }
 }
 
-// /** WebApp */
-// resource webApp 'Microsoft.Web/sites@2024-04-01' = {
-//   name: name
-//   location: location
-//   properties: {
-//     serverFarmId: appServicePlan.id
-//     clientAffinityEnabled: false
-//     httpsOnly: true
-//     publicNetworkAccess: 'Enabled'
-//     autoGeneratedDomainNameLabelScope: 'ResourceGroupReuse'
-//     siteConfig: { linuxFxVersion: 'NODE|22-lts' }
-//   }
-
-//   resource scm 'basicPublishingCredentialsPolicies' = { name: 'scm', properties: { allow: false } }
-//   resource ftp 'basicPublishingCredentialsPolicies' = { name: 'ftp', properties: { allow: false } }
-//   resource siteConfig 'config' = {
-//     name: 'web'
-//     properties: { linuxFxVersion: 'NODE|22-lts', appCommandLine: 'node server.js' }
-//   }
-// }
-
 /* Role Assignments */
 var roles = [
   { name: 'App Configuration Data Reader', id: '516239f1-63e1-4d78-a4de-a74fb236a071' } // Allow read access to App Configuration
+  // { name: 'Log Analytics Reader', id: '73c42c96-874c-492b-b04d-ab87d138a893' } // Allow read access to Log Analytics
+  { name: 'Key Vault Administrator', id: '00482a5a-887f-4fb3-b363-3b7fe8e74483' } // Perform all data plane operations on a key vault
+  { name: 'Storage Blob Data Contributor', id: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe' } // Read, write, and delete Azure Storage containers and blobs
 ]
 
 resource roleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [

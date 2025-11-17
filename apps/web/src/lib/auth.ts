@@ -11,7 +11,7 @@ import {
   sendOrganizationInviteEmail,
   sendUserDeleteVerificationEmail,
 } from '@/emails';
-import { OrganizationTierSchema, OrganizationTypeSchema } from '@/lib/organizations';
+import { OrganizationBillingIntervalSchema, OrganizationTierSchema, OrganizationTypeSchema } from '@/lib/organizations';
 import { PakloId } from '@/lib/paklo-id';
 import { prisma as prismaClient } from '@/lib/prisma';
 import { RegionCodeSchema } from '@/lib/regions';
@@ -68,6 +68,11 @@ export const auth = betterAuth({
               type: ['free', 'pro', 'enterprise'],
               required: true,
               validator: { input: OrganizationTierSchema },
+            },
+            billingInterval: {
+              type: ['monthly', 'yearly'],
+              required: true,
+              validator: { input: OrganizationBillingIntervalSchema },
             },
             providerHostname: { type: 'string', required: true },
             providerApiEndpoint: { type: 'string', required: true },

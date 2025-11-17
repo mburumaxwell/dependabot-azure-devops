@@ -28,11 +28,3 @@ export async function getLLMText(page: InferPageType<typeof docs>) {
 export async function getLLMFullText(page: InferPageType<typeof docs>) {
   return `# ${page.data.title} (${page.url})\n\n${await page.data.getText('processed')}`;
 }
-
-// TODO: remove this after the issue is fixed:
-// https://github.com/fuma-nama/fumadocs/issues/2629
-export function correctLastModified(value?: Date) {
-  if (!value) return undefined;
-  if (typeof value === 'number') return new Date(value);
-  return value;
-}

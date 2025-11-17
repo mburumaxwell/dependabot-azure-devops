@@ -136,8 +136,15 @@ enum OrganizationTier {
   @@map("organization_tier")
 }
 
+enum OrganizationBillingInterval {
+  monthly
+  yearly
+
+  @@map("organization_billing_interval")
+}
+
 model Organization {
-  id                  String                  @id @map("_id")
+  id                  String                      @id @map("_id")
   name                String
   slug                String?
   logo                String?
@@ -151,11 +158,12 @@ model Organization {
   providerHostname    String
   providerApiEndpoint String
   tier                OrganizationTier
+  billingInterval     OrganizationBillingInterval
   billingEmail        String?
   customerId          String?
   subscriptionId      String?
   subscriptionStatus  SubscriptionStatus?
-  maxProjects         Int                     @default(0) // zero until updated after billing setup
+  maxProjects         Int                         @default(0) // zero until updated after billing setup
   credential          OrganizationCredential?
   secrets             OrganizationSecret[]
   projects            Project[]

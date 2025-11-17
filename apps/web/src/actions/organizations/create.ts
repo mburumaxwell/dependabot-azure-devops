@@ -31,6 +31,7 @@ export async function createOrganizationWithCredential(
       url,
       region,
       tier: 'free', // default to free tier
+      billingInterval: 'monthly', // not supporting any other frequency yet
       ...getProviderStuff(options),
 
       // change current active organization to the new one
