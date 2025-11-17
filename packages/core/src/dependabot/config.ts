@@ -156,6 +156,7 @@ export const PackageEcosystemSchema = z.enum([
   // order matches
   // https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#package-ecosystem-
 
+  'bazel', // still in beta as of 2025-Nov-17
   'bun',
   'bundler',
   'cargo',
@@ -320,6 +321,18 @@ export const DependabotConfigSchema = z
         );
       }
       seen.add(key);
+    }
+
+    // ensure that the ecosystems in beta are only used when 'enable-beta-ecosystems' is true
+    const betaEcosystems: PackageEcosystem[] = ['bazel'];
+    if (!value['enable-beta-ecosystems']) {
+      for (const update of value.updates) {
+        if (betaEcosystems.includes(update['package-ecosystem'])) {
+          addIssue(
+            `The package ecosystem '${update['package-ecosystem']}' is currently in beta. To use it, set 'enable-beta-ecosystems' to true in the dependabot configuration.`,
+          );
+        }
+      }
     }
 
     return value;
