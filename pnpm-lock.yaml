@@ -43,7 +43,7 @@ importers:
         version: 1.0.0-beta.32
       '@hono/zod-validator':
         specifier: 0.7.4
-        version: 0.7.4(hono@4.10.4)(zod@4.1.12)
+        version: 0.7.4(hono@4.10.6)(zod@4.1.12)
       '@microsoft/applicationinsights-core-js':
         specifier: 3.3.10
         version: 3.3.10(tslib@2.8.1)
@@ -156,8 +156,8 @@ importers:
         specifier: 16.0.8
         version: 16.0.8(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(lucide-react@0.553.0(react@19.2.0))(next@16.0.1(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17)
       hono:
-        specifier: 4.10.4
-        version: 4.10.4
+        specifier: 4.10.6
+        version: 4.10.6
       lucide-react:
         specifier: 0.553.0
         version: 0.553.0(react@19.2.0)
@@ -310,10 +310,10 @@ importers:
     dependencies:
       '@hono/zod-validator':
         specifier: 0.7.4
-        version: 0.7.4(hono@4.10.4)(zod@4.1.12)
+        version: 0.7.4(hono@4.10.6)(zod@4.1.12)
       hono:
-        specifier: 4.10.4
-        version: 4.10.4
+        specifier: 4.10.6
+        version: 4.10.6
       js-yaml:
         specifier: 4.1.0
         version: 4.1.0
@@ -350,7 +350,7 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: 1.19.6
-        version: 1.19.6(hono@4.10.4)
+        version: 1.19.6(hono@4.10.6)
       '@paklo/core':
         specifier: workspace:*
         version: link:../core
@@ -5430,8 +5430,8 @@ packages:
   history@5.3.0:
     resolution: {integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==}
 
-  hono@4.10.4:
-    resolution: {integrity: sha512-YG/fo7zlU3KwrBL5vDpWKisLYiM+nVstBQqfr7gCPbSYURnNEP9BDxEMz8KfsDR9JX0lJWDRNc6nXX31v7ZEyg==}
+  hono@4.10.6:
+    resolution: {integrity: sha512-BIdolzGpDO9MQ4nu3AUuDwHZZ+KViNm+EZ75Ae55eMXMqLVhDFqEMXxtUe9Qh8hjL+pIna/frs2j6Y2yD5Ua/g==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -9587,13 +9587,13 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/node-server@1.19.6(hono@4.10.4)':
+  '@hono/node-server@1.19.6(hono@4.10.6)':
     dependencies:
-      hono: 4.10.4
+      hono: 4.10.6
 
-  '@hono/zod-validator@0.7.4(hono@4.10.4)(zod@4.1.12)':
+  '@hono/zod-validator@0.7.4(hono@4.10.6)(zod@4.1.12)':
     dependencies:
-      hono: 4.10.4
+      hono: 4.10.6
       zod: 4.1.12
 
   '@img/colour@1.0.0': {}
@@ -14617,7 +14617,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.28.4
 
-  hono@4.10.4: {}
+  hono@4.10.6: {}
 
   hookable@5.5.3: {}
 
