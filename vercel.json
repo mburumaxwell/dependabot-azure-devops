@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "dependabot/*": false
+    }
+  },
+  "github": {
+    "autoJobCancelation": false
+  }
+}

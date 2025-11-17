@@ -5,13 +5,5 @@
       "path": "/api/crons/cleanup/database",
       "schedule": "0 2 * * *"
     }
-  ],
-  "git": {
-    "deploymentEnabled": {
-      "dependabot/*": false
-    }
-  },
-  "github": {
-    "autoJobCancelation": false
-  }
+  ]
 }
