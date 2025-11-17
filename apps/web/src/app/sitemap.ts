@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { docs, legal } from '@/lib/source';
+import { correctLastModified, docs, legal } from '@/lib/source';
 import { config } from '@/site-config';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -22,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     legal.getPages().map(async (post): Promise<Route> => {
       return {
         url: new URL(post.url, config.siteUrl).toString(),
-        lastModified: post.data.updated,
+        lastModified: correctLastModified(post.data.lastModified),
         changeFrequency: 'daily',
         priority: 0.5,
       };
@@ -37,7 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .map(async (doc): Promise<Route> => {
         return {
           url: new URL(doc.url, config.siteUrl).toString(),
-          lastModified: doc.data.lastModified,
+          lastModified: correctLastModified(doc.data.lastModified),
           changeFrequency: 'daily',
           priority: 0.5,
         };
