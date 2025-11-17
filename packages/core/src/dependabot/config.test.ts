@@ -503,23 +503,23 @@ describe('Duplicate update configuration detection', () => {
 });
 
 describe('Beta ecosystems validation', () => {
-  it('Should reject bazel when enable-beta-ecosystems is not set', async () => {
-    const config = { version: 2, updates: [{ 'package-ecosystem': 'bazel', directory: '/' }] };
+  it.each(['bazel', 'opentofu'])('Should reject %s when enable-beta-ecosystems is not set', async (ecosystem) => {
+    const config = { version: 2, updates: [{ 'package-ecosystem': ecosystem, directory: '/' }] };
 
     await expect(DependabotConfigSchema.parseAsync(config)).rejects.toThrow(
-      "The package ecosystem 'bazel' is currently in beta. To use it, set 'enable-beta-ecosystems' to true in the dependabot configuration.",
+      `The package ecosystem '${ecosystem}' is currently in beta. To use it, set 'enable-beta-ecosystems' to true in the dependabot configuration.`,
     );
   });
 
-  it('Should allow bazel when enable-beta-ecosystems is true', async () => {
+  it.each(['bazel', 'opentofu'])('Should allow %s when enable-beta-ecosystems is true', async (ecosystem) => {
     const config = {
       version: 2,
       'enable-beta-ecosystems': true,
-      updates: [{ 'package-ecosystem': 'bazel', directory: '/' }],
+      updates: [{ 'package-ecosystem': ecosystem, directory: '/' }],
     };
 
     const result = await DependabotConfigSchema.parseAsync(config);
-    expect(result.updates[0]?.['package-ecosystem']).toBe('bazel');
+    expect(result.updates[0]?.['package-ecosystem']).toBe(ecosystem);
   });
 });
 

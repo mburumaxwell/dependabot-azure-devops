@@ -176,6 +176,7 @@ export const PackageEcosystemSchema = z.enum([
   'maven',
   'npm',
   'nuget',
+  'opentofu', // in beta as of 2025-Nov-17
   'pip',
   'pip-compile', // alias mapped to 'pip'
   'pipenv', // alias mapped to 'pip'
@@ -324,7 +325,7 @@ export const DependabotConfigSchema = z
     }
 
     // ensure that the ecosystems in beta are only used when 'enable-beta-ecosystems' is true
-    const betaEcosystems: PackageEcosystem[] = ['bazel'];
+    const betaEcosystems: PackageEcosystem[] = ['bazel', 'opentofu'];
     if (!value['enable-beta-ecosystems']) {
       for (const update of value.updates) {
         if (betaEcosystems.includes(update['package-ecosystem'])) {
