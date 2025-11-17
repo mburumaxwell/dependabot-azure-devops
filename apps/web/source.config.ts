@@ -1,5 +1,6 @@
-import { rehypeCodeDefaultOptions, remarkAdmonition, remarkSteps } from 'fumadocs-core/mdx-plugins';
+import { rehypeCodeDefaultOptions, remarkDirectiveAdmonition, remarkSteps } from 'fumadocs-core/mdx-plugins';
 import { defineCollections, defineConfig, defineDocs, metaSchema } from 'fumadocs-mdx/config';
+import lastModified from 'fumadocs-mdx/plugins/last-modified';
 import remarkEmoji from 'remark-emoji';
 
 import { z } from 'zod';
@@ -38,7 +39,7 @@ export const docs = defineDocs({
 });
 
 export default defineConfig({
-  lastModifiedTime: 'git',
+  plugins: [lastModified()],
   mdxOptions: {
     rehypeCodeOptions: {
       lazy: true,
@@ -66,6 +67,6 @@ export default defineConfig({
         },
       ],
     },
-    remarkPlugins: [remarkAdmonition, remarkEmoji, remarkSteps],
+    remarkPlugins: [remarkDirectiveAdmonition, remarkEmoji, remarkSteps],
   },
 });
