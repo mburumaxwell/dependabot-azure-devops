@@ -198,8 +198,8 @@ importers:
         specifier: 2.0.6
         version: 2.0.6
       validator:
-        specifier: 13.15.22
-        version: 13.15.22
+        specifier: 13.15.23
+        version: 13.15.23
       workflow:
         specifier: 4.0.1-beta.13
         version: 4.0.1-beta.13(@aws-sdk/client-sts@3.929.0)(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(next@16.0.1(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
@@ -226,8 +226,8 @@ importers:
         specifier: 19.2.2
         version: 19.2.2(@types/react@19.2.2)
       '@types/validator':
-        specifier: 13.15.4
-        version: 13.15.4
+        specifier: 13.15.9
+        version: 13.15.9
       dotenv-flow:
         specifier: 4.1.0
         version: 4.1.0
@@ -3569,8 +3569,8 @@ packages:
   '@types/unist@3.0.3':
     resolution: {integrity: sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==}
 
-  '@types/validator@13.15.4':
-    resolution: {integrity: sha512-LSFfpSnJJY9wbC0LQxgvfb+ynbHftFo0tMsFOl/J4wexLnYMmDSPaj2ZyDv3TkfL1UePxPrxOWJfbiRS8mQv7A==}
+  '@types/validator@13.15.9':
+    resolution: {integrity: sha512-9ENIuq9PUX45M1QRtfJDprgfErED4fBiMPmjlPci4W9WiBelVtHYCjF3xkQNcSnmUeuruLS1kH6hSl5M1vz4Sw==}
 
   '@types/webpack@5.28.5':
     resolution: {integrity: sha512-wR87cgvxj3p6D0Crt1r5avwqffqPXUkNlnQ1mjU93G7gCuFjufZR4I6j8cz5g1F1tTYpfOOFvly+cmIQwL9wvw==}
@@ -8152,8 +8152,8 @@ packages:
     deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
     hasBin: true
 
-  validator@13.15.22:
-    resolution: {integrity: sha512-uT/YQjiyLJP7HSrv/dPZqK9L28xf8hsNca01HSz1dfmI0DgMfjopp1rO/z13NeGF1tVystF0Ejx3y4rUKPw+bQ==}
+  validator@13.15.23:
+    resolution: {integrity: sha512-4yoz1kEWqUjzi5zsPbAS/903QXSYp0UOtHsPpp7p9rHAw/W+dkInskAE386Fat3oKRROwO98d9ZB0G4cObgUyw==}
     engines: {node: '>= 0.10'}
 
   vary@1.1.2:
@@ -12450,7 +12450,7 @@ snapshots:
 
   '@types/unist@3.0.3': {}
 
-  '@types/validator@13.15.4': {}
+  '@types/validator@13.15.9': {}
 
   '@types/webpack@5.28.5(@swc/core@1.11.24)(esbuild@0.25.10)':
     dependencies:
@@ -17485,7 +17485,7 @@ snapshots:
       tracer: 0.7.4
       util.promisify: 1.1.3
       uuid: 3.4.0
-      validator: 13.15.22
+      validator: 13.15.23
       winreg: 0.0.12
       xml2js: 0.5.0
 
@@ -17909,7 +17909,7 @@ snapshots:
 
   uuid@3.4.0: {}
 
-  validator@13.15.22: {}
+  validator@13.15.23: {}
 
   vary@1.1.2: {}
 
