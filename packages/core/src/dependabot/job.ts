@@ -151,6 +151,7 @@ export const DependabotPackageManagerSchema = z.enum([
   'helm',
   'julia',
   'bazel',
+  'opentofu',
 ]);
 export type DependabotPackageManager = z.infer<typeof DependabotPackageManagerSchema>;
 
