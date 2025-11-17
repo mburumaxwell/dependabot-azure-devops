@@ -89,7 +89,7 @@
     "@react-email/preview-server": "5.0.4",
     "@tailwindcss/postcss": "4.1.17",
     "@types/mdx": "2.0.13",
-    "@types/node": "24.10.0",
+    "@types/node": "24.10.1",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
     "@types/validator": "13.15.9",
