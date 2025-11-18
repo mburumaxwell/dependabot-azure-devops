@@ -21,6 +21,7 @@ env:
 
 permissions:
   contents: read
+  id-token: write # needed for azure/login@v2
 
 jobs:
   Remove:
