@@ -48,7 +48,6 @@
   },
   "publishConfig": {
     "access": "public",
-    "provenance": true,
     "executableFiles": [
       "./dist/index.mjs"
     ]

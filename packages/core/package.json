@@ -88,7 +88,6 @@
     "tsdown": "0.16.5"
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   }
 }
