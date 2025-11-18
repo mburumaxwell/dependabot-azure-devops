@@ -73,6 +73,8 @@ jobs:
           commit: 'Version packages'
           setupGitUser: false # setup above
         env:
+          # needs access to push to main
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
           NPM_CONFIG_PROVENANCE: true
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # use OIDC for npm authentication instead of NPM_TOKEN
+          NPM_TOKEN: '' # See https://github.com/changesets/changesets/issues/1152#issuecomment-3190884868
