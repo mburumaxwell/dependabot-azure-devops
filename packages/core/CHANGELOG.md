@@ -1,5 +1,13 @@
 # @paklo/core
 
+## 0.6.1
+
+### Patch Changes
+
+- c327af1: Fix content handling in pull request file changes and update schema to allow nullish content
+- 539f3f1: Rely on simpler config for provenance (NPM_CONFIG_PROVENANCE=true)
+- 48edd06: Enable package provenance
+
 ## 0.6.0
 
 ### Minor Changes

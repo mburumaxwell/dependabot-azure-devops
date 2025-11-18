@@ -1,5 +1,16 @@
 # @paklo/runner
 
+## 0.3.1
+
+### Patch Changes
+
+- 539f3f1: Rely on simpler config for provenance (NPM_CONFIG_PROVENANCE=true)
+- 48edd06: Enable package provenance
+- Updated dependencies [c327af1]
+- Updated dependencies [539f3f1]
+- Updated dependencies [48edd06]
+  - @paklo/core@0.6.1
+
 ## 0.3.0
 
 ### Minor Changes
