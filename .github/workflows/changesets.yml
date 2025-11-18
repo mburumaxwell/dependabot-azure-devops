@@ -11,7 +11,9 @@ on:
       - '.github/workflows/changesets.yml'
 
 permissions:
-  contents: read
+  contents: write # needed to push commits and create releases
+  pull-requests: write # needed to create PRs
+  id-token: write # needed for provenance and OIDC
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,21 +24,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Generate token
-        id: generate-token
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ secrets.GH_APP_ID_RELEASER }}
-          private-key: ${{ secrets.GH_APP_PRIVATE_KEY_RELEASER }}
-          permission-contents: write
-          permission-pull-requests: write
-          owner: ${{ github.repository_owner }}
-          repositories: ${{ github.repository.name }}
-
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          token: ${{ steps.generate-token.outputs.token }}
           submodules: true
 
       - name: Setup pnpm
@@ -47,6 +37,7 @@ jobs:
         with:
           node-version: 22
           cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Download deps
         run: pnpm install
@@ -57,11 +48,26 @@ jobs:
         run: pnpm turbo build
         working-directory: '${{ github.workspace }}/packages/cli'
 
+      - name: Generate token
+        id: generate-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.GH_APP_ID_RELEASER }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY_RELEASER }}
+          permission-contents: write
+          permission-pull-requests: write
+          # # owner and repositories default to the current repo if not provided
+          # owner: ${{ github.repository_owner }}
+          # repositories: ${{ github.repository.name }}
+
       # Change git info to match the token
       - name: Setup git info
         run: |
           git config user.name release-automator-mburumaxwell[bot]
           git config user.email 214517399+release-automator-mburumaxwell[bot]@users.noreply.github.com
+
+      # Ensure npm 11.5.1 or later for trusted publishing
+      - run: npm install -g npm@latest
 
       - name: Create release PR or Publish
         if: ${{ github.event_name != 'pull_request' }}
@@ -75,6 +81,5 @@ jobs:
         env:
           # needs access to push to main
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
-          NPM_CONFIG_PROVENANCE: true
           # use OIDC for npm authentication instead of NPM_TOKEN
           NPM_TOKEN: '' # See https://github.com/changesets/changesets/issues/1152#issuecomment-3190884868
