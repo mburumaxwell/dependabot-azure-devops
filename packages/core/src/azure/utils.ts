@@ -119,7 +119,7 @@ export function getPullRequestChangedFilesForOutputData(
       return {
         changeType: changeType,
         path: path.join(file.directory, file.name),
-        content: file.content,
+        content: file.content ?? '',
         encoding: file.content_encoding ?? 'utf8',
       } satisfies IFileChange;
     });

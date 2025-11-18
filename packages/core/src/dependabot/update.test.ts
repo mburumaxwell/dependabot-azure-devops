@@ -35,7 +35,7 @@ describe('create_pull_request', () => {
     expect(data.dependencies[0]!.directory).toEqual('/');
 
     expect(data['updated-dependency-files'].length).toEqual(1);
-    expect(data['updated-dependency-files'][0]!.content.length).toBeGreaterThan(20);
+    expect(data['updated-dependency-files'][0]!.content?.length).toBeGreaterThan(20);
     expect(data['updated-dependency-files'][0]!.content_encoding).toEqual('utf-8');
     expect(data['updated-dependency-files'][0]!.deleted).toEqual(false);
     expect(data['updated-dependency-files'][0]!.directory).toEqual('/');

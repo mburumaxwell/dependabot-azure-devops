@@ -4,7 +4,7 @@ import { DependabotDependencySchema } from './job';
 // we use nullish() because it does optional() and allows the value to be set to null
 
 export const DependabotDependencyFileSchema = z.object({
-  content: z.string(),
+  content: z.string().nullish(),
   content_encoding: z.string().nullish(),
   deleted: z.boolean().nullish(),
   directory: z.string(),
