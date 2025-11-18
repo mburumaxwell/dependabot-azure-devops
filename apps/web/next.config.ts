@@ -4,6 +4,7 @@ import { withWorkflow } from 'workflow/next';
 
 const config: NextConfig = {
   reactStrictMode: true,
+  reactCompiler: true,
   typedRoutes: true,
   logging: { fetches: { fullUrl: true } }, // allows us to see cache behavior for fetches
   images: {

@@ -3,18 +3,12 @@
  * The priority order for retrieving the branch name is as follows:
  * 1. `process.env.GITHUB_REF_NAME`
  * 2. `process.env.VERCEL_GIT_COMMIT_REF`
- * 3. `process.env.CF_PAGES_BRANCH`
  * 4. Retrieve the branch name from Git using the `getBranchFromGit` function.
  * @returns The name of the current Git branch, or undefined if it cannot be determined.
  */
 export function getBranch(): string | undefined {
   // GITHUB_REF_NAME may change on every build and we do not want the turbo cache to be invalidated on every build
-  return (
-    process.env.GITHUB_REF_NAME ||
-    process.env.VERCEL_GIT_COMMIT_REF ||
-    process.env.CF_PAGES_BRANCH ||
-    getBranchFromGit()
-  );
+  return process.env.GITHUB_REF_NAME || process.env.VERCEL_GIT_COMMIT_REF || getBranchFromGit();
 }
 
 /**
@@ -22,15 +16,12 @@ export function getBranch(): string | undefined {
  * The priority order for retrieving the Git SHA is as follows:
  * 1. `process.env.GITHUB_SHA`
  * 2. `process.env.VERCEL_GIT_COMMIT_SHA`
- * 3. `process.env.CF_PAGES_COMMIT_SHA`
  * 4. Retrieve the SHA from Git using the `getShaFromGit` function.
  * @returns The Git SHA (commit hash) if available, otherwise `undefined`.
  */
 export function getSha(): string | undefined {
   // GITHUB_SHA changes on every build and we do not want the turbo cache to be invalidated on every build
-  return (
-    process?.env.GITHUB_SHA || process?.env.VERCEL_GIT_COMMIT_SHA || process?.env.CF_PAGES_COMMIT_SHA || getShaFromGit()
-  );
+  return process?.env.GITHUB_SHA || process?.env.VERCEL_GIT_COMMIT_SHA || getShaFromGit();
 }
 
 /**

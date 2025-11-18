@@ -45,24 +45,30 @@ jobs:
         if: ${{ !contains(github.actor, '[bot]') }}
         uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Validate Azure Resources
         if: ${{ !contains(github.actor, '[bot]') && github.event_name == 'pull_request' }}
-        uses: azure/arm-deploy@v2
+        uses: azure/bicep-deploy@v2
         with:
-          subscriptionId: ${{ env.AZURE_SUBSCRIPTION_ID }}
-          resourceGroupName: '${{ env.AZURE_RESOURCE_GROUP }}'
-          template: '${{ github.workspace }}/deploy/main.bicep'
-          scope: 'resourcegroup'
-          deploymentMode: 'Validate'
-          deploymentName: 'main-pr${{ github.event.number }}' # allows for concurrent validation
+          type: deployment
+          operation: 'validate'
+          name: 'main-pr${{ github.event.number }}' # allows for concurrent validation
+          scope: 'resourceGroup'
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+          resource-group-name: '${{ env.AZURE_RESOURCE_GROUP }}'
+          template-file: '${{ github.workspace }}/deploy/main.bicep'
 
       - name: Deploy Azure Resources
         if: ${{ !contains(github.actor, '[bot]') && github.event_name != 'pull_request' }}
-        uses: azure/arm-deploy@v2
+        uses: azure/bicep-deploy@v2
         with:
-          subscriptionId: ${{ env.AZURE_SUBSCRIPTION_ID }}
-          resourceGroupName: '${{ env.AZURE_RESOURCE_GROUP }}'
-          template: '${{ github.workspace }}/deploy/main.bicep'
-          scope: 'resourcegroup'
+          type: deployment
+          operation: 'create'
+          name: 'main'
+          scope: 'resourceGroup'
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+          resource-group-name: '${{ env.AZURE_RESOURCE_GROUP }}'
+          template-file: '${{ github.workspace }}/deploy/main.bicep'
