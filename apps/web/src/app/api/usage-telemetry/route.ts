@@ -1,8 +1,8 @@
 import { zValidator } from '@hono/zod-validator';
+import { toNextJsHandler } from '@paklo/core/hono';
 import { UsageTelemetryRequestDataSchema } from '@paklo/core/usage';
 import { geolocation } from '@vercel/functions';
 import { Hono } from 'hono';
-import { handle } from 'hono/vercel';
 import { z } from 'zod';
 import { prisma, type UsageTelemetry } from '@/lib/prisma';
 import { fromExternalRegion } from '@/lib/regions';
@@ -48,4 +48,4 @@ app.post('/', zValidator('json', RequestDataSchema), async (context) => {
   return context.body(null, 204);
 });
 
-export const POST = handle(app);
+export const { POST } = toNextJsHandler(app);

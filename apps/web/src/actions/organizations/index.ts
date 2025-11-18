@@ -1,6 +1,7 @@
 export * from './billing';
 export * from './create';
 export * from './delete';
+export * from './leave';
 export * from './secrets';
 export * from './update-tokens';
 export * from './validate-creds';

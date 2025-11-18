@@ -16,9 +16,6 @@ on:
         required: true
         type: number
 
-env:
-  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
 permissions:
   contents: read
   id-token: write # needed for azure/login@v2
@@ -47,4 +44,4 @@ jobs:
           dotnet tool install --global azure-resources-cleaner && \
           azrc \
           --pr ${{ inputs.pr || github.event.pull_request.number }} \
-          --subscription ${{ env.AZURE_SUBSCRIPTION_ID }}
+          --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}

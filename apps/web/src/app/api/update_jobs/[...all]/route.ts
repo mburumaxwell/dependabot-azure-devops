@@ -7,8 +7,8 @@ import {
   type DependabotRequest,
   type DependabotTokenType,
 } from '@paklo/core/dependabot';
+import { toNextJsHandler } from '@paklo/core/hono';
 import { logger } from '@paklo/core/logger';
-import { handle } from 'hono/vercel';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 
@@ -82,9 +82,4 @@ const app = createApiServerApp({
   handle: handleRequest,
 });
 
-export const OPTIONS = handle(app);
-export const GET = handle(app);
-export const POST = handle(app);
-export const PUT = handle(app);
-export const PATCH = handle(app);
-export const DELETE = handle(app);
+export const { GET, POST, PUT, PATCH, DELETE, OPTIONS } = toNextJsHandler(app);

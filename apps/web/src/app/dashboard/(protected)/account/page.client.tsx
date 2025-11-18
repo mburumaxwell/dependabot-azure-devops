@@ -15,10 +15,12 @@ import {
   Trash2,
 } from 'lucide-react';
 import type { Route } from 'next';
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { UAParser } from 'ua-parser-js';
+import { leaveOrganization } from '@/actions/organizations';
+import { deleteUser } from '@/actions/user';
 import { TimeAgo } from '@/components/time-ago';
 import {
   AlertDialog,
@@ -53,7 +55,9 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTi
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
+import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { Textarea } from '@/components/ui/textarea';
 import { authClient, type Organization, type Passkey, type Session } from '@/lib/auth-client';
 
 export function ProfileSection({ user }: { user: { id: string; name: string; email: string } }) {
@@ -436,8 +440,11 @@ export function OrganizationsSection({
   activeOrganizationId?: string | null;
   organizations: Organization[];
 }) {
+  const router = useRouter();
   const [organizations, setOrganizations] = useState(initialOrganizations);
   const [orgToLeave, setOrgToLeave] = useState<Organization | null>(null);
+  const [leaveFeedback, setLeaveFeedback] = useState('');
+  const [isLeavingOrg, setIsLeavingOrg] = useState(false);
 
   async function handleSetActiveAndNavigate(orgId: string, path: Route) {
     const { error } = await authClient.organization.setActive({ organizationId: orgId });
@@ -454,12 +461,21 @@ export function OrganizationsSection({
   async function handleLeaveOrg() {
     if (!orgToLeave) return;
 
-    const { error } = await authClient.organization.leave({ organizationId: orgToLeave.id });
+    setIsLeavingOrg(true);
+    const { error } = await leaveOrganization({ organizationId: orgToLeave.id, feedback: leaveFeedback });
+    setIsLeavingOrg(false);
     setOrgToLeave(null);
+    setLeaveFeedback('');
     if (error) {
       toast.error('Failed to leave organization', {
         description: error.message,
       });
+      return;
+    }
+
+    // If the user left the active organization, redirect them to the dashboard root
+    if (orgToLeave.id === activeOrganizationId) {
+      router.push('/dashboard');
       return;
     }
 
@@ -541,19 +557,49 @@ export function OrganizationsSection({
         </CardContent>
       </Card>
 
-      <AlertDialog open={!!orgToLeave} onOpenChange={(open) => !open && setOrgToLeave(null)}>
-        <AlertDialogContent>
+      <AlertDialog
+        open={!!orgToLeave}
+        onOpenChange={(open) => {
+          if (!open) {
+            setOrgToLeave(null);
+            setLeaveFeedback('');
+          }
+        }}
+      >
+        <AlertDialogContent className='max-w-md'>
           <AlertDialogHeader>
-            <AlertDialogTitle>Leave organization?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to leave <span className='font-medium'>{orgToLeave?.name}</span>? You will lose
-              access to all resources and data associated with this organization.
+            <AlertDialogTitle>Leave {orgToLeave?.name}?</AlertDialogTitle>
+            <AlertDialogDescription className='space-y-3'>
+              <p>
+                Leaving will result in the loss of your access to all resources and data associated with this
+                organization.
+              </p>
+              <div className='space-y-2 pt-2'>
+                <Label htmlFor='leave-feedback' className='text-sm font-normal text-foreground'>
+                  Help us improve (optional)
+                </Label>
+                <Textarea
+                  id='leave-feedback'
+                  value={leaveFeedback}
+                  onChange={(e) => setLeaveFeedback(e.target.value)}
+                  placeholder='Why are you leaving? Your feedback helps us improve...'
+                  className='w-full min-h-20 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none'
+                  disabled={isLeavingOrg}
+                />
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleLeaveOrg} className='bg-destructive'>
-              Leave organization
+            <AlertDialogCancel disabled={isLeavingOrg}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleLeaveOrg} disabled={isLeavingOrg} className='bg-destructive'>
+              {isLeavingOrg ? (
+                <>
+                  <Spinner className='mr-2' />
+                  Leaving...
+                </>
+              ) : (
+                'Leave'
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -563,12 +609,21 @@ export function OrganizationsSection({
 }
 
 export function DangerSection({ hasOrganizations }: { hasOrganizations: boolean }) {
+  const [deleteFeedback, setDeleteFeedback] = useState('');
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
   async function handleDeleteAccount() {
+    setIsDeletingAccount(true);
+
     // this will trigger the delete account flow (sends a verification email, with a link)
-    const { data, error } = await authClient.deleteUser({ callbackURL: '/login' });
-    if (error || !data?.success) {
+    const { success, error } = await deleteUser({ feedback: deleteFeedback });
+    setIsDeletingAccount(false);
+    setShowDeleteDialog(false);
+    setDeleteFeedback('');
+    if (error || !success) {
       toast.error('Failed to initiate account deletion.', {
-        description: error?.message || data?.message || 'Unknown error',
+        description: error?.message || 'Unknown error',
       });
       return;
     }
@@ -580,50 +635,74 @@ export function DangerSection({ hasOrganizations }: { hasOrganizations: boolean 
   }
 
   return (
-    <Card className='border-destructive/50'>
-      <CardHeader>
-        <CardTitle className='text-destructive'>Danger Zone</CardTitle>
-        <CardDescription>Irreversible actions for your account</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className='grid grid-cols-1 md:grid-cols-3 items-start justify-between py-4'>
-          <div className='space-y-1 md:col-span-2'>
-            <p className='font-medium'>Delete account</p>
-            <p className='text-sm text-muted-foreground'>Permanently delete your account and all associated data</p>
-            {hasOrganizations && (
-              <p className='text-xs text-destructive mt-1'>
-                You need to leave all organizations before closing your account.
-              </p>
-            )}
+    <>
+      <Card className='border-destructive/50'>
+        <CardHeader>
+          <CardTitle className='text-destructive'>Danger Zone</CardTitle>
+          <CardDescription>Irreversible actions for your account</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className='grid grid-cols-1 md:grid-cols-3 items-start justify-between py-4'>
+            <div className='space-y-1 md:col-span-2'>
+              <p className='font-medium'>Delete account</p>
+              <p className='text-sm text-muted-foreground'>Permanently delete your account and all associated data</p>
+              {hasOrganizations && (
+                <p className='text-xs text-destructive mt-1'>
+                  You need to leave or delete all organizations before closing your account.
+                </p>
+              )}
+            </div>
           </div>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant='destructive'
-                disabled={hasOrganizations}
-                className='mt-4 lg:mt-0 lg:justify-self-end md:w-full lg:w-auto'
-              >
-                Delete account
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete your account and remove all your data from
-                  our servers. If you proceed, you will receive a verification email to confirm this action.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction className='bg-destructive' onClick={handleDeleteAccount}>
-                  Delete account
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      <AlertDialog
+        open={showDeleteDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowDeleteDialog(false);
+            setDeleteFeedback('');
+          }
+        }}
+      >
+        <AlertDialogContent className='max-w-md'>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+            <AlertDialogDescription className='space-y-3'>
+              <p>
+                This action cannot be undone. This will permanently delete your account and remove all your data from
+                our servers.
+              </p>
+              <div className='space-y-2 pt-2'>
+                <Label htmlFor='delete-feedback' className='text-sm font-normal text-foreground'>
+                  Help us improve (optional)
+                </Label>
+                <textarea
+                  id='delete-feedback'
+                  value={deleteFeedback}
+                  onChange={(e) => setDeleteFeedback(e.target.value)}
+                  placeholder='Why are you leaving? Your feedback helps us improve...'
+                  className='w-full min-h-20 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none'
+                  disabled={isDeletingAccount}
+                />
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeletingAccount}>Cancel</AlertDialogCancel>
+            <Button onClick={handleDeleteAccount} variant='destructive' disabled={isDeletingAccount}>
+              {isDeletingAccount ? (
+                <>
+                  <Spinner className='mr-2' />
+                  Deleting...
+                </>
+              ) : (
+                'Delete account'
+              )}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

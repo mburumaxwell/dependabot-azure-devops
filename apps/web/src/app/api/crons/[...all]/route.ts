@@ -1,6 +1,6 @@
+import { toNextJsHandler } from '@paklo/core/hono';
 import { Hono } from 'hono';
 import { bearerAuth } from 'hono/bearer-auth';
-import { handle } from 'hono/vercel';
 import { start } from 'workflow/api';
 import { requestSync } from '@/actions/sync';
 import { getNextRunDate } from '@/lib/cron';
@@ -98,4 +98,4 @@ app.get('/trigger-update-jobs', async (context) => {
 
 // Additional cron endpoints can be added here
 
-export const GET = handle(app);
+export const { GET } = toNextJsHandler(app);

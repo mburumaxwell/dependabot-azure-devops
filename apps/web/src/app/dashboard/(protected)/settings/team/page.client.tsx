@@ -27,7 +27,7 @@ import { Input } from '@/components/ui/input';
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import type { AssignableOrganizationRole, Invitation, Member } from '@/lib/auth-client';
+import type { AssignableMemberRole, Invitation, Member } from '@/lib/auth-client';
 import { authClient } from '@/lib/auth-client';
 import { getInitials } from '@/lib/utils';
 
@@ -41,7 +41,7 @@ export function MembersSection({
   const [members, setMembers] = useState(initialMembers);
   const [invitations, setInvitations] = useState(initialInvitations);
   const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState<AssignableOrganizationRole>('member');
+  const [inviteRole, setInviteRole] = useState<AssignableMemberRole>('member');
   const [isSendingInvite, setIsSendingInvite] = useState(false);
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
 
@@ -114,7 +114,7 @@ export function MembersSection({
     toast.success('Member removed', { description: `${member.user.name} has been removed from the organization.` });
   }
 
-  async function handleChangeRole(member: Member, newRole: AssignableOrganizationRole) {
+  async function handleChangeRole(member: Member, newRole: AssignableMemberRole) {
     setLoadingStates((prev) => ({ ...prev, [`role-${member.id}`]: true }));
     const { error } = await authClient.organization.updateMemberRole({
       memberId: member.id,
@@ -151,7 +151,7 @@ export function MembersSection({
                   onKeyDown={(e) => e.key === 'Enter' && handleSendInvite()}
                   aria-label='Email address'
                 />
-                <Select value={inviteRole} onValueChange={(value: AssignableOrganizationRole) => setInviteRole(value)}>
+                <Select value={inviteRole} onValueChange={(value: AssignableMemberRole) => setInviteRole(value)}>
                   <SelectTrigger className='w-full' aria-label='Role'>
                     <SelectValue />
                   </SelectTrigger>
@@ -288,7 +288,7 @@ export function MembersSection({
                     <>
                       <Select
                         value={member.role}
-                        onValueChange={(value) => handleChangeRole(member, value as AssignableOrganizationRole)}
+                        onValueChange={(value) => handleChangeRole(member, value as AssignableMemberRole)}
                         disabled={loadingStates[`role-${member.id}`] || loadingStates[`remove-${member.id}`]}
                       >
                         <SelectTrigger className='w-[120px] h-9'>

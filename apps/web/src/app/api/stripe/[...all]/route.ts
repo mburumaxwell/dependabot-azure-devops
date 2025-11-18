@@ -1,6 +1,6 @@
+import { toNextJsHandler } from '@paklo/core/hono';
 import { logger } from '@paklo/core/logger';
 import { Hono } from 'hono';
-import { handle } from 'hono/vercel';
 import { stripe, webhookSecret } from '@/lib/stripe';
 
 export const dynamic = 'force-dynamic';
@@ -28,4 +28,4 @@ app.post('/webhook', async (context) => {
   }
 });
 
-export const POST = handle(app);
+export const { POST } = toNextJsHandler(app);

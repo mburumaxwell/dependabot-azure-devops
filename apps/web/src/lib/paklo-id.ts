@@ -5,6 +5,7 @@ import { KSUID } from '@owpz/ksuid';
  * These prefixes make IDs human-readable and help identify the type of object.
  */
 export const TYPE_PREFIX_MAPPING = {
+  user: 'usr',
   organization: 'org',
   organization_secret: 'orgsec',
   project: 'proj',

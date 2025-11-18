@@ -219,6 +219,23 @@ model Passkey {
   @@map("passkey")
 }
 
+enum FeedbackAction {
+  organization_leave @map("organization.leave")
+  user_delete        @map("user.delete")
+
+  @@map("feedback_action")
+}
+
+model Feedback {
+  id        String         @id @map("_id")
+  createdAt DateTime       @default(now())
+  action    FeedbackAction
+  message   String
+  metadata  String?
+
+  @@map("feedback")
+}
+
 // Credentials are stored in a separate table/collection for security reasons.
 // This way they are only queried when needed and not by accident when pulling
 // organization data.
@@ -364,10 +381,10 @@ enum UpdateJobStatus {
 }
 
 enum UpdateJobPlatform {
-  azure_pipelines
-  azure_virtual_machines
-  azure_container_apps
-  azure_container_instances
+  azure_pipelines @map("azure.pipelines")
+  azure_vms       @map("azure.vms")
+  azure_aca       @map("azure.aca")
+  azure_aci       @map("azure.aci")
 }
 
 model UpdateJob {
@@ -423,6 +440,7 @@ model UpdateJob {
 
 /// Secret used to authorize update jobs when they make API calls.
 /// This is stored separately to avoid accidental exposure.
+
 model UpdateJobSecret {
   id               String    @id @map("_id")
   job              UpdateJob @relation(fields: [id], references: [id], onDelete: Cascade)

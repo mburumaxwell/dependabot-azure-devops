@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse, type ProxyConfig } from 'next/server';
 
 export async function proxy(request: NextRequest) {
   const headers = new Headers(request.headers);
+  // TODO: investigate this further:
   // getSessionCookie is sync and faster than calling auth.api.getSession
   // As of 2025-Nov-10 using Next 16.0.1 (renamed middleware to proxy), auth.api.getSession
   // makes the request timeout.

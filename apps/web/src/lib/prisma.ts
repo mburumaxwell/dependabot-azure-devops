@@ -8,6 +8,8 @@ export const prisma = globalForPrisma.prisma || new PrismaClient({});
 
 export type {
   Account,
+  Feedback,
+  FeedbackAction,
   Invitation,
   Member,
   Organization,
