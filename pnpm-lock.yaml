@@ -5,6 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  '@workflow/world-local>undici': ~6.21.2
   tfx-cli>validator: '>=13.15.20'
 
 importers:
@@ -7552,8 +7553,8 @@ packages:
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
-  undici@6.19.0:
-    resolution: {integrity: sha512-9gGwbSLgYMjp4r6M5P9bhqhx1E+RyUIHqZE0r7BmrRoqroJUG6xlVu5TXH9DnwmCPLkcaVNrcYtxUE9d3InnyQ==}
+  undici@6.21.3:
+    resolution: {integrity: sha512-gBLkYIlEnSp8pFbT64yFgGE6UIB9tAkhukC23PmMDCe5Nd+cRqKxSjw5y54MK2AZMgZfJWMaNE4nYUHgi1XEOw==}
     engines: {node: '>=18.17'}
 
   unicode-emoji-modifier-base@1.0.0:
@@ -11798,7 +11799,7 @@ snapshots:
       '@workflow/utils': 4.0.1-beta.3
       '@workflow/world': 4.0.1-beta.6(zod@4.1.11)
       ulid: 3.0.1
-      undici: 6.19.0
+      undici: 6.21.3
       zod: 4.1.11
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
@@ -16329,7 +16330,7 @@ snapshots:
 
   undici-types@7.16.0: {}
 
-  undici@6.19.0: {}
+  undici@6.21.3: {}
 
   unicode-emoji-modifier-base@1.0.0: {}
 
