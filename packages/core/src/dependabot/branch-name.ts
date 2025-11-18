@@ -47,8 +47,11 @@ export function getBranchNameForUpdate(
       targetBranchName,
       // normalize directory to remove leading/trailing slashes and replace remaining ones with the separator
       directory
-        ?.replace(/^\/+|\/+$/g, '')
-        .replace(/\//g, separator),
+        ? directory
+            .split('/')
+            .filter((part) => part.length > 0)
+            .join(separator)
+        : undefined,
       branchName,
     ],
     separator,
