@@ -37,7 +37,7 @@ async function getJob(id: string): Promise<DependabotJobConfig | undefined> {
   const job = await prisma.updateJob.findUnique({ where: { id } });
   if (!job) return undefined;
 
-  const { data, success, error } = DependabotJobConfigSchema.safeParse(JSON.parse(job.configJson));
+  const { data, success, error } = DependabotJobConfigSchema.safeParse(JSON.parse(job.config));
   if (!success) {
     logger.error(
       `
@@ -54,7 +54,7 @@ async function getCredentials(id: string): Promise<DependabotCredential[] | unde
   const job = await prisma.updateJob.findUnique({ where: { id } });
   if (!job) return undefined;
 
-  const { data, success, error } = DependabotCredentialSchema.array().safeParse(JSON.parse(job.credentialsJson));
+  const { data, success, error } = DependabotCredentialSchema.array().safeParse(JSON.parse(job.credentials));
   if (!success) {
     logger.error(
       `
@@ -117,7 +117,7 @@ async function handleRequest(id: string, request: DependabotRequest): Promise<bo
         where: { id: job.id },
         data: {
           errorType,
-          errorDetailJson: errorDetails ? JSON.stringify(errorDetails) : undefined,
+          errorDetails: errorDetails ? JSON.stringify(errorDetails) : undefined,
         },
       });
       return true;

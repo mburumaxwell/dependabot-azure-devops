@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../.prisma"
@@ -413,8 +410,8 @@ model UpdateJob {
   /// Either the original directory or merger of directories.
   directoryKey    String
   workflowRunId   String
-  configJson      String
-  credentialsJson String
+  config          String // JSON stringified DependabotJobConfig
+  credentials     String // JSON stringified DependabotCredential[]
   secret          UpdateJobSecret?
   startedAt       DateTime?
   finishedAt      DateTime?
@@ -425,7 +422,7 @@ model UpdateJob {
   /// URL to download the logs of the job (used when running on our infra).
   downloadLogsUrl String?
   errorType       String?
-  errorDetailJson String?
+  errorDetails    String? // JSON stringified Record<string, any>
 
   @@unique([ecosystem, directoryKey, workflowRunId])
   @@index([organizationId])

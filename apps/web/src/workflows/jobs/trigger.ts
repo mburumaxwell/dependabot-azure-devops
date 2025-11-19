@@ -183,8 +183,8 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
           },
         },
 
-        configJson: JSON.stringify(job),
-        credentialsJson: JSON.stringify(credentials),
+        config: JSON.stringify(job),
+        credentials: JSON.stringify(credentials),
 
         startedAt: null,
         finishedAt: null,
@@ -192,7 +192,7 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
         externalLogsUrl: null,
         downloadLogsUrl: null,
         errorType: null,
-        errorDetailJson: null,
+        errorDetails: null,
       },
     });
     createdUpdateJobs.push(newJob);
