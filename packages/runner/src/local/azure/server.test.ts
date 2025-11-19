@@ -114,7 +114,7 @@ describe('AzureLocalDependabotServer', () => {
     });
 
     it('should process "update_dependency_list"', async () => {
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'update_dependency_list',
         data: {
           dependencies: [],
@@ -137,7 +137,7 @@ describe('AzureLocalDependabotServer', () => {
         credentials: jobBuilderOutput.credentials,
       });
 
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'create_pull_request',
         data: {
           'base-commit-sha': '1234abcd',
@@ -175,7 +175,7 @@ describe('AzureLocalDependabotServer', () => {
         credentials: jobBuilderOutput.credentials,
       });
 
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'create_pull_request',
         data: {
           'base-commit-sha': '1234abcd',
@@ -207,7 +207,7 @@ describe('AzureLocalDependabotServer', () => {
       vi.mocked(authorClient.getDefaultBranch).mockResolvedValue('main');
       vi.mocked(approverClient!.approvePullRequest).mockResolvedValue(true);
 
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'create_pull_request',
         data: {
           'base-commit-sha': '1234abcd',
@@ -236,7 +236,7 @@ describe('AzureLocalDependabotServer', () => {
         credentials: jobBuilderOutput.credentials,
       });
 
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'update_pull_request',
         data: {
           'base-commit-sha': '1234abcd',
@@ -253,7 +253,7 @@ describe('AzureLocalDependabotServer', () => {
     });
 
     it('should fail processing "update_pull_request" if pull request does not exist', async () => {
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'update_pull_request',
         data: {
           'base-commit-sha': '1234abcd',
@@ -297,7 +297,7 @@ describe('AzureLocalDependabotServer', () => {
       vi.mocked(authorClient.updatePullRequest).mockResolvedValue(true);
       vi.mocked(approverClient!.approvePullRequest).mockResolvedValue(true);
 
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'update_pull_request',
         data: {
           'base-commit-sha': '1234abcd',
@@ -326,7 +326,7 @@ describe('AzureLocalDependabotServer', () => {
         credentials: jobBuilderOutput.credentials,
       });
 
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'close_pull_request',
         data: { 'dependency-names': [] },
       });
@@ -336,7 +336,7 @@ describe('AzureLocalDependabotServer', () => {
     });
 
     it('should fail processing "close_pull_request" if pull request does not exist', async () => {
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'close_pull_request',
         data: { 'dependency-names': ['dependency1'] },
       });
@@ -370,7 +370,7 @@ describe('AzureLocalDependabotServer', () => {
 
       vi.mocked(authorClient.abandonPullRequest).mockResolvedValue(true);
 
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'close_pull_request',
         data: { 'dependency-names': ['dependency1'] },
       });
@@ -380,17 +380,17 @@ describe('AzureLocalDependabotServer', () => {
     });
 
     it('should process "mark_as_processed"', async () => {
-      const result = await (server as any).handle(1, { type: 'mark_as_processed', data: {} });
+      const result = await (server as any).handle('1', { type: 'mark_as_processed', data: {} });
       expect(result).toEqual(true);
     });
 
     it('should process "record_ecosystem_versions"', async () => {
-      const result = await (server as any).handle(1, { type: 'record_ecosystem_versions', data: {} });
+      const result = await (server as any).handle('1', { type: 'record_ecosystem_versions', data: {} });
       expect(result).toEqual(true);
     });
 
     it('should process "record_ecosystem_meta"', async () => {
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'record_ecosystem_meta',
         data: [{ ecosystem: { name: 'npm_any_yarn' } }],
       });
@@ -398,7 +398,7 @@ describe('AzureLocalDependabotServer', () => {
     });
 
     it('should process "record_update_job_error"', async () => {
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'record_update_job_error',
         data: { 'error-type': 'random' },
       });
@@ -406,7 +406,7 @@ describe('AzureLocalDependabotServer', () => {
     });
 
     it('should process "record_update_job_unknown_error"', async () => {
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'record_update_job_unknown_error',
         data: { 'error-type': 'random' },
       });
@@ -414,7 +414,7 @@ describe('AzureLocalDependabotServer', () => {
     });
 
     it('should process "increment_metric"', async () => {
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'increment_metric',
         data: { metric: 'random' },
       });
@@ -422,7 +422,7 @@ describe('AzureLocalDependabotServer', () => {
     });
 
     it('should process "record_metrics"', async () => {
-      const result = await (server as any).handle(1, {
+      const result = await (server as any).handle('1', {
         type: 'record_metrics',
         data: [{ metric: 'random', value: 1, type: 'increment' }],
       });
@@ -430,7 +430,7 @@ describe('AzureLocalDependabotServer', () => {
     });
 
     it('should handle unknown output type', async () => {
-      const result = await (server as any).handle(1, { type: 'non_existant_output_type', data: {} });
+      const result = await (server as any).handle('1', { type: 'non_existant_output_type', data: {} });
       expect(result).toEqual(true);
     });
   });
