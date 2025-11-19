@@ -1,4 +1,9 @@
-import { rehypeCodeDefaultOptions, remarkDirectiveAdmonition, remarkSteps } from 'fumadocs-core/mdx-plugins';
+import {
+  rehypeCodeDefaultOptions,
+  remarkDirectiveAdmonition,
+  remarkMdxMermaid,
+  remarkSteps,
+} from 'fumadocs-core/mdx-plugins';
 import { defineCollections, defineConfig, defineDocs, metaSchema } from 'fumadocs-mdx/config';
 import lastModified from 'fumadocs-mdx/plugins/last-modified';
 import remarkEmoji from 'remark-emoji';
@@ -67,6 +72,6 @@ export default defineConfig({
         },
       ],
     },
-    remarkPlugins: [remarkDirectiveAdmonition, remarkEmoji, remarkSteps],
+    remarkPlugins: [remarkDirectiveAdmonition, remarkEmoji, remarkSteps, remarkMdxMermaid],
   },
 });
