@@ -24,7 +24,7 @@ Thank you for contributing to the Dependabot for Azure DevOps project.
 Before contributing, you'll need to configure your local development environment; View the corresponding development guide for the component you'd like to contribute to:
 
 - [Azure DevOps Extension](https://www.paklo.app/docs/extensions/azure#development-guide)
-- [Dependabot Server](https://www.paklo.app/docs/server#development-guide)
+- [Paklo CLI](https://www.paklo.app/docs/cli#development-guide)
 
 # Submitting pull requests
 
@@ -36,7 +36,7 @@ All existing unit tests must pass.
 View the corresponding unit test instructions for the component you'd like to test:
 
 - [Azure DevOps Extension](https://www.paklo.app/docs/extensions/azure#running-the-unit-tests)
-- [Dependabot Server](https://www.paklo.app/docs/server#running-the-unit-tests)
+- [Paklo CLI](https://www.paklo.app/docs/cli#running-the-unit-tests)
 
 ## Static code analyzers and linters
 
@@ -44,7 +44,7 @@ Some components use static code analyzers and linters.
 View the corresponding instructions for each component:
 
 - [Azure DevOps Extension](https://www.paklo.app/docs/extensions/azure#building-the-extension)
-- [Dependabot Server](https://www.paklo.app/docs/server#development-guide)
+- [Paklo CLI](https://www.paklo.app/docs/cli#development-guide)
 
 ## Formatters
 

@@ -3,7 +3,6 @@
 This repository contains tools for updating dependencies in Azure DevOps repositories using [Dependabot](https://dependabot.com).
 
 ![Extensions](https://img.shields.io/github/actions/workflow/status/mburumaxwell/dependabot-azure-devops/extensions.yml?branch=main&label=Extensions&style=flat-square)
-![Server](https://img.shields.io/github/actions/workflow/status/mburumaxwell/dependabot-azure-devops/server.yml?branch=main&label=Server&style=flat-square)
 ![Web](https://img.shields.io/github/actions/workflow/status/mburumaxwell/dependabot-azure-devops/web.yml?branch=main&label=Web&style=flat-square)
 [![CLI](https://img.shields.io/npm/v/@paklo/cli.svg)](https://www.npmjs.com/package/@paklo/cli)
 [![license](https://img.shields.io/github/license/mburumaxwell/dependabot-azure-devops.svg?style=flat-square)](LICENSE)
@@ -11,7 +10,7 @@ This repository contains tools for updating dependencies in Azure DevOps reposit
 In this repository you'll find:
 
 1. [Azure DevOps Extension](https://marketplace.visualstudio.com/items?itemName=tingle-software.dependabot), [source code](./extensions/azure) and [docs](https://www.paklo.app/docs/extensions/azure).
-2. Dependabot Server, [source code](./server/) and [docs](https://www.paklo.app/docs/server).
+2. CLI tool, [source code](./packages/cli/) and [docs](https://www.paklo.app/docs/cli).
 
 ## Table of Contents
 
@@ -71,7 +70,7 @@ Dependabot for Azure DevOps must be explicitly configured to run in your organis
 
 </details>
 
-- [Hosted Server](https://www.paklo.app/docs/server) - Ideal if you have a large number of projects and repositories or prefer to run Dependabot as a managed service instead of using pipeline agents. See [why should I use the server?](https://www.paklo.app/docs/server#why-should-i-use-the-server) for more info.
+- [Hosted Version](https://www.paklo.app/docs/hosted) - Ideal if you have a large number of projects and repositories or prefer to run Dependabot as a managed service instead of using pipeline agents. See [why should I use the server?](https://www.paklo.app/docs/hosted#why-should-i-use-the-hosted-version) for more info.
 
 ### Other Guides
 
