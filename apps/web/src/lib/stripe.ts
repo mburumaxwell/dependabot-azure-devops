@@ -4,7 +4,8 @@ import { ORGANIZATION_TIERS_INFO, type OrganizationTierInfo } from './organizati
 
 export const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-10-29.clover',
+  // TODO: lock this version once we are using it stably
+  // apiVersion: '2025-10-29.clover',
 });
 
 export type EnrichedOrganizationTierInfo = OrganizationTierInfo & {
