@@ -9,5 +9,6 @@ Welcome to the documentation for **Dependabot for Azure DevOps**. These guides s
 - [Using Private Registries](/docs/private-registries) – Configure authentication for feeds and registries.
 - [Troubleshooting](/docs/troubleshooting) – Resolve common issues.
 - [Contributing](/docs/contributing) – Learn how to develop and submit changes.
-- [Dependabot Server](/docs/server) – Deploy and manage the server component for organization-wide updates.
+- [CLI](/docs/cli) – Run your dependabot updates on your own machine.
+- [Hosted version](/docs/hosted) – Leave running of dependabot updates to us.
 - [Azure Extension Guide](/docs/extensions/azure) – Complete guide for the Azure DevOps extension.

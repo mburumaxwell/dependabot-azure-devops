@@ -1,4 +1,0 @@
-<Solution>
-  <Project Path="server/Tingle.Dependabot/Tingle.Dependabot.csproj" />
-  <Project Path="server/Tingle.Dependabot.Tests/Tingle.Dependabot.Tests.csproj" />
-</Solution>

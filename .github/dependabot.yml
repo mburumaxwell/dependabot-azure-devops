@@ -10,70 +10,12 @@ updates:
     schedule:
       interval: 'weekly'
       time: '02:00'
-    groups:
-      docker:
-        patterns: ['docker/*']
 
   - package-ecosystem: 'devcontainers'
     directory: '/'
     schedule:
       interval: 'weekly'
       time: '02:00'
-
-  - package-ecosystem: 'dotnet-sdk'
-    directory: '/'
-    schedule:
-      interval: 'weekly'
-      time: '02:00'
-    ignore:
-      # Ignore patch updates
-      - dependency-name: '*'
-        update-types: ['version-update:semver-patch']
-
-  - package-ecosystem: 'docker'
-    directories: ['**/*']
-    exclude-paths: ['dependabot-action/**']
-    schedule:
-      interval: 'weekly'
-      time: '02:00'
-    groups:
-      dotnet-docker:
-        patterns: ['dotnet/*']
-
-  - package-ecosystem: 'nuget'
-    directory: '/'
-    schedule:
-      interval: 'weekly'
-      time: '02:00'
-    open-pull-requests-limit: 10
-    groups:
-      azure:
-        patterns:
-          - 'Azure.*'
-          - 'Microsoft.Azure.*'
-          - 'Microsoft.Extensions.Configuration.AzureAppConfiguration'
-      event-bus:
-        patterns: ['Tingle.EventBus*']
-      microsoft:
-        patterns:
-          - 'Microsoft.AspNetCore.*'
-          - 'Microsoft.EntityFrameworkCore.*'
-          - 'Microsoft.Extensions.*'
-          - 'dotnet-ef'
-        exclude-patterns:
-          - 'Microsoft.Azure.*'
-          - 'Microsoft.Extensions.Configuration.AzureAppConfiguration'
-          - 'Microsoft.VisualStudio.Azure.Containers.Tools.Targets'
-      opentelemetry:
-        patterns: ['OpenTelemetry*']
-      system:
-        patterns: ['System*']
-      tingle:
-        patterns:
-          - 'Tingle.AspNetCore*'
-          - 'Tingle.Extensions*'
-      xunit:
-        patterns: ['Xunit*']
 
   - package-ecosystem: 'npm'
     directory: '/'

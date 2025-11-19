@@ -1,6 +1,0 @@
-# To get the effective configuration run 'gitversion /showconfig'
-branches:
-  pull-request:
-    label: pr
-  main:
-    label: ci
