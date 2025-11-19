@@ -43,8 +43,8 @@ importers:
         specifier: 3.0.0
         version: 3.0.0
       '@azure/arm-compute':
-        specifier: 23.1.0
-        version: 23.1.0
+        specifier: 23.2.0
+        version: 23.2.0
       '@azure/core-rest-pipeline':
         specifier: 1.22.2
         version: 1.22.2
@@ -550,8 +550,8 @@ packages:
     resolution: {integrity: sha512-kZ5C5rf4GvKf0gGVLkkOa77NYihn779Z4ikSItgJXz2Dsvilf2INFMb8QI25a+Vgz8OGR4zj4w9Xzhv9ozKeRg==}
     engines: {node: '>=20.0.0'}
 
-  '@azure/arm-compute@23.1.0':
-    resolution: {integrity: sha512-B79Ttt8t4cQBmBai9yddAvlHnJEWXuLJG0ehje5719qVRKDcJRg7i65tzHcvVIz1dF8Mtbh4JoZScoZMqtBvBw==}
+  '@azure/arm-compute@23.2.0':
+    resolution: {integrity: sha512-Zgf5TQEXhec7Tb6c2mDcuTfbIWXPo8qzCNpe8mgNfS++YesdFFxzkasinPFJdZg0/qX8ZqisO0pFIVspq9fAAQ==}
     engines: {node: '>=20.0.0'}
 
   '@azure/core-auth@1.10.1':
@@ -8373,7 +8373,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@azure/arm-compute@23.1.0':
+  '@azure/arm-compute@23.2.0':
     dependencies:
       '@azure/abort-controller': 2.1.2
       '@azure/core-auth': 1.10.1
