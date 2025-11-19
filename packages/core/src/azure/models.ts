@@ -12,8 +12,8 @@ export const DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES = 'Dependabot.Dependenci
 export interface IFileChange {
   changeType: VersionControlChangeType;
   path: string;
-  content: string;
-  encoding: string;
+  content?: string;
+  encoding?: string;
 }
 
 /** Pull request properties */

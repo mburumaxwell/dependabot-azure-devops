@@ -109,7 +109,7 @@ export function getPullRequestChangedFilesForOutputData(
     .filter((file) => file.type === 'file')
     .map((file) => {
       let changeType = VersionControlChangeType.None;
-      if (file.deleted === true) {
+      if (file.deleted === true || file.operation === 'delete') {
         changeType = VersionControlChangeType.Delete;
       } else if (file.operation === 'update') {
         changeType = VersionControlChangeType.Edit;
@@ -119,8 +119,8 @@ export function getPullRequestChangedFilesForOutputData(
       return {
         changeType: changeType,
         path: path.join(file.directory, file.name),
-        content: file.content ?? '',
-        encoding: file.content_encoding ?? 'utf8',
+        content: file.content ?? undefined,
+        encoding: file.content_encoding ?? undefined,
       } satisfies IFileChange;
     });
 }

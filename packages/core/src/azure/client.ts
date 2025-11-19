@@ -18,6 +18,7 @@ import {
   ItemContentType,
   PullRequestAsyncStatus,
   PullRequestStatus,
+  VersionControlChangeType,
 } from './types';
 import type { AzureDevOpsOrganizationUrl } from './url-parts';
 import { normalizeBranchName, normalizeFilePath } from './utils';
@@ -317,18 +318,21 @@ export class AzureDevOpsWebApiClient {
             {
               comment: pr.commitMessage,
               author: pr.author,
-              changes: pr.changes.map((change) => {
-                return {
-                  changeType: change.changeType,
-                  item: {
-                    path: normalizeFilePath(change.path),
-                  },
-                  newContent: {
-                    content: Buffer.from(change.content, <BufferEncoding>change.encoding).toString('base64'),
-                    contentType: ItemContentType.Base64Encoded,
-                  },
-                };
-              }),
+              changes: pr.changes
+                .filter((change) => change.changeType !== VersionControlChangeType.None)
+                .map(({ changeType, ...change }) => {
+                  return {
+                    changeType,
+                    item: { path: normalizeFilePath(change.path) },
+                    newContent:
+                      changeType !== VersionControlChangeType.Delete
+                        ? {
+                            content: Buffer.from(change.content!, <BufferEncoding>change.encoding).toString('base64'),
+                            contentType: ItemContentType.Base64Encoded,
+                          }
+                        : undefined,
+                  };
+                }),
             },
           ],
         },
@@ -507,18 +511,21 @@ export class AzureDevOpsWebApiClient {
                   ? 'Resolve merge conflicts'
                   : `Rebase '${sourceBranchName}' onto '${targetBranchName}'`,
               author: pr.author,
-              changes: pr.changes.map((change) => {
-                return {
-                  changeType: change.changeType,
-                  item: {
-                    path: normalizeFilePath(change.path),
-                  },
-                  newContent: {
-                    content: Buffer.from(change.content, <BufferEncoding>change.encoding).toString('base64'),
-                    contentType: ItemContentType.Base64Encoded,
-                  },
-                };
-              }),
+              changes: pr.changes
+                .filter((change) => change.changeType !== VersionControlChangeType.None)
+                .map(({ changeType, ...change }) => {
+                  return {
+                    changeType,
+                    item: { path: normalizeFilePath(change.path) },
+                    newContent:
+                      changeType !== VersionControlChangeType.Delete
+                        ? {
+                            content: Buffer.from(change.content!, <BufferEncoding>change.encoding).toString('base64'),
+                            contentType: ItemContentType.Base64Encoded,
+                          }
+                        : undefined,
+                  };
+                }),
             },
           ],
         },
