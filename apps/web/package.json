@@ -35,7 +35,7 @@
     "@azure/keyvault-secrets": "4.10.0",
     "@azure/monitor-opentelemetry-exporter": "1.0.0-beta.32",
     "@azure/storage-blob": "12.29.1",
-    "@hono/zod-validator": "0.7.4",
+    "@hono/zod-validator": "0.7.5",
     "@microsoft/applicationinsights-core-js": "3.3.10",
     "@microsoft/applicationinsights-react-js": "19.3.8",
     "@microsoft/applicationinsights-web": "3.3.10",
