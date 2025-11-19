@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import type { UsageTelemetry } from '@/lib/prisma';
+import type { UsageTelemetry } from '@/lib/mongodb';
 
 interface TelemetryTableProps {
   data: UsageTelemetry[];
@@ -91,7 +91,7 @@ export function TelemetryTable({ data }: TelemetryTableProps) {
             </thead>
             <tbody>
               {paginatedData.map((item) => (
-                <tr key={item.id.toString()} className='border-b border-border hover:bg-muted/50 transition-colors'>
+                <tr key={item._id.toString()} className='border-b border-border hover:bg-muted/50 transition-colors'>
                   <td className='py-3 px-4'>
                     <Badge
                       variant={item.success ? 'default' : 'destructive'}

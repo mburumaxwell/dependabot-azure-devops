@@ -4,7 +4,7 @@ import { UsageTelemetryRequestDataSchema } from '@paklo/core/usage';
 import { geolocation } from '@vercel/functions';
 import { Hono } from 'hono';
 import { z } from 'zod';
-import { prisma, type UsageTelemetry } from '@/lib/prisma';
+import { getCollection, type UsageTelemetry } from '@/lib/mongodb';
 import { fromExternalRegion } from '@/lib/regions';
 
 export const dynamic = 'force-dynamic';
@@ -19,9 +19,9 @@ const RequestDataSchema = UsageTelemetryRequestDataSchema.omit({ id: true }).ext
 app.post('/', zValidator('json', RequestDataSchema), async (context) => {
   const geo = geolocation(context.req.raw);
   const payload = context.req.valid('json');
-  const id = String(payload.id);
+  const _id = String(payload.id);
 
-  const values: Omit<UsageTelemetry, 'id'> = {
+  const values: Omit<UsageTelemetry, '_id'> = {
     country: geo?.country ?? null,
     region: fromExternalRegion(geo?.region) ?? geo.region ?? null, // may be undefined for non-Vercel providers
     hostPlatform: payload.host.platform,
@@ -39,11 +39,8 @@ app.post('/', zValidator('json', RequestDataSchema), async (context) => {
     success: payload.success,
   };
 
-  await prisma.usageTelemetry.upsert({
-    where: { id },
-    create: { id, ...values },
-    update: { ...values },
-  });
+  const collection = await getCollection('usage_telemetry');
+  await collection.updateOne({ _id }, { $set: { _id, ...values } }, { upsert: true });
 
   return context.body(null, 204);
 });

@@ -1,6 +1,6 @@
 'use server';
 
-import { prisma, type UsageTelemetry } from '@/lib/prisma';
+import { type Filter, getCollection, type UsageTelemetry } from '@/lib/mongodb';
 
 export async function fetchTelemetryData({
   start,
@@ -19,14 +19,14 @@ export async function fetchTelemetryData({
   const packageManager =
     selectedPackageManager && selectedPackageManager !== 'all' ? selectedPackageManager : undefined;
 
-  const data = await prisma.usageTelemetry.findMany({
-    where: {
-      started: { gte: start, lte: end },
-      ...(owner ? { owner } : {}),
-      ...(packageManager ? { packageManager } : {}),
-      ...(success ? { success: Boolean(success) } : {}),
-    },
-  });
+  const collection = await getCollection('usage_telemetry');
+  const query: Filter<UsageTelemetry> = {
+    started: { $gte: start, $lte: end },
+    ...(owner ? { owner } : {}),
+    ...(packageManager ? { packageManager } : {}),
+    ...(success !== undefined ? { success: success } : {}),
+  };
+  const data = await collection.find(query).toArray();
 
   return data;
 }

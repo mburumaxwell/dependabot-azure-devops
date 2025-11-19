@@ -30,7 +30,6 @@ export type {
   UpdateJobSecret,
   UpdateJobStatus,
   UpdateJobTrigger,
-  UsageTelemetry,
   User,
   Verification,
 } from '@/../.prisma/client';

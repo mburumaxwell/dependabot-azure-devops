@@ -8,35 +8,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = env("DATABASE_URL")
-}
-
-model UsageTelemetry {
-  id              String   @id @map("_id")
-  country         String?
-  region          String?
-  hostPlatform    String
-  hostRelease     String
-  hostArch        String
-  hostMachineHash String
-  version         String
-  trigger         String
-  provider        String
-  owner           String
-  project         String? // TODO: remove nullable after older records are cleared (90 days after 2025-Oct-21 i.e. 2026-Jan-19)
-  packageManager  String
-  started         DateTime
-  duration        Int
-  success         Boolean
-
-  @@index([trigger])
-  @@index([owner])
-  @@index([packageManager])
-  @@index([started(sort: Desc)])
-  @@index([duration])
-  @@index([success])
-  @@index([region])
-  @@map("usage_telemetry")
+  url      = env("MONGO_DATABASE_URL")
 }
 
 model User {
