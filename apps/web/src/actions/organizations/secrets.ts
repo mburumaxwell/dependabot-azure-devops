@@ -1,5 +1,6 @@
 'use server';
 
+import { deleteKeyVaultSecret, getKeyVaultSecret, setKeyVaultSecret } from '@/lib/azure';
 import { PakloId } from '@/lib/paklo-id';
 import { type OrganizationSecret, prisma } from '@/lib/prisma';
 import { type SecretValidationResult, validateSecretNameFormat } from '@/lib/secrets';
@@ -29,15 +30,17 @@ export async function validateSecretName({
   return { valid: true };
 }
 
-export type OrganizationSecretSafe = Pick<OrganizationSecret, 'id' | 'name' | 'updatedAt'>;
+export type OrganizationSecretSafe = Pick<OrganizationSecret, 'id' | 'name' | 'createdAt' | 'updatedAt'>;
 function makeSecretResult(secret: OrganizationSecret): OrganizationSecretSafe {
   return {
     id: secret.id,
     name: secret.name,
+    createdAt: secret.createdAt,
     updatedAt: secret.updatedAt,
   };
 }
 
+/** Creates a new organization secret */
 export async function createSecret({
   organizationId,
   name,
@@ -47,18 +50,27 @@ export async function createSecret({
   name: string;
   value: string;
 }): Promise<OrganizationSecretSafe> {
-  const secret = await prisma.organizationSecret.create({
+  let secret = await prisma.organizationSecret.create({
     data: {
       id: PakloId.generate('organization_secret'),
       organizationId,
       name,
-      value,
     },
+  });
+
+  // create the secret in Azure Key Vault
+  const url = await setKeyVaultSecret({ name: secret.id, value });
+
+  // update the secret with the URL
+  secret = await prisma.organizationSecret.update({
+    where: { id: secret.id },
+    data: { secretUrl: url },
   });
 
   return makeSecretResult(secret);
 }
 
+/** Updates an existing organization secret's value */
 export async function updateSecret({
   organizationId,
   id,
@@ -68,23 +80,70 @@ export async function updateSecret({
   id: string;
   value: string;
 }): Promise<OrganizationSecretSafe> {
-  const secret = await prisma.organizationSecret.update({
-    where: {
-      organizationId, // just to make sure it matches the organization
-      id,
-    },
-    data: { value },
+  let secret = await prisma.organizationSecret.findUniqueOrThrow({
+    // organizationId just to make sure it matches the organization
+    where: { organizationId, id },
   });
+
+  // update the secret in Azure Key Vault
+  let { secretUrl: url } = secret;
+  if (url) {
+    await setKeyVaultSecret({ url, value });
+    // update the secret's updatedAt timestamp
+    secret = await prisma.organizationSecret.update({
+      // organizationId just to make sure it matches the organization
+      where: { organizationId, id },
+      data: { updatedAt: new Date() },
+    });
+  } else {
+    // if no URL is set, create a new secret
+    url = await setKeyVaultSecret({ name: secret.id, value });
+    // update the secret with the new URL
+    secret = await prisma.organizationSecret.update({
+      // organizationId just to make sure it matches the organization
+      where: { organizationId, id: secret.id },
+      data: { secretUrl: url },
+    });
+  }
 
   return makeSecretResult(secret);
 }
 
+/** Deletes an existing organization secret */
 export async function deleteSecret({ organizationId, id }: { organizationId: string; id: string }) {
-  // Delete the secret from the database
-  await prisma.organizationSecret.delete({
-    where: {
-      organizationId, // just to make sure it matches the organization
-      id,
-    },
+  const secret = await prisma.organizationSecret.findUniqueOrThrow({
+    // organizationId just to make sure it matches the organization
+    where: { organizationId, id },
   });
+
+  // delete the secret from Azure Key Vault
+  const { secretUrl: url } = secret;
+  if (url) {
+    await deleteKeyVaultSecret({ url });
+  }
+
+  // delete the secret from the database
+  await prisma.organizationSecret.delete({
+    // organizationId just to make sure it matches the organization
+    where: { organizationId, id },
+  });
+}
+
+/**
+ * Retrieves the value of an organization secret.
+ * @note This should only be called server-side when triggering jobs.
+ */
+export async function getSecretValue({
+  organizationId,
+  name,
+}: {
+  organizationId: string;
+  name: string;
+}): Promise<string | undefined> {
+  const secret = await prisma.organizationSecret.findUnique({
+    where: { organizationId_name: { organizationId, name } },
+  });
+  if (!secret || !secret.secretUrl) return undefined;
+
+  return getKeyVaultSecret({ url: secret.secretUrl });
 }

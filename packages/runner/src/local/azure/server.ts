@@ -287,7 +287,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         return true;
 
       default:
-        logger.warn(`Unknown dependabot output type '${type}', ignoring...`);
+        logger.warn(`Unknown dependabot request type '${type}', ignoring...`);
         return true;
     }
   }

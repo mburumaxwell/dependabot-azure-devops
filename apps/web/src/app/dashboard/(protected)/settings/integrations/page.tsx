@@ -25,11 +25,11 @@ export default async function IntegrationsPage() {
   const credential = await prisma.organizationCredential.findUniqueOrThrow({
     where: { id: organization.id },
     select: {
-      githubToken: true,
+      githubTokenSecretUrl: true,
     },
   });
 
-  const hasGithubToken = !!credential.githubToken;
+  const hasGithubToken = !!credential.githubTokenSecretUrl;
 
   return (
     <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>

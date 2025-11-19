@@ -30,6 +30,7 @@
   "dependencies": {
     "@azure/arm-appcontainers": "3.0.0",
     "@azure/arm-compute": "23.1.0",
+    "@azure/core-rest-pipeline": "1.22.2",
     "@azure/identity": "4.13.0",
     "@azure/keyvault-secrets": "4.10.0",
     "@azure/monitor-opentelemetry-exporter": "1.0.0-beta.32",

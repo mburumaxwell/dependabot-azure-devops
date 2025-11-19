@@ -8,6 +8,7 @@ import {
 import { Keygen } from '@paklo/core/keygen';
 import { logger } from '@paklo/core/logger';
 import { FatalError, getWorkflowMetadata, sleep, type WorkflowMetadata } from 'workflow';
+import { getGithubToken, getSecretValue } from '@/actions/organizations';
 import { prisma, type UpdateJob, type UpdateJobPlatform, type UpdateJobTrigger } from '@/lib/prisma';
 import { SequenceNumber } from '@/lib/sequence-number';
 
@@ -61,6 +62,7 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
   });
 
   let config: DependabotConfig | undefined;
+  const githubToken = await getGithubToken({ id: organization.id });
 
   // work on each update
   const existingUpdateJobs: UpdateJob[] = [];
@@ -85,14 +87,18 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
     // parsing config happens once here because the repository is one here
     // however, to avoid repeating calls for secret lookups, we cache the parsed config
     if (!config) {
+      const variables = new Map<string, string | undefined>();
       config = await parseDependabotConfig({
         configContents: repository.configFileContents!,
         configPath: repository.configPath!,
         async variableFinder(name) {
-          const secret = await prisma.organizationSecret.findUnique({
-            where: { organizationId_name: { organizationId: organization.id, name } },
-          });
-          return secret?.value;
+          // first, check cache
+          if (variables.has(name)) return variables.get(name);
+
+          // second, check organization secrets
+          const value = await getSecretValue({ organizationId: organization.id, name });
+          variables.set(name, value);
+          return value;
         },
       });
     }
@@ -127,7 +133,7 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
       config,
       update,
       systemAccessToken: organizationCredential.token,
-      githubToken: organizationCredential.githubToken || undefined,
+      githubToken: githubToken,
       experiments: DEFAULT_EXPERIMENTS,
       debug: false,
     });

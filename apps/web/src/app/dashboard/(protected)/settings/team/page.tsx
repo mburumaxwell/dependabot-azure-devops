@@ -16,7 +16,10 @@ export default async function TeamPage() {
 
   const { members } = await auth.api.listMembers({ headers });
   const invitations = await auth.api.listInvitations({ headers });
-  const activeMember = await auth.api.getActiveMember({ headers });
+  const activeMember = (await auth.api.getActiveMember({ headers })) as Member | null;
+  if (!activeMember) {
+    return null;
+  }
 
   return (
     <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
@@ -25,10 +28,8 @@ export default async function TeamPage() {
         <p className='text-muted-foreground'>Manage your organization members and invitations</p>
       </div>
 
-      <MembersSection members={members as Member[]} invitations={invitations} />
-      {organizationId && activeMember && activeMember.role === 'owner' && (
-        <DangerSection organizationId={organizationId} />
-      )}
+      <MembersSection role={activeMember.role} members={members as Member[]} invitations={invitations} />
+      {organizationId && activeMember.role === 'owner' && <DangerSection organizationId={organizationId} />}
     </div>
   );
 }

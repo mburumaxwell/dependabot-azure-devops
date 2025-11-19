@@ -25,7 +25,7 @@ export type Session = typeof authClient.$Infer.Session;
 export type ActiveOrganization = typeof authClient.$Infer.ActiveOrganization;
 export type Invitation = typeof authClient.$Infer.Invitation;
 export type Member = typeof authClient.$Infer.Member;
-export type { AssignableMemberRole, MemberRole, Organization, Passkey } from '@/lib/auth';
+export type { MemberRole, Organization, Passkey } from '@/lib/auth';
 
 export async function magicLinkLogin({
   email,

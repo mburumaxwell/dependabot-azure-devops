@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { validateGitHubToken } from './validate-github-token';
+import { validateGitHubToken } from './credentials';
 
 describe('validateGitHubToken', () => {
   it('returns invalid for empty token', async () => {

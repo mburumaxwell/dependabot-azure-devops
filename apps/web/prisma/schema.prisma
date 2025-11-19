@@ -243,16 +243,14 @@ model Feedback {
 // Even if it did, it is better to keep sensitive information isolated.
 
 model OrganizationCredential {
-  id                     String       @id @map("_id")
-  organization           Organization @relation(fields: [id], references: [id], onDelete: Cascade)
-  token                  String
-  tokenSecretUrl         String? // Future secret store support
+  id                   String       @id @map("_id")
+  organization         Organization @relation(fields: [id], references: [id], onDelete: Cascade)
+  token                String
+  tokenSecretUrl       String? // Hopefully won't need secret store with federated identity
   /// Token (password) for Webhooks, ServiceHooks, and Notifications from the provider.
   /// This is generated on creation and may be shown on demand but cannot be edited.
-  webhooksToken          String
-  webhooksTokenSecretUrl String? // Future secret store support
-  githubToken            String?
-  githubTokenSecretUrl   String? // Future secret store support
+  webhooksToken        String
+  githubTokenSecretUrl String?
 
   @@map("organization_credential")
 }
@@ -262,10 +260,9 @@ model OrganizationSecret {
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   name           String
-  value          String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
-  secretUrl      String? // Future secret store support
+  secretUrl      String?
 
   @@unique([organizationId, name])
   @@index([organizationId])

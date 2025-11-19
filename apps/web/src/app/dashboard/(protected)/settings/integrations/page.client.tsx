@@ -441,7 +441,7 @@ export function WebhooksSection({ organization }: { organization: Organization }
               <Field>
                 <FieldLabel>Recommended Webhooks</FieldLabel>
                 <div className='space-y-3 bg-muted/50 rounded-md'>
-                  <Table className='text-sm space-y-2 text-muted-foreground'>
+                  <Table className='text-sm text-muted-foreground'>
                     <TableHeader>
                       <TableRow>
                         <TableHead>Type</TableHead>

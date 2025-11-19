@@ -25,8 +25,9 @@ export default async function SecretsPage() {
         select: {
           id: true,
           name: true,
-          value: false, // Do not select the value for listing
+          createdAt: true,
           updatedAt: true,
+          secretUrl: false, // Do not select the url for listing
         },
         orderBy: { name: 'asc' },
       });

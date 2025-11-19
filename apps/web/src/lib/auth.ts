@@ -126,8 +126,8 @@ export type Organization = typeof auth.$Infer.Organization;
 export type ActiveOrganization = typeof auth.$Infer.ActiveOrganization;
 export type Invitation = typeof auth.$Infer.Invitation;
 export type Member = typeof auth.$Infer.Member;
-export type { Passkey } from 'better-auth/plugins/passkey';
 export type MemberRole = Member['role'];
-export type AssignableMemberRole = Exclude<MemberRole, 'owner'>;
+export type { Passkey } from 'better-auth/plugins/passkey';
+
 export { APIError as BetterAuthApiError };
 export { toNextJsHandler } from 'better-auth/next-js';

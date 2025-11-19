@@ -14,6 +14,16 @@ import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
+const app = createApiServerApp({
+  basePath: '/api/update_jobs',
+  authenticate,
+  getJob,
+  getCredentials,
+  handle: handleRequest,
+});
+
+export const { GET, POST, PUT, PATCH, DELETE, OPTIONS } = toNextJsHandler(app);
+
 async function authenticate(type: DependabotTokenType, id: string, value: string): Promise<boolean> {
   // if no secret found, authentication fails
   const secret = await prisma.updateJobSecret.findUnique({ where: { id } });
@@ -70,16 +80,51 @@ async function handleRequest(id: string, request: DependabotRequest): Promise<bo
   ]);
   if (!repositoryUpdate || !repository || !project || !organization) return false;
 
-  // TODO: implement actual logic
-  return true;
+  const { type, data } = request;
+
+  switch (type) {
+    // TODO: implement actual logic
+    case 'create_pull_request':
+    case 'update_pull_request':
+    case 'close_pull_request': {
+      return true;
+    }
+
+    case 'update_dependency_list': {
+      const { dependency_files } = data;
+      await prisma.repositoryUpdate.update({
+        where: { id: repositoryUpdate.id },
+        data: { files: dependency_files ?? [] },
+      });
+
+      // TODO: store dependencies as we need them to pull security advisories later
+
+      return true;
+    }
+
+    // Nothing to do for now
+    case 'mark_as_processed':
+    case 'record_ecosystem_versions':
+    case 'record_ecosystem_meta':
+    case 'increment_metric':
+    case 'record_metrics':
+      return true;
+
+    case 'record_update_job_error':
+    case 'record_update_job_unknown_error': {
+      const { 'error-type': errorType, 'error-details': errorDetails } = data;
+      await prisma.updateJob.update({
+        where: { id: job.id },
+        data: {
+          errorType,
+          errorDetailJson: errorDetails ? JSON.stringify(errorDetails) : undefined,
+        },
+      });
+      return true;
+    }
+
+    default:
+      logger.warn(`Unknown dependabot request type '${type}', ignoring...`);
+      return true;
+  }
 }
-
-const app = createApiServerApp({
-  basePath: '/api/update_jobs',
-  authenticate,
-  getJob,
-  getCredentials,
-  handle: handleRequest,
-});
-
-export const { GET, POST, PUT, PATCH, DELETE, OPTIONS } = toNextJsHandler(app);
