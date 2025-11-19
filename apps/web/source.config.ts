@@ -6,6 +6,7 @@ import {
 } from 'fumadocs-core/mdx-plugins';
 import { defineCollections, defineConfig, defineDocs, metaSchema } from 'fumadocs-mdx/config';
 import lastModified from 'fumadocs-mdx/plugins/last-modified';
+import remarkDirective from 'remark-directive';
 import remarkEmoji from 'remark-emoji';
 
 import { z } from 'zod';
@@ -72,6 +73,13 @@ export default defineConfig({
         },
       ],
     },
-    remarkPlugins: [remarkDirectiveAdmonition, remarkEmoji, remarkSteps, remarkMdxMermaid],
+    remarkPlugins: [
+      // directive must come before any directive-based plugins
+      remarkDirective,
+      remarkDirectiveAdmonition,
+      remarkEmoji,
+      remarkSteps,
+      remarkMdxMermaid,
+    ],
   },
 });

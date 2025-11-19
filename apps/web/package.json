@@ -107,6 +107,7 @@
     "prettier": "3.6.2",
     "prisma": "6.19.0",
     "react-email": "5.0.4",
+    "remark-directive": "4.0.0",
     "remark-emoji": "5.0.2",
     "shadcn": "3.5.0",
     "tailwindcss": "4.1.17",
