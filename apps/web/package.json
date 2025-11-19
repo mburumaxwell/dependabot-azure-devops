@@ -83,7 +83,7 @@
     "react-dom": "19.2.0",
     "react-timeago": "8.3.0",
     "recharts": "2.15.4",
-    "resend": "6.4.2",
+    "resend": "6.5.0",
     "sonner": "2.0.7",
     "stripe": "19.3.1",
     "tailwind-merge": "3.4.0",
