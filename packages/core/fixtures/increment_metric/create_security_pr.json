@@ -1,0 +1,9 @@
+{
+  "type": "increment_metric",
+  "data": {
+    "metric": "updater.started",
+    "tags": {
+      "operation": "create_security_pr"
+    }
+  }
+}

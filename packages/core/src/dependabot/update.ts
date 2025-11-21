@@ -15,13 +15,6 @@ export const DependabotDependencyFileSchema = z.object({
   vendored_file: z.boolean().nullish(),
   symlink_target: z.string().nullish(),
   type: z.string().nullish(),
-  // mode: z.enum([
-  //   '100755', // executable
-  //   '100644', // file
-  //   '040000', // directory
-  //   '160000', // submodule
-  //   "120000", // symlink
-  // ]).nullish(),
   mode: z
     .enum({
       executable: '100755',

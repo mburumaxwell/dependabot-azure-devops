@@ -159,18 +159,15 @@ describe('update_dependency_list', () => {
     const data = DependabotUpdateDependencyListSchema.parse(raw.data);
 
     expect(data.dependency_files).toEqual(['/Root.csproj']);
-    expect(data.dependencies!.length).toEqual(76);
+    expect(data.dependencies!.length).toEqual(3);
 
-    expect(data.dependencies[0]!.name).toEqual('Azure.Core');
-    expect(data.dependencies[0]!.version).toEqual('1.35.0');
-    expect(data.dependencies[0]!.requirements!.length).toEqual(0);
-
-    expect(data.dependencies![3]!.name).toEqual('GraphQL.Server.Ui.Voyager');
-    expect(data.dependencies![3]!.version).toEqual('8.1.0');
-    expect(data.dependencies![3]!.requirements!.length).toEqual(1);
-    expect(data.dependencies![3]!.requirements![0]!.file).toEqual('/Root.csproj');
-    expect(data.dependencies![3]!.requirements![0]!.requirement).toEqual('8.1.0');
-    expect(data.dependencies![3]!.requirements![0]!.groups).toEqual(['dependencies']);
+    expect(data.dependencies[0]!.name).toEqual('Microsoft.Extensions.DependencyInjection.Abstractions');
+    expect(data.dependencies[0]!.version).toEqual('8.0.0');
+    expect(data.dependencies[0]!.requirements!.length).toEqual(1);
+    expect(data.dependencies![0]!.requirements![0]!.file).toEqual('/Root.csproj');
+    expect(data.dependencies![0]!.requirements![0]!.groups).toEqual(['dependencies']);
+    expect(data.dependencies![0]!.requirements![0]!.requirement).toEqual('8.0.0');
+    expect(data.dependencies![0]!.requirements![0]!.source).toBeNull();
   });
 
   it('works for a result from terraform', async () => {
@@ -237,6 +234,14 @@ describe('increment_metric', () => {
     expect(data).toBeDefined();
     expect(data.metric).toEqual('updater.started');
     expect(data.tags).toEqual({ operation: 'group_update_all_versions' });
+  });
+
+  it('create_security_pr', async () => {
+    const raw = JSON.parse(await readFile('fixtures/increment_metric/create_security_pr.json', 'utf-8'));
+    const data = DependabotIncrementMetricSchema.parse(raw.data);
+    expect(data).toBeDefined();
+    expect(data.metric).toEqual('updater.started');
+    expect(data.tags).toEqual({ operation: 'create_security_pr' });
   });
 });
 
