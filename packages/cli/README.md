@@ -79,6 +79,7 @@ paklo run --organisation-url <ORGANISATION-URL> --project <PROJECT> --repository
 - `--updater-image <IMAGE>` - Custom updater Docker image
 - `--dry-run` - Run without making changes
 - `--debug` - Enable debug logging
+- `--inspect` - Write raw Dependabot API requests to `./inspections` for troubleshooting
 
 **Example:**
 

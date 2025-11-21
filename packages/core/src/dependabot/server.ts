@@ -73,6 +73,15 @@ type AuthenticatorFunc = (type: DependabotTokenType, id: string, value: string) 
 type HandlerFunc = (id: string, request: DependabotRequest) => Promise<boolean>;
 
 /**
+ * Function for inspecting raw dependabot requests.
+ * @param id - The ID of the dependabot job.
+ * @param type - The type of dependabot request.
+ * @param raw - The raw JSON data of the request.
+ * @returns A promise that resolves when the operation is complete.
+ */
+type InspectRequestFunc = (id: string, type: DependabotRequestType, raw: unknown) => Promise<void>;
+
+/**
  * Function for getting a dependabot job config by ID.
  * @param id - The ID of the dependabot job.
  * @returns A promise that resolves to the dependabot job config, or undefined if not found.
@@ -102,6 +111,12 @@ export type CreateApiServerAppOptions = {
   /** Function for getting dependabot credentials by job ID. */
   getCredentials: GetCredentialsFunc;
 
+  /**
+   * Optional function for inspecting raw dependabot requests.
+   * Should only be used for troubleshooting.
+   * */
+  inspect?: InspectRequestFunc;
+
   /** Handler function for processing the operations. */
   handle: HandlerFunc;
 };
@@ -123,6 +138,7 @@ export function createApiServerApp({
   authenticate,
   getJob,
   getCredentials,
+  inspect,
   handle,
 }: CreateApiServerAppOptions): Hono {
   // Setup app with base path and middleware
@@ -155,8 +171,8 @@ export function createApiServerApp({
          */
         const url = new URL(context.req.url);
         const isHTTPS = url.protocol === 'https:';
+        const { id } = context.req.valid('param');
         if (isHTTPS) {
-          const { id } = context.req.valid('param');
           const value = context.req.header('Authorization');
           if (!value) return context.body(null, 401);
           const valid = await authenticate('job', id, value);
@@ -164,6 +180,12 @@ export function createApiServerApp({
         } else {
           logger.trace(`Skipping authentication because it is not secure ${context.req.url}`);
         }
+
+        // if inspection is provided, call it with the raw request data
+        if (inspect) {
+          await inspect(id, type, await context.req.json());
+        }
+
         await next();
       },
       zValidator('json', z.object({ data: schema })),
