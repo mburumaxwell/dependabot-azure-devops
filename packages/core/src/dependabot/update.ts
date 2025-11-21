@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DependabotDependencySchema } from './job';
+import { DependabotDependencySchema, DependabotPackageManagerSchema } from './job';
 
 // we use nullish() because it does optional() and allows the value to be set to null
 
@@ -40,6 +40,35 @@ export const DependabotUpdateDependencyListSchema = z.object({
   dependency_files: z.string().array().nullish(),
 });
 export type DependabotUpdateDependencyList = z.infer<typeof DependabotUpdateDependencyListSchema>;
+
+export const DependabotDependencySubmissionSchema = z.object({
+  version: z.number(),
+  sha: z.string(),
+  ref: z.string(),
+  job: z.object({
+    correlator: z.string(),
+    id: z.string(),
+  }),
+  detector: z.object({
+    name: z.string(),
+    version: z.string(),
+    url: z.string(),
+  }),
+  manifests: z.object({
+    name: z.string().nullish(),
+    file: z.object({ source_location: z.string() }).nullish(),
+    metadata: z.object({ ecosystem: DependabotPackageManagerSchema }).nullish(),
+    resolved: z
+      .object({
+        package_url: z.string(),
+        relationship: z.enum(['direct', 'indirect']),
+        scope: z.enum(['runtime', 'development']),
+        dependencies: DependabotDependencySchema.array(),
+      })
+      .nullish(),
+  }),
+});
+export type DependabotDependencySubmission = z.infer<typeof DependabotDependencySubmissionSchema>;
 
 export const DependabotCreatePullRequestSchema = z.object({
   'base-commit-sha': z.string(),

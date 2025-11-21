@@ -291,6 +291,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
 
       // No action required
       case 'update_dependency_list':
+      case 'create_dependency_submission':
       case 'mark_as_processed':
       case 'record_ecosystem_versions':
       case 'record_ecosystem_meta':
