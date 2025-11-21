@@ -1,5 +1,32 @@
 # @paklo/core
 
+## 0.7.0
+
+### Minor Changes
+
+- 5402afc: Support for `create_dependency_submission` requests.
+  While these requests are doing nothing at this time, it helps keep similar request possibilities to avoid jobs failing because of 404 responses.
+  This could also be used in the managed version to support SBOM or checking vulnerabilities.
+- b24a07a: Use enum for dependabot close PR reason
+- 3fcaa18: Add request inspection support for troubleshooting.
+  - CLI `run` command can write raw Dependabot requests with `--inspect`, writing JSON snapshots under `./inspections`.
+  - Core server accepts an optional inspect hook that records the raw request payload before processing.
+- 80e7937: Support for `record_update_job_warning` by creating comments on modified pull requests.
+  The `record_update_job_warning` is based on dependabot notices and is for scenarios such as when the package manager is outdated and Dependabot would stop supporting it.
+  There are other scenarios when notices are generated.
+
+### Patch Changes
+
+- ff9570c: Prevent ReDoS vulnerabilities in regex patterns
+  - Replace unsafe regex quantifiers in branch name normalization with safe string operations using split/filter/join
+  - Replace regex-based placeholder extraction with bounded quantifiers and non-global matching to prevent exponential backtracking
+  - Eliminates potential denial of service attacks from maliciously crafted input strings with consecutive special characters
+
+- 538ddb9: Improve Azure DevOps file change handling for Dependabot updates
+  - Skip no-op changes and avoid sending bodies for delete operations when pushing PR commits
+  - Treat missing content and encoding as optional through the request models and builders
+  - Tighten Dependabot dependency file schema with explicit operation and encoding enums
+
 ## 0.6.1
 
 ### Patch Changes

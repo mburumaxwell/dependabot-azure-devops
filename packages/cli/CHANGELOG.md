@@ -1,5 +1,28 @@
 # paklo
 
+## 0.12.0
+
+### Minor Changes
+
+- 3fcaa18: Add request inspection support for troubleshooting.
+  - CLI `run` command can write raw Dependabot requests with `--inspect`, writing JSON snapshots under `./inspections`.
+  - Core server accepts an optional inspect hook that records the raw request payload before processing.
+- a03803e: Add `fetch-images` command
+
+### Patch Changes
+
+- Updated dependencies [ff9570c]
+- Updated dependencies [5402afc]
+- Updated dependencies [578e49b]
+- Updated dependencies [b24a07a]
+- Updated dependencies [3fcaa18]
+- Updated dependencies [538ddb9]
+- Updated dependencies [d999288]
+- Updated dependencies [48615d6]
+- Updated dependencies [80e7937]
+  - @paklo/core@0.7.0
+  - @paklo/runner@0.4.0
+
 ## 0.11.7
 
 ### Patch Changes
