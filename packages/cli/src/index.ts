@@ -2,13 +2,14 @@
 
 import { Command } from 'commander';
 import packageJson from '../package.json';
-import { cleanup, run, validate } from './commands';
+import { cleanup, fetchImages, run, validate } from './commands';
 
 const root = new Command();
 
 root.name('paklo').description('CLI tool for running E2E dependabot updates locally.');
 root.usage();
 root.version(packageJson.version, '--version');
+root.addCommand(fetchImages);
 root.addCommand(validate);
 root.addCommand(run);
 root.addCommand(cleanup);
