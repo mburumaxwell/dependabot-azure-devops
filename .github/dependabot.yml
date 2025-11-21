@@ -24,7 +24,7 @@ updates:
       time: '02:00'
 
   - package-ecosystem: 'docker'
-    directory: '/docker'
+    directories: ['/packages/runner/docker']
     schedule:
       interval: 'weekly'
       time: '02:00'
