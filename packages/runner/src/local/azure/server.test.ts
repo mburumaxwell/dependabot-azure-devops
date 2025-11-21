@@ -27,6 +27,7 @@ describe('AzureLocalDependabotServer', () => {
       createPullRequest: vi.fn(),
       updatePullRequest: vi.fn(),
       abandonPullRequest: vi.fn(),
+      addCommentThread: vi.fn(),
       approvePullRequest: vi.fn(),
       getDefaultBranch: vi.fn(),
     } as unknown as AzureDevOpsWebApiClient;
@@ -377,6 +378,38 @@ describe('AzureLocalDependabotServer', () => {
 
       expect(result).toEqual(true);
       expect(authorClient.abandonPullRequest).toHaveBeenCalled();
+    });
+
+    it('should process "record_update_job_warning" if "dryRun" is true', async () => {
+      options.dryRun = true;
+
+      vi.mocked(authorClient.addCommentThread).mockResolvedValue(1);
+
+      const result = await (server as any).handle('1', {
+        type: 'record_update_job_warning',
+        data: {
+          'warn-type': 'deprecated_dependency',
+          'warn-title': 'Deprecated Dependency Used',
+          'warn-description': 'The dependency xyz is deprecated and should be updated or removed.',
+        },
+      });
+      expect(result).toEqual(true);
+      expect(authorClient.addCommentThread).not.toHaveBeenCalled();
+    });
+
+    it('should process "record_update_job_warning"', async () => {
+      vi.mocked(authorClient.addCommentThread).mockResolvedValue(1);
+
+      const result = await (server as any).handle('1', {
+        type: 'record_update_job_warning',
+        data: {
+          'warn-type': 'deprecated_dependency',
+          'warn-title': 'Deprecated Dependency Used',
+          'warn-description': 'The dependency xyz is deprecated and should be updated or removed.',
+        },
+      });
+      expect(result).toEqual(true);
+      expect(authorClient.addCommentThread).toHaveBeenCalled();
     });
 
     it('should process "mark_as_processed"', async () => {

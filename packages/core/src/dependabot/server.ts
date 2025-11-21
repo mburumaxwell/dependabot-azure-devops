@@ -13,6 +13,7 @@ import {
   DependabotRecordEcosystemVersionsSchema,
   DependabotRecordUpdateJobErrorSchema,
   DependabotRecordUpdateJobUnknownErrorSchema,
+  DependabotRecordUpdateJobWarningSchema,
   DependabotUpdateDependencyListSchema,
   DependabotUpdatePullRequestSchema,
 } from './update';
@@ -22,6 +23,7 @@ export const DependabotRequestTypeSchema = z.enum([
   'update_pull_request',
   'close_pull_request',
   'record_update_job_error',
+  'record_update_job_warning',
   'record_update_job_unknown_error',
   'mark_as_processed',
   'update_dependency_list',
@@ -37,6 +39,7 @@ export const DependabotRequestSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('update_pull_request'), data: DependabotUpdatePullRequestSchema }),
   z.object({ type: z.literal('close_pull_request'), data: DependabotClosePullRequestSchema }),
   z.object({ type: z.literal('record_update_job_error'), data: DependabotRecordUpdateJobErrorSchema }),
+  z.object({ type: z.literal('record_update_job_warning'), data: DependabotRecordUpdateJobWarningSchema }),
   z.object({ type: z.literal('record_update_job_unknown_error'), data: DependabotRecordUpdateJobUnknownErrorSchema }),
   z.object({ type: z.literal('mark_as_processed'), data: DependabotMarkAsProcessedSchema }),
   z.object({ type: z.literal('update_dependency_list'), data: DependabotUpdateDependencyListSchema }),
@@ -127,6 +130,7 @@ export function createApiServerApp({
   // - POST  request to /update_pull_request
   // - POST  request to /close_pull_request
   // - POST  request to /record_update_job_error
+  // - POST  request to /record_update_job_warning
   // - POST  request to /record_update_job_unknown_error
   // - PATCH request to /mark_as_processed
   // - POST  request to /update_dependency_list
@@ -173,6 +177,7 @@ export function createApiServerApp({
   operation('update_pull_request', DependabotUpdatePullRequestSchema);
   operation('close_pull_request', DependabotClosePullRequestSchema);
   operation('record_update_job_error', DependabotRecordUpdateJobErrorSchema);
+  operation('record_update_job_warning', DependabotRecordUpdateJobWarningSchema);
   operation('record_update_job_unknown_error', DependabotRecordUpdateJobUnknownErrorSchema);
   operation('mark_as_processed', DependabotMarkAsProcessedSchema, 'patch');
   operation('update_dependency_list', DependabotUpdateDependencyListSchema);

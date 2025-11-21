@@ -4,6 +4,7 @@ import type {
   IAbandonPullRequest,
   IApprovePullRequest,
   ICreatePullRequest,
+  IPullRequestComment,
   IPullRequestProperties,
   IUpdatePullRequest,
 } from './models';
@@ -599,22 +600,12 @@ export class AzureDevOpsWebApiClient {
       // Add a comment to the pull request, if supplied
       if (pr.comment) {
         logger.info(` - Adding abandonment reason comment to pull request...`);
-        const thread = await this.restApiPost(
-          `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests/${pr.pullRequestId}/threads`,
-          {
-            status: CommentThreadStatus.Closed,
-            comments: [
-              {
-                author: {
-                  id: userId,
-                },
-                content: pr.comment,
-                commentType: CommentType.System,
-              },
-            ],
-          },
-        );
-        if (!thread?.id) {
+        const threadId = await this.addCommentThread({
+          ...pr,
+          content: pr.comment,
+          userId,
+        });
+        if (!threadId) {
           throw new Error('Failed to add comment to pull request, thread was not created');
         }
       }
@@ -660,6 +651,30 @@ export class AzureDevOpsWebApiClient {
       logger.debug(e); // Dump the error stack trace to help with debugging
       return false;
     }
+  }
+
+  /**
+   * Add a comment thread on a pull request.
+   * Requires scope "Code (Write)" (vso.code_write).
+   */
+  public async addCommentThread(comment: IPullRequestComment): Promise<number | undefined> {
+    const userId = comment.userId ?? (await this.getUserId());
+    const thread = await this.restApiPost(
+      `${this.organisationApiUrl}/${comment.project}/_apis/git/repositories/${comment.repository}/pullrequests/${comment.pullRequestId}/threads`,
+      {
+        status: CommentThreadStatus.Closed,
+        comments: [
+          {
+            author: {
+              id: userId,
+            },
+            content: comment.content,
+            commentType: CommentType.System,
+          },
+        ],
+      },
+    );
+    return thread?.id;
   }
 
   private async restApiGet(
