@@ -122,8 +122,6 @@ export const DependabotExperimentsSchema = z.record(z.string(), z.union([z.strin
 export type DependabotExperiments = z.infer<typeof DependabotExperimentsSchema>;
 
 export const DependabotPackageManagerSchema = z.enum([
-  // order matches dependabot-action/src/update-containers.ts
-
   'bundler',
   'cargo',
   'composer',
