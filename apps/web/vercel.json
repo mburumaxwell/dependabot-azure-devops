@@ -13,6 +13,6 @@
     }
   },
   "github": {
-    "autoJobCancelation": false
+    "autoJobCancelation": true
   }
 }
