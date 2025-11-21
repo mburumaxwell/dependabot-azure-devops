@@ -19,7 +19,7 @@
     "workflow-web": "workflow web",
     "prebuild": "pnpm prisma-gen",
     "predev": "pnpm prisma-gen",
-    "typegen": "next typegen",
+    "typegen": "next typegen && pnpm prisma-gen",
     "build": "next build",
     "dev": "next dev",
     "start": "next start",

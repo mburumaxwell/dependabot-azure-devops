@@ -61,18 +61,18 @@ jobs:
           # owner: ${{ github.repository_owner }}
           # repositories: ${{ github.repository.name }}
 
+      # Ensure npm 11.5.1 or later for trusted publishing
+      # https://github.com/orgs/community/discussions/173102
+      - name: Update npm to latest
+        if: ${{ github.event_name != 'pull_request' }}
+        run: npm install -g npm@latest
+
       # Change git info to match the token
       - name: Setup git info
         if: ${{ github.event_name != 'pull_request' }}
         run: |
           git config user.name release-automator-mburumaxwell[bot]
           git config user.email 214517399+release-automator-mburumaxwell[bot]@users.noreply.github.com
-
-      # Ensure npm 11.5.1 or later for trusted publishing
-      # https://github.com/orgs/community/discussions/173102
-      - name: Update npm to latest
-        if: ${{ github.event_name != 'pull_request' }}
-        run: npm install -g npm@latest
 
       - name: Create release PR or Publish
         if: ${{ github.event_name != 'pull_request' }}
