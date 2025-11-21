@@ -1,5 +1,30 @@
 # @paklo/runner
 
+## 0.4.0
+
+### Minor Changes
+
+- 5402afc: Support for `create_dependency_submission` requests.
+  While these requests are doing nothing at this time, it helps keep similar request possibilities to avoid jobs failing because of 404 responses.
+  This could also be used in the managed version to support SBOM or checking vulnerabilities.
+- 578e49b: Track docker images locally since `dependabot-action` is slow.
+  This way newer docker images make it here a little faster.
+- d999288: Bump the dependabot-core-images (28 updates) to from various versions to `v2.0.20251120202309`
+- 80e7937: Support for `record_update_job_warning` by creating comments on modified pull requests.
+  The `record_update_job_warning` is based on dependabot notices and is for scenarios such as when the package manager is outdated and Dependabot would stop supporting it.
+  There are other scenarios when notices are generated.
+
+### Patch Changes
+
+- 48615d6: Bump github/dependabot-update-job-proxy/dependabot-update-job-proxy from v2.0.20251113195050 to v2.0.20251114180523
+- Updated dependencies [ff9570c]
+- Updated dependencies [5402afc]
+- Updated dependencies [b24a07a]
+- Updated dependencies [3fcaa18]
+- Updated dependencies [538ddb9]
+- Updated dependencies [80e7937]
+  - @paklo/core@0.7.0
+
 ## 0.3.1
 
 ### Patch Changes
