@@ -4,16 +4,34 @@ import { DependabotDependencySchema } from './job';
 // we use nullish() because it does optional() and allows the value to be set to null
 
 export const DependabotDependencyFileSchema = z.object({
+  // https://github.com/dependabot/dependabot-core/blob/5e2711f9913cc387acb7cb0d29d51fb52d235ef2/common/lib/dependabot/dependency_file.rb#L14-L15
   content: z.string().nullish(),
-  content_encoding: z.string().nullish(),
+  content_encoding: z.enum(['utf-8', 'base64']).nullish(),
   deleted: z.boolean().nullish(),
   directory: z.string(),
   name: z.string(),
-  operation: z.string(), // TODO: convert to enum?
+  operation: z.enum(['update', 'create', 'delete']),
   support_file: z.boolean().nullish(),
+  vendored_file: z.boolean().nullish(),
   symlink_target: z.string().nullish(),
-  type: z.string().nullish(), // TODO: convert to enum?
-  mode: z.string().nullish(),
+  type: z.string().nullish(),
+  // mode: z.enum([
+  //   '100755', // executable
+  //   '100644', // file
+  //   '040000', // directory
+  //   '160000', // submodule
+  //   "120000", // symlink
+  // ]).nullish(),
+  mode: z
+    .enum({
+      executable: '100755',
+      file: '100644',
+      directory: '040000',
+      submodule: '160000',
+      symlink: '120000',
+    })
+    .or(z.string())
+    .nullish(),
 });
 export type DependabotDependencyFile = z.infer<typeof DependabotDependencyFileSchema>;
 
