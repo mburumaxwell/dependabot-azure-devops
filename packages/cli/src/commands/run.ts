@@ -1,3 +1,5 @@
+import fs from 'node:fs/promises';
+import { dirname } from 'node:path';
 import { stdin, stdout } from 'node:process';
 import readline from 'node:readline/promises';
 import { extractRepositoryUrl, getDependabotConfig } from '@paklo/core/azure';
@@ -5,6 +7,7 @@ import {
   DEFAULT_EXPERIMENTS,
   DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
   DEPENDABOT_DEFAULT_AUTHOR_NAME,
+  type DependabotRequestType,
   parseExperiments,
 } from '@paklo/core/dependabot';
 import { logger } from '@paklo/core/logger';
@@ -36,6 +39,7 @@ const schema = z.object({
   targetUpdateIds: z.coerce.number().array(),
   experiments: z.string().optional(),
   updaterImage: z.string().optional(),
+  inspect: z.boolean().optional(),
   debug: z.boolean(),
   dryRun: z.boolean(),
 });
@@ -52,6 +56,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     experiments: rawExperiments,
     updaterImage,
     command,
+    inspect,
     ...remainingOptions
   } = options;
 
@@ -117,6 +122,12 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     `Configuration file valid: ${config.updates.length} update(s) and ${config.registries?.length ?? 'no'} registries.`,
   );
 
+  async function requestInspector(id: string, type: DependabotRequestType, raw: unknown) {
+    const path = `./inspections/${id}/${type}/${crypto.randomUUID()}.json`;
+    await fs.mkdir(dirname(path), { recursive: true });
+    await fs.writeFile(path, JSON.stringify(raw, null, 2), 'utf-8');
+  }
+
   try {
     const runnerOptions: AzureLocalJobsRunnerOptions = {
       config,
@@ -128,6 +139,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
       experiments,
       updaterImage,
       command,
+      inspect: inspect ? requestInspector : undefined,
       ...remainingOptions,
     };
     const runner = new AzureLocalJobsRunner(runnerOptions);
@@ -200,6 +212,7 @@ export const command = new Command('run')
     'The dependabot-updater docker image to use for updates. e.g. ghcr.io/dependabot/dependabot-updater-{ecosystem}:latest',
   )
   .addOption(new Option('--command <COMMAND>', 'The command to run for the update.').choices(COMMANDS))
+  .option('--inspect', 'Whether to enable request inspection. Only for troubleshooting.')
   .option('--port <PORT>', 'Port to run the API server on.')
   .option('--debug', 'Whether to enable debug logging.', false)
   .option('--dry-run', 'Whether to enable dry run mode.', false)
