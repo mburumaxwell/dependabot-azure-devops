@@ -35,29 +35,28 @@ describe('cron', () => {
       ['cron', undefined, undefined, '0 2 * * 1-5', '0 2 * * 1-5'],
     ] as const;
 
-    it.each(samples)(
-      'generates correct cron for interval=%s, time=%s, day=%s, cronjob=%s',
-      (interval, time, day, cronjob, expected) => {
-        const schedule = createSchedule({
-          interval,
-          ...(time && { time }),
-          ...(day && { day }),
-          ...(cronjob && { cronjob }),
-        });
+    it.each(
+      samples,
+    )('generates correct cron for interval=%s, time=%s, day=%s, cronjob=%s', (interval, time, day, cronjob, expected) => {
+      const schedule = createSchedule({
+        interval,
+        ...(time && { time }),
+        ...(day && { day }),
+        ...(cronjob && { cronjob }),
+      });
 
-        const result = generateCron(schedule, 'Etc/UTC');
-        expect(result.cron).toBe(expected);
-        expect(result.next).toBeInstanceOf(Date);
-        expect(result.next.getTime()).toBeGreaterThan(Date.now());
+      const result = generateCron(schedule, 'Etc/UTC');
+      expect(result.cron).toBe(expected);
+      expect(result.next).toBeInstanceOf(Date);
+      expect(result.next.getTime()).toBeGreaterThan(Date.now());
 
-        // Validate that the generated cron expression is parseable
-        expect(() => {
-          const cronParser = CronExpressionParser.parse(result.cron);
-          // Verify we can get next execution time
-          cronParser.next();
-        }).not.toThrow();
-      },
-    );
+      // Validate that the generated cron expression is parseable
+      expect(() => {
+        const cronParser = CronExpressionParser.parse(result.cron);
+        // Verify we can get next execution time
+        cronParser.next();
+      }).not.toThrow();
+    });
 
     describe('cron validation', () => {
       it('shows sample execution times for different intervals', () => {
