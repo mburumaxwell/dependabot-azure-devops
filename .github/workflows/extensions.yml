@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    tags: ['extension*']
+    tags: ['extension**']
     paths:
       - 'extensions/**'
       - 'packages/core/**'
