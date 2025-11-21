@@ -1,4 +1,4 @@
-import dockerContainerConfig from '../../../dependabot-action/docker/containers.json';
+import dockerContainerConfig from '../docker/containers.json';
 
 export const PROXY_IMAGE_NAME = dockerContainerConfig.proxy;
 

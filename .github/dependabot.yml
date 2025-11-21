@@ -17,12 +17,30 @@ updates:
       interval: 'weekly'
       time: '02:00'
 
+  - package-ecosystem: 'gitsubmodule'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      time: '02:00'
+
+  - package-ecosystem: 'docker'
+    directory: '/docker'
+    schedule:
+      interval: 'weekly'
+      time: '02:00'
+    cooldown:
+      default-days: 14 # chill for 14 days so that they fix any sudden issues
+      include: ['dependabot/*']
+    groups:
+      dependabot-core-images:
+        patterns: ['dependabot/*']
+
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
       interval: 'weekly'
       time: '02:00'
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 20
     groups:
       applicationinsights:
         patterns: ['@microsoft/applicationinsights*']
@@ -98,9 +116,3 @@ updates:
     ignore:
       - dependency-name: recharts
         update-types: [version-update:semver-major] # shadcn still doesn't support (https://github.com/shadcn-ui/ui/issues/7669)
-
-  - package-ecosystem: 'gitsubmodule'
-    directory: '/'
-    schedule:
-      interval: 'weekly'
-      time: '02:00'
