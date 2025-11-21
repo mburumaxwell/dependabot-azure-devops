@@ -88,6 +88,13 @@ export const DependabotRecordUpdateJobErrorSchema = z.object({
 });
 export type DependabotRecordUpdateJobError = z.infer<typeof DependabotRecordUpdateJobErrorSchema>;
 
+export const DependabotRecordUpdateJobWarningSchema = z.object({
+  'warn-type': z.string(),
+  'warn-title': z.string(),
+  'warn-description': z.string(),
+});
+export type DependabotRecordUpdateJobWarning = z.infer<typeof DependabotRecordUpdateJobWarningSchema>;
+
 export const DependabotRecordUpdateJobUnknownErrorSchema = z.object({
   'error-type': z.string(),
   'error-details': z.record(z.string(), z.any()).nullish(),

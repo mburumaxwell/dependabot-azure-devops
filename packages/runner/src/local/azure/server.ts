@@ -269,6 +269,26 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         return false;
       }
 
+      case 'record_update_job_warning': {
+        if (dryRun) {
+          logger.warn(`Skipping warning as 'dryRun' is set to 'true'`);
+          return true;
+        }
+
+        // add comment to each create/updated pull request
+        const ids = affectedPullRequestIds.get(id)!.created.concat(affectedPullRequestIds.get(id)!.updated);
+        for (const pullRequestId of ids) {
+          await authorClient.addCommentThread({
+            project: project,
+            repository: repository,
+            content: `### Dependabot Warning: ${data['warn-title']}\n\n${data['warn-description']}`,
+            pullRequestId,
+          });
+        }
+
+        return true;
+      }
+
       // No action required
       case 'update_dependency_list':
       case 'mark_as_processed':

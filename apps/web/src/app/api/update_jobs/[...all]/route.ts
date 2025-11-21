@@ -86,7 +86,8 @@ async function handleRequest(id: string, request: DependabotRequest): Promise<bo
     // TODO: implement actual logic
     case 'create_pull_request':
     case 'update_pull_request':
-    case 'close_pull_request': {
+    case 'close_pull_request':
+    case 'record_update_job_warning': {
       return true;
     }
 

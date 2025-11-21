@@ -88,3 +88,12 @@ export interface IAbandonPullRequest {
   comment?: string;
   deleteSourceBranch?: boolean;
 }
+
+/** Pull request comment */
+export interface IPullRequestComment {
+  project: string;
+  repository: string;
+  pullRequestId: number;
+  content: string;
+  userId?: string;
+}
