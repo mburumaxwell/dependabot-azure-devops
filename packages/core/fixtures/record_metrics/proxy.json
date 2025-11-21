@@ -1,0 +1,26 @@
+{
+  "type": "record_metrics",
+  "data": [
+    {
+      "metric": "dependabot.job_proxy.http_request_count",
+      "type": "increment",
+      "value": 13,
+      "tags": {
+        "grouped_update": "",
+        "package_manager": "",
+        "request_host": "OTHER"
+      }
+    },
+    {
+      "metric": "dependabot.job_proxy.http_response_count",
+      "type": "increment",
+      "value": 19,
+      "tags": {
+        "grouped_update": "",
+        "package_manager": "",
+        "request_host": "OTHER",
+        "response_code": "200"
+      }
+    }
+  ]
+}

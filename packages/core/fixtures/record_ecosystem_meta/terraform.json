@@ -1,0 +1,16 @@
+{
+  "type": "record_ecosystem_meta",
+  "data": [
+    {
+      "ecosystem": {
+        "name": "terraform",
+        "package_manager": {
+          "name": "terraform",
+          "version": "1.12.2",
+          "raw_version": "1.12.2",
+          "requirement": null
+        }
+      }
+    }
+  ]
+}

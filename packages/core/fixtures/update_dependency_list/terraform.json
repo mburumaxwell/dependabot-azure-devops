@@ -1,0 +1,77 @@
+{
+  "type": "update_dependency_list",
+  "data": {
+    "dependencies": [
+      {
+        "name": "hashicorp/azurerm",
+        "version": null,
+        "requirements": [
+          {
+            "file": "main.tf",
+            "groups": [],
+            "requirement": ">=3.18.0",
+            "source": {
+              "type": "provider",
+              "registry_hostname": "registry.terraform.io",
+              "module_identifier": "hashicorp/azurerm"
+            }
+          }
+        ]
+      },
+      {
+        "name": "hashicorp/azurerm",
+        "version": null,
+        "requirements": [
+          {
+            "file": "main.tf",
+            "groups": [],
+            "requirement": ">=3.18.0",
+            "source": {
+              "type": "provider",
+              "registry_hostname": "registry.terraform.io",
+              "module_identifier": "hashicorp/azurerm"
+            }
+          }
+        ]
+      },
+      {
+        "name": "hashicorp/azurerm",
+        "version": null,
+        "requirements": [
+          {
+            "file": "main.tf",
+            "groups": [],
+            "requirement": ">=3.18.0",
+            "source": {
+              "type": "provider",
+              "registry_hostname": "registry.terraform.io",
+              "module_identifier": "hashicorp/azurerm"
+            }
+          }
+        ]
+      },
+      {
+        "name": "hashicorp/azurerm",
+        "version": null,
+        "requirements": [
+          {
+            "file": "main.tf",
+            "groups": [],
+            "requirement": ">=3.18.0",
+            "source": {
+              "type": "provider",
+              "registry_hostname": "registry.terraform.io",
+              "module_identifier": "hashicorp/azurerm"
+            }
+          }
+        ]
+      }
+    ],
+    "dependency_files": [
+      "/backend/service-1/terraform/main.tf",
+      "/backend/service-2/terraform/main.tf",
+      "/frontend/terraform/main.tf",
+      "/ml/terraform/main.tf"
+    ]
+  }
+}

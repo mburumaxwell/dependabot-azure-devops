@@ -1,0 +1,14 @@
+{
+  "type": "record_metrics",
+  "data": [
+    {
+      "metric": "dependabot.action.ghcr_image_pull",
+      "type": "increment",
+      "value": 1,
+      "tags": {
+        "package_manager": "pip",
+        "org": "dependabot"
+      }
+    }
+  ]
+}
