@@ -201,6 +201,12 @@ importers:
       octokit:
         specifier: 5.0.5
         version: 5.0.5
+      pino:
+        specifier: 10.1.0
+        version: 10.1.0
+      pino-pretty:
+        specifier: 13.1.2
+        version: 13.1.2
       react:
         specifier: 19.2.0
         version: 19.2.0
