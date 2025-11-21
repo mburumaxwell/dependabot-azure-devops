@@ -45,9 +45,17 @@ export const DependabotUpdatePullRequestSchema = z.object({
 });
 export type DependabotUpdatePullRequest = z.infer<typeof DependabotUpdatePullRequestSchema>;
 
+export const DependabotClosePullRequestReasonEnum = z.enum([
+  'dependencies_changed',
+  'dependency_group_empty',
+  'dependency_removed',
+  'up_to_date',
+  'update_no_longer_possible',
+]);
+export type DependabotClosePullRequestReason = z.infer<typeof DependabotClosePullRequestReasonEnum>;
 export const DependabotClosePullRequestSchema = z.object({
   'dependency-names': z.string().array(),
-  reason: z.string().nullish(), // TODO: convert to enum?
+  reason: DependabotClosePullRequestReasonEnum.nullish(),
 });
 export type DependabotClosePullRequest = z.infer<typeof DependabotClosePullRequestSchema>;
 
