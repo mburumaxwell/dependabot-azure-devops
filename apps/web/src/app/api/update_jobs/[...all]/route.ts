@@ -87,6 +87,7 @@ async function handleRequest(id: string, request: DependabotRequest): Promise<bo
     case 'create_pull_request':
     case 'update_pull_request':
     case 'close_pull_request':
+    case 'create_dependency_submission': // can be used for SBOM or checking vulnerabilities
     case 'record_update_job_warning': {
       return true;
     }

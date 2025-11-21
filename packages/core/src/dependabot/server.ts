@@ -6,6 +6,7 @@ import type { DependabotCredential, DependabotJobConfig } from './job';
 import {
   DependabotClosePullRequestSchema,
   DependabotCreatePullRequestSchema,
+  DependabotDependencySubmissionSchema,
   DependabotIncrementMetricSchema,
   DependabotMarkAsProcessedSchema,
   DependabotMetricSchema,
@@ -27,6 +28,7 @@ export const DependabotRequestTypeSchema = z.enum([
   'record_update_job_unknown_error',
   'mark_as_processed',
   'update_dependency_list',
+  'create_dependency_submission',
   'record_ecosystem_versions',
   'record_ecosystem_meta',
   'increment_metric',
@@ -43,6 +45,7 @@ export const DependabotRequestSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('record_update_job_unknown_error'), data: DependabotRecordUpdateJobUnknownErrorSchema }),
   z.object({ type: z.literal('mark_as_processed'), data: DependabotMarkAsProcessedSchema }),
   z.object({ type: z.literal('update_dependency_list'), data: DependabotUpdateDependencyListSchema }),
+  z.object({ type: z.literal('create_dependency_submission'), data: DependabotDependencySubmissionSchema }),
   z.object({ type: z.literal('record_ecosystem_versions'), data: DependabotRecordEcosystemVersionsSchema }),
   z.object({ type: z.literal('record_ecosystem_meta'), data: DependabotRecordEcosystemMetaSchema.array() }),
   z.object({ type: z.literal('increment_metric'), data: DependabotIncrementMetricSchema }),
@@ -134,6 +137,7 @@ export function createApiServerApp({
   // - POST  request to /record_update_job_unknown_error
   // - PATCH request to /mark_as_processed
   // - POST  request to /update_dependency_list
+  // - POST  request to /create_dependency_submission
   // - POST  request to /record_ecosystem_versions
   // - POST  request to /record_ecosystem_meta
   // - POST  request to /increment_metric
@@ -181,6 +185,7 @@ export function createApiServerApp({
   operation('record_update_job_unknown_error', DependabotRecordUpdateJobUnknownErrorSchema);
   operation('mark_as_processed', DependabotMarkAsProcessedSchema, 'patch');
   operation('update_dependency_list', DependabotUpdateDependencyListSchema);
+  operation('create_dependency_submission', DependabotDependencySubmissionSchema);
   operation('record_ecosystem_versions', DependabotRecordEcosystemVersionsSchema);
   operation('record_ecosystem_meta', DependabotRecordEcosystemMetaSchema.array());
   operation('increment_metric', DependabotIncrementMetricSchema);

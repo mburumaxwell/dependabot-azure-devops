@@ -126,6 +126,29 @@ describe('AzureLocalDependabotServer', () => {
       expect(result).toEqual(true);
     });
 
+    it('should process "create_dependency_submission"', async () => {
+      const result = await (server as any).handle('1', {
+        type: 'create_dependency_submission',
+        data: {
+          version: 1,
+          sha: '41fa8b4fe8d90fe7db38d4b730768e7dc52bc983',
+          ref: 'refs/heads/main',
+          job: {
+            correlator: 'dependabot-terraform-**-terraform',
+            id: '3302222848',
+          },
+          detector: {
+            name: 'dependabot',
+            version: '0.349.0-25e6e4a90121d8f8dae0c687f99ccd0aa15a7db6dd1ba623bbee7d766936e0aa',
+            url: 'https://github.com/dependabot/dependabot-core',
+          },
+          manifests: {},
+        },
+      });
+
+      expect(result).toEqual(true);
+    });
+
     it('should skip processing "create_pull_request" if "dryRun" is true', async () => {
       options.dryRun = true;
       server = new AzureLocalDependabotServer(options);

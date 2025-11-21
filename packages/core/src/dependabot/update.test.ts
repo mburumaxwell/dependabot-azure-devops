@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   DependabotCreatePullRequestSchema,
+  DependabotDependencySubmissionSchema,
   DependabotIncrementMetricSchema,
   DependabotMarkAsProcessedSchema,
   DependabotMetricSchema,
@@ -10,6 +11,26 @@ import {
   DependabotRecordEcosystemVersionsSchema,
   DependabotUpdateDependencyListSchema,
 } from './update';
+
+describe('create_dependency_submission', () => {
+  it('terraform', async () => {
+    const raw = JSON.parse(await readFile('fixtures/create_dependency_submission/terraform.json', 'utf-8'));
+    const data = DependabotDependencySubmissionSchema.parse(raw.data);
+
+    expect(data.version).toEqual(1);
+    expect(data.sha).toEqual('41fa8b4fe8d90fe7db38d4b730768e7dc52bc983');
+    expect(data.ref).toEqual('refs/heads/main');
+    expect(data.job.id).toEqual('3302222848');
+    expect(data.job.correlator).toEqual('dependabot-terraform-**-terraform');
+    expect(data.detector.name).toEqual('dependabot');
+    expect(data.detector.version).toEqual('0.349.0-25e6e4a90121d8f8dae0c687f99ccd0aa15a7db6dd1ba623bbee7d766936e0aa');
+    expect(data.detector.url).toEqual('https://github.com/dependabot/dependabot-core');
+    expect(data.manifests.name).toBeUndefined();
+    expect(data.manifests.file).toBeUndefined();
+    expect(data.manifests.metadata).toBeUndefined();
+    expect(data.manifests.resolved).toBeUndefined();
+  });
+});
 
 describe('create_pull_request', () => {
   it('python-pip', async () => {
