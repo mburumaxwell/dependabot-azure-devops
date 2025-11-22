@@ -45,5 +45,6 @@ export default async function LegalDocPage(props: PageProps<'/legal/[slug]'>) {
 }
 
 export function generateStaticParams() {
-  return legal.generateParams();
+  // return legal.generateParams();
+  return legal.getPages().map((doc) => ({ slug: doc.slugs[0] }));
 }
