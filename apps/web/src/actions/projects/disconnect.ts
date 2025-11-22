@@ -6,10 +6,8 @@ export async function disconnectProject({ organizationId, projectId }: { organiz
   // delete the project if it belongs to the organization
   // cascading deletes will handle related entities
   await prisma.project.deleteMany({
-    where: {
-      organizationId, // must belong to the organization
-      id: projectId,
-    },
+    // must belong to the organization
+    where: { organizationId, id: projectId },
   });
 
   // jobs should not be deleted because of billing and analysis purposes

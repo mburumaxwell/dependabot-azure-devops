@@ -6,9 +6,23 @@ import { notFound } from 'next/navigation';
 import { docs, getPageImage } from '@/lib/source';
 import { getMDXComponents } from '@/mdx-components';
 
+export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): Promise<Metadata> {
+  const { slug } = await props.params;
+  const page = docs.getPage(slug);
+  if (!page) notFound();
+
+  return {
+    title: page.data.title,
+    description: page.data.description,
+    openGraph: {
+      images: getPageImage(page).url,
+    },
+  };
+}
+
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
-  const params = await props.params;
-  const page = docs.getPage(params.slug);
+  const { slug } = await props.params;
+  const page = docs.getPage(slug);
   if (!page) notFound();
 
   const MDX = page.data.body;
@@ -31,18 +45,4 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
 
 export async function generateStaticParams() {
   return docs.generateParams();
-}
-
-export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): Promise<Metadata> {
-  const params = await props.params;
-  const page = docs.getPage(params.slug);
-  if (!page) notFound();
-
-  return {
-    title: page.data.title,
-    description: page.data.description,
-    openGraph: {
-      images: getPageImage(page).url,
-    },
-  };
 }

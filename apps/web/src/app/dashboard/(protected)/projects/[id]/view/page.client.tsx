@@ -29,7 +29,7 @@ type SimpleProject = Pick<
   Project,
   'id' | 'name' | 'url' | 'maxRepositories' | 'synchronizationStatus' | 'synchronizedAt' | 'organizationId'
 >;
-type SimpleRepository = Pick<Repository, 'id' | 'name' | 'synchronizationStatus' | 'updatedAt' | 'synchronizedAt'>;
+type SimpleRepository = Pick<Repository, 'id' | 'name' | 'updatedAt' | 'synchronizationStatus' | 'synchronizedAt'>;
 export function RepositoriesView({
   project: initialProject,
   repositories,

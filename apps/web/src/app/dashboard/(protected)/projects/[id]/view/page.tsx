@@ -6,8 +6,8 @@ import { prisma } from '@/lib/prisma';
 import { RepositoriesView } from './page.client';
 
 export async function generateMetadata(props: PageProps<'/dashboard/projects/[id]/view'>): Promise<Metadata> {
-  const params = await props.params;
-  const project = await getProject({ id: params.id });
+  const { id } = await props.params;
+  const project = await getProject({ id });
   if (!project) {
     notFound();
   }
@@ -15,19 +15,26 @@ export async function generateMetadata(props: PageProps<'/dashboard/projects/[id
   return {
     title: project.name,
     description: `View project ${project.name}`,
-    openGraph: { url: `/dashboard/projects/${params.id}/view` },
+    openGraph: { url: `/dashboard/projects/${id}/view` },
   };
 }
 
 export default async function ProjectPage(props: PageProps<'/dashboard/projects/[id]/view'>) {
-  const params = await props.params;
-  const project = await getProject({ id: params.id });
+  const { id } = await props.params;
+  const project = await getProject({ id });
   if (!project) {
     notFound();
   }
 
   const repositories = await prisma.repository.findMany({
     where: { projectId: project.id },
+    select: {
+      id: true,
+      name: true,
+      updatedAt: true,
+      synchronizationStatus: true,
+      synchronizedAt: true,
+    },
   });
 
   return <RepositoriesView project={project} repositories={repositories} />;
@@ -42,10 +49,8 @@ async function getProject({ id }: { id: string }) {
   }
 
   const project = await prisma.project.findUnique({
-    where: {
-      organizationId, // must belong to an organization they are a member of (the active one)
-      id,
-    },
+    // must belong to an organization they are a member of (the active one)
+    where: { organizationId, id },
     select: {
       id: true,
       name: true,

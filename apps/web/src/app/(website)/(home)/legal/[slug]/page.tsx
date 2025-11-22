@@ -4,8 +4,8 @@ import { legal } from '@/lib/source';
 import { formatDate } from '@/lib/utils';
 
 export async function generateMetadata(props: PageProps<'/legal/[slug]'>): Promise<Metadata> {
-  const params = await props.params;
-  const doc = legal.getPage([params.slug]);
+  const { slug } = await props.params;
+  const doc = legal.getPage([slug]);
   if (!doc) {
     notFound();
   }
@@ -17,8 +17,8 @@ export async function generateMetadata(props: PageProps<'/legal/[slug]'>): Promi
 }
 
 export default async function LegalDocPage(props: PageProps<'/legal/[slug]'>) {
-  const params = await props.params;
-  const doc = legal.getPage([params.slug]);
+  const { slug } = await props.params;
+  const doc = legal.getPage([slug]);
   if (!doc) {
     notFound();
   }
@@ -45,5 +45,5 @@ export default async function LegalDocPage(props: PageProps<'/legal/[slug]'>) {
 }
 
 export function generateStaticParams() {
-  return legal.getPages().map((doc) => ({ slug: doc.slugs[0] }));
+  return legal.generateParams();
 }
