@@ -1,0 +1,15 @@
+meta {
+  name: web-cron-cleanup-database
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:3000/api/crons/cleanup/database
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{CRON_SECRET}}
+}
