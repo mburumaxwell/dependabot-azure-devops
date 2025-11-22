@@ -18,6 +18,7 @@ export async function cleanupDatabase() {
 
   await deleteUsageTelemetry();
   await deleteExpiredInvitations();
+  await deleteExpiredVerifications();
 }
 
 /**
@@ -56,4 +57,20 @@ async function deleteExpiredInvitations() {
   });
 
   logger.info(`Expired invitations cleanup completed: deleted ${result.count} expired invitations`);
+}
+
+/**
+ * Deletes verifications that have expired.
+ * A verification is considered expired if its `expiresAt` date is earlier than the current date.
+ * This step removes all such expired verifications from the database.
+ */
+async function deleteExpiredVerifications() {
+  'use step';
+
+  // Delete verifications that have expired (date in the database)
+  const result = await prisma.verification.deleteMany({
+    where: { expiresAt: { lt: new Date() } },
+  });
+
+  logger.info(`Expired verifications cleanup completed: deleted ${result.count} expired verifications`);
 }
