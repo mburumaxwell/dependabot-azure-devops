@@ -79,7 +79,7 @@ export class Synchronizer {
 
       // track for further synchronization
       syncPairs.push([sci, repository]);
-      if (syncPairs.length >= this.project.maxRepositories) {
+      if (syncPairs.filter(([item]) => item.hasConfiguration).length >= this.project.maxRepositories) {
         logger.debug(
           `Reached maximum number of repositories (${this.project.maxRepositories}) for project ${this.project.id}. Stopping further discovery.`,
         );
