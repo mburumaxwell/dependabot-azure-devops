@@ -1,10 +1,10 @@
+import { passkey } from '@better-auth/passkey';
 import { logger } from '@paklo/core/logger';
-import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { APIError } from 'better-auth/api';
+import { betterAuth } from 'better-auth/minimal';
 import { nextCookies } from 'better-auth/next-js';
 import { admin, magicLink, organization } from 'better-auth/plugins';
-import { passkey } from 'better-auth/plugins/passkey';
 import {
   sendMagicLinkEmail,
   sendOrganizationInviteDeclinedEmail,
@@ -112,7 +112,7 @@ export const auth = betterAuth({
     passkey({ rpName: 'Paklo' }),
     magicLink({
       expiresIn: 5 * 60, // 5 minutes
-      async sendMagicLink({ email, url }, request) {
+      async sendMagicLink({ email, url }, ctx) {
         logger.debug(`Sending magic link to ${email} url: ${url}`);
         await sendMagicLinkEmail({ recipient: email, url });
       },
@@ -127,7 +127,7 @@ export type ActiveOrganization = typeof auth.$Infer.ActiveOrganization;
 export type Invitation = typeof auth.$Infer.Invitation;
 export type Member = typeof auth.$Infer.Member;
 export type MemberRole = Member['role'];
-export type { Passkey } from 'better-auth/plugins/passkey';
+export type { Passkey } from '@better-auth/passkey';
 
 export { APIError as BetterAuthApiError };
 export { toNextJsHandler } from 'better-auth/next-js';
