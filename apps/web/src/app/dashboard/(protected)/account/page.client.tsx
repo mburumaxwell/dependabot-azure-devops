@@ -123,7 +123,7 @@ export function PasskeysSection({ passkeys: initialPasskeys }: { passkeys: Passk
 
   async function handleAddPasskey() {
     setIsModifyingPasskeys(true);
-    // TODO: fix after https://github.com/better-auth/better-auth/pull/5736 is merged
+    // TODO: fix after https://github.com/better-auth/better-auth/pull/6199 is merged
     const response = await authClient.passkey.addPasskey({
       // Not setting name, as it overrides the default (email) which makes it look awkward
       // in password managers. Instead, we'll let the user edit it afterwards.

@@ -29,7 +29,6 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
     setIsLoading(true);
     let error: { code?: string; message?: string } | null = null;
     try {
-      // https://www.better-auth.com/docs/plugins/passkey
       ({ error } = await authClient.signIn.passkey({
         // autoFill enables conditional UI but lots more needs to be done
         // autoFill: true,

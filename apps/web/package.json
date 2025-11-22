@@ -14,7 +14,7 @@
     "prisma-push": "pnpm exec prisma db push",
     "prisma-studio": "pnpm exec prisma studio",
     "prisma-format": "pnpm exec prisma format",
-    "better-auth-gen": "pnpm dlx @better-auth/cli generate",
+    "better-auth-gen": "pnpm dlx @better-auth/cli@1.3.34 generate",
     "email-dev": "email dev --dir src/emails/templates --port 4001",
     "workflow-web": "workflow web",
     "prebuild": "pnpm prisma-gen",
