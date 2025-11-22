@@ -179,11 +179,11 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
       <FieldSeparator />
       <FieldDescription className='text-center text-xs'>
         By continuing, you agree to our{' '}
-        <Link href='/legal/terms' target='_blank'>
+        <Link href='/legal/terms' target='_blank' rel='noreferrer'>
           Terms of Service
         </Link>{' '}
         and{' '}
-        <Link href='/legal/privacy' target='_blank'>
+        <Link href='/legal/privacy' target='_blank' rel='noreferrer'>
           Privacy Policy
         </Link>
         .

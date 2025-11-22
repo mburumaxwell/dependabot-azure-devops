@@ -2,12 +2,12 @@ import { toNextJsHandler } from '@paklo/core/hono';
 import { Hono } from 'hono';
 import { bearerAuth } from 'hono/bearer-auth';
 import { start } from 'workflow/api';
+import { requestTriggerUpdateJobs } from '@/actions/repositories/trigger';
 import { requestSync } from '@/actions/sync';
 import { getNextRunDate } from '@/lib/cron';
 import { prisma } from '@/lib/prisma';
 import { MIN_AUTO_SYNC_INTERVAL_PROJECT } from '@/lib/sync';
 import { cleanupDatabase } from '@/workflows/cleanup-database';
-import { triggerUpdateJobs } from '@/workflows/jobs';
 
 export const dynamic = 'force-dynamic';
 
@@ -83,15 +83,13 @@ app.get('/trigger-update-jobs', async (context) => {
     const organization = organizationMap.get(project.organizationId)!;
 
     // trigger update jobs
-    await start(triggerUpdateJobs, [
-      {
-        organizationId: organization.id,
-        projectId: project.id,
-        repositoryId: repository.id,
-        repositoryUpdateIds: [update.id],
-        trigger: 'scheduled',
-      },
-    ]);
+    await requestTriggerUpdateJobs({
+      organizationId: organization.id,
+      projectId: project.id,
+      repositoryId: repository.id,
+      repositoryUpdateIds: [update.id],
+      trigger: 'scheduled',
+    });
   }
   return context.body(null, 204);
 });

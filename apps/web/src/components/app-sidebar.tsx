@@ -45,7 +45,7 @@ const groups: MenuGroup[] = [
       { label: 'Activity', href: '/dashboard/activity' },
       { label: 'Projects', href: '/dashboard/projects' },
       { label: 'Runs', href: '/dashboard/runs' },
-      { label: 'Advisories', href: '/dashboard/advisories' },
+      // { label: 'Advisories', href: '/dashboard/advisories' },
       { label: 'Secrets', href: '/dashboard/secrets' },
     ],
   },

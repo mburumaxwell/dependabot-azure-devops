@@ -23,3 +23,15 @@ export function getInitials(value: string, type: InitialsType = 'all') {
     .join('')
     .toUpperCase();
 }
+
+export function trimLeadingSlash(value: string): string {
+  return value.replace(/^\/+/, ''); // removes one or more leading slashes
+}
+
+export function trimTrailingSlash(value: string): string {
+  return value.replace(/\/+$/, ''); // removes one or more trailing slashes
+}
+
+export function trimSlashes(value: string): string {
+  return trimLeadingSlash(trimTrailingSlash(value));
+}

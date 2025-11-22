@@ -5,9 +5,9 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { RepositoriesView } from './page.client';
 
-export async function generateMetadata(props: PageProps<'/dashboard/projects/[id]/view'>): Promise<Metadata> {
+export async function generateMetadata(props: PageProps<'/dashboard/projects/[id]'>): Promise<Metadata> {
   const { id } = await props.params;
-  const project = await getProject({ id });
+  const { project } = await getProject({ id });
   if (!project) {
     notFound();
   }
@@ -15,13 +15,13 @@ export async function generateMetadata(props: PageProps<'/dashboard/projects/[id
   return {
     title: project.name,
     description: `View project ${project.name}`,
-    openGraph: { url: `/dashboard/projects/${id}/view` },
+    openGraph: { url: `/dashboard/projects/${id}` },
   };
 }
 
-export default async function ProjectPage(props: PageProps<'/dashboard/projects/[id]/view'>) {
+export default async function ProjectPage(props: PageProps<'/dashboard/projects/[id]'>) {
   const { id } = await props.params;
-  const project = await getProject({ id });
+  const { project } = await getProject({ id });
   if (!project) {
     notFound();
   }
@@ -45,7 +45,7 @@ async function getProject({ id }: { id: string }) {
   const session = (await auth.api.getSession({ headers }))!;
   const organizationId = session.session.activeOrganizationId;
   if (!organizationId) {
-    return undefined;
+    return { project: undefined };
   }
 
   const project = await prisma.project.findUnique({
@@ -62,5 +62,5 @@ async function getProject({ id }: { id: string }) {
     },
   });
 
-  return project;
+  return { project };
 }

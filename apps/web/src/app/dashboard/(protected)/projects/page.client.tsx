@@ -61,7 +61,7 @@ export function ProjectsView({ projects }: { projects: SimpleProject[] }) {
           <ItemGroup className='space-y-4'>
             {projects.map((project) => (
               <Item key={project.id} variant='outline' asChild>
-                <Link href={`/dashboard/projects/${project.id}/view`}>
+                <Link href={`/dashboard/projects/${project.id}`}>
                   <ItemMedia variant='icon'>
                     <FolderGit2 className='size-5' />
                   </ItemMedia>

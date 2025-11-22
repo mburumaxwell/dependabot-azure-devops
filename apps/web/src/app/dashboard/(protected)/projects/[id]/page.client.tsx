@@ -157,7 +157,7 @@ export function RepositoriesView({
               <TableRow
                 key={repo.id}
                 className='group hover:cursor-pointer'
-                onClick={() => router.push(`/dashboard/repositories/${repo.id}`)}
+                onClick={() => router.push(`/dashboard/projects/${project.id}/repos/${repo.id}`)}
               >
                 <TableCell>{repo.name}</TableCell>
                 <TableCell className='text-right'>

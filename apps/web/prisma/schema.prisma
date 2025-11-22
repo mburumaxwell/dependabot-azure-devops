@@ -393,6 +393,7 @@ model UpdateJob {
   downloadLogsUrl String?
   errorType       String?
   errorDetails    String? // JSON stringified Record<string, any>
+  affectedPrIds   Int[]
 
   @@unique([ecosystem, directoryKey, workflowRunId])
   @@index([organizationId])

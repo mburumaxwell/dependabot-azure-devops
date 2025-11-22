@@ -9,6 +9,15 @@ export const enableEnterpriseTier = flag({
   },
 });
 
+export const enableSbomDownload = flag({
+  key: 'enable-sbom-download',
+  // disabled until we have storage of discovered dependencies
+  defaultValue: false,
+  decide() {
+    return false;
+  },
+});
+
 export const enableDependabotDebug = flag({
   key: 'enable-dependabot-debug',
   defaultValue: false,
