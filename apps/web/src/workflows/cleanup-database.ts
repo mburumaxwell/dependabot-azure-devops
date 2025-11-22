@@ -1,5 +1,5 @@
 import { logger } from '@paklo/core/logger';
-import { getCollection } from '@/lib/mongodb';
+import { getMongoCollection } from '@/lib/mongodb';
 import { prisma } from '@/lib/prisma';
 
 /**
@@ -32,7 +32,7 @@ async function deleteUsageTelemetry() {
   // Delete usage telemetry records older than 1 year
   const oneYearAgo = new Date();
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-  const collection = await getCollection('usage_telemetry');
+  const collection = await getMongoCollection('usage_telemetry');
   const result = await collection.deleteMany({
     started: { $lt: oneYearAgo },
   });

@@ -1,6 +1,6 @@
 'use server';
 
-import { type Filter, getCollection, type UsageTelemetry } from '@/lib/mongodb';
+import { type Filter, getMongoCollection, type UsageTelemetry } from '@/lib/mongodb';
 
 export async function fetchTelemetryData({
   start,
@@ -19,7 +19,7 @@ export async function fetchTelemetryData({
   const packageManager =
     selectedPackageManager && selectedPackageManager !== 'all' ? selectedPackageManager : undefined;
 
-  const collection = await getCollection('usage_telemetry');
+  const collection = await getMongoCollection('usage_telemetry');
   const query: Filter<UsageTelemetry> = {
     started: { $gte: start, $lte: end },
     ...(owner ? { owner } : {}),

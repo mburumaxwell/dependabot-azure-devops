@@ -4,7 +4,7 @@ import { UsageTelemetryRequestDataSchema } from '@paklo/core/usage';
 import { geolocation } from '@vercel/functions';
 import { Hono } from 'hono';
 import { z } from 'zod';
-import { getCollection, type UsageTelemetry } from '@/lib/mongodb';
+import { getMongoCollection, type UsageTelemetry } from '@/lib/mongodb';
 import { fromExternalRegion } from '@/lib/regions';
 
 export const dynamic = 'force-dynamic';
@@ -39,7 +39,7 @@ app.post('/', zValidator('json', RequestDataSchema), async (context) => {
     success: payload.success,
   };
 
-  const collection = await getCollection('usage_telemetry');
+  const collection = await getMongoCollection('usage_telemetry');
   await collection.updateOne({ _id }, { $set: { _id, ...values } }, { upsert: true });
 
   return context.body(null, 204);

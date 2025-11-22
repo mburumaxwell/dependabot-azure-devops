@@ -18,7 +18,7 @@ type Collections = EnsureDocumentMap<{
   // add future collections here
 }>;
 
-export async function getCollection<K extends keyof Collections>(name: K) {
+export async function getMongoCollection<K extends keyof Collections>(name: K) {
   const client = await getMongoClient();
   const db = client.db();
   return db.collection<Collections[K]>(name);
