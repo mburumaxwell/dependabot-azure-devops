@@ -1,5 +1,13 @@
 # @paklo/core
 
+## 0.7.1
+
+### Patch Changes
+
+- f6e7cd9: Update default experiments as of 23 November 2025
+- 434bc91: Move environment and shared-date out of core for ease
+- d79af62: Collect error messages for tracking where issues are coming from
+
 ## 0.7.0
 
 ### Minor Changes
