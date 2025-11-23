@@ -421,6 +421,22 @@ describe('AzureLocalDependabotServer', () => {
     });
 
     it('should process "record_update_job_warning"', async () => {
+      server = new AzureLocalDependabotServer(options);
+      server.add({
+        id: '1',
+        update,
+        job: jobBuilderOutput.job,
+        jobToken: 'test-token',
+        credentialsToken: 'test-creds-token',
+        credentials: jobBuilderOutput.credentials,
+      });
+
+      // Add the PR id to affectedPullRequestIds so the handler will call addCommentThread
+      if (!server['affectedPullRequestIds'].get('1')) {
+        server['affectedPullRequestIds'].set('1', { created: [], updated: [], closed: [] });
+      }
+      server['affectedPullRequestIds'].get('1')!.created.push(11);
+
       vi.mocked(authorClient.addCommentThread).mockResolvedValue(1);
 
       const result = await (server as any).handle('1', {
