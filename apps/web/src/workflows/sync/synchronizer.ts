@@ -2,7 +2,7 @@ import { type DependabotConfig, makeDirectoryKey, parseDependabotConfig } from '
 import { logger } from '@paklo/core/logger';
 import { requestTriggerUpdateJobs } from '@/actions/repositories/trigger';
 import { generateCron } from '@/lib/cron';
-import { PakloId } from '@/lib/paklo-id';
+import { PakloId } from '@/lib/ids';
 import { type Organization, type OrganizationCredential, type Project, prisma, type Repository } from '@/lib/prisma';
 import { type ISyncProvider, type SynchronizerConfigurationItem, toSynchronizerProject } from './provider';
 

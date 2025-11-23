@@ -1,6 +1,6 @@
 import { KSUID } from '@owpz/ksuid';
 import { describe, expect, it } from 'vitest';
-import { OBJECT_TYPES, PakloId, type PakloObjectType, TYPE_PREFIX_MAPPING } from './paklo-id';
+import { OBJECT_TYPES, PakloId, type PakloObjectType, TYPE_PREFIX_MAPPING } from './ids';
 
 const VALID_TEST_IDS = [
   'org_0o5Fs0EELR0fUjHjbCnEtdUwQe3',

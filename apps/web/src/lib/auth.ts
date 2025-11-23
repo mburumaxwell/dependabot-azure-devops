@@ -11,8 +11,8 @@ import {
   sendOrganizationInviteEmail,
   sendUserDeleteVerificationEmail,
 } from '@/emails';
+import { PakloId } from '@/lib/ids';
 import { OrganizationBillingIntervalSchema, OrganizationTierSchema, OrganizationTypeSchema } from '@/lib/organizations';
-import { PakloId } from '@/lib/paklo-id';
 import { prisma as prismaClient } from '@/lib/prisma';
 import { RegionCodeSchema } from '@/lib/regions';
 import { config } from '@/site-config';

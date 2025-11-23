@@ -26,8 +26,8 @@ import {
   ItemTitle,
 } from '@/components/ui/item';
 import { Separator } from '@/components/ui/separator';
+import { getPullRequestUrl, getRepositoryFileUrl } from '@/lib/organizations';
 import type { Organization, Project, Repository, RepositoryUpdate, UpdateJob } from '@/lib/prisma';
-import { getPullRequestUrl, getRepositoryFileUrl } from '@/lib/repositories';
 import { trimLeadingSlash } from '@/lib/utils';
 
 type SimpleProject = Pick<Project, 'id' | 'name' | 'organizationId'> & {

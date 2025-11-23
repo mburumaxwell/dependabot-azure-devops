@@ -1,8 +1,8 @@
 'use server';
 
 import { requestSync } from '@/actions/sync';
+import { PakloId } from '@/lib/ids';
 import { getOrganizationTierInfo } from '@/lib/organizations/tiers';
-import { PakloId } from '@/lib/paklo-id';
 import { prisma } from '@/lib/prisma';
 import type { AvailableProject } from './available';
 

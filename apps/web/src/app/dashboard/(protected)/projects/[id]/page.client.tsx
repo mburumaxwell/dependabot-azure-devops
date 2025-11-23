@@ -22,8 +22,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Spinner } from '@/components/ui/spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { getNextManualSyncTime, isManualSyncAllowed } from '@/lib/organizations';
 import type { Project, Repository } from '@/lib/prisma';
-import { getNextManualSyncTime, isManualSyncAllowed } from '@/lib/sync';
 
 type SimpleProject = Pick<
   Project,

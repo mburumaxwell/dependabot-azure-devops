@@ -5,8 +5,8 @@ import { start } from 'workflow/api';
 import { requestTriggerUpdateJobs } from '@/actions/repositories/trigger';
 import { requestSync } from '@/actions/sync';
 import { getNextRunDate } from '@/lib/cron';
+import { MIN_AUTO_SYNC_INTERVAL_PROJECT } from '@/lib/organizations';
 import { prisma } from '@/lib/prisma';
-import { MIN_AUTO_SYNC_INTERVAL_PROJECT } from '@/lib/sync';
 import { cleanupDatabase } from '@/workflows/cleanup-database';
 
 export const dynamic = 'force-dynamic';

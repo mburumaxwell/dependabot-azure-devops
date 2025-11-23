@@ -14,8 +14,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Item, ItemActions, ItemContent, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getRepositoryFileUrl } from '@/lib/organizations';
 import type { Organization, Project, Repository, RepositoryUpdate } from '@/lib/prisma';
-import { getRepositoryFileUrl } from '@/lib/repositories';
 import { cn, trimLeadingSlash } from '@/lib/utils';
 
 type SimpleProject = Pick<Project, 'id' | 'name' | 'organizationId'> & {

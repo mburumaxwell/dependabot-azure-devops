@@ -1,6 +1,6 @@
 'use server';
 
-import { PakloId } from '@/lib/paklo-id';
+import { PakloId } from '@/lib/ids';
 import { type Feedback, prisma } from '@/lib/prisma';
 
 export type StoreFeedbackOptions = Pick<Feedback, 'message' | 'action'> & {

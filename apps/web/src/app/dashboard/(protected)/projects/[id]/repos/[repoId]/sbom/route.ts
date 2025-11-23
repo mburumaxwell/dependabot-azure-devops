@@ -4,8 +4,8 @@ import { join } from 'node:path';
 import * as spdx from '@spdx/tools';
 import { notFound } from 'next/navigation';
 
+import { getSpdxDocumentName } from '@/lib/organizations';
 import { prisma } from '@/lib/prisma';
-import { getSpdxDocumentName } from '@/lib/repositories';
 
 export const revalidate = 0; // always revalidate to get the latest SBOM
 

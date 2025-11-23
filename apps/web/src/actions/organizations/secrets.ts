@@ -1,7 +1,7 @@
 'use server';
 
 import { deleteKeyVaultSecret, getKeyVaultSecret, setKeyVaultSecret } from '@/lib/azure';
-import { PakloId } from '@/lib/paklo-id';
+import { PakloId } from '@/lib/ids';
 import { type OrganizationSecret, prisma } from '@/lib/prisma';
 import { type SecretValidationResult, validateSecretNameFormat } from '@/lib/secrets';
 
