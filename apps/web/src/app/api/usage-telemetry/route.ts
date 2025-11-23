@@ -37,6 +37,7 @@ app.post('/', zValidator('json', RequestDataSchema), async (context) => {
     started: payload.started,
     duration: payload.duration,
     success: payload.success,
+    error: payload.error,
   };
 
   const collection = await getMongoCollection('usage_telemetry');

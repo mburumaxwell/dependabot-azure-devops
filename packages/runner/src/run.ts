@@ -117,6 +117,8 @@ export async function runJob(options: RunJobOptions): Promise<RunJobResult> {
     started,
     duration,
     success,
+    // error message but truncate to first 1000 characters to avoid sending too much data
+    error: message ? { message: message.substring(0, 1000) } : undefined,
   };
   try {
     const json = JSON.stringify(data);

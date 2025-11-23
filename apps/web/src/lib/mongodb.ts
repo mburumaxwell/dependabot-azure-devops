@@ -49,6 +49,7 @@ export type UsageTelemetry = {
   started: Date;
   duration: number;
   success: boolean;
+  error?: { message: string };
 };
 
 export type { Filter } from 'mongodb';

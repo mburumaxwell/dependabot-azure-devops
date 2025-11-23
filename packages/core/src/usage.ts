@@ -19,7 +19,10 @@ import { DependabotPackageManagerSchema, DependabotSourceProviderSchema } from '
  *   "id": 2850677077,
  *   "started": "2025-10-03T14:44:00.191Z",
  *   "duration": 31812,
- *   "success": true
+ *   "success": true,
+ *   "error": {
+ *     "message": "An error occurred"
+ *   }
  * }
  * ```
  */
@@ -40,6 +43,7 @@ export const UsageTelemetryRequestDataSchema = z.object({
   started: z.coerce.date(),
   duration: z.number().min(0), // in milliseconds
   success: z.boolean(),
+  error: z.object({ message: z.string() }).optional(),
 });
 
 /**

@@ -1,4 +1,5 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: test file
+// biome-ignore-all lint/complexity/useLiteralKeys: test file
 
 import type { AzureDevOpsWebApiClient } from '@paklo/core/azure';
 import {
