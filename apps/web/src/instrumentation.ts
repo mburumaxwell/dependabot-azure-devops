@@ -1,10 +1,14 @@
+import { MongoDBInstrumentation } from '@opentelemetry/instrumentation-mongodb';
 import { environment } from '@paklo/core/environment';
+import { PrismaInstrumentation } from '@prisma/instrumentation';
 import { type Configuration, registerOTel } from '@vercel/otel';
-import { PrismaInstrumentation } from '@prisma/instrumentation'
 
 export async function register() {
   let traceExporter: Configuration['traceExporter'];
-  let instrumentations: Configuration['instrumentations'] = [new PrismaInstrumentation()];
+  const instrumentations: Configuration['instrumentations'] = [
+    new PrismaInstrumentation(),
+    new MongoDBInstrumentation(),
+  ];
 
   if (process.env.NEXT_RUNTIME !== 'edge') {
     const isVercelDeployment = Boolean(process.env.VERCEL_DEPLOYMENT_ID);
