@@ -6,10 +6,6 @@
   "author": "mburumaxwell",
   "license": "AGPL-3.0-later",
   "exports": {
-    "./environment": {
-      "types": "./dist/environment/index.d.mts",
-      "import": "./dist/environment/index.mjs"
-    },
     "./http": {
       "types": "./dist/http/index.d.mts",
       "import": "./dist/http/index.mjs"
@@ -25,10 +21,6 @@
     "./logger": {
       "types": "./dist/logger.d.mts",
       "import": "./dist/logger.mjs"
-    },
-    "./shared-data": {
-      "types": "./dist/shared-data/index.d.mts",
-      "import": "./dist/shared-data/index.mjs"
     },
     "./usage": {
       "types": "./dist/usage.d.mts",

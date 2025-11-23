@@ -1,8 +1,8 @@
 'use server';
 
-import { environment } from '@paklo/core/environment';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { environment } from '@/lib/environment';
 
 const COOKIE_NAME = 'auth-auth';
 

@@ -1,7 +1,5 @@
 import type { ZodType } from 'zod';
 
-import { environment } from '@/environment';
-
 import {
   HEADER_NAME_ACCEPT,
   HEADER_NAME_AUTHORIZATION,
@@ -10,8 +8,6 @@ import {
 } from './headers';
 import { MultipartFormDataBody } from './multipart';
 import type { ProblemDetails } from './problem';
-
-const defaultUserAgent = `paklo/${environment.sha?.substring(0, 7) ?? 'dogfood'}`;
 
 export type CreateInnerApiClientOptions = {
   /**
@@ -143,8 +139,9 @@ export class InnerApiClient {
 
     // create headers for the request
     const headers = new Headers(this.headers);
-    const finalUserAgent = userAgent && userAgent.length > 0 ? `${userAgent} (${defaultUserAgent})` : defaultUserAgent;
-    headers.set(HEADER_NAME_USER_AGENT, finalUserAgent);
+    if (userAgent) {
+      headers.set(HEADER_NAME_USER_AGENT, userAgent);
+    }
 
     // populate authorization header
     if (this.token) {

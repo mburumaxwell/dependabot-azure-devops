@@ -14,9 +14,9 @@ import { BatchLogRecordProcessor, type LogRecordExporter } from '@opentelemetry/
 import { PeriodicExportingMetricReader, type PushMetricExporter } from '@opentelemetry/sdk-metrics';
 import type { BufferConfig, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { environment } from '@paklo/core/environment';
 import { PrismaInstrumentation } from '@prisma/instrumentation';
 import { type Configuration, registerOTel } from '@vercel/otel';
+import { environment } from '@/lib/environment';
 
 export async function register() {
   const instrumentations: Configuration['instrumentations'] = [

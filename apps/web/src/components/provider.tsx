@@ -1,5 +1,5 @@
-import { environment } from '@paklo/core/environment';
 import type { ReactNode } from 'react';
+import { environment } from '@/lib/environment';
 import { ApplicationInsightsProvider } from './app-insights';
 import { ThemeProvider } from './theme';
 import { TooltipProvider } from './ui/tooltip';

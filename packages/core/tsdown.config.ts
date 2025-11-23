@@ -6,12 +6,10 @@ export default defineConfig({
   sourcemap: true,
   entry: [
     // base
-    'src/environment/index.ts',
     'src/http/index.ts',
     'src/hono.ts',
     'src/keygen.ts',
     'src/logger.ts',
-    'src/shared-data/index.ts',
     'src/usage.ts',
 
     // dependabot

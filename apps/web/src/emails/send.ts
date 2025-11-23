@@ -56,9 +56,6 @@ export type EmailRequest = {
    * @example `Feedback <feedback@paklo.app>`
    * @remarks
    * This email address or its domain must be verified with the chosen provider.
-   * Common email addresses can be found in the `emails` object in the `@paklo/core/shared-/data` module.
-   *
-   * `import { emails } from '@paklo/core/shared-data';`
    */
   from: string;
 
