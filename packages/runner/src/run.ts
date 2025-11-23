@@ -4,6 +4,7 @@ import os from 'node:os';
 import { InnerApiClient } from '@paklo/core/http';
 import { logger } from '@paklo/core/logger';
 import type { UsageTelemetryRequestData } from '@paklo/core/usage';
+import { z } from 'zod';
 import packageJson from '../package.json';
 import { ApiClient, CredentialFetchingError, type SecretMasker } from './api-client';
 import { PROXY_IMAGE_NAME, updaterImageName } from './docker-tags';
@@ -103,37 +104,43 @@ export async function runJob(options: RunJobOptions): Promise<RunJobResult> {
     }
   }
 
-  const duration = Date.now() - started.getTime();
-  const data: UsageTelemetryRequestData = {
-    ...usage,
-    host: {
-      platform: os.platform(),
-      release: os.release(),
-      arch: os.arch(),
-      'machine-hash': crypto.createHash('sha256').update(os.hostname()).digest('hex'),
-    },
-    version: packageJson.version,
-    id: jobId,
-    started,
-    duration,
-    success,
-    // error message but truncate to first 1000 characters to avoid sending too much data
-    error: message ? { message: message.substring(0, 1000) } : undefined,
-  };
-  try {
-    const json = JSON.stringify(data);
-    logger.debug(`Usage telemetry data: ${json}`);
-    const resp = await fetch('https://www.paklo.app/api/usage-telemetry', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: json,
-    });
-    if (!resp.ok) {
-      logger.debug(`Failed to send usage telemetry data: ${resp.status} ${resp.statusText}`);
+  // send usage telemetry, unless explicitly disabled
+  const telemetryDisabled = z.stringbool().optional().parse(process.env.PAKLO_TELEMETRY_DISABLED);
+  if (!telemetryDisabled) {
+    const duration = Date.now() - started.getTime();
+    const data: UsageTelemetryRequestData = {
+      ...usage,
+      host: {
+        platform: os.platform(),
+        release: os.release(),
+        arch: os.arch(),
+        'machine-hash': crypto.createHash('sha256').update(os.hostname()).digest('hex'),
+      },
+      version: packageJson.version,
+      id: jobId,
+      started,
+      duration,
+      success,
+      // error message but truncate to first 1000 characters to avoid sending too much data
+      error: message ? { message: message.substring(0, 1000) } : undefined,
+    };
+    try {
+      const json = JSON.stringify(data);
+      logger.debug(`Usage telemetry data: ${json}`);
+      const resp = await fetch('https://www.paklo.app/api/usage-telemetry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: json,
+      });
+      if (!resp.ok) {
+        logger.debug(`Failed to send usage telemetry data: ${resp.status} ${resp.statusText}`);
+      }
+    } catch (err) {
+      logger.debug(`Failed to send usage telemetry data: ${(err as Error).message}`);
+      // ignore
     }
-  } catch (err) {
-    logger.debug(`Failed to send usage telemetry data: ${(err as Error).message}`);
-    // ignore
+  } else {
+    logger.debug('Telemetry disabled, not sending usage telemetry data');
   }
 
   logger.info(`Update job ${jobId} completed`);
