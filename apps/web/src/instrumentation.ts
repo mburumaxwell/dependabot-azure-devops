@@ -50,7 +50,7 @@ export async function register() {
         url: `https://api.axiom.co/v1/${category}`,
         headers: {
           Authorization: `Bearer ${axiomApiKey}`,
-          'X-Axiom-Dataset': category,
+          'X-Axiom-Dataset': environment.name || 'development',
         },
       } satisfies OTLPExporterNodeConfigBase;
     }
