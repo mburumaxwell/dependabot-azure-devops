@@ -7,7 +7,6 @@ export const DEFAULT_EXPERIMENTS: DependabotExperiments = {
   'record-ecosystem-versions': true,
   'record-update-job-unknown-error': true,
   'proxy-cached': true,
-  'move-job-token': true,
   'dependency-change-validation': true,
   'enable-file-parser-python-local': true,
   'npm-fallback-version-above-v6': true,
