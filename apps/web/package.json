@@ -4,7 +4,6 @@
   "license": "AGPL-3.0-later",
   "author": "mburumaxwell",
   "private": true,
-  "type": "module",
   "scripts": {
     "postinstall": "pnpm typegen",
     "ui": "shadcn",
