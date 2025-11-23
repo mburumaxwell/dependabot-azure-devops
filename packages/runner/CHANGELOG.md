@@ -1,5 +1,17 @@
 # @paklo/runner
 
+## 0.4.1
+
+### Patch Changes
+
+- 5e16a01: Allow disabling usage telemetry by setting `PAKLO_TELEMETRY_DISABLED` env
+  It can be set to any truthy value like 1, true, yes, etc to set it
+- d79af62: Collect error messages for tracking where issues are coming from
+- Updated dependencies [f6e7cd9]
+- Updated dependencies [434bc91]
+- Updated dependencies [d79af62]
+  - @paklo/core@0.7.1
+
 ## 0.4.0
 
 ### Minor Changes
