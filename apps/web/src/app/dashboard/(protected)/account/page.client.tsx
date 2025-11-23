@@ -123,32 +123,20 @@ export function PasskeysSection({ passkeys: initialPasskeys }: { passkeys: Passk
 
   async function handleAddPasskey() {
     setIsModifyingPasskeys(true);
-    // TODO: fix after https://github.com/better-auth/better-auth/pull/6199 is merged
-    const response = await authClient.passkey.addPasskey({
+    const { data, error } = await authClient.passkey.addPasskey({
       // Not setting name, as it overrides the default (email) which makes it look awkward
       // in password managers. Instead, we'll let the user edit it afterwards.
     });
     setIsModifyingPasskeys(false);
-    if (response?.error) {
-      if (
-        'code' in response.error &&
-        response.error.code !== 'AUTH_CANCELLED' &&
-        response.error.code !== 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY' // from @simplewebauthn/browser
-      ) {
-        toast.error('Failed to add passkey.', { description: response.error.message || 'Unknown error' });
-      }
+    if (error) {
+      // ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY is from @simplewebauthn/browser
+      const cancellationCodes = ['AUTH_CANCELLED', 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY'];
+      if ('code' in error && cancellationCodes.includes(error.code)) return;
+      toast.error('Failed to add passkey.', { description: error.message || 'Unknown error' });
       return;
     }
 
-    const passkey = response?.data as Passkey | null | undefined;
-    if (!passkey) {
-      toast.error('Failed to add passkey.', {
-        description:
-          'No passkey data returned. This should not happen but it has and you may want to refresh the page before trying again.',
-      });
-      return;
-    }
-    setPasskeys((prev) => [...prev, passkey]);
+    setPasskeys((prev) => [...prev, data]);
   }
 
   async function handleDeletePasskey(id: string) {

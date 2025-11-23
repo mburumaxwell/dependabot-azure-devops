@@ -18,7 +18,7 @@ model User {
   emailVerified Boolean      @default(false)
   image         String?
   createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @default(now()) @updatedAt
+  updatedAt     DateTime     @updatedAt
   role          String?
   banned        Boolean?     @default(false)
   banReason     String?
@@ -47,6 +47,7 @@ model Session {
   activeOrganizationId String?
 
   @@unique([token])
+  @@index([userId])
   @@map("session")
 }
 
@@ -66,6 +67,7 @@ model Account {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
+  @@index([userId])
   @@map("account")
 }
 
@@ -75,8 +77,9 @@ model Verification {
   value      String
   expiresAt  DateTime
   createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
+  updatedAt  DateTime @updatedAt
 
+  @@index([identifier])
   @@map("verification")
 }
 
@@ -115,24 +118,24 @@ enum OrganizationBillingInterval {
 model Organization {
   id                  String                      @id @map("_id")
   name                String
-  slug                String?
+  slug                String
   logo                String?
   createdAt           DateTime
   metadata            String?
-  members             Member[]
-  invitations         Invitation[]
   type                OrganizationType
   url                 String
   region              String
-  providerHostname    String
-  providerApiEndpoint String
   tier                OrganizationTier
   billingInterval     OrganizationBillingInterval
+  providerHostname    String
+  providerApiEndpoint String
   billingEmail        String?
   customerId          String?
   subscriptionId      String?
   subscriptionStatus  SubscriptionStatus?
-  maxProjects         Int                         @default(0) // zero until updated after billing setup
+  maxProjects         Int
+  members             Member[]
+  invitations         Invitation[]
   credential          OrganizationCredential?
   secrets             OrganizationSecret[]
   projects            Project[]
@@ -151,9 +154,11 @@ model Member {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   userId         String
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role           String
+  role           String       @default("member")
   createdAt      DateTime
 
+  @@index([organizationId])
+  @@index([userId])
   @@map("member")
 }
 
@@ -163,11 +168,14 @@ model Invitation {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   email          String
   role           String?
-  status         String
+  status         String       @default("pending")
   expiresAt      DateTime
+  createdAt      DateTime     @default(now())
   inviterId      String
   user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
 
+  @@index([organizationId])
+  @@index([email])
   @@map("invitation")
 }
 
@@ -185,6 +193,8 @@ model Passkey {
   createdAt    DateTime?
   aaguid       String?
 
+  @@index([userId])
+  @@index([credentialID])
   @@map("passkey")
 }
 
