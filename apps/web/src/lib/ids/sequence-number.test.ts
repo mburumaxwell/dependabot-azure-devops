@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SequenceNumber } from './ids';
+import { SequenceNumber } from './sequence-number';
 
 describe('SequenceNumber', () => {
   describe('generate', () => {
