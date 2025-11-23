@@ -1,4 +1,5 @@
 import { MongoDBInstrumentation } from '@opentelemetry/instrumentation-mongodb';
+import { PinoInstrumentation } from '@opentelemetry/instrumentation-pino';
 import { environment } from '@paklo/core/environment';
 import { PrismaInstrumentation } from '@prisma/instrumentation';
 import { type Configuration, registerOTel } from '@vercel/otel';
@@ -8,6 +9,7 @@ export async function register() {
   const instrumentations: Configuration['instrumentations'] = [
     new PrismaInstrumentation(),
     new MongoDBInstrumentation(),
+    new PinoInstrumentation(),
   ];
 
   if (process.env.NEXT_RUNTIME !== 'edge') {
