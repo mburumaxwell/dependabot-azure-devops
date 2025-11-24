@@ -284,8 +284,8 @@ importers:
         version: 4.1.12
     devDependencies:
       '@react-email/preview-server':
-        specifier: 5.0.4
-        version: 5.0.4(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        specifier: 5.0.5
+        version: 5.0.5(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@tailwindcss/postcss':
         specifier: 4.1.17
         version: 4.1.17
@@ -317,8 +317,8 @@ importers:
         specifier: 6.19.0
         version: 6.19.0(typescript@5.9.3)
       react-email:
-        specifier: 5.0.4
-        version: 5.0.4
+        specifier: 5.0.5
+        version: 5.0.5
       remark-directive:
         specifier: 4.0.0
         version: 4.0.0
@@ -2866,8 +2866,8 @@ packages:
     peerDependencies:
       react: ^18.0 || ^19.0 || ^19.0.0-rc
 
-  '@react-email/preview-server@5.0.4':
-    resolution: {integrity: sha512-i3kUTvE369ly32ZUMmfjIjb9NK8F19S8EgH/KzUvPWOwfXwePJK3AZTBabqGPCqEDRmDe7THEH6lDf2XWC73lg==}
+  '@react-email/preview-server@5.0.5':
+    resolution: {integrity: sha512-dNZ8G7PqQ+BUGkBRJgo+8PDjEtRj8c2vRzUMA3s7Q6zTfXFrBrSchG37UT5TsL6zi/RAOVN2P0wBZqz60J3hsw==}
 
   '@react-email/preview@0.0.13':
     resolution: {integrity: sha512-F7j9FJ0JN/A4d7yr+aw28p4uX7VLWs7hTHtLo7WRyw4G+Lit6Zucq4UWKRxJC8lpsUdzVmG7aBJnKOT+urqs/w==}
@@ -6454,9 +6454,9 @@ packages:
     resolution: {integrity: sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==}
     engines: {node: '>= 0.6'}
 
-  mime-types@3.0.1:
-    resolution: {integrity: sha512-xRc4oEhT6eaBpU1XF7AjpOFD+xQmXNB5OVKwp4tqCuBpHLS/ZbBDrc07mYTDqVMg6PfxUjjNp85O6Cd2Z/5HWA==}
-    engines: {node: '>= 0.6'}
+  mime-types@3.0.2:
+    resolution: {integrity: sha512-Lbgzdk0h4juoQ9fCKXW4by0UJqj+nOOrI9MJ1sSj4nI8aI2eo1qmvQEie4VD1glsS250n15LsWsYtCugiStS5A==}
+    engines: {node: '>=18'}
 
   mimic-fn@2.1.0:
     resolution: {integrity: sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==}
@@ -7121,9 +7121,9 @@ packages:
     peerDependencies:
       react: ^19.2.0
 
-  react-email@5.0.4:
-    resolution: {integrity: sha512-pI6b4ePMWC1AFtyd0gyVMsJ6Nhg4nnmDxVo1EQP+r011WQafU8UGAUfPUiE5Wh7x28+3yFw7qXCnD33y71guUw==}
-    engines: {node: '>=22.0.0'}
+  react-email@5.0.5:
+    resolution: {integrity: sha512-O0BCyg2zR/3CsEYqoeDQuJL6W8oHYSPmvzIeSbFa5XXdtofmgizCLThbs50lcP7wGCTkDvdJIZ6XWUt2aRU6zA==}
+    engines: {node: '>=20.0.0'}
     hasBin: true
 
   react-is@16.13.1:
@@ -11462,7 +11462,7 @@ snapshots:
       marked: 15.0.12
       react: 19.2.0
 
-  '@react-email/preview-server@5.0.4(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
+  '@react-email/preview-server@5.0.5(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)':
     dependencies:
       next: 16.0.1(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
     transitivePeerDependencies:
@@ -12642,7 +12642,7 @@ snapshots:
 
   accepts@2.0.0:
     dependencies:
-      mime-types: 3.0.1
+      mime-types: 3.0.2
       negotiator: 1.0.0
 
   acorn-import-attributes@1.9.5(acorn@8.15.0):
@@ -14003,7 +14003,7 @@ snapshots:
       fresh: 2.0.0
       http-errors: 2.0.0
       merge-descriptors: 2.0.0
-      mime-types: 3.0.1
+      mime-types: 3.0.2
       on-finished: 2.4.1
       once: 1.4.0
       parseurl: 1.3.3
@@ -15578,7 +15578,7 @@ snapshots:
     dependencies:
       mime-db: 1.52.0
 
-  mime-types@3.0.1:
+  mime-types@3.0.2:
     dependencies:
       mime-db: 1.54.0
 
@@ -16250,7 +16250,7 @@ snapshots:
       react: 19.2.0
       scheduler: 0.27.0
 
-  react-email@5.0.4:
+  react-email@5.0.5:
     dependencies:
       '@babel/parser': 7.28.5
       '@babel/traverse': 7.28.5
@@ -16262,7 +16262,7 @@ snapshots:
       glob: 11.1.0
       jiti: 2.4.2
       log-symbols: 7.0.1
-      mime-types: 3.0.1
+      mime-types: 3.0.2
       normalize-path: 3.0.0
       nypm: 0.6.0
       ora: 8.2.0
@@ -16747,7 +16747,7 @@ snapshots:
       etag: 1.8.1
       fresh: 2.0.0
       http-errors: 2.0.0
-      mime-types: 3.0.1
+      mime-types: 3.0.2
       ms: 2.1.3
       on-finished: 2.4.1
       range-parser: 1.2.1
@@ -17417,7 +17417,7 @@ snapshots:
     dependencies:
       content-type: 1.0.5
       media-typer: 1.1.0
-      mime-types: 3.0.1
+      mime-types: 3.0.2
 
   typed-array-buffer@1.0.3:
     dependencies:
