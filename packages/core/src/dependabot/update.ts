@@ -139,6 +139,7 @@ export type DependabotEcosystemVersionManager = z.infer<typeof DependabotEcosyst
 export const DependabotEcosystemMetaSchema = z.object({
   name: z.string(),
   package_manager: DependabotEcosystemVersionManagerSchema.nullish(),
+  language: DependabotEcosystemVersionManagerSchema.nullish(),
   version: DependabotEcosystemVersionManagerSchema.nullish(),
 });
 export type DependabotEcosystemMeta = z.infer<typeof DependabotEcosystemMetaSchema>;

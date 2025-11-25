@@ -1,0 +1,9 @@
+{
+  "data": {
+    "ecosystem_versions": {
+      "package_managers": {
+        "gomod": "1.24"
+      }
+    }
+  }
+}

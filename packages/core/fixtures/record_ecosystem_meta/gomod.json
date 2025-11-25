@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "ecosystem": {
+        "name": "go",
+        "package_manager": {
+          "name": "go_modules",
+          "version": "1.25.0",
+          "raw_version": "1.25.0",
+          "requirement": null
+        },
+        "language": {
+          "name": "go",
+          "version": "1.24.0",
+          "raw_version": "1.24.0",
+          "requirement": null
+        }
+      }
+    }
+  ],
+  "type": "record_ecosystem_meta"
+}

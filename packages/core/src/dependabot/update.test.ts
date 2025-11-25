@@ -124,6 +124,25 @@ describe('mark_as_processed', () => {
 });
 
 describe('update_dependency_list', () => {
+  it('gomod', async () => {
+    const raw = JSON.parse(await readFile('fixtures/update_dependency_list/gomod.json', 'utf-8'));
+    const data = DependabotUpdateDependencyListSchema.parse(raw.data);
+
+    expect(data.dependency_files).toEqual(['/go.mod', '/go.sum']);
+    expect(data.dependencies!.length).toEqual(2);
+
+    expect(data.dependencies[0]!.name).toEqual('github.com/Nerzal/gocloak/v13');
+    expect(data.dependencies[0]!.version).toEqual('13.9.0');
+    expect(data.dependencies[0]!.requirements!.length).toEqual(1);
+    expect(data.dependencies[0]!.requirements![0]!.file).toEqual('go.mod');
+    expect(data.dependencies[0]!.requirements![0]!.requirement).toEqual('v13.9.0');
+    expect(data.dependencies[0]!.requirements![0]!.source).toEqual({
+      type: 'default',
+      source: 'github.com/Nerzal/gocloak/v13',
+    });
+    expect(data.dependencies[0]!.requirements![0]!.groups).toEqual([]);
+  });
+
   it('python-pip', async () => {
     const raw = JSON.parse(await readFile('fixtures/update_dependency_list/python-pip.json', 'utf-8'));
     const data = DependabotUpdateDependencyListSchema.parse(raw.data);
@@ -192,6 +211,16 @@ describe('update_dependency_list', () => {
 });
 
 describe('record_ecosystem_versions', () => {
+  it('gomod', async () => {
+    const raw = JSON.parse(await readFile('fixtures/record_ecosystem_versions/gomod.json', 'utf-8'));
+    const data = DependabotRecordEcosystemVersionsSchema.parse(raw.data);
+    expect(data).toBeDefined();
+    expect(data.ecosystem_versions).toBeDefined();
+    expect(Object.keys(data.ecosystem_versions!)).toEqual(['package_managers']);
+    expect(Object.keys(data.ecosystem_versions!.package_managers)).toEqual(['gomod']);
+    expect(data.ecosystem_versions?.package_managers.gomod).toEqual('1.24');
+  });
+
   it('python-pip', async () => {
     const raw = JSON.parse(await readFile('fixtures/record_ecosystem_versions/python-pip.json', 'utf-8'));
     const data = DependabotRecordEcosystemVersionsSchema.parse(raw.data);
@@ -206,6 +235,21 @@ describe('record_ecosystem_versions', () => {
 });
 
 describe('record_ecosystem_meta', () => {
+  it('gomod', async () => {
+    const raw = JSON.parse(await readFile('fixtures/record_ecosystem_meta/gomod.json', 'utf-8'));
+    const data = DependabotRecordEcosystemMetaSchema.array().parse(raw.data);
+    expect(data.length).toEqual(1);
+    expect(data[0]?.ecosystem.name).toEqual('go');
+    expect(data[0]?.ecosystem.package_manager?.name).toEqual('go_modules');
+    expect(data[0]?.ecosystem.package_manager?.version).toEqual('1.25.0');
+    expect(data[0]?.ecosystem.package_manager?.raw_version).toEqual('1.25.0');
+    expect(data[0]?.ecosystem.package_manager?.requirement).toBeNull();
+    expect(data[0]?.ecosystem.language?.name).toEqual('go');
+    expect(data[0]?.ecosystem.language?.version).toEqual('1.24.0');
+    expect(data[0]?.ecosystem.language?.raw_version).toEqual('1.24.0');
+    expect(data[0]?.ecosystem.language?.requirement).toBeNull();
+  });
+
   it('python-pip', async () => {
     const raw = JSON.parse(await readFile('fixtures/record_ecosystem_meta/python-pip.json', 'utf-8'));
     const data = DependabotRecordEcosystemMetaSchema.array().parse(raw.data);
@@ -242,6 +286,17 @@ describe('increment_metric', () => {
     expect(data).toBeDefined();
     expect(data.metric).toEqual('updater.started');
     expect(data.tags).toEqual({ operation: 'create_security_pr' });
+  });
+
+  it('gomod-error', async () => {
+    const raw = JSON.parse(await readFile('fixtures/increment_metric/gomod-error.json', 'utf-8'));
+    const data = DependabotIncrementMetricSchema.parse(raw.data);
+    expect(data).toBeDefined();
+    expect(data.metric).toEqual('updater.update_job_unknown_error');
+    expect(data.tags).toEqual({
+      package_manager: 'go_modules',
+      class_name: 'Dependabot::ApiError',
+    });
   });
 });
 

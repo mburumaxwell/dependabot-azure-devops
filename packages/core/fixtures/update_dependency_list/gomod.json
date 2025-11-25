@@ -1,0 +1,27 @@
+{
+  "data": {
+    "dependencies": [
+      {
+        "name": "github.com/Nerzal/gocloak/v13",
+        "version": "13.9.0",
+        "requirements": [
+          {
+            "requirement": "v13.9.0",
+            "file": "go.mod",
+            "source": {
+              "type": "default",
+              "source": "github.com/Nerzal/gocloak/v13"
+            },
+            "groups": []
+          }
+        ]
+      },
+      {
+        "name": "gopkg.in/yaml.v3",
+        "version": "3.0.1",
+        "requirements": []
+      }
+    ],
+    "dependency_files": ["/go.mod", "/go.sum"]
+  }
+}
