@@ -6,6 +6,8 @@
     "useIgnoreFile": true
   },
   "files": {
+    // default max size is 1MB, increasing to 5MB
+    "maxSize": 5242880,
     "ignoreUnknown": true,
     "includes": [
       "**",
