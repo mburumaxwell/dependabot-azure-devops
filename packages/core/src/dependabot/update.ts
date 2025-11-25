@@ -6,7 +6,14 @@ import { DependabotDependencySchema, DependabotPackageManagerSchema } from './jo
 export const DependabotDependencyFileSchema = z.object({
   // https://github.com/dependabot/dependabot-core/blob/5e2711f9913cc387acb7cb0d29d51fb52d235ef2/common/lib/dependabot/dependency_file.rb#L14-L15
   content: z.string().nullish(),
-  content_encoding: z.enum(['utf-8', 'base64']).nullish(),
+  content_encoding: z
+    .enum([
+      'utf-8',
+      'base64',
+      // for some reason, some files (e.g. txt in gomod) are marked as empty string encoding
+      '',
+    ])
+    .nullish(),
   deleted: z.boolean().nullish(),
   directory: z.string(),
   name: z.string(),

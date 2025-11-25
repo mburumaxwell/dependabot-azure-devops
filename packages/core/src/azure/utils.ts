@@ -120,7 +120,7 @@ export function getPullRequestChangedFilesForOutputData(
         changeType: changeType,
         path: path.join(file.directory, file.name),
         content: file.content ?? undefined,
-        encoding: file.content_encoding ?? undefined,
+        encoding: file.content_encoding || 'utf-8', // default to 'utf-8' if nullish or empty string
       } satisfies IFileChange;
     });
 }

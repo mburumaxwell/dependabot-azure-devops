@@ -33,6 +33,66 @@ describe('create_dependency_submission', () => {
 });
 
 describe('create_pull_request', () => {
+  it('gomod', async () => {
+    const raw = JSON.parse(await readFile('fixtures/create_pull_request/gomod.json', 'utf-8'));
+    const data = DependabotCreatePullRequestSchema.parse(raw.data);
+
+    expect(data['base-commit-sha']).toEqual('ef33860e2034fd2020c7384c7a5406ff01e74f93');
+
+    expect(data.dependencies!.length).toEqual(1);
+    expect(data.dependencies[0]!.name).toEqual('github.com/aws/aws-sdk-go-v2/service/s3');
+    expect(data.dependencies[0]!['previous-requirements']!.length).toEqual(1);
+    expect(data.dependencies[0]!['previous-requirements']![0]!.file).toEqual('go.mod');
+    expect(data.dependencies[0]!['previous-requirements']![0]!.groups).toEqual([]);
+    expect(data.dependencies[0]!['previous-requirements']![0]!.requirement).toEqual('v1.91.1');
+    expect(data.dependencies[0]!['previous-requirements']![0]!.source).toEqual({
+      type: 'default',
+      source: 'github.com/aws/aws-sdk-go-v2/service/s3',
+    });
+    expect(data.dependencies[0]!['previous-version']).toEqual('1.91.1');
+
+    expect(data.dependencies[0]!.requirements!.length).toEqual(1);
+    expect(data.dependencies[0]!.requirements![0]!.file).toEqual('go.mod');
+    expect(data.dependencies[0]!.requirements![0]!.groups).toEqual([]);
+    expect(data.dependencies[0]!.requirements![0]!.requirement).toEqual('1.92.0');
+    expect(data.dependencies[0]!.requirements![0]!.source).toEqual({
+      type: 'default',
+      source: 'github.com/aws/aws-sdk-go-v2/service/s3',
+    });
+    expect(data.dependencies[0]!.version).toEqual('1.92.0');
+    expect(data.dependencies[0]!.directory).toEqual('/');
+
+    expect(data['updated-dependency-files'].length).toEqual(21);
+
+    expect(data['updated-dependency-files'][0]!.content?.length).toBeGreaterThan(20);
+    expect(data['updated-dependency-files'][0]!.content_encoding).toEqual('utf-8');
+    expect(data['updated-dependency-files'][0]!.deleted).toEqual(false);
+    expect(data['updated-dependency-files'][0]!.directory).toEqual('/');
+    expect(data['updated-dependency-files'][0]!.name).toEqual('go.mod');
+    expect(data['updated-dependency-files'][0]!.operation).toEqual('update');
+    expect(data['updated-dependency-files'][0]!.support_file).toEqual(false);
+    expect(data['updated-dependency-files'][0]!.type).toEqual('file');
+    expect(data['updated-dependency-files'][0]!.mode).toBeUndefined();
+
+    // a vendor file
+    expect(data['updated-dependency-files'][20]!.content?.length).toBeGreaterThan(20);
+    expect(data['updated-dependency-files'][20]!.content_encoding).toEqual('');
+    expect(data['updated-dependency-files'][20]!.deleted).toEqual(false);
+    expect(data['updated-dependency-files'][20]!.directory).toEqual('/');
+    expect(data['updated-dependency-files'][20]!.name).toEqual(
+      'vendor/github.com/aws/aws-sdk-go-v2/service/s3/api_op_PutBucketAbac.go',
+    );
+    expect(data['updated-dependency-files'][20]!.operation).toEqual('create');
+    expect(data['updated-dependency-files'][20]!.support_file).toEqual(false);
+    expect(data['updated-dependency-files'][20]!.type).toEqual('file');
+    expect(data['updated-dependency-files'][20]!.mode).toBeUndefined();
+
+    expect(data['pr-title']).toEqual('Bump github.com/aws/aws-sdk-go-v2/service/s3 from 1.91.1 to 1.92.0');
+    expect(data['pr-body']?.length).toBeGreaterThan(20);
+    expect(data['commit-message'].length).toBeGreaterThan(20);
+    expect(data['dependency-group']).toBeUndefined();
+  });
+
   it('python-pip', async () => {
     const raw = JSON.parse(await readFile('fixtures/create_pull_request/python-pip.json', 'utf-8'));
     const data = DependabotCreatePullRequestSchema.parse(raw.data);
