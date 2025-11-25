@@ -1,5 +1,12 @@
 # @paklo/core
 
+## 0.7.2
+
+### Patch Changes
+
+- c5fb405: Restore empty string for 'content_encoding' hence fix gomod issue
+- 903ca2c: Add Docker container detection and update telemetry schema
+
 ## 0.7.1
 
 ### Patch Changes

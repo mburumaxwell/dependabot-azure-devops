@@ -1,5 +1,14 @@
 # paklo
 
+## 0.12.2
+
+### Patch Changes
+
+- Updated dependencies [c5fb405]
+- Updated dependencies [903ca2c]
+  - @paklo/core@0.7.2
+  - @paklo/runner@0.4.2
+
 ## 0.12.1
 
 ### Patch Changes
