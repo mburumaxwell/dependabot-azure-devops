@@ -1,4 +1,6 @@
 import crypto from 'node:crypto';
+import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import os from 'node:os';
 
 import { InnerApiClient } from '@paklo/core/http';
@@ -107,6 +109,8 @@ export async function runJob(options: RunJobOptions): Promise<RunJobResult> {
   // send usage telemetry, unless explicitly disabled
   const telemetryDisabled = z.stringbool().optional().parse(process.env.PAKLO_TELEMETRY_DISABLED);
   if (!telemetryDisabled) {
+    // detect if we are running inside a Docker container
+    const inDocker = await isRunningInDocker();
     const duration = Date.now() - started.getTime();
     const data: UsageTelemetryRequestData = {
       ...usage,
@@ -115,6 +119,7 @@ export async function runJob(options: RunJobOptions): Promise<RunJobResult> {
         release: os.release(),
         arch: os.arch(),
         'machine-hash': crypto.createHash('sha256').update(os.hostname()).digest('hex'),
+        'docker-container': inDocker,
       },
       version: packageJson.version,
       id: jobId,
@@ -145,4 +150,20 @@ export async function runJob(options: RunJobOptions): Promise<RunJobResult> {
 
   logger.info(`Update job ${jobId} completed`);
   return { success, message: message! };
+}
+
+/**
+ * Detects if the current process is running inside a Docker container.
+ */
+export async function isRunningInDocker(): Promise<boolean> {
+  // Check for .dockerenv file
+  if (existsSync('/.dockerenv')) return true;
+
+  // Check cgroup
+  try {
+    const cgroup = await readFile('/proc/self/cgroup', 'utf8');
+    return cgroup.includes('docker') || cgroup.includes('kubepods');
+  } catch {
+    return false;
+  }
 }

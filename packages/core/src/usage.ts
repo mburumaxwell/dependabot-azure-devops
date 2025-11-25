@@ -9,7 +9,8 @@ import { DependabotPackageManagerSchema, DependabotSourceProviderSchema } from '
  *     "platform": "darwin",
  *     "os": "25.0.0",
  *     "arch": "arm64",
- *     "machine-hash": "d3bbb66be2ad9dfab10af69b450f7e7e814ef7bbf1277a6d0df9e1db44ba4f5c"
+ *     "machine-hash": "d3bbb66be2ad9dfab10af69b450f7e7e814ef7bbf1277a6d0df9e1db44ba4f5c",
+ *     "docker-container": false
  *   },
  *   "trigger": "user",
  *   "provider": "azure",
@@ -32,6 +33,7 @@ export const UsageTelemetryRequestDataSchema = z.object({
     release: z.string().max(100), // e.g. 26.0.0, 10.0.19043
     arch: z.string().max(50), // e.g. x64, arm64
     'machine-hash': z.string().max(250), // e.g. "d3bbb66be2ad9dfab10af69b450f7e7e814ef7bbf1277a6d0df9e1db44ba4f5c" for "Maxwells-MacBook-Pro.local"
+    'docker-container': z.boolean().optional(), // whether running inside a Docker container
   }),
   version: z.string().max(50),
   trigger: z.enum(['user', 'service']),
@@ -54,7 +56,8 @@ export const UsageTelemetryRequestDataSchema = z.object({
  *     "platform": "darwin",
  *     "os": "25.0.0",
  *     "arch": "arm64",
- *     "machine-hash": "d3bbb66be2ad9dfab10af69b450f7e7e814ef7bbf1277a6d0df9e1db44ba4f5c"
+ *     "machine-hash": "d3bbb66be2ad9dfab10af69b450f7e7e814ef7bbf1277a6d0df9e1db44ba4f5c",
+ *     "docker-container": false
  *   },
  *   "trigger": "user",
  *   "provider": "azure",

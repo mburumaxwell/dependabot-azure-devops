@@ -40,6 +40,7 @@ export type UsageTelemetry = {
   hostRelease: string;
   hostArch: string;
   hostMachineHash: string;
+  hostDockerContainer?: boolean;
   version: string;
   trigger: string;
   provider: string;

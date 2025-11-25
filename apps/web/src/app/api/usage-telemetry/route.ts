@@ -28,6 +28,7 @@ app.post('/', zValidator('json', RequestDataSchema), async (context) => {
     hostRelease: payload.host.release,
     hostArch: payload.host.arch,
     hostMachineHash: payload.host['machine-hash'],
+    hostDockerContainer: payload.host['docker-container'] ?? false,
     trigger: payload.trigger,
     version: payload.version,
     provider: payload.provider,
