@@ -1,4 +1,4 @@
-name: Extensions
+name: Extension - Azure
 
 on:
   workflow_dispatch:
@@ -6,17 +6,17 @@ on:
     branches: [main]
     tags: ['extension-azure-devops@*']
     paths:
-      - 'extensions/**'
+      - 'extensions/azure/**'
       - 'packages/core/**'
       - 'packages/runner/**'
-      - '.github/workflows/extensions.yml'
+      - '.github/workflows/extension-azure.yml'
   pull_request:
     branches: [main]
     paths:
-      - 'extensions/**'
+      - 'extensions/azure/**'
       - 'packages/core/**'
       - 'packages/runner/**'
-      - '.github/workflows/extensions.yml'
+      - '.github/workflows/extension-azure.yml'
 
 permissions:
   contents: write # write required for ncipollo/release-action to create a release
@@ -32,7 +32,7 @@ env:
   BUILD_NUMBER: ${{ github.run_number }} # not discovered by default
 
 jobs:
-  Azure:
+  Build-And-Publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -116,28 +116,3 @@ jobs:
           --token ${{ secrets.AZURE_DEVOPS_EXTENSION_TOKEN }}
           ${{ (github.ref == 'refs/heads/main' && '--share-with tingle rhyskoedijk') || '' }}
         working-directory: extensions/azure
-
-  # Bitbucket:
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v6
-  #       with:
-  #         submodules: true
-
-  #     - name: Setup turborepo caching
-  #       uses: rharkor/caching-for-turbo@v1.8
-
-  #     - name: Setup pnpm
-  #       uses: pnpm/action-setup@v4
-
-  #     - name: Setup node
-  #       uses: actions/setup-node@v6
-  #       with:
-  #         node-version: 22
-  #         cache: 'pnpm'
-
-  #     - name: Download deps
-  #       run: pnpm install
-  #       working-directory: '${{ github.workspace }}/extensions/bitbucket'
