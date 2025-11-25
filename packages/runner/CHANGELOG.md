@@ -1,5 +1,14 @@
 # @paklo/runner
 
+## 0.4.2
+
+### Patch Changes
+
+- 903ca2c: Add Docker container detection and update telemetry schema
+- Updated dependencies [c5fb405]
+- Updated dependencies [903ca2c]
+  - @paklo/core@0.7.2
+
 ## 0.4.1
 
 ### Patch Changes

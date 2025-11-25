@@ -1,5 +1,14 @@
 # extension-azure-devops
 
+## 2.59.13
+
+### Patch Changes
+
+- Updated dependencies [c5fb405]
+- Updated dependencies [903ca2c]
+  - @paklo/core@0.7.2
+  - @paklo/runner@0.4.2
+
 ## 2.59.12
 
 ### Patch Changes
