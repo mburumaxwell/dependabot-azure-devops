@@ -156,6 +156,19 @@ export const DependabotRecordEcosystemMetaSchema = z.object({
 });
 export type DependabotRecordEcosystemMeta = z.infer<typeof DependabotRecordEcosystemMetaSchema>;
 
+export const DependabotRecordCooldownMetaSchema = z.object({
+  cooldown: z.object({
+    ecosystem_name: DependabotPackageManagerSchema,
+    config: z.object({
+      default_days: z.number(),
+      semver_major_days: z.number(),
+      semver_minor_days: z.number(),
+      semver_patch_days: z.number(),
+    }),
+  }),
+});
+export type DependabotRecordCooldownMeta = z.infer<typeof DependabotRecordCooldownMetaSchema>;
+
 export const DependabotIncrementMetricSchema = z.object({
   metric: z.string(),
   tags: z.record(z.string(), z.any()).nullish(),

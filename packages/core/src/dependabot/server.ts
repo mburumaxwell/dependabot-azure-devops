@@ -10,6 +10,7 @@ import {
   DependabotIncrementMetricSchema,
   DependabotMarkAsProcessedSchema,
   DependabotMetricSchema,
+  DependabotRecordCooldownMetaSchema,
   DependabotRecordEcosystemMetaSchema,
   DependabotRecordEcosystemVersionsSchema,
   DependabotRecordUpdateJobErrorSchema,
@@ -30,9 +31,10 @@ export const DependabotRequestTypeSchema = z.enum([
   'update_dependency_list',
   'create_dependency_submission',
   'record_ecosystem_versions',
-  'record_ecosystem_meta',
   'increment_metric',
-  'record_metrics',
+  'record_ecosystem_meta',
+  'record_cooldown_meta',
+  'record_metrics', // from the runner
 ]);
 export type DependabotRequestType = z.infer<typeof DependabotRequestTypeSchema>;
 
@@ -48,8 +50,9 @@ export const DependabotRequestSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('create_dependency_submission'), data: DependabotDependencySubmissionSchema }),
   z.object({ type: z.literal('record_ecosystem_versions'), data: DependabotRecordEcosystemVersionsSchema }),
   z.object({ type: z.literal('record_ecosystem_meta'), data: DependabotRecordEcosystemMetaSchema.array() }),
+  z.object({ type: z.literal('record_cooldown_meta'), data: DependabotRecordCooldownMetaSchema.array() }),
   z.object({ type: z.literal('increment_metric'), data: DependabotIncrementMetricSchema }),
-  z.object({ type: z.literal('record_metrics'), data: DependabotMetricSchema.array() }),
+  z.object({ type: z.literal('record_metrics'), data: DependabotMetricSchema.array() }), // from the runner
 ]);
 export type DependabotRequest = z.infer<typeof DependabotRequestSchema>;
 
@@ -210,8 +213,9 @@ export function createApiServerApp({
   operation('create_dependency_submission', DependabotDependencySubmissionSchema);
   operation('record_ecosystem_versions', DependabotRecordEcosystemVersionsSchema);
   operation('record_ecosystem_meta', DependabotRecordEcosystemMetaSchema.array());
+  operation('record_cooldown_meta', DependabotRecordCooldownMetaSchema.array());
   operation('increment_metric', DependabotIncrementMetricSchema);
-  operation('record_metrics', DependabotMetricSchema.array());
+  operation('record_metrics', DependabotMetricSchema.array()); // from the runner
 
   // Handle endpoints:
   // - GET request to /details

@@ -462,10 +462,26 @@ describe('AzureLocalDependabotServer', () => {
       expect(result).toEqual(true);
     });
 
+    it('should process "increment_metric"', async () => {
+      const result = await (server as any).handle('1', {
+        type: 'increment_metric',
+        data: { metric: 'random' },
+      });
+      expect(result).toEqual(true);
+    });
+
     it('should process "record_ecosystem_meta"', async () => {
       const result = await (server as any).handle('1', {
         type: 'record_ecosystem_meta',
         data: [{ ecosystem: { name: 'npm_any_yarn' } }],
+      });
+      expect(result).toEqual(true);
+    });
+
+    it('should process "record_cooldown_meta"', async () => {
+      const result = await (server as any).handle('1', {
+        type: 'record_cooldown_meta',
+        // data: [{ metric: 'random', value: 1, type: 'increment' }],
       });
       expect(result).toEqual(true);
     });
@@ -482,14 +498,6 @@ describe('AzureLocalDependabotServer', () => {
       const result = await (server as any).handle('1', {
         type: 'record_update_job_unknown_error',
         data: { 'error-type': 'random' },
-      });
-      expect(result).toEqual(true);
-    });
-
-    it('should process "increment_metric"', async () => {
-      const result = await (server as any).handle('1', {
-        type: 'increment_metric',
-        data: { metric: 'random' },
       });
       expect(result).toEqual(true);
     });

@@ -7,6 +7,7 @@ import {
   DependabotIncrementMetricSchema,
   DependabotMarkAsProcessedSchema,
   DependabotMetricSchema,
+  DependabotRecordCooldownMetaSchema,
   DependabotRecordEcosystemMetaSchema,
   DependabotRecordEcosystemVersionsSchema,
   DependabotUpdateDependencyListSchema,
@@ -328,6 +329,20 @@ describe('record_ecosystem_meta', () => {
     expect(data[0]?.ecosystem.package_manager?.name).toEqual('terraform');
     expect(data[0]?.ecosystem.package_manager?.version).toEqual('1.12.2');
     expect(data[0]?.ecosystem.package_manager?.raw_version).toEqual('1.12.2');
+  });
+});
+
+describe('record_cooldown_meta', () => {
+  it('gomod', async () => {
+    const raw = JSON.parse(await readFile('fixtures/record_cooldown_meta/gomod.json', 'utf-8'));
+    const data = DependabotRecordCooldownMetaSchema.array().parse(raw.data);
+    expect(data.length).toEqual(1);
+    expect(data[0]?.cooldown).toBeDefined();
+    expect(data[0]?.cooldown.ecosystem_name).toEqual('go_modules');
+    expect(data[0]?.cooldown.config.default_days).toEqual(5);
+    expect(data[0]?.cooldown.config.semver_major_days).toEqual(5);
+    expect(data[0]?.cooldown.config.semver_minor_days).toEqual(5);
+    expect(data[0]?.cooldown.config.semver_patch_days).toEqual(5);
   });
 });
 

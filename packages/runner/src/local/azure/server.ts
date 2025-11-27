@@ -294,9 +294,10 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
       case 'create_dependency_submission':
       case 'mark_as_processed':
       case 'record_ecosystem_versions':
-      case 'record_ecosystem_meta':
       case 'increment_metric':
-      case 'record_metrics':
+      case 'record_ecosystem_meta':
+      case 'record_cooldown_meta':
+      case 'record_metrics': // from the runner
         return true;
 
       case 'record_update_job_error':
