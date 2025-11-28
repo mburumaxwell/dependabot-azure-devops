@@ -6,6 +6,7 @@ import { ZodError } from 'zod';
 import {
   DependabotConfigSchema,
   type DependabotRegistry,
+  DependabotScheduleSchema,
   type DependabotUpdate,
   DependabotUpdateSchema,
   parseRegistries,
@@ -82,13 +83,70 @@ describe('Parse configuration file', () => {
   });
 });
 
+describe('DependabotScheduleSchema', () => {
+  it('works with defaults', () => {
+    const raw = { interval: 'daily' };
+    const schedule = DependabotScheduleSchema.parse(raw);
+    expect(schedule.cronjob).toBeUndefined();
+    expect(schedule.interval).toBe('daily');
+    expect(schedule.time).toBe('02:00');
+    expect(schedule.timezone).toBe('Etc/UTC');
+    expect(schedule.day).toBe('monday');
+  });
+
+  it('overrides defaults', () => {
+    const raw = {
+      interval: 'weekly',
+      time: '04:00',
+      timezone: 'Europe/London',
+      day: 'thursday',
+    };
+    const schedule = DependabotScheduleSchema.parse(raw);
+    expect(schedule.cronjob).toBeUndefined();
+    expect(schedule.interval).toBe('weekly');
+    expect(schedule.time).toBe('04:00');
+    expect(schedule.timezone).toBe('Europe/London');
+    expect(schedule.day).toBe('thursday');
+  });
+
+  it('works for cronjob', () => {
+    const raw = { interval: 'cron', cronjob: '0 5 * * 1' };
+    const schedule = DependabotScheduleSchema.parse(raw);
+    expect(schedule.cronjob).toBe('0 5 * * 1');
+    expect(schedule.interval).toBe('cron');
+    expect(schedule.time).toBe('02:00');
+    expect(schedule.timezone).toBe('Etc/UTC');
+    expect(schedule.day).toBe('monday');
+  });
+});
+
 describe('Directory validation', () => {
   it('Should reject directory with glob patterns', async () => {
     const invalidConfigs = [
-      { version: 2, updates: [{ 'package-ecosystem': 'npm', directory: '/src/*' }] },
-      { version: 2, updates: [{ 'package-ecosystem': 'npm', directory: '/src/app-?' }] },
-      { version: 2, updates: [{ 'package-ecosystem': 'npm', directory: '/src/[abc]' }] },
-      { version: 2, updates: [{ 'package-ecosystem': 'npm', directory: '/src/{a,b}' }] },
+      {
+        version: 2,
+        updates: [
+          { 'package-ecosystem': 'npm', schedule: { interval: 'cron', cronjob: '0 0 * * *' }, directory: '/src/*' },
+        ],
+      },
+      {
+        version: 2,
+        updates: [
+          { 'package-ecosystem': 'npm', schedule: { interval: 'cron', cronjob: '0 0 * * *' }, directory: '/src/app-?' },
+        ],
+      },
+      {
+        version: 2,
+        updates: [
+          { 'package-ecosystem': 'npm', schedule: { interval: 'cron', cronjob: '0 0 * * *' }, directory: '/src/[abc]' },
+        ],
+      },
+      {
+        version: 2,
+        updates: [
+          { 'package-ecosystem': 'npm', schedule: { interval: 'cron', cronjob: '0 0 * * *' }, directory: '/src/{a,b}' },
+        ],
+      },
     ];
 
     for (const config of invalidConfigs) {
@@ -101,7 +159,13 @@ describe('Directory validation', () => {
   it('Should accept directory without glob patterns', async () => {
     const validConfig = {
       version: 2,
-      updates: [{ 'package-ecosystem': 'npm', directory: '/src/app' }],
+      updates: [
+        {
+          'package-ecosystem': 'npm',
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+          directory: '/src/app',
+        },
+      ],
     };
 
     const result = await DependabotConfigSchema.parseAsync(validConfig);
@@ -112,10 +176,26 @@ describe('Directory validation', () => {
     const validConfig = {
       version: 2,
       updates: [
-        { 'package-ecosystem': 'npm', directory: '/src/app-name' },
-        { 'package-ecosystem': 'docker', directory: '/src/app_name' },
-        { 'package-ecosystem': 'nuget', directory: '/src/app.name' },
-        { 'package-ecosystem': 'pip', directory: '/src/app@version' },
+        {
+          'package-ecosystem': 'npm',
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+          directory: '/src/app-name',
+        },
+        {
+          'package-ecosystem': 'docker',
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+          directory: '/src/app_name',
+        },
+        {
+          'package-ecosystem': 'nuget',
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+          directory: '/src/app.name',
+        },
+        {
+          'package-ecosystem': 'pip',
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+          directory: '/src/app@version',
+        },
       ],
     };
 
@@ -128,7 +208,11 @@ describe('Directory validation', () => {
   });
 
   it('Should validate individual DependabotUpdate schema with glob patterns', async () => {
-    const invalidUpdate = { 'package-ecosystem': 'npm', directory: '/src/*' };
+    const invalidUpdate = {
+      'package-ecosystem': 'npm',
+      schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+      directory: '/src/*',
+    };
 
     await expect(DependabotUpdateSchema.parseAsync(invalidUpdate)).rejects.toThrow(
       "The 'directory' field must not include glob pattern.",
@@ -136,7 +220,11 @@ describe('Directory validation', () => {
   });
 
   it('Should validate individual DependabotUpdate schema without glob patterns', async () => {
-    const validUpdate = { 'package-ecosystem': 'npm', directory: '/src/app' };
+    const validUpdate = {
+      'package-ecosystem': 'npm',
+      schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+      directory: '/src/app',
+    };
 
     const result = await DependabotUpdateSchema.parseAsync(validUpdate);
     expect(result.directory).toBe('/src/app');
@@ -146,8 +234,16 @@ describe('Directory validation', () => {
     const configWithGlob = {
       version: 2,
       updates: [
-        { 'package-ecosystem': 'npm', directory: '/src/*' },
-        { 'package-ecosystem': 'docker', directory: '/apps/[abc]' },
+        {
+          'package-ecosystem': 'npm',
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+          directory: '/src/*',
+        },
+        {
+          'package-ecosystem': 'docker',
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+          directory: '/apps/[abc]',
+        },
       ],
     };
 
@@ -437,8 +533,16 @@ describe('Duplicate update configuration detection', () => {
     const configWithDuplicates = {
       version: 2,
       updates: [
-        { 'package-ecosystem': 'npm', directory: '/client' },
-        { 'package-ecosystem': 'npm', directory: '/client' },
+        {
+          'package-ecosystem': 'npm',
+          directory: '/client',
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+        },
+        {
+          'package-ecosystem': 'npm',
+          directory: '/client',
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+        },
       ],
     };
 
@@ -451,8 +555,16 @@ describe('Duplicate update configuration detection', () => {
     const configWithDuplicates = {
       version: 2,
       updates: [
-        { 'package-ecosystem': 'nuget', directories: ['/src/client', '/src/server'] },
-        { 'package-ecosystem': 'nuget', directories: ['/src/client', '/src/server'] },
+        {
+          'package-ecosystem': 'nuget',
+          directories: ['/src/client', '/src/server'],
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+        },
+        {
+          'package-ecosystem': 'nuget',
+          directories: ['/src/client', '/src/server'],
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+        },
       ],
     };
 
@@ -465,8 +577,16 @@ describe('Duplicate update configuration detection', () => {
     const configWithDuplicates = {
       version: 2,
       updates: [
-        { 'package-ecosystem': 'npm', directory: '/src' },
-        { 'package-ecosystem': 'npm', directories: ['/src'] },
+        {
+          'package-ecosystem': 'npm',
+          directory: '/src',
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+        },
+        {
+          'package-ecosystem': 'npm',
+          directories: ['/src'],
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+        },
       ],
     };
 
@@ -479,8 +599,16 @@ describe('Duplicate update configuration detection', () => {
     const validConfig = {
       version: 2,
       updates: [
-        { 'package-ecosystem': 'npm', directory: '/client' },
-        { 'package-ecosystem': 'docker', directory: '/client' },
+        {
+          'package-ecosystem': 'npm',
+          directory: '/client',
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+        },
+        {
+          'package-ecosystem': 'docker',
+          directory: '/client',
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+        },
       ],
     };
 
@@ -492,8 +620,16 @@ describe('Duplicate update configuration detection', () => {
     const validConfig = {
       version: 2,
       updates: [
-        { 'package-ecosystem': 'npm', directory: '/client' },
-        { 'package-ecosystem': 'npm', directory: '/server' },
+        {
+          'package-ecosystem': 'npm',
+          directory: '/client',
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+        },
+        {
+          'package-ecosystem': 'npm',
+          directory: '/server',
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+        },
       ],
     };
 
@@ -508,7 +644,16 @@ describe('Beta ecosystems validation', () => {
     'conda',
     'opentofu',
   ])('Should reject %s when enable-beta-ecosystems is not set', async (ecosystem) => {
-    const config = { version: 2, updates: [{ 'package-ecosystem': ecosystem, directory: '/' }] };
+    const config = {
+      version: 2,
+      updates: [
+        {
+          'package-ecosystem': ecosystem,
+          schedule: { interval: 'daily' },
+          directory: '/',
+        },
+      ],
+    };
 
     await expect(DependabotConfigSchema.parseAsync(config)).rejects.toThrow(
       `The package ecosystem '${ecosystem}' is currently in beta. To use it, set 'enable-beta-ecosystems' to true in the dependabot configuration.`,
@@ -519,7 +664,13 @@ describe('Beta ecosystems validation', () => {
     const config = {
       version: 2,
       'enable-beta-ecosystems': true,
-      updates: [{ 'package-ecosystem': ecosystem, directory: '/' }],
+      updates: [
+        {
+          'package-ecosystem': ecosystem,
+          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
+          directory: '/',
+        },
+      ],
     };
 
     const result = await DependabotConfigSchema.parseAsync(config);
@@ -538,6 +689,7 @@ describe('Validate registries', () => {
     const updates: DependabotUpdate[] = [
       {
         'package-ecosystem': 'npm',
+        schedule: { interval: 'daily', time: '02:00', timezone: 'UTC', day: 'sunday' },
         directory: '/',
         directories: undefined,
         registries: ['dummy1', 'dummy2'],

@@ -307,8 +307,8 @@ export class Synchronizer {
     const updatesToUpsert = updates;
     for (const update of updatesToUpsert) {
       const directoryKey = makeDirectoryKey(update);
-      const timezone = update.schedule?.timezone || 'UTC'; // TODO: remove nullable and default once schedule is enforced
-      const { cron, next: nextUpdateJobAt } = generateCron(update.schedule!, timezone); // TODO: remove assertion once schedule is enforced
+      const timezone = update.schedule.timezone;
+      const { cron, next: nextUpdateJobAt } = generateCron(update.schedule, timezone);
       await prisma.repositoryUpdate.upsert({
         where: {
           repositoryId_ecosystem_directoryKey: {
