@@ -1,5 +1,22 @@
 # @paklo/runner
 
+## 0.5.0
+
+### Minor Changes
+
+- b6ca368: Fix outStream to write to stdout instead of stderr
+- b201dae: No longer log the request body in local server as one can use inspect with CLI
+
+### Patch Changes
+
+- 59c83f7: Add support for `record_cooldown_meta` endpoint though unused
+- d315af2: Support for conda ecosystem/manager (in beta)
+  Official changelog (unpublished): https://github.blog/changelog/2025-09-16-conda-ecosystem-support-for-dependabot-now-generally-available
+- Updated dependencies [59c83f7]
+- Updated dependencies [d315af2]
+- Updated dependencies [45e8456]
+  - @paklo/core@0.7.3
+
 ## 0.4.2
 
 ### Patch Changes
