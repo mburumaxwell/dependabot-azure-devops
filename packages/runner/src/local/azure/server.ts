@@ -49,7 +49,6 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
       setAutoComplete,
       autoCompleteIgnoreConfigIds,
       author,
-      debug,
       dryRun,
     } = options;
 
@@ -61,9 +60,6 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
     }
     const { 'package-manager': packageManager } = job;
     logger.info(`Processing '${type}' for job ID '${id}'`);
-    if (debug) {
-      logger.debug(JSON.stringify(data));
-    }
 
     const update = this.update(id)!; // exists because job exists
     const { project, repository } = url;
