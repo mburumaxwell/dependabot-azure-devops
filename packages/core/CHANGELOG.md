@@ -1,5 +1,14 @@
 # @paklo/core
 
+## 0.7.3
+
+### Patch Changes
+
+- 59c83f7: Add support for `record_cooldown_meta` endpoint though unused
+- d315af2: Support for conda ecosystem/manager (in beta)
+  Official changelog (unpublished): https://github.blog/changelog/2025-09-16-conda-ecosystem-support-for-dependabot-now-generally-available
+- 45e8456: Refactor logger implementation to support customizable options and multiple output streams
+
 ## 0.7.2
 
 ### Patch Changes

@@ -1,5 +1,23 @@
 # extension-azure-devops
 
+## 2.60.0
+
+### Minor Changes
+
+- b6ca368: Fix outStream to write to stdout instead of stderr
+- b201dae: No longer log the request body in local server as one can use inspect with CLI
+
+### Patch Changes
+
+- 827a434: Update logger level based on debug input (env:System.Debug)
+- Updated dependencies [59c83f7]
+- Updated dependencies [b6ca368]
+- Updated dependencies [d315af2]
+- Updated dependencies [45e8456]
+- Updated dependencies [b201dae]
+  - @paklo/runner@0.5.0
+  - @paklo/core@0.7.3
+
 ## 2.59.13
 
 ### Patch Changes

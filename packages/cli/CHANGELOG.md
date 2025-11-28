@@ -1,5 +1,23 @@
 # paklo
 
+## 0.13.0
+
+### Minor Changes
+
+- 96d4898: Add verbosity option for dynamic logger level adjustment
+- 7e4c4bd: Add cutoff option to cleanup command for customizable duration
+
+### Patch Changes
+
+- 45e8456: Refactor logger implementation to support customizable options and multiple output streams
+- Updated dependencies [59c83f7]
+- Updated dependencies [b6ca368]
+- Updated dependencies [d315af2]
+- Updated dependencies [45e8456]
+- Updated dependencies [b201dae]
+  - @paklo/runner@0.5.0
+  - @paklo/core@0.7.3
+
 ## 0.12.2
 
 ### Patch Changes
