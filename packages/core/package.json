@@ -69,7 +69,7 @@
   "homepage": "https://github.com/mburumaxwell/dependabot-azure-devops#readme",
   "dependencies": {
     "@hono/zod-validator": "0.7.5",
-    "hono": "4.10.6",
+    "hono": "4.10.7",
     "js-yaml": "4.1.1",
     "octokit": "5.0.5",
     "pino": "10.1.0",
