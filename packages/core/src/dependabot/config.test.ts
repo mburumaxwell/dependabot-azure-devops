@@ -503,7 +503,11 @@ describe('Duplicate update configuration detection', () => {
 });
 
 describe('Beta ecosystems validation', () => {
-  it.each(['bazel', 'opentofu'])('Should reject %s when enable-beta-ecosystems is not set', async (ecosystem) => {
+  it.each([
+    'bazel',
+    'conda',
+    'opentofu',
+  ])('Should reject %s when enable-beta-ecosystems is not set', async (ecosystem) => {
     const config = { version: 2, updates: [{ 'package-ecosystem': ecosystem, directory: '/' }] };
 
     await expect(DependabotConfigSchema.parseAsync(config)).rejects.toThrow(
@@ -511,7 +515,7 @@ describe('Beta ecosystems validation', () => {
     );
   });
 
-  it.each(['bazel', 'opentofu'])('Should allow %s when enable-beta-ecosystems is true', async (ecosystem) => {
+  it.each(['bazel', 'conda', 'opentofu'])('Should allow %s when enable-beta-ecosystems is true', async (ecosystem) => {
     const config = {
       version: 2,
       'enable-beta-ecosystems': true,
