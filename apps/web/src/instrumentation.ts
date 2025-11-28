@@ -16,6 +16,7 @@ import type { BufferConfig, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { PrismaInstrumentation } from '@prisma/instrumentation';
 import { type Configuration, registerOTel } from '@vercel/otel';
+import { credential } from '@/lib/azure';
 import { environment } from '@/lib/environment';
 
 export async function register() {
@@ -29,11 +30,12 @@ export async function register() {
   const metricReaders: Configuration['metricReaders'] = [];
   const providers: ProviderExporters[] = [];
 
+  // export to azure monitor if configured, in production, and not on vercel or edge
   const edge = process.env.NEXT_RUNTIME === 'edge';
   const vercel = Boolean(process.env.VERCEL_DEPLOYMENT_ID);
-  if (!edge && environment.production && !vercel) {
-    const connectionString = process.env.NEXT_PUBLIC_APP_INSIGHTS_CONNECTION_STRING;
-    const exporterOptions: AzureMonitorExporterOptions = { connectionString };
+  const connectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING;
+  if (!edge && environment.production && !vercel && connectionString) {
+    const exporterOptions: AzureMonitorExporterOptions = { connectionString, credential };
 
     providers.push({
       spanExporter: new AzureMonitorTraceExporter(exporterOptions),

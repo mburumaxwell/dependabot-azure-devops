@@ -44,8 +44,6 @@ updates:
       time: '02:00'
     open-pull-requests-limit: 20
     groups:
-      applicationinsights:
-        patterns: ['@microsoft/applicationinsights*']
       azure:
         patterns: ['@azure/*']
       better-auth:

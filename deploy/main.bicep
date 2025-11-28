@@ -164,14 +164,6 @@ resource appEnvironment 'Microsoft.App/managedEnvironments@2025-01-01' = {
   }]
 }
 
-/* Application Insights */
-resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: name
-  location: location
-  kind: 'web'
-  properties: { Application_Type: 'web', WorkspaceResourceId: logAnalyticsWorkspace.id }
-}
-
 /* Role Assignments */
 var roles = [
   { name: 'App Configuration Data Reader', id: '516239f1-63e1-4d78-a4de-a74fb236a071' } // Allow read access to App Configuration

@@ -24,10 +24,10 @@ const config: NextConfig = {
             value: `
               default-src 'self';
               img-src 'self' data: https:;
-              script-src 'self' 'unsafe-inline' https://js.monitor.azure.com https://*.applicationinsights.azure.com https://*.vercel-scripts.com https://vercel.live;
+              script-src 'self' 'unsafe-inline' https://*.vercel-scripts.com https://vercel.live;
               style-src 'self' 'unsafe-inline';
               font-src 'self';
-              connect-src 'self' https://js.monitor.azure.com https://*.applicationinsights.azure.com https://*.vercel-scripts.com;
+              connect-src 'self' https://*.vercel-scripts.com;
               frame-src https://vercel.live;
               frame-ancestors 'none';
               object-src 'none';

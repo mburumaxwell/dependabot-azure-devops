@@ -3,7 +3,6 @@
   "globalDependencies": ["**/.env", "**/.env.*", "**/biome.json", "**/vitest.config.*"],
   "globalEnv": [
     "NODE_ENV",
-    "NEXT_PUBLIC_APP_INSIGHTS_CONNECTION_STRING",
     "BETTER_AUTH_SECRET",
     "CRON_SECRET",
     "MONGO_DATABASE_URL",
@@ -12,6 +11,7 @@
   ],
   "globalPassThroughEnv": [
     "LOG_LEVEL",
+    "APPLICATIONINSIGHTS_CONNECTION_STRING",
     "AZURE_TENANT_ID",
     "AZURE_CLIENT_ID",
     "AZURE_SUBSCRIPTION_ID",
