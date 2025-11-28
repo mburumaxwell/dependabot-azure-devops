@@ -75,7 +75,7 @@
     "pino": "10.1.0",
     "pino-pretty": "13.1.2",
     "semver": "7.7.3",
-    "zod": "4.1.12"
+    "zod": "4.1.13"
   },
   "devDependencies": {
     "@types/js-yaml": "4.0.9",
