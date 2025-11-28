@@ -5,7 +5,7 @@ import stream, { type Writable } from 'node:stream';
 export const outStream = (prefix: string): Writable => {
   return new stream.Writable({
     write(chunk, _, next) {
-      process.stderr.write(`${prefix} | ${chunk.toString()}`);
+      process.stdout.write(`${prefix} | ${chunk.toString()}`);
       next();
     },
   });
