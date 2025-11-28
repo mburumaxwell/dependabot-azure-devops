@@ -2,6 +2,7 @@ import { defineConfig } from 'tsdown';
 
 export default defineConfig({
   format: ['esm'],
+  tsconfig: true,
   dts: true,
   sourcemap: true,
   entry: [
