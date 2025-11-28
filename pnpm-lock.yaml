@@ -335,8 +335,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/runner
       azure-pipelines-task-lib:
-        specifier: 5.2.1
-        version: 5.2.1
+        specifier: 5.2.2
+        version: 5.2.2
       semver:
         specifier: 7.7.3
         version: 7.7.3
@@ -4040,8 +4040,8 @@ packages:
     resolution: {integrity: sha512-QhpgjH1LQ+vgDJ7oBwcmsZ3+o4ZpjLVilw0D3oJQpYpRzN+L39lk5jZDLJ464hLUgsDzWn/Ksv7zLLMKLfoBzA==}
     engines: {node: '>= 16.0.0'}
 
-  azure-pipelines-task-lib@5.2.1:
-    resolution: {integrity: sha512-10RL/bGbs39spWf3yklOp+vWPOn54Y9x4OZUUih7OCpCXyj6S0POttlGd5fY2Vcd9KgERdaJHPhOXRG0fHGWfQ==}
+  azure-pipelines-task-lib@5.2.2:
+    resolution: {integrity: sha512-McTb45c4oP1ma0evhXBe+y1Gy4gQihYnb+2Kr1tnBYhIv2xzK8iAIfwqhlyhHloCBVDHNrToFQcAC0UH1Gd32g==}
 
   b4a@1.7.3:
     resolution: {integrity: sha512-5Q2mfq2WfGuFp3uS//0s6baOJLMoVduPYVeNmDYxu5OUA1/cBfvr2RIS7vi62LdNj/urk1hfmj867I3qt6uZ7Q==}
@@ -12654,7 +12654,7 @@ snapshots:
       tunnel: 0.0.6
       typed-rest-client: 2.1.0
 
-  azure-pipelines-task-lib@5.2.1:
+  azure-pipelines-task-lib@5.2.2:
     dependencies:
       adm-zip: 0.5.16
       minimatch: 3.0.5
