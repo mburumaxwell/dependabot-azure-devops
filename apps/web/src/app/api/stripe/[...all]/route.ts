@@ -1,6 +1,6 @@
 import { toNextJsHandler } from '@paklo/core/hono';
-import { logger } from '@paklo/core/logger';
 import { Hono } from 'hono';
+import { logger } from '@/lib/logger';
 import { stripe, webhookSecret } from '@/lib/stripe';
 
 export const dynamic = 'force-dynamic';

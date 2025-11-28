@@ -1,4 +1,4 @@
-import { logger } from '@paklo/core/logger';
+import { logger } from '@/lib/logger';
 import { getMongoCollection } from '@/lib/mongodb';
 import { prisma } from '@/lib/prisma';
 

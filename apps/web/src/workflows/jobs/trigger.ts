@@ -6,10 +6,10 @@ import {
   parseDependabotConfig,
 } from '@paklo/core/dependabot';
 import { Keygen } from '@paklo/core/keygen';
-import { logger } from '@paklo/core/logger';
 import { FatalError, getWorkflowMetadata, sleep, type WorkflowMetadata } from 'workflow';
 import { getGithubToken, getSecretValue } from '@/actions/organizations';
 import { SequenceNumber } from '@/lib/ids';
+import { logger } from '@/lib/logger';
 import { prisma, type UpdateJob, type UpdateJobPlatform, type UpdateJobTrigger } from '@/lib/prisma';
 
 export type TriggerUpdateJobsWorkflowOptions = {

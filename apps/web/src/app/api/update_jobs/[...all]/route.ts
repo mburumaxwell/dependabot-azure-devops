@@ -8,8 +8,8 @@ import {
   type DependabotTokenType,
 } from '@paklo/core/dependabot';
 import { toNextJsHandler } from '@paklo/core/hono';
-import { logger } from '@paklo/core/logger';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';

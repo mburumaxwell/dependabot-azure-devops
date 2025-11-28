@@ -1,5 +1,4 @@
 import { passkey } from '@better-auth/passkey';
-import { logger } from '@paklo/core/logger';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { APIError } from 'better-auth/api';
 import { betterAuth } from 'better-auth/minimal';
@@ -12,6 +11,7 @@ import {
   sendUserDeleteVerificationEmail,
 } from '@/emails';
 import { PakloId } from '@/lib/ids';
+import { logger } from '@/lib/logger';
 import { OrganizationBillingIntervalSchema, OrganizationTierSchema, OrganizationTypeSchema } from '@/lib/organizations';
 import { prisma as prismaClient } from '@/lib/prisma';
 import { RegionCodeSchema } from '@/lib/regions';
