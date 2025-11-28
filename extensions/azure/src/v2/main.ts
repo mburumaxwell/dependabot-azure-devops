@@ -4,6 +4,7 @@ import {
   DEPENDABOT_DEFAULT_AUTHOR_NAME,
   type GitAuthor,
 } from '@paklo/core/dependabot';
+import { logger } from '@paklo/core/logger';
 import type { SecretMasker } from '@paklo/runner';
 import { AzureLocalJobsRunner, type AzureLocalJobsRunnerOptions } from '@paklo/runner/local/azure';
 import * as tl from 'azure-pipelines-task-lib/task';
@@ -21,6 +22,9 @@ async function run() {
     if (!inputs) {
       throw new Error('Failed to parse task input configuration');
     }
+
+    // update logger level based on debug input
+    logger.level = inputs.debug ? 'debug' : 'warn';
 
     const { url, authorEmail, authorName, ...remainingInputs } = inputs;
 
