@@ -68,7 +68,7 @@ importers:
         version: 1.4.1(@better-auth/core@1.4.1(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.0)(jose@6.1.2)(kysely@0.28.8)(nanostores@1.0.1))(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-auth@1.4.1(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(better-call@1.1.0)(nanostores@1.0.1)
       '@hono/zod-validator':
         specifier: 0.7.5
-        version: 0.7.5(hono@4.10.6)(zod@4.1.12)
+        version: 0.7.5(hono@4.10.7)(zod@4.1.12)
       '@opentelemetry/api':
         specifier: 1.9.0
         version: 1.9.0
@@ -211,8 +211,8 @@ importers:
         specifier: 16.1.0
         version: 16.1.0(@types/react-dom@19.2.3(@types/react@19.2.6))(@types/react@19.2.6)(lucide-react@0.554.0(react@19.2.0))(next@16.0.3(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(tailwindcss@4.1.17)
       hono:
-        specifier: 4.10.6
-        version: 4.10.6
+        specifier: 4.10.7
+        version: 4.10.7
       lucide-react:
         specifier: 0.554.0
         version: 0.554.0(react@19.2.0)
@@ -380,10 +380,10 @@ importers:
     dependencies:
       '@hono/zod-validator':
         specifier: 0.7.5
-        version: 0.7.5(hono@4.10.6)(zod@4.1.12)
+        version: 0.7.5(hono@4.10.7)(zod@4.1.12)
       hono:
-        specifier: 4.10.6
-        version: 4.10.6
+        specifier: 4.10.7
+        version: 4.10.7
       js-yaml:
         specifier: 4.1.1
         version: 4.1.1
@@ -420,7 +420,7 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: 1.19.6
-        version: 1.19.6(hono@4.10.6)
+        version: 1.19.6(hono@4.10.7)
       '@paklo/core':
         specifier: workspace:*
         version: link:../core
@@ -5521,8 +5521,8 @@ packages:
   help-me@5.0.0:
     resolution: {integrity: sha512-7xgomUX6ADmcYzFik0HzAxh/73YlKR9bmFzf51CZwR+b6YtzU2m0u49hQCqV6SvlqIqsaxovfwdvbnsw3b/zpg==}
 
-  hono@4.10.6:
-    resolution: {integrity: sha512-BIdolzGpDO9MQ4nu3AUuDwHZZ+KViNm+EZ75Ae55eMXMqLVhDFqEMXxtUe9Qh8hjL+pIna/frs2j6Y2yD5Ua/g==}
+  hono@4.10.7:
+    resolution: {integrity: sha512-icXIITfw/07Q88nLSkB9aiUrd8rYzSweK681Kjo/TSggaGbOX4RRyxxm71v+3PC8C/j+4rlxGeoTRxQDkaJkUw==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -9743,13 +9743,13 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/node-server@1.19.6(hono@4.10.6)':
+  '@hono/node-server@1.19.6(hono@4.10.7)':
     dependencies:
-      hono: 4.10.6
+      hono: 4.10.7
 
-  '@hono/zod-validator@0.7.5(hono@4.10.6)(zod@4.1.12)':
+  '@hono/zod-validator@0.7.5(hono@4.10.7)(zod@4.1.12)':
     dependencies:
-      hono: 4.10.6
+      hono: 4.10.7
       zod: 4.1.12
 
   '@iconify/types@2.0.0': {}
@@ -14324,7 +14324,7 @@ snapshots:
 
   help-me@5.0.0: {}
 
-  hono@4.10.6: {}
+  hono@4.10.7: {}
 
   hookable@5.5.3: {}
 
