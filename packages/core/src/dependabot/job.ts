@@ -125,6 +125,7 @@ export const DependabotPackageManagerSchema = z.enum([
   'bundler',
   'cargo',
   'composer',
+  'conda',
   'pub',
   'docker',
   'elm',

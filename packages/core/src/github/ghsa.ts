@@ -58,6 +58,7 @@ const GHSA_SECURITY_VULNERABILITIES_QUERY = `
 `;
 
 export const PackageEcosystemSchema = z.enum([
+  // https://docs.github.com/en/enterprise-cloud@latest/graphql/reference/enums#securityadvisoryecosystem
   'COMPOSER',
   'ERLANG',
   'GO',

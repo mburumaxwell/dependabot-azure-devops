@@ -1,5 +1,6 @@
 import type { PackageEcosystem } from '@paklo/core/dependabot';
 import {
+  AnacondaOriginal,
   BazelOriginal,
   BunOriginal,
   ComposerOriginal,
@@ -34,6 +35,8 @@ export function EcosystemIcon({
     // case 'cargo':
     case 'composer':
       return <ComposerOriginal {...props} />;
+    case 'conda':
+      return <AnacondaOriginal {...props} />;
     // case 'pub':
     case 'docker':
       return <DockerOriginal {...props} />;

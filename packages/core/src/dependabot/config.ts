@@ -162,6 +162,7 @@ export const PackageEcosystemSchema = z.enum([
   'bundler',
   'cargo',
   'composer',
+  'conda',
   'devcontainers',
   'docker',
   'docker-compose',
@@ -326,7 +327,7 @@ export const DependabotConfigSchema = z
     }
 
     // ensure that the ecosystems in beta are only used when 'enable-beta-ecosystems' is true
-    const betaEcosystems: PackageEcosystem[] = ['bazel', 'opentofu'];
+    const betaEcosystems: PackageEcosystem[] = ['bazel', 'conda', 'opentofu'];
     if (!value['enable-beta-ecosystems']) {
       for (const update of value.updates) {
         if (betaEcosystems.includes(update['package-ecosystem'])) {

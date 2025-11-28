@@ -27,6 +27,7 @@ const manifest = {
   bundler: getImageName('Dockerfile.bundler'),
   cargo: getImageName('Dockerfile.cargo'),
   composer: getImageName('Dockerfile.composer'),
+  conda: getImageName('Dockerfile.conda'),
   pub: getImageName('Dockerfile.pub'),
   docker: getImageName('Dockerfile.docker'),
   elm: getImageName('Dockerfile.elm'),
