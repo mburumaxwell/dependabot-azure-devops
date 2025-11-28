@@ -1,1 +1,1 @@
-FROM ghcr.io/dependabot/dependabot-updater-terraform:v2.0.20251120202309@sha256:25e6e4a90121d8f8dae0c687f99ccd0aa15a7db6dd1ba623bbee7d766936e0aa
+FROM ghcr.io/dependabot/dependabot-updater-terraform:v2.0.20251128103852@sha256:0e3acded95b04949fc9eb0cea6673916f2476971a383c4c4cc4d5b8a5c8d944b
