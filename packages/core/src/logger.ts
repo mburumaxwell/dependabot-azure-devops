@@ -1,4 +1,4 @@
-import pino, { type DestinationStream } from 'pino';
+import pino, { type DestinationStream, type Level } from 'pino';
 import pretty from 'pino-pretty';
 
 export type LoggerCreateOptions = {
@@ -6,7 +6,7 @@ export type LoggerCreateOptions = {
    * Log level
    * Only set this if you must override the default log level logic from env variables
    */
-  level?: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
+  level?: Level;
 
   /**
    * Whether to include time stamps in log entries
@@ -67,6 +67,19 @@ export function create(options: LoggerCreateOptions = {}) {
         colorize: prettyColorize,
         ignore: 'pid,hostname',
         customPrettifiers: prettyIncludeLevel ? undefined : { level: () => '' },
+        // these colors only apply to the log level which we may be hiding above
+        // support for custom colors in the message itself is not yet supported
+        // https://github.com/pinojs/pino-pretty/issues/430
+        // https://github.com/pinojs/pino-pretty/issues/524
+        // https://github.com/pinojs/pino-pretty/pull/611
+        customColors: {
+          trace: 'grey',
+          debug: 'grey',
+          info: 'white',
+          warn: 'yellow',
+          error: 'red',
+          fatal: 'magenta',
+        } satisfies Record<Level, string>,
       })
     : undefined;
 
