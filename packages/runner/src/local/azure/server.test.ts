@@ -102,6 +102,7 @@ describe('AzureLocalDependabotServer', () => {
       };
       update = {
         'package-ecosystem': 'npm',
+        schedule: { interval: 'daily', time: '02:00', timezone: 'UTC', day: 'sunday' },
       };
 
       // Mock the job and update methods

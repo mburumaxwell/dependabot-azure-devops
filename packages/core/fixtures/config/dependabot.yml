@@ -5,47 +5,63 @@
 
 version: 2
 updates:
-  - package-ecosystem: 'docker' # See documentation for possible values
-    directory: '/' # Location of package manifests
+  - package-ecosystem: "docker" # See documentation for possible values
+    schedule:
+      interval: "cron"
+      cronjob: "0 0 * * *"
+    directory: "/" # Location of package manifests
     open-pull-requests-limit: 10
-  - package-ecosystem: 'npm' # See documentation for possible values
-    directory: '/client' # Location of package manifests
+  - package-ecosystem: "npm" # See documentation for possible values
+    schedule:
+      interval: "cron"
+      cronjob: "0 0 * * *"
+    directory: "/client" # Location of package manifests
     open-pull-requests-limit: 10
     registries:
       - reg1
       - reg2
-    insecure-external-code-execution: 'deny'
+    insecure-external-code-execution: "deny"
     ignore:
-      - dependency-name: 'react'
-        update-types: ['version-update:semver-major']
-      - dependency-name: 'react-dom'
-        update-types: ['version-update:semver-major']
-      - dependency-name: '@types/react'
-        update-types: ['version-update:semver-major']
-      - dependency-name: '@types/react-dom'
-        update-types: ['version-update:semver-major']
-  - package-ecosystem: 'nuget'
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react-dom"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: "nuget"
+    schedule:
+      interval: "cron"
+      cronjob: "0 0 * * *"
     directories:
-      - '/src/client'
-      - '/src/server'
+      - "/src/client"
+      - "/src/server"
     groups:
       microsoft:
         patterns:
-          - 'microsoft*'
+          - "microsoft*"
         update-types:
-          - 'minor'
-          - 'patch'
-  - package-ecosystem: 'devcontainers' # See documentation for possible values
-    directory: '/' # Location of package manifests
+          - "minor"
+          - "patch"
+  - package-ecosystem: "devcontainers" # See documentation for possible values
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "12:00"
+      timezone: "UTC"
+    directory: "/" # Location of package manifests
     open-pull-requests-limit: 0
-  - package-ecosystem: 'dotnet-sdk' # See documentation for possible values
-    directory: '/' # Location of package manifests
+  - package-ecosystem: "dotnet-sdk" # See documentation for possible values
+    schedule:
+      interval: "daily"
+    directory: "/" # Location of package manifests
 registries:
   reg1:
     type: nuget-feed
-    url: 'https://pkgs.dev.azure.com/dependabot/_packaging/dependabot/nuget/v3/index.json'
-    token: ':${{DEFAULT_TOKEN}}'
+    url: "https://pkgs.dev.azure.com/dependabot/_packaging/dependabot/nuget/v3/index.json"
+    token: ":${{DEFAULT_TOKEN}}"
   reg2:
     type: npm-registry
-    url: 'https://pkgs.dev.azure.com/dependabot/_packaging/dependabot-npm/npm/registry/'
-    token: 'tingle-npm:${{ DEFAULT_TOKEN }}'
+    url: "https://pkgs.dev.azure.com/dependabot/_packaging/dependabot-npm/npm/registry/"
+    token: "tingle-npm:${{ DEFAULT_TOKEN }}"

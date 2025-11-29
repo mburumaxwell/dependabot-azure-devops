@@ -74,6 +74,7 @@ describe('mapSourceFromDependabotConfigToJobConfig', () => {
     };
     const update = {
       'package-ecosystem': 'nuget',
+      schedule: { interval: 'daily', time: '02:00', timezone: 'UTC', day: 'sunday' },
       directory: '/',
       directories: [],
     } as DependabotUpdate;
@@ -96,6 +97,7 @@ describe('mapSourceFromDependabotConfigToJobConfig', () => {
     };
     const update = {
       'package-ecosystem': 'nuget',
+      schedule: { interval: 'daily', time: '02:00', timezone: 'UTC', day: 'sunday' },
       directory: '/',
       directories: [],
     } as DependabotUpdate;

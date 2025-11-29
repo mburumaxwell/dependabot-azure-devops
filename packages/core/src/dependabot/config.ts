@@ -216,7 +216,7 @@ export const DependabotUpdateSchema = z
     'pull-request-branch-name': DependabotPullRequestBranchNameSchema.optional(),
     'rebase-strategy': z.string().optional(),
     registries: z.string().array().optional(),
-    schedule: DependabotScheduleSchema.optional(), // TODO: make required after 2025-Nov-30
+    schedule: DependabotScheduleSchema,
     'target-branch': z.string().optional(),
     vendor: z.boolean().optional(),
     'versioning-strategy': VersioningStrategySchema.optional(),
