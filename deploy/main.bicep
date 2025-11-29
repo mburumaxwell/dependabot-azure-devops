@@ -52,7 +52,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2025-05-01' = {
 }
 
 /* Storage Account */
-resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2025-06-01' = {
   name: name
   location: location
   kind: 'StorageV2'
@@ -82,7 +82,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
 }
 
 /* LogAnalytics */
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02-01' = {
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-07-01' = {
   name: name
   location: location
   properties: {
@@ -93,7 +93,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02
 }
 
 /* MongoDB Cluster */
-resource mongoCluster 'Microsoft.DocumentDB/mongoClusters@2024-07-01' = {
+resource mongoCluster 'Microsoft.DocumentDB/mongoClusters@2025-09-01' = {
   name: name
   location: location
   properties: {
@@ -101,10 +101,12 @@ resource mongoCluster 'Microsoft.DocumentDB/mongoClusters@2024-07-01' = {
     administrator: { userName: 'puppy', password: administratorLoginPasswordMongo }
     serverVersion: '8.0'
     compute: { tier: 'Free' } // we remain free until, there are paying users :)
-    storage: { sizeGb: 32 }
+    storage: { sizeGb: 32, type: 'PremiumSSD' }
     sharding: { shardCount: 1 }
     highAvailability: { targetMode: 'Disabled' }
     publicNetworkAccess: 'Enabled'
+    authConfig: { allowedModes: ['NativeAuth'] }
+    dataApi: { mode: 'Disabled' }
   }
 
   // resource allowAzure 'firewallRules' = {
@@ -138,12 +140,13 @@ resource appConfiguration 'Microsoft.AppConfiguration/configurationStores@2024-0
 }
 
 /* Container App Environment */
-resource appEnvironment 'Microsoft.App/managedEnvironments@2025-01-01' = {
+resource appEnvironment 'Microsoft.App/managedEnvironments@2025-07-01' = {
   name: name
   location: location
   properties: {
     peerAuthentication: { mtls: { enabled: false } }
     peerTrafficConfiguration: { encryption: { enabled: false } }
+    publicNetworkAccess: 'Enabled'
     workloadProfiles: [{ name: 'Consumption', workloadProfileType: 'Consumption' }]
   }
   identity: {
