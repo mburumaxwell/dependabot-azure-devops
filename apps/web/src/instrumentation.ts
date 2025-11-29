@@ -30,11 +30,9 @@ export async function register() {
   const metricReaders: Configuration['metricReaders'] = [];
   const providers: ProviderExporters[] = [];
 
-  // export to azure monitor if configured, in production, and not on vercel or edge
-  const edge = process.env.NEXT_RUNTIME === 'edge';
-  const vercel = Boolean(process.env.VERCEL_DEPLOYMENT_ID);
+  // export to azure monitor if configured
   const connectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING;
-  if (!edge && environment.production && !vercel && connectionString) {
+  if (connectionString) {
     const exporterOptions: AzureMonitorExporterOptions = { connectionString, credential };
 
     providers.push({
