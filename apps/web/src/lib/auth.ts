@@ -10,6 +10,7 @@ import {
   sendOrganizationInviteEmail,
   sendUserDeleteVerificationEmail,
 } from '@/emails';
+import { environment } from '@/lib/environment';
 import { PakloId } from '@/lib/ids';
 import { logger } from '@/lib/logger';
 import { OrganizationBillingIntervalSchema, OrganizationTierSchema, OrganizationTypeSchema } from '@/lib/organizations';
@@ -28,6 +29,8 @@ export const auth = betterAuth({
       generateId: ({ model, size }) =>
         PakloId.isValidType(model) ? PakloId.generate(model) : PakloId.generateKidOnly(),
     },
+    // since we have not set baseURL, we need to trust proxy headers on ACA
+    trustProxyHeaders: environment.platform === 'azure_container_apps',
   },
   user: {
     deleteUser: {
