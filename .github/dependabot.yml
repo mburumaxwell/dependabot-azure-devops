@@ -119,10 +119,6 @@ updates:
           - 'vite-*'
           - '@vitejs/*'
           - 'vitest'
-      workflow:
-        patterns:
-          - '@workflow/*'
-          - 'workflow'
     ignore:
       - dependency-name: recharts
         update-types: [version-update:semver-major] # shadcn still doesn't support (https://github.com/shadcn-ui/ui/issues/7669)

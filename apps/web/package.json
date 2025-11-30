@@ -76,8 +76,6 @@
     "@vercel/oidc": "3.0.5",
     "@vercel/otel": "2.1.0",
     "@vercel/speed-insights": "1.2.0",
-    "@workflow/core": "4.0.1-beta.19",
-    "@workflow/next": "4.0.1-beta.22",
     "better-auth": "1.4.4",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
