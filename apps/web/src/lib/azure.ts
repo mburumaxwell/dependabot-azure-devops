@@ -1,9 +1,9 @@
-import { ContainerAppsAPIClient, type Job as ContainerAppJob } from '@azure/arm-appcontainers';
+import { type Job as ContainerAppJob, ContainerAppsAPIClient } from '@azure/arm-appcontainers';
 import { ComputeManagementClient } from '@azure/arm-compute';
 import { RestError } from '@azure/core-rest-pipeline';
 import { ClientAssertionCredential, DefaultAzureCredential, type TokenCredential } from '@azure/identity';
-import { LogsQueryClient } from "@azure/monitor-query-logs";
 import { parseKeyVaultSecretIdentifier, SecretClient } from '@azure/keyvault-secrets';
+import { LogsQueryClient } from '@azure/monitor-query-logs';
 import { BlobServiceClient } from '@azure/storage-blob';
 import { getVercelOidcToken } from '@vercel/oidc';
 
