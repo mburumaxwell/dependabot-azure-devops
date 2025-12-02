@@ -60,6 +60,9 @@ importers:
       '@azure/monitor-opentelemetry-exporter':
         specifier: 1.0.0-beta.32
         version: 1.0.0-beta.32
+      '@azure/monitor-query-logs':
+        specifier: 1.0.0
+        version: 1.0.0
       '@azure/storage-blob':
         specifier: 12.29.1
         version: 12.29.1
@@ -669,6 +672,10 @@ packages:
   '@azure/monitor-opentelemetry-exporter@1.0.0-beta.32':
     resolution: {integrity: sha512-Tk5Tv8KwHhKCQlXET/7ZLtjBv1Zi4lmPTadKTQ9KCURRJWdt+6hu5ze52Tlp2pVeg3mg+MRQ9vhWvVNXMZAp/A==}
     engines: {node: '>=18.0.0'}
+
+  '@azure/monitor-query-logs@1.0.0':
+    resolution: {integrity: sha512-5mZzLGZKAZ1vrVm0le2Jh+5VXu/4U+1tSpmgssdMyYzT+VA9J1EstXpni6q/unsTtkJAdo4jsVpigfr95Sl7hg==}
+    engines: {node: '>=20.0.0'}
 
   '@azure/msal-browser@4.26.1':
     resolution: {integrity: sha512-GGCIsZXxyNm5QcQZ4maA9q+9UWmM+/87G+ybvPkrE32el1URSa9WYt0t67ks3/P0gspZX9RoEqyLqJ/X/JDnBQ==}
@@ -9367,6 +9374,20 @@ snapshots:
       '@opentelemetry/sdk-metrics': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.38.0
+      tslib: 2.8.1
+    transitivePeerDependencies:
+      - supports-color
+
+  '@azure/monitor-query-logs@1.0.0':
+    dependencies:
+      '@azure-rest/core-client': 2.5.1
+      '@azure/core-auth': 1.10.1
+      '@azure/core-client': 1.10.1
+      '@azure/core-paging': 1.6.2
+      '@azure/core-rest-pipeline': 1.22.2
+      '@azure/core-tracing': 1.3.1
+      '@azure/core-util': 1.13.1
+      '@azure/logger': 1.3.0
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color

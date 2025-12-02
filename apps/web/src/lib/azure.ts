@@ -1,7 +1,8 @@
-import { ContainerAppsAPIClient } from '@azure/arm-appcontainers';
+import { ContainerAppsAPIClient, type Job as ContainerAppJob } from '@azure/arm-appcontainers';
 import { ComputeManagementClient } from '@azure/arm-compute';
 import { RestError } from '@azure/core-rest-pipeline';
 import { ClientAssertionCredential, DefaultAzureCredential, type TokenCredential } from '@azure/identity';
+import { LogsQueryClient } from "@azure/monitor-query-logs";
 import { parseKeyVaultSecretIdentifier, SecretClient } from '@azure/keyvault-secrets';
 import { BlobServiceClient } from '@azure/storage-blob';
 import { getVercelOidcToken } from '@vercel/oidc';
@@ -31,8 +32,15 @@ export const secretClient = new SecretClient(process.env.AZURE_KEY_VAULT_URL!, c
 export const blobServiceClient = new BlobServiceClient(process.env.AZURE_BLOB_STORAGE_URL!, credential);
 export const computeClient = new ComputeManagementClient(credential, subscriptionId);
 export const containerAppsClient = new ContainerAppsAPIClient(credential, subscriptionId);
+export const logsQueryClient = new LogsQueryClient(credential);
+
+export const resourceGroupName = process.env.AZURE_RESOURCE_GROUP!;
+export const resourceGroupNameJobs = process.env.AZURE_RESOURCE_GROUP_JOBS!;
+export const managedAppEnvironmentId = process.env.AZURE_MANAGED_ENVIRONMENT_ID!;
+export const logAnalyticsWorkspaceId = process.env.AZURE_LOG_ANALYTICS_WORKSPACE_ID!;
 
 export { RestError as AzureRestError };
+export type { ContainerAppJob };
 
 /**
  * Get a secret from Azure Key Vault

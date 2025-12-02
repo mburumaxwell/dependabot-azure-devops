@@ -34,6 +34,7 @@
     "@azure/identity": "4.13.0",
     "@azure/keyvault-secrets": "4.10.0",
     "@azure/monitor-opentelemetry-exporter": "1.0.0-beta.32",
+    "@azure/monitor-query-logs": "1.0.0",
     "@azure/storage-blob": "12.29.1",
     "@better-auth/passkey": "1.4.4",
     "@hono/zod-validator": "0.7.5",
