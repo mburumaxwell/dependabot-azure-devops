@@ -45,3 +45,24 @@ export function parseExperiments(raw?: string): DependabotExperiments | undefine
       return acc;
     }, {} as DependabotExperiments);
 }
+
+/**
+ * Set experiment in the given experiments map.
+ * If the experiments map is undefined, a new map will be created.
+ * @param experiments The experiments map to set the experiment in.
+ * @param name The name of the experiment to set.
+ * @param value The value of the experiment to set. Defaults to true.
+ * @returns The updated experiments map.
+ */
+export function setExperiment(
+  experiments: DependabotExperiments | undefined,
+  name: string,
+  value: boolean | string = true,
+): DependabotExperiments {
+  return {
+    ...(experiments || {}),
+    // always add the experiment, even if the value is false or an empty string
+    // this allows explicit disabling of experiments
+    [name]: value,
+  };
+}

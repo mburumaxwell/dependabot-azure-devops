@@ -9,6 +9,7 @@ import type {
   PackageEcosystem,
   VersioningStrategy,
 } from './config';
+import { setExperiment } from './experiments';
 import type {
   DependabotAllowed,
   DependabotCondition,
@@ -71,8 +72,9 @@ export class DependabotJobBuilder {
   }) {
     this.config = config;
     this.update = update;
-    this.experiments = experiments;
     this.debug = debug;
+
+    this.experiments = setExperiment(experiments, 'enable_beta_ecosystems', config['enable-beta-ecosystems']);
 
     this.packageManager = mapPackageEcosystemToPackageManager(update['package-ecosystem']);
     this.source = mapSourceFromDependabotConfigToJobConfig(source, update);
