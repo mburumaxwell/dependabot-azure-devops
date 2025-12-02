@@ -76,10 +76,10 @@ export function isValidRegionCode(code: string): code is RegionCode {
   return RegionCodeSchema.safeParse(code).success;
 }
 
-export function fromAzureRegion(value: string | undefined): RegionCode | undefined {
+export function fromAzureLocation(value: string | undefined): RegionCode | undefined {
   return REGIONS.find((r) => r.azure === value)?.code;
 }
-export function toAzureRegion(code: RegionCode | undefined): string | undefined {
+export function toAzureLocation(code: RegionCode | undefined): string | undefined {
   return REGIONS.find((r) => r.code === code)?.azure;
 }
 
@@ -91,5 +91,5 @@ export function toVercelRegion(code: RegionCode | undefined): string | undefined
 }
 
 export function fromExternalRegion(value: string | undefined): RegionCode | undefined {
-  return fromVercelRegion(value) ?? fromAzureRegion(value);
+  return fromVercelRegion(value) ?? fromAzureLocation(value);
 }

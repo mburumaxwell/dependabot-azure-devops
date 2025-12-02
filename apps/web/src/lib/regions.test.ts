@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
-  fromAzureRegion,
+  fromAzureLocation,
   fromExternalRegion,
   fromVercelRegion,
   isValidRegionCode,
   REGIONS,
   RegionCodeSchema,
-  toAzureRegion,
+  toAzureLocation,
   toVercelRegion,
 } from './regions';
 
@@ -56,31 +56,31 @@ describe('regions', () => {
   });
 
   describe('Azure region mappings', () => {
-    it('fromAzureRegion maps known Azure regions to RegionCode', () => {
-      expect(fromAzureRegion('uksouth')).toBe('lhr');
-      expect(fromAzureRegion('westus')).toBe('sfo');
-      expect(fromAzureRegion('northeurope')).toBe('dub');
-      expect(fromAzureRegion('australiaeast')).toBe('syd');
+    it('fromAzureLocation maps known Azure regions to RegionCode', () => {
+      expect(fromAzureLocation('uksouth')).toBe('lhr');
+      expect(fromAzureLocation('westus')).toBe('sfo');
+      expect(fromAzureLocation('northeurope')).toBe('dub');
+      expect(fromAzureLocation('australiaeast')).toBe('syd');
     });
 
-    it('toAzureRegion maps RegionCode to Azure regions', () => {
-      expect(toAzureRegion('lhr')).toBe('uksouth');
-      expect(toAzureRegion('sfo')).toBe('westus');
-      expect(toAzureRegion('dub')).toBe('northeurope');
-      expect(toAzureRegion('syd')).toBe('australiaeast');
+    it('toAzureLocation maps RegionCode to Azure regions', () => {
+      expect(toAzureLocation('lhr')).toBe('uksouth');
+      expect(toAzureLocation('sfo')).toBe('westus');
+      expect(toAzureLocation('dub')).toBe('northeurope');
+      expect(toAzureLocation('syd')).toBe('australiaeast');
     });
 
     it('unknown or undefined Azure inputs return undefined', () => {
-      expect(fromAzureRegion('unknown-region')).toBeUndefined();
-      expect(fromAzureRegion(undefined)).toBeUndefined();
-      expect(toAzureRegion(undefined)).toBeUndefined();
+      expect(fromAzureLocation('unknown-region')).toBeUndefined();
+      expect(fromAzureLocation(undefined)).toBeUndefined();
+      expect(toAzureLocation(undefined)).toBeUndefined();
     });
 
     it('Azure conversion roundtrips (RegionCode -> Azure -> RegionCode)', () => {
       for (const code of EXPECTED_CODES) {
-        const azure = toAzureRegion(code);
+        const azure = toAzureLocation(code);
         expect(azure).toBeDefined();
-        expect(fromAzureRegion(azure!)).toBe(code);
+        expect(fromAzureLocation(azure!)).toBe(code);
       }
     });
   });

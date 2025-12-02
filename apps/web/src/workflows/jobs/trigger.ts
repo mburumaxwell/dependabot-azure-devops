@@ -3,6 +3,8 @@ import {
   type DependabotConfig,
   DependabotJobBuilder,
   makeDirectoryKey,
+  mapPackageEcosystemToPackageManager,
+  type PackageEcosystem,
   parseDependabotConfig,
 } from '@paklo/core/dependabot';
 import { Keygen } from '@paklo/core/keygen';
@@ -30,7 +32,7 @@ export async function triggerUpdateJobs(options: TriggerUpdateJobsWorkflowOption
   const { workflowRunId } = getWorkflowMetadata();
   const { ids } = await getOrCreateUpdateJobs({ workflowRunId, ...options });
   for (const id of ids) {
-    await runJob(id);
+    await runUpdateJob({ id });
   }
   return { ids };
 }
@@ -172,6 +174,7 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
 
         commit: repository.latestCommit!,
         ecosystem: repoUpdate.ecosystem,
+        packageManager: mapPackageEcosystemToPackageManager(repoUpdate.ecosystem as PackageEcosystem),
         directory: repoUpdate.directory,
         directories: repoUpdate.directories,
         directoryKey,
@@ -185,6 +188,7 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
 
         config: JSON.stringify(job),
         credentials: JSON.stringify(credentials),
+        region: organization.region,
 
         startedAt: null,
         finishedAt: null,
@@ -215,10 +219,10 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
   };
 }
 
-async function runJob(id: string) {
+async function runUpdateJob({ id }: { id: string }) {
   'use step';
 
-  const job = await prisma.updateJob.findUnique({ where: { id } });
+  const job = await prisma.updateJob.findUnique({ where: { id }, include: { secret: true } });
   if (!job) {
     logger.error(`Update job with ID '${id}' not found.`);
     return;

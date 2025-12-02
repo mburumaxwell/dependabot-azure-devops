@@ -358,7 +358,6 @@ enum UpdateJobPlatform {
   azure_pipelines @map("azure.pipelines")
   azure_vms       @map("azure.vms")
   azure_aca       @map("azure.aca")
-  azure_aci       @map("azure.aci")
 }
 
 model UpdateJob {
@@ -383,8 +382,10 @@ model UpdateJob {
 
   /// Commit SHA of the configuration file used for the update.
   commit          String
-  /// Ecosystem for the update (e.g., npm, pip, etc.)
+  /// Ecosystem for the update (e.g., npm, dotnet-sdk, etc.)
   ecosystem       String
+  /// Package manager for the update (e.g., npm_and_yarn, dotnet_sdk, etc.)
+  packageManager  String
   directory       String?
   directories     String[]
   /// Either the original directory or merger of directories.
@@ -393,6 +394,7 @@ model UpdateJob {
   config          String // JSON stringified DependabotJobConfig
   credentials     String // JSON stringified DependabotCredential[]
   secret          UpdateJobSecret?
+  region          String
   startedAt       DateTime?
   finishedAt      DateTime?
   /// Duration in milliseconds.
@@ -410,6 +412,8 @@ model UpdateJob {
   @@index([projectId])
   @@index([repositoryId])
   @@index([repositoryUpdateId])
+  @@index([region])
+  @@index([platform])
   @@map("update_job")
 }
 
