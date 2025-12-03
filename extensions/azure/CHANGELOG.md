@@ -1,5 +1,22 @@
 # extension-azure-devops
 
+## 2.61.0
+
+### Minor Changes
+
+- f279661: Require schedule to be present in the updates configuration.
+  Anyone using `.github/dependabot.{yaml,yml}` already has schema warnings in the IDE.
+  This change is another step to bringing parity to the GitHub-hosted version and is necessary for our hosted version.
+
+### Patch Changes
+
+- Updated dependencies [985700f]
+- Updated dependencies [f279661]
+- Updated dependencies [34acb19]
+- Updated dependencies [326ec5f]
+  - @paklo/core@0.8.0
+  - @paklo/runner@0.6.0
+
 ## 2.60.0
 
 ### Minor Changes

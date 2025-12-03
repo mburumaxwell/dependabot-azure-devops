@@ -1,5 +1,17 @@
 # @paklo/core
 
+## 0.8.0
+
+### Minor Changes
+
+- f279661: Require schedule to be present in the updates configuration.
+  Anyone using `.github/dependabot.{yaml,yml}` already has schema warnings in the IDE.
+  This change is another step to bringing parity to the GitHub-hosted version and is necessary for our hosted version.
+
+### Patch Changes
+
+- 985700f: Set `enable_beta_ecosystems` experiment if the `enable-beta-ecosystems` is set in the config
+
 ## 0.7.3
 
 ### Patch Changes
