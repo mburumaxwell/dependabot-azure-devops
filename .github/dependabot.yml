@@ -124,3 +124,5 @@ updates:
         update-types: [version-update:semver-major] # shadcn still doesn't support (https://github.com/shadcn-ui/ui/issues/7669)
       - dependency-name: '@biomejs/biome'
         update-types: [version-update:semver-patch] # too much changes
+      - dependency-name: 'vite*'
+        update-types: [version-update:semver-patch] # too much changes
