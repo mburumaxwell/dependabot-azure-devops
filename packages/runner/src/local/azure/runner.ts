@@ -216,6 +216,13 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
 
     const results: RunJobsResult = [];
 
+
+    function makeRandomJobId(): string {
+      const array = new Uint32Array(1);
+      crypto.getRandomValues(array);
+      return `${array[0]! % 10000000000}`; // Limit to 10 digits to match GitHub's job IDs
+    }
+
     function makeUsageData(job: DependabotJobConfig): RunJobOptions['usage'] {
       return {
         trigger: 'user',
@@ -263,13 +270,14 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       const securityUpdatesOnly = update['open-pull-requests-limit'] === 0;
       if (securityUpdatesOnly) {
         // Run an update job to discover all dependencies
-        ({ job, credentials } = builder.forDependenciesList({ command }));
+        const id = makeRandomJobId();
+        ({ job, credentials } = builder.forDependenciesList({ id, command }));
         ({ jobToken, credentialsToken } = this.makeTokens());
-        server.add({ id: job.id, update, job, jobToken, credentialsToken, credentials });
+        server.add({ id, update, job, jobToken, credentialsToken, credentials });
         await runJob({
           dependabotApiUrl,
           dependabotApiDockerUrl,
-          jobId: job.id,
+          jobId: id,
           jobToken,
           credentialsToken,
           updaterImage,
@@ -277,7 +285,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
           usage: makeUsageData(job),
         });
 
-        const outputs = server.requests(job.id);
+        const outputs = server.requests(id);
         const packagesToCheckForVulnerabilities: Package[] | undefined = outputs!
           .find((o) => o.type === 'update_dependency_list')
           ?.data.dependencies?.map((d) => ({ name: d.name, version: d.version }));
@@ -322,11 +330,11 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
           }
         } else {
           logger.info(`No vulnerabilities detected for update ${update['package-ecosystem']} in ${update.directory}`);
-          server.clear(job.id);
+          server.clear(id);
           continue; // nothing more to do for this update
         }
 
-        server.clear(job.id);
+        server.clear(id);
       }
 
       // Run an update job for "all dependencies"; this will create new pull requests for dependencies that need updating
@@ -337,27 +345,29 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       if (!hasReachedOpenPullRequestLimit) {
         const dependenciesHaveVulnerabilities = dependencyNamesToUpdate.length && securityVulnerabilities.length;
         if (!securityUpdatesOnly || dependenciesHaveVulnerabilities) {
+          const id = makeRandomJobId();
           ({ job, credentials } = builder.forUpdate({
+            id,
             command,
             dependencyNamesToUpdate,
             existingPullRequests: existingPullRequestDependenciesForPackageManager,
             securityVulnerabilities,
           }));
           ({ jobToken, credentialsToken } = this.makeTokens());
-          server.add({ id: job.id, update, job, jobToken, credentialsToken, credentials });
+          server.add({ id, update, job, jobToken, credentialsToken, credentials });
           const { success, message } = await runJob({
             dependabotApiUrl,
             dependabotApiDockerUrl,
-            jobId: job.id,
+            jobId: id,
             jobToken,
             credentialsToken,
             updaterImage,
             secretMasker,
             usage: makeUsageData(job),
           });
-          const affectedPrs = server.allAffectedPrs(job.id);
-          server.clear(job.id);
-          results.push({ id: job.id, success, message, affectedPrs });
+          const affectedPrs = server.allAffectedPrs(id);
+          server.clear(id);
+          results.push({ id, success, message, affectedPrs });
         } else {
           logger.info('Nothing to update; dependencies are not affected by any known vulnerability');
         }
@@ -372,27 +382,29 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       if (numberOfPullRequestsToUpdate > 0) {
         if (!dryRun) {
           for (const pullRequestId in existingPullRequestsForPackageManager) {
+            const id = makeRandomJobId();
             ({ job, credentials } = builder.forUpdate({
+              id,
               command,
               existingPullRequests: existingPullRequestDependenciesForPackageManager,
               pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
               securityVulnerabilities,
             }));
             ({ jobToken, credentialsToken } = this.makeTokens());
-            server.add({ id: job.id, update, job, jobToken, credentialsToken, credentials });
+            server.add({ id, update, job, jobToken, credentialsToken, credentials });
             const { success, message } = await runJob({
               dependabotApiUrl,
               dependabotApiDockerUrl,
-              jobId: job.id,
+              jobId: id,
               jobToken,
               credentialsToken,
               updaterImage,
               secretMasker,
               usage: makeUsageData(job),
             });
-            const affectedPrs = server.allAffectedPrs(job.id);
-            server.clear(job.id);
-            results.push({ id: job.id, success, message, affectedPrs });
+            const affectedPrs = server.allAffectedPrs(id);
+            server.clear(id);
+            results.push({ id, success, message, affectedPrs });
           }
         } else {
           logger.warn(
