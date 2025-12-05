@@ -9,13 +9,13 @@ import type { JobParameters } from './params';
 import type { Proxy } from './proxy';
 import { extractUpdaterSha } from './utils';
 
-const JOB_OUTPUT_FILENAME = 'output.json';
-const JOB_OUTPUT_PATH = '/home/dependabot/dependabot-updater/output';
-const JOB_INPUT_FILENAME = 'job.json';
-const JOB_INPUT_PATH = `/home/dependabot/dependabot-updater`;
-const REPO_CONTENTS_PATH = '/home/dependabot/dependabot-updater/repo';
-const CA_CERT_INPUT_PATH = '/usr/local/share/ca-certificates';
-const CA_CERT_FILENAME = 'dbot-ca.crt';
+export const JOB_OUTPUT_FILENAME = 'output.json';
+export const JOB_OUTPUT_PATH = '/home/dependabot/dependabot-updater/output';
+export const JOB_INPUT_FILENAME = 'job.json';
+export const JOB_INPUT_PATH = `/home/dependabot/dependabot-updater`;
+export const REPO_CONTENTS_PATH = '/home/dependabot/dependabot-updater/repo';
+export const CA_CERT_INPUT_PATH = '/usr/local/share/ca-certificates';
+export const CA_CERT_FILENAME = 'dbot-ca.crt';
 const UPDATER_MAX_MEMORY = 8 * 1024 * 1024 * 1024; // 8GB in bytes
 
 // Code below is borrowed and adapted from dependabot-action

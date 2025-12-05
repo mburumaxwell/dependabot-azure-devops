@@ -20,7 +20,7 @@ export type Proxy = {
 const KEY_SIZE = 2048;
 const KEY_EXPIRY_YEARS = 2;
 const CONFIG_FILE_PATH = '/';
-const CONFIG_FILE_NAME = 'config.json';
+export const CONFIG_FILE_NAME = 'config.json';
 const CA_CERT_INPUT_PATH = '/usr/local/share/ca-certificates';
 const CUSTOM_CA_CERT_NAME = 'custom-ca-cert.crt';
 const CERT_SUBJECT = [
@@ -119,14 +119,14 @@ export class ProxyBuilder {
   }
 
   private async buildProxyConfig(credentials: DependabotCredential[]): Promise<DependabotProxyConfig> {
-    const ca = await this.generateCertificateAuthority();
+    const ca = await ProxyBuilder.generateCertificateAuthority();
 
     const config: DependabotProxyConfig = { all_credentials: credentials, ca };
 
     return config;
   }
 
-  private async generateCertificateAuthority(): Promise<CertificateAuthority> {
+  public static async generateCertificateAuthority(): Promise<CertificateAuthority> {
     // node-forge is a CommonJS module, so we need to import it dynamically
     const {
       default: { md, pki },

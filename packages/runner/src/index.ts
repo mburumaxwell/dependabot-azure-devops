@@ -8,3 +8,5 @@ export * from './proxy';
 export * from './run';
 export * from './updater';
 export * from './updater-builder';
+
+export { extractUpdaterSha } from './utils';
