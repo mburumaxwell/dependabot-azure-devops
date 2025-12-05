@@ -1,5 +1,16 @@
 # @paklo/runner
 
+## 0.6.1
+
+### Patch Changes
+
+- 9a4f3ea: Expose constants and helper functions from runner that are needed by web
+- 0fe301e: No longer expose random gen for job id, move it closer to where in use
+- 128bd4e: Bump github/dependabot-update-job-proxy/dependabot-update-job-proxy from v2.0.20251124194534 to v2.0.20251202213123
+- Updated dependencies [0fe301e]
+- Updated dependencies [abf1f0e]
+  - @paklo/core@0.8.1
+
 ## 0.6.0
 
 ### Minor Changes

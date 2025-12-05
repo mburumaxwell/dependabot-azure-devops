@@ -1,5 +1,12 @@
 # @paklo/core
 
+## 0.8.1
+
+### Patch Changes
+
+- 0fe301e: No longer expose random gen for job id, move it closer to where in use
+- abf1f0e: Fix log level filtering with pino's multistream
+
 ## 0.8.0
 
 ### Minor Changes
