@@ -216,7 +216,6 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
 
     const results: RunJobsResult = [];
 
-
     function makeRandomJobId(): string {
       const array = new Uint32Array(1);
       crypto.getRandomValues(array);
