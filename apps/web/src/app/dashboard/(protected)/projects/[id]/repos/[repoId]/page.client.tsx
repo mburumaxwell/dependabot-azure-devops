@@ -15,7 +15,7 @@ import {
 import { Item, ItemActions, ItemContent, ItemGroup, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getRepositoryFileUrl } from '@/lib/organizations';
-import type { Organization, Project, Repository, RepositoryUpdate } from '@/lib/prisma';
+import type { Organization, Project, Repository, RepositoryUpdate, UpdateJob } from '@/lib/prisma';
 import { cn, trimLeadingSlash } from '@/lib/utils';
 
 type SimpleProject = Pick<Project, 'id' | 'name' | 'organizationId'> & {
@@ -25,7 +25,9 @@ type SimpleRepository = Pick<
   Repository,
   'id' | 'name' | 'url' | 'slug' | 'updatedAt' | 'synchronizationStatus' | 'synchronizedAt'
 >;
-type SimpleRepositoryUpdate = Pick<RepositoryUpdate, 'id' | 'ecosystem' | 'files' | 'latestUpdateJobStatus'>;
+type SimpleRepositoryUpdate = Pick<RepositoryUpdate, 'id' | 'ecosystem' | 'files'> & {
+  latestUpdateJob: Pick<UpdateJob, 'id' | 'status'> | null;
+};
 
 export function RepositoryView({
   project,
@@ -139,8 +141,8 @@ export function RepositoryView({
                 </ItemContent>
                 <ItemActions>
                   {/* Show icon if the latest update job status is not succeeded */}
-                  {update.latestUpdateJobStatus && update.latestUpdateJobStatus !== 'succeeded' && (
-                    <JobStatusIcon status={update.latestUpdateJobStatus} className='size-5' />
+                  {update.latestUpdateJob?.status && update.latestUpdateJob.status !== 'succeeded' && (
+                    <JobStatusIcon status={update.latestUpdateJob.status} className='size-5' />
                   )}
                   <Link
                     href={`/dashboard/projects/${project.id}/repos/${repository.id}/updates/${update.id}/jobs`}

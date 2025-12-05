@@ -26,7 +26,6 @@ export type {
   SubscriptionStatus,
   SynchronizationStatus,
   UpdateJob,
-  UpdateJobPlatform,
   UpdateJobSecret,
   UpdateJobStatus,
   UpdateJobTrigger,

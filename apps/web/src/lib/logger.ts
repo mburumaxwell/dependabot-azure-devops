@@ -3,4 +3,4 @@
 
 import { create } from '@paklo/core/logger';
 
-export const logger = create({ pretty: { includeLevel: true } });
+export const logger = create({ timestamp: true, pretty: { includeLevel: true } });

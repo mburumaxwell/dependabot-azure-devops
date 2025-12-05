@@ -8,9 +8,11 @@ import {
   type DependabotTokenType,
 } from '@paklo/core/dependabot';
 import { toNextJsHandler } from '@paklo/core/hono';
+import { resumeHook } from 'workflow/api';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
+import type { UpdateJobHookResult } from '@/workflows/jobs';
 
 export const dynamic = 'force-dynamic';
 
@@ -104,8 +106,13 @@ async function handleRequest(id: string, request: DependabotRequest): Promise<bo
       return true;
     }
 
+    case 'mark_as_processed': {
+      const secret = await prisma.updateJobSecret.findUniqueOrThrow({ where: { id: job.id } });
+      await resumeHook<UpdateJobHookResult>(secret.hookToken!, { completed: true, finishedAt: new Date() });
+      return true;
+    }
+
     // Nothing to do for now
-    case 'mark_as_processed':
     case 'record_ecosystem_versions':
     case 'increment_metric':
     case 'record_ecosystem_meta':

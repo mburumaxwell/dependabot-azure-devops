@@ -101,7 +101,6 @@ async function getRepositoryUpdate({
       updatedAt: true,
       ecosystem: true,
       files: true,
-      latestUpdateJobStatus: true,
     },
   });
 

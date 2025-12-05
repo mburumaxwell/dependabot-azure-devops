@@ -139,7 +139,6 @@ model Organization {
   credential          OrganizationCredential?
   secrets             OrganizationSecret[]
   projects            Project[]
-  jobs                UpdateJob[]
 
   @@unique([slug])
   @@unique([url])
@@ -271,7 +270,6 @@ model Project {
   synchronizationStatus SynchronizationStatus
   synchronizedAt        DateTime?
   repositories          Repository[]
-  jobs                  UpdateJob[]
 
   @@unique([organizationId, providerId])
   @@index([organizationId])
@@ -301,7 +299,6 @@ model Repository {
   synchronizationStatus SynchronizationStatus
   synchronizedAt        DateTime?
   updates               RepositoryUpdate[]
-  jobs                  UpdateJob[]
 
   @@unique([projectId, providerId])
   @@unique([url])
@@ -326,10 +323,6 @@ model RepositoryUpdate {
   cron                  String
   timezone              String
   files                 String[]
-  jobs                  UpdateJob[]
-  latestUpdateJobId     String?
-  latestUpdateJobStatus UpdateJobStatus?
-  latestUpdateJobAt     DateTime?
   nextUpdateJobAt       DateTime?
 
   @@unique([repositoryId, ecosystem, directoryKey])
@@ -354,58 +347,43 @@ enum UpdateJobStatus {
   @@map("update_job_status")
 }
 
-enum UpdateJobPlatform {
-  azure_pipelines @map("azure.pipelines")
-  azure_vms       @map("azure.vms")
-  azure_aca       @map("azure.aca")
-}
-
 model UpdateJob {
-  id        String            @id @map("_id")
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
+  id        String           @id @map("_id")
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
   status    UpdateJobStatus
   trigger   UpdateJobTrigger
-  platform  UpdateJobPlatform
 
+  // no related objects to allow delete to not cascade, records retained for billing and analytics
   organizationId     String
   projectId          String
   repositoryId       String
   repositoryUpdateId String
-  // no delete cascade, records here retained for billing and analytics
-  organization       Organization     @relation(fields: [organizationId], references: [id], onDelete: NoAction)
-  project            Project          @relation(fields: [projectId], references: [id], onDelete: NoAction)
-  repository         Repository       @relation(fields: [repositoryId], references: [id], onDelete: NoAction)
-  repositoryUpdate   RepositoryUpdate @relation(fields: [repositoryUpdateId], references: [id], onDelete: NoAction)
 
   repositorySlug String
 
   /// Commit SHA of the configuration file used for the update.
-  commit          String
+  commit         String
   /// Ecosystem for the update (e.g., npm, dotnet-sdk, etc.)
-  ecosystem       String
+  ecosystem      String
   /// Package manager for the update (e.g., npm_and_yarn, dotnet_sdk, etc.)
-  packageManager  String
-  directory       String?
-  directories     String[]
+  packageManager String
+  directory      String?
+  directories    String[]
   /// Either the original directory or merger of directories.
-  directoryKey    String
-  workflowRunId   String
-  config          String // JSON stringified DependabotJobConfig
-  credentials     String // JSON stringified DependabotCredential[]
-  secret          UpdateJobSecret?
-  region          String
-  startedAt       DateTime?
-  finishedAt      DateTime?
+  directoryKey   String
+  workflowRunId  String
+  config         String // JSON stringified DependabotJobConfig
+  credentials    String // JSON stringified DependabotCredential[]
+  secret         UpdateJobSecret?
+  region         String
+  startedAt      DateTime?
+  finishedAt     DateTime?
   /// Duration in milliseconds.
-  duration        Int?
-  /// URL to view the logs of the job (used when running on customer infra e.g. azure pipelines).
-  externalLogsUrl String?
-  /// URL to download the logs of the job (used when running on our infra).
-  downloadLogsUrl String?
-  errorType       String?
-  errorDetails    String? // JSON stringified Record<string, any>
-  affectedPrIds   Int[]
+  duration       Int?
+  errorType      String?
+  errorDetails   String? // JSON stringified Record<string, any>
+  affectedPrIds  Int[]
 
   @@unique([ecosystem, directoryKey, workflowRunId])
   @@index([organizationId])
@@ -413,7 +391,6 @@ model UpdateJob {
   @@index([repositoryId])
   @@index([repositoryUpdateId])
   @@index([region])
-  @@index([platform])
   @@map("update_job")
 }
 
@@ -425,8 +402,10 @@ model UpdateJobSecret {
   job              UpdateJob @relation(fields: [id], references: [id], onDelete: Cascade)
   jobToken         String
   credentialsToken String
+  hookToken        String
 
   @@unique([jobToken])
   @@unique([credentialsToken])
+  @@unique([hookToken])
   @@map("update_job_secret")
 }

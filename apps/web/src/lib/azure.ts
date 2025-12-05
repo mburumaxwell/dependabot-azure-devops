@@ -3,7 +3,6 @@ import { ComputeManagementClient } from '@azure/arm-compute';
 import { RestError } from '@azure/core-rest-pipeline';
 import { ClientAssertionCredential, DefaultAzureCredential, type TokenCredential } from '@azure/identity';
 import { parseKeyVaultSecretIdentifier, SecretClient } from '@azure/keyvault-secrets';
-import { LogsQueryClient } from '@azure/monitor-query-logs';
 import { BlobServiceClient } from '@azure/storage-blob';
 import { getVercelOidcToken } from '@vercel/oidc';
 
@@ -24,20 +23,24 @@ export const credential: TokenCredential = process.env.VERCEL
       process.env.AZURE_CLIENT_ID!,
       getVercelOidcToken,
     )
-  : new DefaultAzureCredential();
+  : new DefaultAzureCredential({
+      // this helps when I have many tenants in my dev environment
+      tenantId: process.env.AZURE_TENANT_ID,
+    });
 
 export const subscriptionId = process.env.AZURE_SUBSCRIPTION_ID!;
 
 export const secretClient = new SecretClient(process.env.AZURE_KEY_VAULT_URL!, credential);
 export const blobServiceClient = new BlobServiceClient(process.env.AZURE_BLOB_STORAGE_URL!, credential);
+export const consoleLogsContainer = blobServiceClient.getContainerClient('insights-logs-containerappconsolelogs');
+export const logsContainer = blobServiceClient.getContainerClient('dependabot-job-logs');
+
 export const computeClient = new ComputeManagementClient(credential, subscriptionId);
 export const containerAppsClient = new ContainerAppsAPIClient(credential, subscriptionId);
-export const logsQueryClient = new LogsQueryClient(credential);
 
 export const resourceGroupName = process.env.AZURE_RESOURCE_GROUP!;
 export const resourceGroupNameJobs = process.env.AZURE_RESOURCE_GROUP_JOBS!;
 export const managedAppEnvironmentId = process.env.AZURE_MANAGED_ENVIRONMENT_ID!;
-export const logAnalyticsWorkspaceId = process.env.AZURE_LOG_ANALYTICS_WORKSPACE_ID!;
 
 export { RestError as AzureRestError };
 export type { ContainerAppJob };

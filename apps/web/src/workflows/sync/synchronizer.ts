@@ -328,9 +328,6 @@ export class Synchronizer {
           timezone,
           directoryKey,
           files: [], // will be populated when running update jobs
-          latestUpdateJobAt: null,
-          latestUpdateJobStatus: null,
-          latestUpdateJobId: null,
           nextUpdateJobAt,
         },
         update: { enabled: true, cron, timezone, nextUpdateJobAt },

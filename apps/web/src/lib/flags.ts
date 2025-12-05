@@ -26,4 +26,12 @@ export const enableDependabotDebug = flag({
   },
 });
 
+export const enableDependabotConnectivityCheck = flag({
+  key: 'enable-dependabot-connectivity-check',
+  defaultValue: Boolean(process.env.DEPENDABOT_ENABLE_CONNECTIVITY_CHECK || '1'),
+  decide() {
+    return true;
+  },
+});
+
 // Add more feature flags here as needed

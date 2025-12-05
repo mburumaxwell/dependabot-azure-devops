@@ -11,7 +11,14 @@ const config: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     unoptimized: true, // hoping this improves site performance
   },
-  serverExternalPackages: ['pino', 'pino-pretty', 'thread-stream'],
+  serverExternalPackages: [
+    // needed for logging
+    'pino',
+    'pino-pretty',
+    'thread-stream',
+    // needed for triggering runs
+    'cpu-features',
+  ],
   async headers() {
     return [
       // security headers

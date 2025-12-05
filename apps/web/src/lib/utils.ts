@@ -35,3 +35,12 @@ export function trimTrailingSlash(value: string): string {
 export function trimSlashes(value: string): string {
   return trimLeadingSlash(trimTrailingSlash(value));
 }
+
+export async function streamToString(readable: NodeJS.ReadableStream | undefined): Promise<string> {
+  if (!readable) return '';
+  const chunks: Uint8Array[] = [];
+  for await (const chunk of readable) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks).toString('utf-8');
+}

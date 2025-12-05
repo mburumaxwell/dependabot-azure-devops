@@ -37,10 +37,7 @@ type SimpleRepository = Pick<
   Repository,
   'id' | 'name' | 'slug' | 'url' | 'updatedAt' | 'synchronizationStatus' | 'synchronizedAt'
 >;
-type SimpleRepositoryUpdate = Pick<
-  RepositoryUpdate,
-  'id' | 'updatedAt' | 'ecosystem' | 'files' | 'latestUpdateJobStatus'
->;
+type SimpleRepositoryUpdate = Pick<RepositoryUpdate, 'id' | 'updatedAt' | 'ecosystem' | 'files'>;
 type SimpleJob = Pick<
   UpdateJob,
   'id' | 'status' | 'createdAt' | 'finishedAt' | 'errorType' | 'errorDetails' | 'affectedPrIds'
@@ -58,6 +55,7 @@ export function UpdateJobsView({
   jobs: SimpleJob[];
 }) {
   const organizationType = project.organization.type;
+  const latestUpdateJob = jobs.at(0);
 
   const fileLinks: Map<string, string> = new Map(
     update.files.map((file) => [
@@ -95,7 +93,7 @@ export function UpdateJobsView({
     });
 
     // redirect back to the repository page
-    router.push(`/dashboard/projects/${project.id}/repos/${repository.id}`);
+    router.push(`/dashboard/projects/${project.id}/repos/${repository.id}?triggeredUpdateId=${update.id}`);
   }
 
   return (
@@ -149,9 +147,7 @@ export function UpdateJobsView({
           </ItemContent>
           <ItemActions>
             {/* If there are a lot of updates running, this might block any manual request which should not be a big issue */}
-            {!update.latestUpdateJobStatus ||
-            update.latestUpdateJobStatus === 'scheduled' ||
-            update.latestUpdateJobStatus === 'running' ? (
+            {!latestUpdateJob || latestUpdateJob.status === 'scheduled' || latestUpdateJob.status === 'running' ? (
               <>Running version update job now</>
             ) : (
               <Button size='sm' onClick={handleCheckForUpdates}>

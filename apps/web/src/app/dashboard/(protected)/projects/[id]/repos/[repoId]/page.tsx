@@ -3,7 +3,7 @@ import { headers as requestHeaders } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { enableSbomDownload } from '@/lib/flags';
-import { prisma } from '@/lib/prisma';
+import { prisma, type UpdateJobStatus } from '@/lib/prisma';
 import { RepositoryView } from './page.client';
 
 export async function generateMetadata(props: PageProps<'/dashboard/projects/[id]/repos/[repoId]'>): Promise<Metadata> {
@@ -22,6 +22,7 @@ export async function generateMetadata(props: PageProps<'/dashboard/projects/[id
 
 export default async function RepositoryPage(props: PageProps<'/dashboard/projects/[id]/repos/[repoId]'>) {
   const { id: projectId, repoId: repositoryId } = await props.params;
+  const { triggeredUpdateId } = await props.searchParams;
   const { project, repository } = await getRepository({ projectId, repositoryId });
   if (!project || !repository) {
     notFound();
@@ -34,12 +35,34 @@ export default async function RepositoryPage(props: PageProps<'/dashboard/projec
       id: true,
       ecosystem: true,
       files: true,
-      latestUpdateJobStatus: true,
     },
   });
 
+  const enrichedUpdates = await Promise.all(
+    updates.map(async (update) => {
+      const latestUpdateJob = await prisma.updateJob.findFirst({
+        where: { repositoryUpdateId: update.id },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true, status: true },
+      });
+      return {
+        ...update,
+        // if this was triggered, override status to 'scheduled'
+        latestUpdateJob:
+          triggeredUpdateId === update.id
+            ? {
+                id: latestUpdateJob?.id || 'dummy',
+                status: 'scheduled' as UpdateJobStatus,
+              }
+            : latestUpdateJob,
+      };
+    }),
+  );
+
   const sbomAllowed = updates.length > 0 && (await enableSbomDownload());
-  return <RepositoryView project={project} repository={repository} updates={updates} sbomAllowed={sbomAllowed} />;
+  return (
+    <RepositoryView project={project} repository={repository} updates={enrichedUpdates} sbomAllowed={sbomAllowed} />
+  );
 }
 
 async function getRepository({ projectId, repositoryId }: { projectId: string; repositoryId: string }) {

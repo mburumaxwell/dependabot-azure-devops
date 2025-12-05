@@ -8,7 +8,7 @@ param name string = 'paklo'
 
 var vercelEnvironments = ['production', 'preview']
 var administratorLoginPasswordMongo = '${skip(uniqueString(resourceGroup().id), 5)}^${uniqueString('mongo-password', resourceGroup().id)}' // e.g. abcde%zecnx476et7xm (19 characters)
-var fileShares = ['jobs']
+var blobContainers = ['dependabot-job-logs']
 
 /* Managed Identity */
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' = {
@@ -68,16 +68,19 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2025-06-01' = {
     minimumTlsVersion: 'TLS1_2'
   }
 
-  resource fileServices 'fileServices' existing = {
+  resource blobServices 'blobServices' existing = {
     name: 'default'
 
-    resource shares 'shares' = [for fs in fileShares: {
-      name: fs
-      properties: {
-        accessTier: 'TransactionOptimized'
-        shareQuota: 1
+    resource containers 'containers' = [
+      for bc in blobContainers: {
+        name: bc
+        properties: {
+          publicAccess: 'None'
+          defaultEncryptionScope: '$account-encryption-key'
+          denyEncryptionScopeOverride: false
+        }
       }
-    }]
+    ]
   }
 }
 
@@ -148,23 +151,75 @@ resource appEnvironment 'Microsoft.App/managedEnvironments@2025-07-01' = {
     peerTrafficConfiguration: { encryption: { enabled: false } }
     publicNetworkAccess: 'Enabled'
     workloadProfiles: [{ name: 'Consumption', workloadProfileType: 'Consumption' }]
+    appLogsConfiguration: { destination: 'azure-monitor' }
   }
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: { '${managedIdentity.id}': {} }
   }
-
-  resource storages 'storages' = [for fs in fileShares: {
-    name: fs
-    properties: {
-      azureFile: {
-        accountName: storageAccount.name
-        accountKey: storageAccount.listKeys().keys[0].value
-        shareName: fs
-        accessMode: 'ReadOnly'
-      }
+}
+resource appEnvironmentDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: 'console-logs'
+  scope: appEnvironment
+  properties: {
+    // this could be changed to EventHubs if streaming logs is needed in the future
+    storageAccountId: storageAccount.id
+    logs: [
+      { category: 'ContainerAppConsoleLogs', enabled: true, retentionPolicy: { days: 0, enabled: false } }
+      // disabled but added here for reference and easier to detect changed on deploy
+      { category: 'ContainerAppSystemLogs', enabled: false, retentionPolicy: { days: 0, enabled: false } }
+      { category: 'AppEnvSpringAppConsoleLogs', enabled: false, retentionPolicy: { days: 0, enabled: false } }
+      { category: 'AppEnvSessionConsoleLogs', enabled: false, retentionPolicy: { days: 0, enabled: false } }
+      { category: 'AppEnvSessionPoolEventLogs', enabled: false, retentionPolicy: { days: 0, enabled: false } }
+      { category: 'AppEnvSessionLifeCycleLogs', enabled: false, retentionPolicy: { days: 0, enabled: false } }
+    ]
+    metrics: [
+      { category: 'AllMetrics', enabled: false, retentionPolicy: { days: 0, enabled: false } }
+    ]
+  }
+}
+resource appEnvironmentLogsRetention 'Microsoft.Storage/storageAccounts/managementPolicies@2025-06-01' = {
+  parent: storageAccount
+  name: 'default'
+  properties: {
+    policy: {
+      rules: [
+        {
+          name: 'delete-old-console-logs'
+          enabled: true
+          type: 'Lifecycle'
+          definition: {
+            actions: { baseBlob: { delete: { daysAfterModificationGreaterThan: 14 } } }
+            filters: {
+              blobTypes: ['blockBlob', 'appendBlob']
+              prefixMatch: ['insights-logs-containerappconsolelogs/ResourceId=${toUpper(appEnvironment.id)}/']
+            }
+          }
+        }
+      ]
     }
-  }]
+  }
+}
+
+/* Idler app (Used to prevent the environment from being shutdown) */
+resource app 'Microsoft.App/containerApps@2025-07-01' = {
+  name: 'idler'
+  location: location
+  properties: {
+    managedEnvironmentId: appEnvironment.id
+    workloadProfileName: 'Consumption'
+    template: {
+      containers: [
+        {
+          name: 'idler'
+          image: 'mcr.microsoft.com/k8se/quickstart'
+          // these are the least resources we can provision
+          resources: { cpu: json('0.25'), memory: '0.5Gi' }
+        }
+      ]
+      scale: { minReplicas: 0, maxReplicas: 1, cooldownPeriod: 300, pollingInterval: 30 }
+    }
+  }
 }
 
 /* Role Assignments */
@@ -185,6 +240,12 @@ resource roleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = 
     }
   }
 ]
+
+module jobs 'jobs.bicep' = {
+  name: 'deploy-jobs'
+  scope: resourceGroup('${resourceGroup().name}-JOBS')
+  params: { name: name, mainRGName: resourceGroup().name }
+}
 
 output managedIdentityPrincipalId string = managedIdentity.properties.principalId
 output mongoConnectionString string = replace(
