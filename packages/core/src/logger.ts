@@ -84,15 +84,17 @@ export function create(options: LoggerCreateOptions = {}) {
     : undefined;
 
   // create and return the logger
+  const resolvedLevel = level || process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'warn' : 'debug');
   return pino(
     {
-      level: level || process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'warn' : 'debug'),
+      level: resolvedLevel,
       timestamp,
     },
     pino.multistream([
       // add streams conditionally
-      ...(prettyStream ? [prettyStream] : []),
-      ...streams,
+      // without setting the level on each stream, some logs seem to be skipped
+      ...(prettyStream ? [{ level: resolvedLevel, stream: prettyStream }] : []),
+      ...streams.map((stream) => ({ level: resolvedLevel, stream })),
     ]),
   );
 }
