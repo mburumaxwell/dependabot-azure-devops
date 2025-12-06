@@ -1,4 +1,4 @@
-import type { GitPullRequestMergeStrategy, VersionControlChangeType } from './types';
+import type { AzdoPullRequestMergeStrategy, AzdoVersionControlChangeType } from './types';
 
 /**
  * Pull request property names used to store metadata about the pull request.
@@ -10,7 +10,7 @@ export const DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES = 'Dependabot.Dependenci
 
 /** File change */
 export interface IFileChange {
-  changeType: VersionControlChangeType;
+  changeType: AzdoVersionControlChangeType;
   path: string;
   content?: string;
   encoding?: string;
@@ -45,7 +45,7 @@ export interface ICreatePullRequest {
   commitMessage: string;
   autoComplete?: {
     ignorePolicyConfigIds?: number[];
-    mergeStrategy?: GitPullRequestMergeStrategy;
+    mergeStrategy?: AzdoPullRequestMergeStrategy;
   };
   assignees?: string[];
   labels?: string[];

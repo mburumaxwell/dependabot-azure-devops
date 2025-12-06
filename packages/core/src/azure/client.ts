@@ -1,4 +1,4 @@
-import { HttpRequestError, isErrorTemporaryFailure } from '@/http';
+import ky, { isHTTPError, type KyInstance } from 'ky';
 import { logger } from '@/logger';
 import type {
   IAbandonPullRequest,
@@ -8,18 +8,23 @@ import type {
   IPullRequestProperties,
   IUpdatePullRequest,
 } from './models';
-import {
-  type AzdoListResponse,
-  type AzdoProject,
-  type AzdoRepository,
-  type AzdoRepositoryItem,
-  CommentThreadStatus,
-  CommentType,
-  type IdentityRefWithVote,
-  ItemContentType,
-  PullRequestAsyncStatus,
-  PullRequestStatus,
-  VersionControlChangeType,
+import type {
+  AdoProperties,
+  AzdoConnectionData,
+  AzdoGitBranchStats,
+  AzdoGitCommitRef,
+  AzdoGitPush,
+  AzdoGitPushCreate,
+  AzdoGitRef,
+  AzdoGitRefUpdateResult,
+  AzdoIdentity,
+  AzdoIdentityRefWithVote,
+  AzdoListResponse,
+  AzdoProject,
+  AzdoPullRequest,
+  AzdoPullRequestCommentThread,
+  AzdoRepository,
+  AzdoRepositoryItem,
 } from './types';
 import type { AzureDevOpsOrganizationUrl } from './url-parts';
 import { normalizeBranchName, normalizeFilePath } from './utils';
@@ -33,6 +38,7 @@ export class AzureDevOpsWebApiClient {
   private readonly identityApiUrl: string;
   private readonly accessToken: string;
   private readonly debug: boolean;
+  private readonly client: KyInstance;
 
   private authenticatedUserId?: string;
   private resolvedUserIds: Record<string, string>;
@@ -41,12 +47,13 @@ export class AzureDevOpsWebApiClient {
   public static API_VERSION_PREVIEW = '5.0-preview';
 
   constructor(url: AzureDevOpsOrganizationUrl, accessToken: string, debug: boolean = false) {
-    const organisationApiUrl = url.value.toString();
-    this.organisationApiUrl = organisationApiUrl.replace(/\/$/, ''); // trim trailing slash
-    this.identityApiUrl = getIdentityApiUrl(organisationApiUrl).replace(/\/$/, ''); // trim trailing slash
+    this.organisationApiUrl = url.value.toString().replace(/\/$/, ''); // trim trailing slash
+    this.identityApiUrl = url['identity-api-url'].toString().replace(/\/$/, ''); // trim trailing slash
     this.accessToken = accessToken;
     this.debug = debug;
     this.resolvedUserIds = {};
+
+    this.client = this.createClient();
   }
 
   /**
@@ -55,11 +62,11 @@ export class AzureDevOpsWebApiClient {
    */
   public async getUserId(): Promise<string> {
     if (!this.authenticatedUserId) {
-      const connectionData = await this.restApiGet(
-        `${this.organisationApiUrl}/_apis/connectiondata`,
-        undefined,
-        AzureDevOpsWebApiClient.API_VERSION_PREVIEW,
-      );
+      const connectionData = await this.client
+        .get<AzdoConnectionData>(
+          this.makeUrl(`${this.organisationApiUrl}/_apis/connectiondata`, AzureDevOpsWebApiClient.API_VERSION_PREVIEW),
+        )
+        .json();
       this.authenticatedUserId = connectionData?.authenticatedUser?.id;
       if (!this.authenticatedUserId) {
         throw new Error('Failed to get authenticated user ID');
@@ -79,15 +86,19 @@ export class AzureDevOpsWebApiClient {
       return this.resolvedUserIds[userNameEmailOrGroupName];
     }
     try {
-      const identities = await this.restApiGet(`${this.identityApiUrl}/_apis/identities`, {
-        searchFilter: 'General',
-        filterValue: userNameEmailOrGroupName,
-        queryMembership: 'None',
-      });
+      const identities = await this.client
+        .get<AzdoListResponse<AzdoIdentity[]>>(
+          this.makeUrl(`${this.identityApiUrl}/_apis/identities`, {
+            searchFilter: 'General',
+            filterValue: userNameEmailOrGroupName,
+            queryMembership: 'None',
+          }),
+        )
+        .json();
       if (!identities?.value || identities.value.length === 0) {
         return undefined;
       }
-      this.resolvedUserIds[userNameEmailOrGroupName] = identities.value[0]?.id;
+      this.resolvedUserIds[userNameEmailOrGroupName] = identities.value[0]!.id;
       return this.resolvedUserIds[userNameEmailOrGroupName];
     } catch (e) {
       logger.error(`Failed to resolve user id: ${e}`);
@@ -96,9 +107,11 @@ export class AzureDevOpsWebApiClient {
     }
   }
 
-  public async getProjects(): Promise<AzdoListResponse<AzdoProject> | undefined> {
+  public async getProjects(): Promise<AzdoListResponse<AzdoProject[]> | undefined> {
     try {
-      const projects = await this.restApiGet(`${this.organisationApiUrl}/_apis/projects`);
+      const projects = await this.client
+        .get<AzdoListResponse<AzdoProject[]>>(this.makeUrl(`${this.organisationApiUrl}/_apis/projects`))
+        .json();
       return projects;
     } catch (e) {
       logger.error(`Failed to get projects: ${e}`);
@@ -109,9 +122,9 @@ export class AzureDevOpsWebApiClient {
 
   public async getProject(idOrName: string): Promise<AzdoProject | undefined> {
     try {
-      const project = await this.restApiGet(
-        `${this.organisationApiUrl}/_apis/projects/${encodeURIComponent(idOrName)}`,
-      );
+      const project = await this.client
+        .get<AzdoProject>(this.makeUrl(`${this.organisationApiUrl}/_apis/projects/${encodeURIComponent(idOrName)}`))
+        .json();
       return project;
     } catch (e) {
       logger.error(`Failed to get project: ${e}`);
@@ -120,11 +133,13 @@ export class AzureDevOpsWebApiClient {
     }
   }
 
-  public async getRepositories(projectIdOrName: string): Promise<AzdoListResponse<AzdoRepository> | undefined> {
+  public async getRepositories(projectIdOrName: string): Promise<AzdoListResponse<AzdoRepository[]> | undefined> {
     try {
-      const repos = await this.restApiGet(
-        `${this.organisationApiUrl}/${encodeURIComponent(projectIdOrName)}/_apis/git/repositories`,
-      );
+      const repos = await this.client
+        .get<AzdoListResponse<AzdoRepository[]>>(
+          this.makeUrl(`${this.organisationApiUrl}/${encodeURIComponent(projectIdOrName)}/_apis/git/repositories`),
+        )
+        .json();
       return repos;
     } catch (e) {
       logger.error(`Failed to get repositories: ${e}`);
@@ -135,12 +150,16 @@ export class AzureDevOpsWebApiClient {
 
   public async getRepository(projectIdOrName: string, repositoryIdOrName: string): Promise<AzdoRepository | undefined> {
     try {
-      const repo = await this.restApiGet(
-        `${this.organisationApiUrl}/${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}`,
-      );
+      const repo = await this.client
+        .get<AzdoRepository>(
+          this.makeUrl(
+            `${this.organisationApiUrl}/${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}`,
+          ),
+        )
+        .json();
       return repo;
     } catch (e) {
-      if (e instanceof HttpRequestError && e.code === 404) {
+      if (isHTTPError(e) && e.response.status === 404) {
         // repository no longer exists
         return undefined;
       } else {
@@ -159,17 +178,21 @@ export class AzureDevOpsWebApiClient {
     latestProcessedChange: boolean = true,
   ): Promise<AzdoRepositoryItem | undefined> {
     try {
-      const item = await this.restApiGet(
-        `${this.organisationApiUrl}/${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/items`,
-        {
-          path,
-          includeContent,
-          latestProcessedChange,
-        },
-      );
+      const item = await this.client
+        .get<AzdoRepositoryItem>(
+          this.makeUrl(
+            `${this.organisationApiUrl}/${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/items`,
+            {
+              path,
+              includeContent,
+              latestProcessedChange,
+            },
+          ),
+        )
+        .json();
       return item;
     } catch (e) {
-      if (e instanceof HttpRequestError && e.code === 404) {
+      if (isHTTPError(e) && e.response.status === 404) {
         // item does not exist
         return undefined;
       } else {
@@ -189,7 +212,9 @@ export class AzureDevOpsWebApiClient {
    */
   public async getDefaultBranch(project: string, repository: string): Promise<string | undefined> {
     try {
-      const repo = await this.restApiGet(`${this.organisationApiUrl}/${project}/_apis/git/repositories/${repository}`);
+      const repo = await this.client
+        .get<AzdoRepository>(this.makeUrl(`${this.organisationApiUrl}/${project}/_apis/git/repositories/${repository}`))
+        .json();
       if (!repo) {
         throw new Error(`Repository '${project}/${repository}' not found`);
       }
@@ -211,14 +236,16 @@ export class AzureDevOpsWebApiClient {
    */
   public async getBranchNames(project: string, repository: string): Promise<string[] | undefined> {
     try {
-      const refs = await this.restApiGet(
-        `${this.organisationApiUrl}/${project}/_apis/git/repositories/${repository}/refs`,
-      );
+      const refs = await this.client
+        .get<AzdoListResponse<AzdoGitRef[]>>(
+          this.makeUrl(`${this.organisationApiUrl}/${project}/_apis/git/repositories/${repository}/refs`),
+        )
+        .json();
       if (!refs) {
         throw new Error(`Repository '${project}/${repository}' not found`);
       }
 
-      return refs.value?.map((r: { name?: string }) => normalizeBranchName(r.name)) || [];
+      return refs.value?.map((r) => normalizeBranchName(r.name)) || [];
     } catch (e) {
       logger.error(`Failed to list branch names for '${project}/${repository}': ${e}`);
       logger.debug(e); // Dump the error stack trace to help with debugging
@@ -240,31 +267,33 @@ export class AzureDevOpsWebApiClient {
     creator: string,
   ): Promise<IPullRequestProperties[]> {
     try {
-      const pullRequests = await this.restApiGet(
-        `${this.organisationApiUrl}/${project}/_apis/git/repositories/${repository}/pullrequests`,
-        {
-          'searchCriteria.creatorId': isGuid(creator) ? creator : await this.getUserId(),
-          'searchCriteria.status': 'Active',
-        },
-      );
+      const pullRequests = await this.client
+        .get<AzdoListResponse<AzdoPullRequest[]>>(
+          this.makeUrl(`${this.organisationApiUrl}/${project}/_apis/git/repositories/${repository}/pullrequests`, {
+            'searchCriteria.creatorId': isGuid(creator) ? creator : await this.getUserId(),
+            'searchCriteria.status': 'Active',
+          }),
+        )
+        .json();
       if (!pullRequests?.value || pullRequests.value.length === 0) {
         return [];
       }
 
       return await Promise.all(
-        pullRequests.value.map(async (pr: { pullRequestId: number }) => {
-          const properties = await this.restApiGet(
-            `${this.organisationApiUrl}/${project}/_apis/git/repositories/${repository}/pullrequests/${pr.pullRequestId}/properties`,
-          );
+        pullRequests.value.map(async (pr) => {
+          const properties = await this.client
+            .get<AzdoListResponse<AdoProperties>>(
+              this.makeUrl(
+                `${this.organisationApiUrl}/${project}/_apis/git/repositories/${repository}/pullrequests/${pr.pullRequestId}/properties`,
+              ),
+            )
+            .json();
           return {
             id: pr.pullRequestId,
-            properties:
-              Object.keys(properties?.value || {}).map((key) => {
-                return {
-                  name: key,
-                  value: properties.value[key]?.$value,
-                };
-              }) || [],
+            properties: Object.entries(properties?.value || {}).map(([key, val]) => ({
+              name: key,
+              value: val?.$value,
+            })),
           };
         }),
       );
@@ -290,7 +319,7 @@ export class AzureDevOpsWebApiClient {
       // Map the list of the pull request reviewer ids
       // NOTE: Azure DevOps does not have a concept of assignees.
       //       We treat them as optional reviewers. Branch policies should be used for required reviewers.
-      const reviewers: IdentityRefWithVote[] = [];
+      const reviewers: AzdoIdentityRefWithVote[] = [];
       if (pr.assignees && pr.assignees.length > 0) {
         for (const assignee of pr.assignees) {
           const identityId = isGuid(assignee) ? assignee : await this.resolveIdentityId(assignee);
@@ -306,57 +335,67 @@ export class AzureDevOpsWebApiClient {
 
       // Create the source branch and push a commit with the dependency file changes
       logger.info(` - Pushing ${pr.changes.length} file change(s) to branch '${pr.source.branch}'...`);
-      const push = await this.restApiPost(
-        `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pushes`,
-        {
-          refUpdates: [
-            {
-              name: `refs/heads/${pr.source.branch}`,
-              oldObjectId: pr.source.commit,
-            },
-          ],
-          commits: [
-            {
-              comment: pr.commitMessage,
-              author: pr.author,
-              changes: pr.changes
-                .filter((change) => change.changeType !== VersionControlChangeType.None)
-                .map(({ changeType, ...change }) => {
-                  return {
-                    changeType,
-                    item: { path: normalizeFilePath(change.path) },
-                    newContent:
-                      changeType !== VersionControlChangeType.Delete
-                        ? {
-                            content: Buffer.from(change.content!, <BufferEncoding>change.encoding).toString('base64'),
-                            contentType: ItemContentType.Base64Encoded,
-                          }
-                        : undefined,
-                  };
-                }),
-            },
-          ],
-        },
-      );
+      const push = await this.client
+        .post<AzdoGitPush>(
+          this.makeUrl(`${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pushes`),
+          {
+            json: {
+              refUpdates: [
+                {
+                  name: `refs/heads/${pr.source.branch}`,
+                  oldObjectId: pr.source.commit,
+                },
+              ],
+              commits: [
+                {
+                  comment: pr.commitMessage,
+                  author: pr.author,
+                  changes: pr.changes
+                    .filter((change) => change.changeType !== 'none')
+                    .map(({ changeType, ...change }) => {
+                      return {
+                        changeType,
+                        item: { path: normalizeFilePath(change.path) },
+                        newContent:
+                          changeType !== 'delete'
+                            ? {
+                                content: Buffer.from(change.content!, <BufferEncoding>change.encoding).toString(
+                                  'base64',
+                                ),
+                                contentType: 'base64encoded',
+                              }
+                            : undefined,
+                      } satisfies AzdoGitPushCreate['commits'][0]['changes'][0];
+                    }),
+                },
+              ],
+            } satisfies AzdoGitPushCreate,
+          },
+        )
+        .json();
       if (!push?.commits?.length) {
         throw new Error('Failed to push changes to source branch, no commits were created');
       }
-      logger.info(` - Pushed commit: ${push.commits.map((c: { commitId: string }) => c.commitId).join(', ')}.`);
+      logger.info(` - Pushed commit: ${push.commits.map((c) => c.commitId).join(', ')}.`);
 
       // Create the pull request
       logger.info(` - Creating pull request to merge '${pr.source.branch}' into '${pr.target.branch}'...`);
-      const pullRequest = await this.restApiPost(
-        `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests`,
-        {
-          sourceRefName: `refs/heads/${pr.source.branch}`,
-          targetRefName: `refs/heads/${pr.target.branch}`,
-          title: pr.title,
-          description: pr.description,
-          reviewers: reviewers,
-          workItemRefs: pr.workItems?.map((id) => ({ id: id })),
-          labels: pr.labels?.map((label) => ({ name: label })),
-        },
-      );
+      const pullRequest = await this.client
+        .post<AzdoPullRequest>(
+          this.makeUrl(`${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests`),
+          {
+            json: {
+              sourceRefName: `refs/heads/${pr.source.branch}`,
+              targetRefName: `refs/heads/${pr.target.branch}`,
+              title: pr.title,
+              description: pr.description,
+              reviewers: reviewers,
+              workItemRefs: pr.workItems?.map((id) => ({ id: id })),
+              labels: pr.labels?.map((label) => ({ name: label })),
+            },
+          },
+        )
+        .json();
       if (!pullRequest?.pullRequestId) {
         throw new Error('Failed to create pull request, no pull request id was returned');
       }
@@ -365,17 +404,23 @@ export class AzureDevOpsWebApiClient {
       // Add the pull request properties
       if (pr.properties && pr.properties.length > 0) {
         logger.info(` - Adding dependency metadata to pull request properties...`);
-        const newProperties = await this.restApiPatch(
-          `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests/${pullRequest.pullRequestId}/properties`,
-          pr.properties.map((property) => {
-            return {
-              op: 'add',
-              path: `/${property.name}`,
-              value: property.value,
-            };
-          }),
-          'application/json-patch+json',
-        );
+        const newProperties = await this.client
+          .patch<AzdoListResponse<AdoProperties>>(
+            this.makeUrl(
+              `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests/${pullRequest.pullRequestId}/properties`,
+            ),
+            {
+              json: pr.properties.map((property) => {
+                return {
+                  op: 'add',
+                  path: `/${property.name}`,
+                  value: property.value,
+                };
+              }),
+              headers: { 'Content-Type': 'application/json-patch+json' },
+            },
+          )
+          .json();
         if (!newProperties?.count) {
           throw new Error('Failed to add dependency metadata properties to pull request');
         }
@@ -388,21 +433,25 @@ export class AzureDevOpsWebApiClient {
       // Set the pull request auto-complete status
       if (pr.autoComplete) {
         logger.info(` - Updating auto-complete options...`);
-        const updatedPullRequest = await this.restApiPatch(
-          `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests/${pullRequest.pullRequestId}`,
-          {
-            autoCompleteSetBy: {
-              id: userId,
+        const updatedPullRequest = await this.client
+          .patch<AzdoPullRequest>(
+            this.makeUrl(
+              `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests/${pullRequest.pullRequestId}`,
+            ),
+            {
+              json: {
+                autoCompleteSetBy: { id: userId },
+                completionOptions: {
+                  autoCompleteIgnoreConfigIds: pr.autoComplete.ignorePolicyConfigIds,
+                  deleteSourceBranch: true,
+                  mergeCommitMessage: mergeCommitMessage(pullRequest.pullRequestId, pr.title, pr.description),
+                  mergeStrategy: pr.autoComplete.mergeStrategy,
+                  transitionWorkItems: false,
+                },
+              },
             },
-            completionOptions: {
-              autoCompleteIgnoreConfigIds: pr.autoComplete.ignorePolicyConfigIds,
-              deleteSourceBranch: true,
-              mergeCommitMessage: mergeCommitMessage(pullRequest.pullRequestId, pr.title, pr.description),
-              mergeStrategy: pr.autoComplete.mergeStrategy,
-              transitionWorkItems: false,
-            },
-          },
-        );
+          )
+          .json();
         if (!updatedPullRequest || updatedPullRequest.autoCompleteSetBy?.id !== userId) {
           throw new Error('Failed to set auto-complete on pull request');
         }
@@ -427,9 +476,13 @@ export class AzureDevOpsWebApiClient {
     logger.info(`Updating pull request #${pr.pullRequestId}...`);
     try {
       // Get the pull request details
-      const pullRequest = await this.restApiGet(
-        `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests/${pr.pullRequestId}`,
-      );
+      const pullRequest = await this.client
+        .get<AzdoPullRequest>(
+          this.makeUrl(
+            `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests/${pr.pullRequestId}`,
+          ),
+        )
+        .json();
       if (!pullRequest) {
         throw new Error(`Pull request #${pr.pullRequestId} not found`);
       }
@@ -442,26 +495,30 @@ export class AzureDevOpsWebApiClient {
 
       // Skip if the pull request has been modified by another author
       if (pr.skipIfCommitsFromAuthorsOtherThan) {
-        const commits = await this.restApiGet(
-          `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests/${pr.pullRequestId}/commits`,
-        );
-        if (
-          commits?.value?.some(
-            (c: { author?: { email?: string } }) => c.author?.email !== pr.skipIfCommitsFromAuthorsOtherThan,
+        const commits = await this.client
+          .get<AzdoListResponse<AzdoGitCommitRef[]>>(
+            this.makeUrl(
+              `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests/${pr.pullRequestId}/commits`,
+            ),
           )
-        ) {
+          .json();
+        if (commits?.value?.some((c) => c.author?.email !== pr.skipIfCommitsFromAuthorsOtherThan)) {
           logger.info(` - Skipping update as pull request has been modified by another user.`);
           return true;
         }
       }
 
       // Get the branch stats to check if the source branch is behind the target branch
-      const stats = await this.restApiGet(
-        `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/stats/branches`,
-        {
-          name: normalizeBranchName(pullRequest.sourceRefName),
-        },
-      );
+      const stats = await this.client
+        .get<AzdoGitBranchStats>(
+          this.makeUrl(
+            `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/stats/branches`,
+            {
+              name: normalizeBranchName(pullRequest.sourceRefName),
+            },
+          ),
+        )
+        .json();
       if (stats?.behindCount === undefined) {
         throw new Error(`Failed to get branch stats for '${pullRequest.sourceRefName}'`);
       }
@@ -479,16 +536,20 @@ export class AzureDevOpsWebApiClient {
         logger.info(
           ` - Rebasing '${targetBranchName}' into '${sourceBranchName}' (${stats.behindCount} commit(s) behind)...`,
         );
-        const rebase = await this.restApiPost(
-          `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/refs`,
-          [
+        const rebase = await this.client
+          .post<AzdoListResponse<AzdoGitRefUpdateResult[]>>(
+            this.makeUrl(`${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/refs`),
             {
-              name: pullRequest.sourceRefName,
-              oldObjectId: pullRequest.lastMergeSourceCommit.commitId,
-              newObjectId: pr.commit,
+              json: [
+                {
+                  name: pullRequest.sourceRefName,
+                  oldObjectId: pullRequest.lastMergeSourceCommit.commitId,
+                  newObjectId: pr.commit,
+                },
+              ],
             },
-          ],
-        );
+          )
+          .json();
         if (rebase?.value?.[0]?.success !== true) {
           throw new Error('Failed to rebase the target branch into the source branch');
         }
@@ -496,45 +557,51 @@ export class AzureDevOpsWebApiClient {
 
       // Push all file changes to the source branch
       logger.info(` - Pushing ${pr.changes.length} file change(s) to branch '${pullRequest.sourceRefName}'...`);
-      const push = await this.restApiPost(
-        `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pushes`,
-        {
-          refUpdates: [
-            {
-              name: pullRequest.sourceRefName,
-              oldObjectId: pr.commit,
-            },
-          ],
-          commits: [
-            {
-              comment:
-                pullRequest.mergeStatus === PullRequestAsyncStatus.Conflicts
-                  ? 'Resolve merge conflicts'
-                  : `Rebase '${sourceBranchName}' onto '${targetBranchName}'`,
-              author: pr.author,
-              changes: pr.changes
-                .filter((change) => change.changeType !== VersionControlChangeType.None)
-                .map(({ changeType, ...change }) => {
-                  return {
-                    changeType,
-                    item: { path: normalizeFilePath(change.path) },
-                    newContent:
-                      changeType !== VersionControlChangeType.Delete
-                        ? {
-                            content: Buffer.from(change.content!, <BufferEncoding>change.encoding).toString('base64'),
-                            contentType: ItemContentType.Base64Encoded,
-                          }
-                        : undefined,
-                  };
-                }),
-            },
-          ],
-        },
-      );
+      const push = await this.client
+        .post<AzdoGitPush>(
+          this.makeUrl(`${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pushes`),
+          {
+            json: {
+              refUpdates: [
+                {
+                  name: pullRequest.sourceRefName,
+                  oldObjectId: pr.commit,
+                },
+              ],
+              commits: [
+                {
+                  comment:
+                    pullRequest.mergeStatus === 'conflicts'
+                      ? 'Resolve merge conflicts'
+                      : `Rebase '${sourceBranchName}' onto '${targetBranchName}'`,
+                  author: pr.author,
+                  changes: pr.changes
+                    .filter((change) => change.changeType !== 'none')
+                    .map(({ changeType, ...change }) => {
+                      return {
+                        changeType,
+                        item: { path: normalizeFilePath(change.path) },
+                        newContent:
+                          changeType !== 'delete'
+                            ? {
+                                content: Buffer.from(change.content!, <BufferEncoding>change.encoding).toString(
+                                  'base64',
+                                ),
+                                contentType: 'base64encoded',
+                              }
+                            : undefined,
+                      } satisfies AzdoGitPushCreate['commits'][0]['changes'][0];
+                    }),
+                },
+              ],
+            } satisfies AzdoGitPushCreate,
+          },
+        )
+        .json();
       if (!push?.commits?.length) {
         throw new Error('Failed to push changes to source branch, no commits were created');
       }
-      logger.info(` - Pushed commit: ${push.commits.map((c: { commitId: string }) => c.commitId).join(', ')}.`);
+      logger.info(` - Pushed commit: ${push.commits.map((c) => c.commitId).join(', ')}.`);
 
       logger.info(` - Pull request was updated successfully.`);
       return true;
@@ -557,22 +624,28 @@ export class AzureDevOpsWebApiClient {
       // Approve the pull request
       logger.info(` - Updating reviewer vote on pull request...`);
       const userId = await this.getUserId();
-      const userVote = await this.restApiPut(
-        `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests/${pr.pullRequestId}/reviewers/${userId}`,
-        {
-          // Vote 10 = "approved"; 5 = "approved with suggestions"; 0 = "no vote"; -5 = "waiting for author"; -10 = "rejected"
-          vote: 10,
-          // Reapprove must be set to true after the 2023 August 23 update;
-          // Approval of a previous PR iteration does not count in later iterations, which means we must (re)approve every after push to the source branch
-          // See: https://learn.microsoft.com/en-us/azure/devops/release-notes/2023/sprint-226-update#new-branch-policy-preventing-users-to-approve-their-own-changes
-          //      https://github.com/mburumaxwell/dependabot-azure-devops/issues/1069
-          isReapprove: true,
-        },
-        // API version 7.1 is required to use the 'isReapprove' parameter
-        // See: https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-request-reviewers/create-pull-request-reviewer?view=azure-devops-rest-7.1&tabs=HTTP#request-body
-        //      https://learn.microsoft.com/en-us/azure/devops/integrate/concepts/rest-api-versioning?view=azure-devops#supported-versions
-        '7.1',
-      );
+      const userVote = await this.client
+        .put<AzdoIdentityRefWithVote>(
+          this.makeUrl(
+            `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests/${pr.pullRequestId}/reviewers/${userId}`,
+            // API version 7.1 is required to use the 'isReapprove' parameter
+            // See: https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-request-reviewers/create-pull-request-reviewer?view=azure-devops-rest-7.1&tabs=HTTP#request-body
+            //      https://learn.microsoft.com/en-us/azure/devops/integrate/concepts/rest-api-versioning?view=azure-devops#supported-versions
+            '7.1',
+          ),
+          {
+            json: {
+              // Vote 10 = "approved"; 5 = "approved with suggestions"; 0 = "no vote"; -5 = "waiting for author"; -10 = "rejected"
+              vote: 10,
+              // Reapprove must be set to true after the 2023 August 23 update;
+              // Approval of a previous PR iteration does not count in later iterations, which means we must (re)approve every after push to the source branch
+              // See: https://learn.microsoft.com/en-us/azure/devops/release-notes/2023/sprint-226-update#new-branch-policy-preventing-users-to-approve-their-own-changes
+              //      https://github.com/mburumaxwell/dependabot-azure-devops/issues/1069
+              isReapprove: true,
+            },
+          },
+        )
+        .json();
       if (userVote?.vote !== 10) {
         throw new Error('Failed to approve pull request, vote was not recorded');
       }
@@ -612,33 +685,41 @@ export class AzureDevOpsWebApiClient {
 
       // Abandon the pull request
       logger.info(` - Abandoning pull request...`);
-      const abandonedPullRequest = await this.restApiPatch(
-        `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests/${pr.pullRequestId}`,
-        {
-          status: PullRequestStatus.Abandoned,
-          closedBy: {
-            id: userId,
+      const abandonedPullRequest = await this.client
+        .patch<AzdoPullRequest>(
+          this.makeUrl(
+            `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/pullrequests/${pr.pullRequestId}`,
+          ),
+          {
+            json: {
+              status: 'abandoned',
+              closedBy: { id: userId },
+            } satisfies Pick<AzdoPullRequest, 'status' | 'closedBy'>,
           },
-        },
-      );
-      if (abandonedPullRequest?.status?.toLowerCase() !== 'abandoned') {
+        )
+        .json();
+      if (abandonedPullRequest?.status !== 'abandoned') {
         throw new Error('Failed to abandon pull request, status was not updated');
       }
 
       // Delete the source branch if required
       if (pr.deleteSourceBranch) {
         logger.info(` - Deleting source branch...`);
-        const deletedBranch = await this.restApiPost(
-          `${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/refs`,
-          [
+        const deletedBranch = await this.client
+          .post<AzdoListResponse<AzdoGitRefUpdateResult[]>>(
+            this.makeUrl(`${this.organisationApiUrl}/${pr.project}/_apis/git/repositories/${pr.repository}/refs`),
             {
-              name: abandonedPullRequest.sourceRefName,
-              oldObjectId: abandonedPullRequest.lastMergeSourceCommit.commitId,
-              newObjectId: '0000000000000000000000000000000000000000',
-              isLocked: false,
+              json: [
+                {
+                  name: abandonedPullRequest.sourceRefName,
+                  oldObjectId: abandonedPullRequest.lastMergeSourceCommit.commitId,
+                  newObjectId: '0000000000000000000000000000000000000000',
+                  isLocked: false,
+                },
+              ],
             },
-          ],
-        );
+          )
+          .json();
         if (deletedBranch?.value?.[0]?.success !== true) {
           throw new Error('Failed to delete the source branch');
         }
@@ -659,115 +740,93 @@ export class AzureDevOpsWebApiClient {
    */
   public async addCommentThread(comment: IPullRequestComment): Promise<number | undefined> {
     const userId = comment.userId ?? (await this.getUserId());
-    const thread = await this.restApiPost(
-      `${this.organisationApiUrl}/${comment.project}/_apis/git/repositories/${comment.repository}/pullrequests/${comment.pullRequestId}/threads`,
-      {
-        status: CommentThreadStatus.Closed,
-        comments: [
-          {
-            author: {
-              id: userId,
-            },
-            content: comment.content,
-            commentType: CommentType.System,
-          },
-        ],
-      },
-    );
+    type CreationType = {
+      status: AzdoPullRequestCommentThread['status'];
+      comments: Partial<AzdoPullRequestCommentThread['comments'][number]>[];
+    };
+    const thread = await this.client
+      .post<AzdoPullRequestCommentThread>(
+        this.makeUrl(
+          `${this.organisationApiUrl}/${comment.project}/_apis/git/repositories/${comment.repository}/pullrequests/${comment.pullRequestId}/threads`,
+        ),
+        {
+          json: {
+            status: 'closed',
+            comments: [
+              {
+                author: { id: userId },
+                content: comment.content,
+                commentType: 'system',
+              },
+            ],
+          } satisfies CreationType,
+        },
+      )
+      .json();
     return thread?.id;
   }
 
-  private async restApiGet(
+  private makeUrl(url: string): string;
+  private makeUrl(url: string, apiVersion: string): string;
+  private makeUrl(url: string, params: Record<string, unknown>): string;
+  private makeUrl(url: string, params: Record<string, unknown>, apiVersion: string): string;
+  private makeUrl(
     url: string,
-    params?: Record<string, unknown>,
+    params?: Record<string, unknown> | string,
     apiVersion: string = AzureDevOpsWebApiClient.API_VERSION,
-  ) {
-    params ??= {};
-    const queryString = Object.keys(params)
-      .map((key) => `${key}=${params[key]}`)
+  ): string {
+    if (typeof params === 'string') {
+      apiVersion = params;
+      params = {};
+    }
+
+    const queryString = Object.entries({ 'api-version': apiVersion, ...params })
+      .map(([key, value]) => `${key}=${value}`)
       .join('&');
-    const fullUrl = `${url}?api-version=${apiVersion}${queryString ? `&${queryString}` : ''}`;
-
-    return await sendRestApiRequestWithRetry(
-      'GET',
-      fullUrl,
-      undefined,
-      async () => {
-        return await fetch(fullUrl, {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
-          },
-        });
-      },
-      this.debug,
-    );
+    return `${url}?${queryString}`;
   }
 
-  private async restApiPost(url: string, data?: unknown, apiVersion: string = AzureDevOpsWebApiClient.API_VERSION) {
-    const fullUrl = `${url}?api-version=${apiVersion}`;
-    return await sendRestApiRequestWithRetry(
-      'POST',
-      fullUrl,
-      data,
-      async () => {
-        return await fetch(fullUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
-          },
-          body: JSON.stringify(data),
-        });
+  private createClient() {
+    return ky.create({
+      headers: {
+        Authorization: `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
+        Accept: 'application/json',
       },
-      this.debug,
-    );
-  }
+      hooks: {
+        beforeRequest: [
+          async (request, options) => {
+            if (this.debug) logger.debug(`🌎 🠊 [${request.method}] ${request.url}`);
+          },
+        ],
+        afterResponse: [
+          async (request, options, response) => {
+            if (this.debug) {
+              logger.debug(`🌎 🠈 [${response.status}] ${response.statusText}`);
 
-  private async restApiPut(url: string, data?: unknown, apiVersion: string = AzureDevOpsWebApiClient.API_VERSION) {
-    const fullUrl = `${url}?api-version=${apiVersion}`;
-    return await sendRestApiRequestWithRetry(
-      'PUT',
-      fullUrl,
-      data,
-      async () => {
-        return await fetch(fullUrl, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
+              // log the request and response for debugging
+              if (request.body) {
+                logger.debug(`REQUEST: ${JSON.stringify(request.body)}`);
+              }
+              // const body = await response.text();
+              // if (body) {
+              //   logger.debug(`RESPONSE: ${body}`);
+              // }
+            }
           },
-          body: JSON.stringify(data),
-        });
-      },
-      this.debug,
-    );
-  }
-
-  private async restApiPatch(
-    url: string,
-    data?: unknown,
-    contentType?: string,
-    apiVersion: string = AzureDevOpsWebApiClient.API_VERSION,
-  ) {
-    const fullUrl = `${url}?api-version=${apiVersion}`;
-    return await sendRestApiRequestWithRetry(
-      'PATCH',
-      fullUrl,
-      data,
-      async () => {
-        return await fetch(fullUrl, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': contentType || 'application/json',
-            Authorization: `Basic ${Buffer.from(`:${this.accessToken}`).toString('base64')}`,
+        ],
+        beforeRetry: [
+          async ({ request, options, error, retryCount }) => {
+            if (this.debug && isHTTPError(error)) {
+              logger.debug(`⏳ Retrying failed request with status code: ${error.response.status}`);
+            }
           },
-          body: JSON.stringify(data),
-        });
+        ],
       },
-      this.debug,
-    );
+      retry: {
+        limit: 3,
+        delay: (attempt) => 3000, // all attempts after 3 seconds
+      },
+    });
   }
 }
 
@@ -797,65 +856,4 @@ function mergeCommitMessage(id: number, title: string, description: string): str
 function isGuid(guid: string): boolean {
   const regex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
   return regex.test(guid);
-}
-
-function getIdentityApiUrl(organisationApiUrl: string): string {
-  const uri = new URL(organisationApiUrl);
-  const hostname = uri.hostname.toLowerCase();
-
-  // If the organisation is hosted on Azure DevOps, use the 'vssps.dev.azure.com' domain
-  if (hostname === 'dev.azure.com' || hostname.endsWith('.visualstudio.com')) {
-    uri.host = 'vssps.dev.azure.com';
-  }
-  return uri.toString();
-}
-
-export async function sendRestApiRequestWithRetry(
-  method: string,
-  url: string,
-  payload: unknown,
-  requestAsync: () => Promise<Response>,
-  isDebug: boolean = false,
-  retryCount: number = 3,
-  retryDelay: number = 3000,
-) {
-  let body: string | undefined;
-  try {
-    // Send the request, ready the response
-    if (isDebug) logger.debug(`🌎 🠊 [${method}] ${url}`);
-    const response = await requestAsync();
-    body = await response.text();
-    const { status: statusCode, statusText: statusMessage } = response;
-    if (isDebug) logger.debug(`🌎 🠈 [${statusCode}] ${statusMessage}`);
-
-    // Check that the request was successful
-    if (statusCode < 200 || statusCode > 299) {
-      throw new HttpRequestError(`HTTP ${method} '${url}' failed: ${statusCode} ${statusMessage}`, statusCode);
-    }
-
-    // Parse the response
-    return JSON.parse(body);
-  } catch (e) {
-    const err = e as Error;
-    // Retry the request if the error is a temporary failure
-    if (retryCount > 1 && isErrorTemporaryFailure(err)) {
-      logger.warn(err.message);
-      if (isDebug) logger.debug(`⏳ Retrying request in ${retryDelay}ms...`);
-      await new Promise((resolve) => setTimeout(resolve, retryDelay));
-      return sendRestApiRequestWithRetry(method, url, payload, requestAsync, isDebug, retryCount - 1, retryDelay);
-    }
-
-    // In debug mode, log the error, request, and response for debugging
-    if (isDebug) {
-      if (payload) {
-        logger.debug(`REQUEST: ${JSON.stringify(payload)}`);
-      }
-      if (body) {
-        logger.debug(`RESPONSE: ${body}`);
-      }
-    }
-
-    logger.trace(`THROW${e}`);
-    throw e;
-  }
 }

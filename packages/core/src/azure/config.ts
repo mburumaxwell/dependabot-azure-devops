@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import * as path from 'node:path';
+import ky from 'ky';
 
 import {
   type DependabotConfig,
@@ -55,11 +56,13 @@ export async function getDependabotConfig({
 
       try {
         const authHeader = `Basic ${Buffer.from(`x-access-token:${token}`).toString('base64')}`;
-        const response = await fetch(requestUrl, {
+        const response = await ky.get(requestUrl, {
           headers: {
             Authorization: authHeader,
             Accept: '*/*', // Gotcha!!! without this SH*T fails terribly
           },
+          // 401, 403 and 404 are handled explicitly
+          throwHttpErrors: (status) => ![401, 403, 404].includes(status),
         });
         if (response.ok) {
           logger.debug(`Found configuration file at '${requestUrl}'`);

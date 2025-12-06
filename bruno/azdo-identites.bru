@@ -1,0 +1,27 @@
+meta {
+  name: azdo-identities
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://vssps.dev.azure.com/tingle/_apis/identities?api-version=5.0&searchFilter=General&filterValue={{username-or-email-or-group-name}}&queryMembership=None
+  body: none
+  auth: basic
+}
+
+params:query {
+  api-version: 5.0
+  searchFilter: General
+  filterValue: {{username-or-email-or-group-name}}
+  queryMembership: None
+}
+
+auth:basic {
+  username: 
+  password: {{AZURE_DEVOPS_PAT}}
+}
+
+vars:pre-request {
+  username-or-email-or-group-name: dependabot@paklo.app
+}

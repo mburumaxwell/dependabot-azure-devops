@@ -7,7 +7,6 @@ export default defineConfig({
   sourcemap: true,
   entry: [
     // base
-    'src/http/index.ts',
     'src/hono.ts',
     'src/keygen.ts',
     'src/logger.ts',

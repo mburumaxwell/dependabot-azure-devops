@@ -1,4 +1,8 @@
-import { type AzureDevOpsRepositoryUrl, extractRepositoryUrl } from '@paklo/core/azure';
+import {
+  type AzdoPullRequestMergeStrategy,
+  type AzureDevOpsRepositoryUrl,
+  extractRepositoryUrl,
+} from '@paklo/core/azure';
 import { DEFAULT_EXPERIMENTS, type DependabotExperiments, parseExperiments } from '@paklo/core/dependabot';
 import * as tl from 'azure-pipelines-task-lib/task';
 import { setSecrets } from '../formatting';
@@ -22,7 +26,7 @@ export type TaskInputs = {
   /** Determines if the pull requests that dependabot creates should have auto complete set */
   setAutoComplete: boolean;
   /** Merge strategies which can be used to complete a pull request */
-  mergeStrategy?: string;
+  mergeStrategy?: AzdoPullRequestMergeStrategy;
   /** List of any policy configuration Id's which auto-complete should not wait for */
   autoCompleteIgnoreConfigIds: number[];
 
@@ -93,7 +97,7 @@ export function getTaskInputs(): TaskInputs {
 
   // Prepare variables for auto complete
   const setAutoComplete = tl.getBoolInput('setAutoComplete', false);
-  const mergeStrategy = tl.getInput('mergeStrategy', true);
+  const mergeStrategy = tl.getInput('mergeStrategy', true) as AzdoPullRequestMergeStrategy | undefined;
   const autoCompleteIgnoreConfigIds = tl.getDelimitedInput('autoCompleteIgnoreConfigIds', ';', false).map(Number);
 
   // Prepare variables for auto approve

@@ -11,6 +11,7 @@ describe('extractRepositoryUrl', () => {
     });
     expect(url.hostname).toBe('dev.azure.com');
     expect(url['api-endpoint']).toBe('https://dev.azure.com/');
+    expect(url['identity-api-url']).toEqual(new URL('https://vssps.dev.azure.com/contoso/'));
     expect(url.project).toBe('prj1');
     expect(url.repository).toBe('repo1');
     expect(url['repository-slug']).toBe('contoso/prj1/_git/repo1');
@@ -24,6 +25,7 @@ describe('extractRepositoryUrl', () => {
     });
     expect(url.hostname).toBe('dev.azure.com');
     expect(url['api-endpoint']).toBe('https://dev.azure.com/');
+    expect(url['identity-api-url']).toEqual(new URL('https://vssps.dev.azure.com/contoso/'));
     expect(url.project).toBe('prj1');
     expect(url.repository).toBe('repo1');
     expect(url['repository-slug']).toBe('contoso/prj1/_git/repo1');
@@ -37,6 +39,7 @@ describe('extractRepositoryUrl', () => {
     });
     expect(url.hostname).toBe('server.domain.com');
     expect(url['api-endpoint']).toBe('https://server.domain.com/tfs/');
+    expect(url['identity-api-url']).toEqual(new URL('https://server.domain.com/tfs/contoso/'));
     expect(url.project).toBe('prj1');
     expect(url.repository).toBe('repo1');
     expect(url['repository-slug']).toBe('tfs/contoso/prj1/_git/repo1');

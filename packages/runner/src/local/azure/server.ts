@@ -1,7 +1,7 @@
 import type { AzureDevOpsRepositoryUrl, AzureDevOpsWebApiClient, IPullRequestProperties } from '@paklo/core/azure';
 import {
+  type AzdoPullRequestMergeStrategy,
   buildPullRequestProperties,
-  GitPullRequestMergeStrategy,
   getPullRequestChangedFilesForOutputData,
   getPullRequestCloseReasonForOutputData,
   getPullRequestDependenciesPropertyValueForOutputData,
@@ -19,7 +19,7 @@ export type AzureLocalDependabotServerOptions = LocalDependabotServerOptions & {
   autoApprove: boolean;
   approverClient?: AzureDevOpsWebApiClient;
   setAutoComplete: boolean;
-  mergeStrategy?: string;
+  mergeStrategy?: AzdoPullRequestMergeStrategy;
   autoCompleteIgnoreConfigIds: number[];
   existingBranchNames: string[] | undefined;
   existingPullRequests: IPullRequestProperties[];
@@ -139,20 +139,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           autoComplete: setAutoComplete
             ? {
                 ignorePolicyConfigIds: autoCompleteIgnoreConfigIds,
-                mergeStrategy: (() => {
-                  switch (mergeStrategy) {
-                    case 'noFastForward':
-                      return GitPullRequestMergeStrategy.NoFastForward;
-                    case 'squash':
-                      return GitPullRequestMergeStrategy.Squash;
-                    case 'rebase':
-                      return GitPullRequestMergeStrategy.Rebase;
-                    case 'rebaseMerge':
-                      return GitPullRequestMergeStrategy.RebaseMerge;
-                    default:
-                      return GitPullRequestMergeStrategy.Squash;
-                  }
-                })(),
+                mergeStrategy: mergeStrategy ?? 'squash',
               }
             : undefined,
           assignees: update.assignees,

@@ -1,19 +1,11 @@
-import type { DependabotMetric, DependabotRecordUpdateJobError } from '@paklo/core/dependabot';
-import {
-  type DependabotCredential,
-  DependabotCredentialSchema,
-  type DependabotJobConfig,
-  DependabotJobConfigSchema,
+import type {
+  DependabotCredential,
+  DependabotJobConfig,
+  DependabotMetric,
+  DependabotRecordUpdateJobError,
 } from '@paklo/core/dependabot';
-import {
-  HEADER_NAME_AUTHORIZATION,
-  HttpRequestError,
-  type InnerApiClient,
-  type InnerRequestOptions,
-  isErrorTemporaryFailure,
-  type ResourceResponse,
-} from '@paklo/core/http';
 import { logger } from '@paklo/core/logger';
+import { isHTTPError, type KyInstance, type KyResponse } from 'ky';
 import type { JobParameters } from './params';
 
 export class JobDetailsFetchingError extends Error {}
@@ -21,14 +13,18 @@ export class CredentialFetchingError extends Error {}
 export type SecretMasker = (value: string) => void;
 
 export class ApiClient {
+  private dependabotApiUrl: string;
   private jobToken: string;
   constructor(
-    private readonly client: InnerApiClient,
+    private readonly client: KyInstance,
     readonly params: JobParameters,
     jobToken: string,
     private readonly credentialsToken: string,
     private readonly secretMasker: SecretMasker,
   ) {
+    // if dependabotApiUrl contains "host.docker.internal", we need to replace it with "localhost" for local calls
+    const baseUrl = params.dependabotApiUrl.replace('host.docker.internal', 'localhost');
+    this.dependabotApiUrl = baseUrl;
     this.jobToken = jobToken;
   }
 
@@ -44,28 +40,26 @@ export class ApiClient {
   }
 
   async getJobDetails(): Promise<DependabotJobConfig> {
+    const detailsURL = `${this.dependabotApiUrl}/update_jobs/${this.params.jobId}/details`;
     try {
-      const res = await this.getWithRetry<DependabotJobConfig>(
-        `/update_jobs/${this.params.jobId}/details`,
-        this.jobToken,
-        { schema: DependabotJobConfigSchema },
-      );
+      const res = await this.getWithRetry<DependabotJobConfig>(detailsURL, this.jobToken);
       if (res.status !== 200) {
         throw new JobDetailsFetchingError(
-          `fetching job details: unexpected status code: ${res.status}: ${JSON.stringify(res.error)}`,
+          `fetching job details: unexpected status code: ${res.status}: ${JSON.stringify(await res.json())}`,
         );
       }
-      if (!res.data) {
+      const data = await res.json();
+      if (!data) {
         throw new JobDetailsFetchingError(`fetching job details: missing response`);
       }
 
-      return res.data;
+      return data;
     } catch (error) {
       if (error instanceof JobDetailsFetchingError) {
         throw error;
-      } else if (error instanceof HttpRequestError) {
+      } else if (isHTTPError(error)) {
         throw new JobDetailsFetchingError(
-          `fetching job details: unexpected status code: ${error.code}: ${error.message}`,
+          `fetching job details: unexpected status code: ${error.response.status}: ${error.message}`,
         );
       } else if (error instanceof Error) {
         throw new JobDetailsFetchingError(`fetching job details: ${error.name}: ${error.message}`);
@@ -75,24 +69,22 @@ export class ApiClient {
   }
 
   async getCredentials(): Promise<DependabotCredential[]> {
+    const credentialsURL = `${this.dependabotApiUrl}/update_jobs/${this.params.jobId}/credentials`;
     try {
-      const res = await this.getWithRetry<DependabotCredential[]>(
-        `/update_jobs/${this.params.jobId}/credentials`,
-        this.credentialsToken,
-        { schema: DependabotCredentialSchema.array() },
-      );
+      const res = await this.getWithRetry<DependabotCredential[]>(credentialsURL, this.credentialsToken);
 
       if (res.status !== 200) {
         throw new CredentialFetchingError(
-          `fetching credentials: unexpected status code: ${res.status}: ${JSON.stringify(res.error)}`,
+          `fetching credentials: unexpected status code: ${res.status}: ${JSON.stringify(await res.json())}`,
         );
       }
-      if (!res.data) {
+      const data = await res.json();
+      if (!data) {
         throw new CredentialFetchingError(`fetching credentials: missing response`);
       }
 
       // Mask any secrets we've just retrieved from environment logs
-      for (const credential of res.data) {
+      for (const credential of data) {
         if (credential.password) {
           this.secretMasker(credential.password);
         }
@@ -104,13 +96,13 @@ export class ApiClient {
         }
       }
 
-      return res.data;
+      return data;
     } catch (error: unknown) {
       if (error instanceof CredentialFetchingError) {
         throw error;
-      } else if (error instanceof HttpRequestError) {
+      } else if (isHTTPError(error)) {
         throw new CredentialFetchingError(
-          `fetching credentials: unexpected status code: ${error.code}: ${error.message}`,
+          `fetching credentials: unexpected status code: ${error.response.status}: ${error.message}`,
         );
       } else if (error instanceof Error) {
         throw new CredentialFetchingError(`fetching credentials: ${error.name}: ${error.message}`);
@@ -120,11 +112,10 @@ export class ApiClient {
   }
 
   async reportJobError(error: DependabotRecordUpdateJobError): Promise<void> {
-    const res = await this.client.post(`/update_jobs/${this.params.jobId}/record_update_job_error`, {
-      payload: error,
-      headers: {
-        [HEADER_NAME_AUTHORIZATION]: this.jobToken,
-      },
+    const recordErrorURL = `${this.dependabotApiUrl}/update_jobs/${this.params.jobId}/record_update_job_error`;
+    const res = await this.client.post(recordErrorURL, {
+      json: error,
+      headers: { Authorization: this.jobToken },
     });
     if (res.status !== 204) {
       throw new Error(`Unexpected status code: ${res.status}`);
@@ -132,11 +123,10 @@ export class ApiClient {
   }
 
   async markJobAsProcessed(): Promise<void> {
-    const res = await this.client.patch(`/update_jobs/${this.params.jobId}/mark_as_processed`, {
-      payload: this.UnknownSha,
-      headers: {
-        [HEADER_NAME_AUTHORIZATION]: this.jobToken,
-      },
+    const markAsProcessedURL = `${this.dependabotApiUrl}/update_jobs/${this.params.jobId}/mark_as_processed`;
+    const res = await this.client.patch(markAsProcessedURL, {
+      json: this.UnknownSha,
+      headers: { Authorization: this.jobToken },
     });
     if (res.status !== 204) {
       throw new Error(`Unexpected status code: ${res.status}`);
@@ -167,11 +157,10 @@ export class ApiClient {
   }
 
   async reportMetrics(metrics: DependabotMetric[]): Promise<void> {
-    const res = await this.client.post(`/update_jobs/${this.params.jobId}/record_metrics`, {
-      payload: { data: metrics },
-      headers: {
-        [HEADER_NAME_AUTHORIZATION]: this.jobToken,
-      },
+    const metricsURL = `${this.dependabotApiUrl}/update_jobs/${this.params.jobId}/record_metrics`;
+    const res = await this.client.post(metricsURL, {
+      json: { data: metrics },
+      headers: { Authorization: this.jobToken },
     });
 
     if (res.status !== 204) {
@@ -179,41 +168,31 @@ export class ApiClient {
     }
   }
 
-  private async getWithRetry<T>(
-    url: string,
-    token: string,
-    options?: Omit<InnerRequestOptions<T>, 'headers'>,
-  ): Promise<ResourceResponse<T>> {
-    let attempt = 1;
-    const delayMs = 1000 * 2 ** attempt;
+  private async getWithRetry<T>(url: string, token: string, options?: RequestInit): Promise<KyResponse<T>> {
+    const execute = async (): Promise<KyResponse<T>> => {
+      const res = await this.client.get<T>(url, {
+        headers: { Authorization: token },
+        retry: {
+          limit: 3,
+          // other default options are sufficient:
+          // https://github.com/sindresorhus/ky#retry
+          // delay: attemptCount => 0.3 * (2 ** (attemptCount - 1)) * 1000
+          // statusCodes: 408 413 429 500 502 503 504
+          // afterStatusCodes: 413, 429, 503
+        },
+        hooks: {
+          beforeRetry: [
+            async ({ request, options, error, retryCount }) => {
+              if (isHTTPError(error)) {
+                logger.warn(`Retrying failed request with status code: ${error.response.status}`);
+              }
+            },
+          ],
+        },
+        ...options,
+      });
 
-    const execute = async (): Promise<ResourceResponse<T>> => {
-      try {
-        const res = await this.client.get<T>(url, {
-          headers: { Authorization: token },
-          ...options,
-        });
-
-        // Check that the request was successful
-        const { status, statusText } = res;
-        if (status < 200 || status > 299) {
-          throw new HttpRequestError(`HTTP GET '${url}' failed: ${status} ${statusText}`, status);
-        }
-
-        return res;
-      } catch (e) {
-        const error = e as Error;
-
-        if (isErrorTemporaryFailure(error)) {
-          if (attempt >= 3) throw error;
-          logger.warn(`Retrying failed request in ${delayMs}ms...`);
-          await new Promise((resolve) => setTimeout(resolve, delayMs));
-
-          attempt++;
-          return execute();
-        }
-        throw error;
-      }
+      return res;
     };
 
     return execute();

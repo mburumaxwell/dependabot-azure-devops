@@ -2,7 +2,12 @@ import fs from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { stdin, stdout } from 'node:process';
 import readline from 'node:readline/promises';
-import { extractRepositoryUrl, getDependabotConfig } from '@paklo/core/azure';
+import {
+  AZDO_PULL_REQUEST_MERGE_STRATEGIES,
+  AzdoPullRequestMergeStrategySchema,
+  extractRepositoryUrl,
+  getDependabotConfig,
+} from '@paklo/core/azure';
 import {
   DEFAULT_EXPERIMENTS,
   DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
@@ -16,7 +21,6 @@ import { Command, Option } from 'commander';
 import { z } from 'zod';
 import { type HandlerOptions, handlerOptions } from './base';
 
-const MERGE_STRATEGIES = ['squash', 'rebase', 'merge'] as const;
 const COMMANDS = ['graph', 'version', 'recreate'] as const;
 const schema = z.object({
   organisationUrl: z.string(),
@@ -32,7 +36,7 @@ const schema = z.object({
   autoApprove: z.boolean(),
   autoApproveToken: z.string().optional(),
   setAutoComplete: z.boolean(),
-  mergeStrategy: z.enum(MERGE_STRATEGIES),
+  mergeStrategy: AzdoPullRequestMergeStrategySchema,
   autoCompleteIgnoreConfigIds: z.coerce.number().array(),
   authorName: z.string(),
   authorEmail: z.email(),
@@ -191,7 +195,7 @@ export const command = new Command('run')
       '--merge-strategy <MERGE-STRATEGY>',
       'The merge strategy to use when auto-completing pull requests. Only applies if --set-auto-complete is set.',
     )
-      .choices(MERGE_STRATEGIES)
+      .choices(AZDO_PULL_REQUEST_MERGE_STRATEGIES)
       .default('squash'),
   )
   .option(

@@ -2,11 +2,11 @@ import crypto from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import os from 'node:os';
-
-import { InnerApiClient } from '@paklo/core/http';
 import { logger } from '@paklo/core/logger';
 import type { UsageTelemetryRequestData } from '@paklo/core/usage';
+import ky from 'ky';
 import { z } from 'zod';
+
 import packageJson from '../package.json';
 import { ApiClient, CredentialFetchingError, type SecretMasker } from './api-client';
 import { PROXY_IMAGE_NAME, updaterImageName } from './docker-tags';
@@ -45,9 +45,7 @@ export async function runJob(options: RunJobOptions): Promise<RunJobResult> {
       updaterImage: options.updaterImage,
     })!;
 
-    // if dependabotApiUrl contains "host.docker.internal", we need to replace it with "localhost" for local calls
-    const baseUrl = dependabotApiUrl.replace('host.docker.internal', 'localhost');
-    const client = new InnerApiClient({ baseUrl });
+    const client = ky.create({ headers: { 'User-Agent': `paklo-runner/${packageJson.version}` } });
     const apiClient = new ApiClient(client, params, jobToken, credentialsToken, secretMasker);
 
     // If we fail to succeed in fetching the job details, we cannot be sure the job has entered a 'processing' state,
@@ -132,8 +130,7 @@ export async function runJob(options: RunJobOptions): Promise<RunJobResult> {
     try {
       const json = JSON.stringify(data);
       logger.debug(`Usage telemetry data: ${json}`);
-      const resp = await fetch('https://www.paklo.app/api/usage-telemetry', {
-        method: 'POST',
+      const resp = await ky.post('https://www.paklo.app/api/usage-telemetry', {
         headers: { 'Content-Type': 'application/json' },
         body: json,
       });

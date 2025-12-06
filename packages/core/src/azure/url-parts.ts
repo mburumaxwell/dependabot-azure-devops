@@ -13,6 +13,12 @@ export type AzureDevOpsOrganizationUrl = {
 
   /** Virtual directory if present (on-premises only) */
   'virtual-directory'?: string;
+
+  /**
+   * Organization Identity API URL (different from the API endpoint).
+   * Used for querying user identities.
+   */
+  'identity-api-url': URL;
 };
 
 export type AzureDevOpsProjectUrl = AzureDevOpsOrganizationUrl & {
@@ -41,12 +47,21 @@ export function extractOrganizationUrl({ organisationUrl }: { organisationUrl: s
   const virtualDirectory = extractVirtualDirectory(value);
   const apiEndpoint = `${protocol}://${hostname}${value.port ? `:${value.port}` : ''}/${virtualDirectory ? `${virtualDirectory}/` : ''}`;
 
+  // determine identity api url
+  // if hosted on Azure DevOps, use the 'vssps.dev.azure.com' domain
+  const identityApiUrl =
+    hostname === 'dev.azure.com' || hostname.endsWith('.visualstudio.com')
+      ? // https://learn.microsoft.com/en-us/rest/api/azure/devops/ims/identities/read-identities
+        new URL(`https://vssps.dev.azure.com/${organisation}/`)
+      : value;
+
   return {
     value,
     hostname,
     'api-endpoint': apiEndpoint,
     organisation,
     'virtual-directory': virtualDirectory,
+    'identity-api-url': identityApiUrl,
   };
 }
 

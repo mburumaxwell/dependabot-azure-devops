@@ -16,7 +16,7 @@ import {
   type IFileChange,
   type IPullRequestProperties,
 } from './models';
-import { VersionControlChangeType } from './types';
+import type { AzdoVersionControlChangeType } from './types';
 
 export function normalizeFilePath(path: string): string {
   // Convert backslashes to forward slashes, convert './' => '/' and ensure the path starts with a forward slash if it doesn't already, this is how DevOps paths are formatted
@@ -26,6 +26,8 @@ export function normalizeFilePath(path: string): string {
     ?.replace(/^([^/])/, '/$1');
 }
 
+export function normalizeBranchName(branch: string): string;
+export function normalizeBranchName(branch?: string): string | undefined;
 export function normalizeBranchName(branch?: string): string | undefined {
   // Strip the 'refs/heads/' prefix from the branch name, if present
   return branch?.replace(/^refs\/heads\//i, '');
@@ -108,13 +110,13 @@ export function getPullRequestChangedFilesForOutputData(
   return data['updated-dependency-files']
     .filter((file) => file.type === 'file')
     .map((file) => {
-      let changeType = VersionControlChangeType.None;
+      let changeType: AzdoVersionControlChangeType = 'none';
       if (file.deleted === true || file.operation === 'delete') {
-        changeType = VersionControlChangeType.Delete;
+        changeType = 'delete';
       } else if (file.operation === 'update') {
-        changeType = VersionControlChangeType.Edit;
+        changeType = 'edit';
       } else {
-        changeType = VersionControlChangeType.Add;
+        changeType = 'add';
       }
       return {
         changeType: changeType,
