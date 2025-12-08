@@ -1,5 +1,24 @@
 # paklo
 
+## 0.15.0
+
+### Minor Changes
+
+- e9b5d09: Rectify merge strategy options available
+
+### Patch Changes
+
+- Updated dependencies [e9b5d09]
+- Updated dependencies [9a4f3ea]
+- Updated dependencies [0fe301e]
+- Updated dependencies [e9d5ad2]
+- Updated dependencies [128bd4e]
+- Updated dependencies [abf1f0e]
+- Updated dependencies [e9b5d09]
+- Updated dependencies [e9b5d09]
+  - @paklo/core@0.9.0
+  - @paklo/runner@0.7.0
+
 ## 0.14.0
 
 ### Minor Changes

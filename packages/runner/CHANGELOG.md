@@ -1,5 +1,24 @@
 # @paklo/runner
 
+## 0.7.0
+
+### Minor Changes
+
+- e9b5d09: Make use of ky instaed of direct fetch to improve retries and remove own HTTP client implementation
+
+### Patch Changes
+
+- 9a4f3ea: Expose constants and helper functions from runner that are needed by web
+- 0fe301e: No longer expose random gen for job id, move it closer to where in use
+- e9d5ad2: Bump the dependabot-core-images (29 updates) to from various versions to `v2.0.20251207232046`
+- 128bd4e: Bump github/dependabot-update-job-proxy/dependabot-update-job-proxy from v2.0.20251124194534 to v2.0.20251202213123
+- Updated dependencies [e9b5d09]
+- Updated dependencies [0fe301e]
+- Updated dependencies [abf1f0e]
+- Updated dependencies [e9b5d09]
+- Updated dependencies [e9b5d09]
+  - @paklo/core@0.9.0
+
 ## 0.6.0
 
 ### Minor Changes
