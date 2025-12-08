@@ -110,7 +110,7 @@
   },
   "devDependencies": {
     "@better-auth/cli": "1.4.5",
-    "@react-email/preview-server": "5.0.5",
+    "@react-email/preview-server": "5.0.6",
     "@tailwindcss/postcss": "4.1.17",
     "@types/mdx": "2.0.13",
     "@types/node": "24.10.1",
@@ -122,7 +122,7 @@
     "dotenv-flow": "4.1.0",
     "postcss": "8.5.6",
     "prisma": "6.19.0",
-    "react-email": "5.0.5",
+    "react-email": "5.0.6",
     "remark-directive": "4.0.0",
     "remark-emoji": "5.0.2",
     "shadcn": "3.5.1",
