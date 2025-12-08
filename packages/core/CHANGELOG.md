@@ -1,5 +1,18 @@
 # @paklo/core
 
+## 0.9.0
+
+### Minor Changes
+
+- e9b5d09: Extract and hence test functionality to get identity API url
+- e9b5d09: Improve azure client request/response types with zod (schema valiation in the future)
+- e9b5d09: Make use of ky instaed of direct fetch to improve retries and remove own HTTP client implementation
+
+### Patch Changes
+
+- 0fe301e: No longer expose random gen for job id, move it closer to where in use
+- abf1f0e: Fix log level filtering with pino's multistream
+
 ## 0.8.0
 
 ### Minor Changes
