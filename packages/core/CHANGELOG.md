@@ -5,8 +5,8 @@
 ### Minor Changes
 
 - e9b5d09: Extract and hence test functionality to get identity API url
-- e9b5d09: Improve azure client request/response types with zod (schema valiation in the future)
-- e9b5d09: Make use of ky instaed of direct fetch to improve retries and remove own HTTP client implementation
+- e9b5d09: Improve azure client request/response types with zod (schema validation in the future)
+- e9b5d09: Make use of ky instead of direct fetch to improve retries and remove own HTTP client implementation
 
 ### Patch Changes
 

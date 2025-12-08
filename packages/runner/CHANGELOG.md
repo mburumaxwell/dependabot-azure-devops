@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- e9b5d09: Make use of ky instaed of direct fetch to improve retries and remove own HTTP client implementation
+- e9b5d09: Make use of ky instead of direct fetch to improve retries and remove own HTTP client implementation
 
 ### Patch Changes
 
