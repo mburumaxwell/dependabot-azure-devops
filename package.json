@@ -33,7 +33,7 @@
     "@changesets/cli": "2.29.8",
     "husky": "9.1.7",
     "rimraf": "6.1.2",
-    "turbo": "2.6.2",
+    "turbo": "2.6.3",
     "typescript": "5.9.3",
     "vite": "7.2.6",
     "vite-tsconfig-paths": "5.1.4",
