@@ -42,7 +42,7 @@
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "pnpm@10.13.1",
+  "packageManager": "pnpm@10.24.0",
   "pnpm": {
     "overrides": {
       "@workflow/world-local>undici": "~6.21.2",
