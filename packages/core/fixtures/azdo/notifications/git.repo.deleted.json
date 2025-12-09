@@ -1,0 +1,40 @@
+{
+  "subscriptionId": "435e539d-3ce2-4283-8da9-8f3c0fe2e45e",
+  "notificationId": 3,
+  "id": "a0a0a0a0-bbbb-cccc-dddd-e1e1e1e1e1e1",
+  "eventType": "git.repo.deleted",
+  "publisherId": "tfs",
+  "resource": {
+    "project": {
+      "id": "00aa00aa-bb11-cc22-dd33-44ee44ee44ee",
+      "name": "Contoso",
+      "url": "https://fabrikam-fiber-inc.visualstudio.com/DefaultCollection/_apis/projects/00aa00aa-bb11-cc22-dd33-44ee44ee44ee",
+      "state": "wellFormed",
+      "revision": 11,
+      "visibility": "private",
+      "lastUpdateTime": "2025-06-12T20:33:32.4370396+00:00"
+    },
+    "repositoryId": "c2c2c2c2-dddd-eeee-ffff-a3a3a3a3a3a3",
+    "repositoryName": "Fabrikam-Fiber-Git",
+    "isHardDelete": false,
+    "initiatedBy": {
+      "displayName": "Himani Maharjan",
+      "id": "d3d3d3d3-eeee-ffff-aaaa-b4b4b4b4b4b4",
+      "uniqueName": "himani@fabrikamfiber.com"
+    },
+    "utcTimestamp": "2022-12-12T12:34:56.5498459Z"
+  },
+  "resourceVersion": "1.0-preview.1",
+  "resourceContainers": {
+    "collection": {
+      "id": "b1b1b1b1-cccc-dddd-eeee-f2f2f2f2f2f2"
+    },
+    "account": {
+      "id": "bbbb1b1b-cc2c-dd3d-ee4e-ffffff5f5f5f"
+    },
+    "project": {
+      "id": "00aa00aa-bb11-cc22-dd33-44ee44ee44ee"
+    }
+  },
+  "createdDate": "2025-06-12T20:33:32.512Z"
+}

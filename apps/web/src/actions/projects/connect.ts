@@ -51,5 +51,13 @@ export async function connectProjects({
     });
   }
 
+  // create service hooks on azure
+  if (organization.type === 'azure') {
+    const created = await prisma.project.findMany({ where: { id: { in: projectIds } } });
+    for (const _project of created) {
+      // TODO: implement service hook creation
+    }
+  }
+
   return result.count;
 }

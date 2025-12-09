@@ -91,6 +91,7 @@ export type AzdoIdentity = z.infer<typeof AzdoIdentitySchema>;
 export const AzdoIdentityRefSchema = z.object({
   id: z.string().optional(),
   displayName: z.string().optional(),
+  uniqueName: z.string().optional(),
   url: z.string().optional(),
 });
 export type AzdoIdentityRef = z.infer<typeof AzdoIdentityRefSchema>;
@@ -134,7 +135,7 @@ export const AzdoGitCommitRefSchema = z.object({
   commitId: z.string().optional(),
   author: AzdoGitUserDateSchema.optional(),
   committer: AzdoGitUserDateSchema.optional(),
-  changes: AzdoGitChangeSchema.array(),
+  changes: AzdoGitChangeSchema.array().optional(),
 });
 export type AzdoGitCommitRef = z.infer<typeof AzdoGitCommitRefSchema>;
 export const AzdoGitPushSchema = z.object({
@@ -212,7 +213,7 @@ export const AzdoPullRequestCommentSchema = z.object({
   content: z.string(),
   commentType: AzdoCommentTypeSchema,
   publishedDate: z.string(),
-  author: AzdoIdentityRefSchema.optional(),
+  author: AzdoIdentityRefSchema,
 });
 export type AzdoPullRequestComment = z.infer<typeof AzdoPullRequestCommentSchema>;
 export const AzdoPullRequestCommentThreadSchema = z.object({
@@ -265,68 +266,3 @@ export const AzdoSubscriptionsQuerySchema = z.object({
   subscriberId: z.string().optional(),
 });
 export type AzdoSubscriptionsQuery = z.infer<typeof AzdoSubscriptionsQuerySchema>;
-
-export const AzdoEventTypeSchema = z.enum([
-  // Code is pushed to a Git repository.
-  'git.push',
-  // Pull request is updated – status, review list, reviewer vote
-  // changed or the source branch is updated with a push.
-  'git.pullrequest.updated',
-  // Pull request - Branch merge attempted.
-  'git.pullrequest.merged',
-  // Comments are added to a pull request.
-  'ms.vss-code.git-pullrequest-comment-event',
-]);
-export type AzdoEventType = z.infer<typeof AzdoEventTypeSchema>;
-
-export const AzdoEventRepositorySchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  project: z.object({
-    id: z.string(),
-    name: z.string(),
-    url: z.string(),
-  }),
-  defaultBranch: z.string().optional(),
-  remoteUrl: z.string(),
-});
-export const AzdoEventPullRequestResourceSchema = z.object({
-  repository: AzdoEventRepositorySchema,
-  pullRequestId: z.number(),
-  status: AzdoPullRequestStatusSchema,
-  title: z.string(),
-  sourceRefName: z.string(),
-  targetRefName: z.string(),
-  mergeStatus: AzdoPullRequestAsyncStatusSchema,
-  mergeId: z.string(),
-  url: z.string(),
-});
-export type AzdoEventPullRequestResource = z.infer<typeof AzdoEventPullRequestResourceSchema>;
-export const AzdoEventPullRequestCommentEventResourceSchema = z.object({
-  pullRequest: AzdoEventPullRequestResourceSchema,
-  comment: AzdoPullRequestCommentSchema,
-});
-export type AzdoEventPullRequestCommentEventResource = z.infer<typeof AzdoEventPullRequestCommentEventResourceSchema>;
-export const AzdoEventCodePushResourceSchema = z.object({
-  repository: AzdoEventRepositorySchema,
-  refUpdates: z
-    .object({
-      name: z.string(),
-      oldObjectId: z.string().nullish(),
-      newObjectId: z.string().nullish(),
-    })
-    .array(),
-});
-export type AzdoEventCodePushResource = z.infer<typeof AzdoEventCodePushResourceSchema>;
-export const AzdoEventSchema = z.object({ subscriptionId: z.string(), notificationId: z.number() }).and(
-  z.discriminatedUnion('eventType', [
-    z.object({ eventType: z.literal('git.push'), resource: AzdoEventCodePushResourceSchema }),
-    z.object({ eventType: z.literal('git.pullrequest.updated'), resource: AzdoEventPullRequestResourceSchema }),
-    z.object({ eventType: z.literal('git.pullrequest.merged'), resource: AzdoEventPullRequestResourceSchema }),
-    z.object({
-      eventType: z.literal('ms.vss-code.git-pullrequest-comment-event'),
-      resource: AzdoEventPullRequestCommentEventResourceSchema,
-    }),
-  ]),
-);
-export type AzdoEvent = z.infer<typeof AzdoEventSchema>;

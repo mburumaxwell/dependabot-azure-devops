@@ -85,8 +85,8 @@ model Verification {
 
 enum OrganizationType {
   azure
-  gitlab
   bitbucket
+  gitlab
 
   @@map("organization_type")
 }
@@ -271,8 +271,9 @@ model Project {
   synchronizedAt        DateTime?
   repositories          Repository[]
 
-  @@unique([organizationId, providerId])
   @@index([organizationId])
+  @@index([providerId])
+  @@index([organizationId, providerId])
   @@map("project")
 }
 
