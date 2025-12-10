@@ -56,12 +56,19 @@ export class AzureDevOpsClientWrapper {
   private authenticatedUserId?: string;
   private resolvedUserIds: Record<string, string> = {};
 
+  /**
+   * Create a new Azure DevOps client wrapper.
+   * @param url The Azure DevOps organization URL
+   * @param accessToken The personal access token for authentication
+   * @param debug Enable debug logging for API requests (default: false)
+   */
   constructor(url: AzureDevOpsOrganizationUrl, accessToken: string, debug: boolean = false) {
     this.client = new AzureDevOpsClient(url, accessToken, debug);
   }
 
   /**
    * Get the identity of the authenticated user.
+   * The result is cached after the first call to avoid repeated API requests.
    */
   public async getUserId(): Promise<string> {
     if (!this.authenticatedUserId) {
@@ -76,8 +83,11 @@ export class AzureDevOpsClientWrapper {
 
   /**
    * Get the identity id from a user name, email, or group name.
+   * Results are cached to avoid repeated API requests for the same identifier.
+   *
    * Requires scope "Identity (Read)" (vso.identity).
-   * @param identifier username, email, or group name
+   * @param identifier Username, email, or group name to resolve
+   * @returns The resolved identity ID, or undefined if not found or on error
    */
   public async resolveIdentityId(identifier: string): Promise<string | undefined> {
     if (this.resolvedUserIds[identifier]) {
@@ -99,7 +109,10 @@ export class AzureDevOpsClientWrapper {
 
   /**
    * Get the default branch for a repository.
+   *
    * Requires scope "Code (Read)" (vso.code).
+   * @param options Repository identification options (project and repository)
+   * @returns The normalized default branch name (e.g., "main"), or undefined if not found
    */
   public async getDefaultBranch(options: AzdoRepositoryOptions): Promise<string | undefined> {
     return normalizeBranchName(
@@ -109,7 +122,10 @@ export class AzureDevOpsClientWrapper {
 
   /**
    * Get the list of branch names for a repository.
+   *
    * Requires scope "Code (Read)" (vso.code).
+   * @param options Repository identification options (project and repository)
+   * @returns Array of normalized branch names, or undefined if not found
    */
   public async getBranchNames(options: AzdoRepositoryOptions): Promise<string[] | undefined> {
     return (await this.client.repositories.getRefs(options.project, options.repository))?.map((r) =>
@@ -118,8 +134,12 @@ export class AzureDevOpsClientWrapper {
   }
 
   /**
-   * Get the properties for all active pull request created by the supplied user.
+   * Get the properties for all active pull requests created by the specified user.
+   * This retrieves both the pull request IDs and their associated properties.
+   *
    * Requires scope "Code (Read)" (vso.code).
+   * @param options Repository identification options including the creator user ID
+   * @returns Array of pull request IDs with their properties, empty array on error
    */
   public async getActivePullRequestProperties({
     project,
@@ -146,9 +166,18 @@ export class AzureDevOpsClientWrapper {
   }
 
   /**
-   * Create a new pull request.
+   * Create a new pull request with the specified changes.
+   * This method performs the following operations:
+   * 1. Resolves assignee identities fo assignees (if specified)
+   * 2. Creates a new branch and pushes changes
+   * 3. Creates the pull request with assignees (optional reviewers), labels, and work items
+   * 4. Sets pull request properties for dependency metadata
+   * 5. Configures auto-complete options (if specified)
+   *
    * Requires scope "Code (Write)" (vso.code_write).
    * Requires scope "Identity (Read)" (vso.identity), if assignees are specified.
+   * @param options Pull request creation options including changes, assignees, and auto-complete settings
+   * @returns The created pull request ID, or null on error
    */
   public async createPullRequest(options: AzdoPullRequestCreateOptions): Promise<number | null> {
     logger.info(`Creating pull request '${options.title}'...`);
@@ -277,8 +306,16 @@ export class AzureDevOpsClientWrapper {
   }
 
   /**
-   * Update a pull request.
+   * Update an existing pull request with new changes.
+   * This method performs the following operations:
+   * 1. Validates the pull request hasn't been modified by another author
+   * 2. Checks if the source branch is behind the target branch
+   * 3. Rebases the target branch into the source branch if needed
+   * 4. Pushes the new changes to the source branch
+   *
    * Requires scope "Code (Read & Write)" (vso.code, vso.code_write).
+   * @param options Pull request update options including the commit and changes
+   * @returns True if successful, false on error
    */
   public async updatePullRequest(options: AzdoPullRequestUpdateOptions): Promise<boolean> {
     logger.info(`Updating pull request #${options.pullRequestId}...`);
@@ -388,8 +425,12 @@ export class AzureDevOpsClientWrapper {
   }
 
   /**
-   * Approve a pull request.
+   * Approve a pull request as the authenticated user.
+   * Sets the reviewer vote to 10 (approved).
+   *
    * Requires scope "Code (Write)" (vso.code_write).
+   * @param options Pull request identification options
+   * @returns True if successful, false on error
    */
   public async approvePullRequest(options: AzdoPullRequestOptions): Promise<boolean> {
     logger.info(`Approving pull request #${options.pullRequestId}...`);
@@ -417,8 +458,15 @@ export class AzureDevOpsClientWrapper {
   }
 
   /**
-   * Abandon a pull request.
+   * Abandon a pull request and optionally delete its source branch.
+   * This method performs the following operations:
+   * 1. Adds an optional comment explaining the abandonment reason
+   * 2. Sets the pull request status to abandoned
+   * 3. Deletes the source branch if requested
+   *
    * Requires scope "Code (Write)" (vso.code_write).
+   * @param options Pull request abandonment options including optional comment and branch deletion flag
+   * @returns True if successful, false on error
    */
   public async abandonPullRequest(options: AzdoPullRequestAbandonOptions): Promise<boolean> {
     logger.info(`Abandoning pull request #${options.pullRequestId}...`);
@@ -477,7 +525,11 @@ export class AzureDevOpsClientWrapper {
 
   /**
    * Add a comment thread on a pull request.
+   * The comment thread is created with a closed status and system comment type.
+   *
    * Requires scope "Code (Write)" (vso.code_write).
+   * @param options Comment creation options including content and optional user ID
+   * @returns The created thread ID, or undefined on error
    */
   public async addCommentThread(options: AzdoPullRequestCommentCreateOptions): Promise<number | undefined> {
     const userId = options.userId ?? (await this.getUserId());
@@ -499,6 +551,15 @@ export class AzureDevOpsClientWrapper {
     return thread?.id;
   }
 
+  /**
+   * Create or update webhook subscriptions for Azure DevOps events.
+   * This sets up subscriptions for various git events (push, pull request updates, repository changes, etc.)
+   * and ensures they are configured to send webhooks to the specified URL.
+   * Existing subscriptions matching the URL will be updated, otherwise new subscriptions are created.
+   *
+   * Requires scope "Service Hooks (Read & Write)" (vso.hooks_write).
+   * @returns Array of subscription IDs that were created or updated
+   */
   public async createOrUpdateHookSubscriptions({
     url,
     token,
