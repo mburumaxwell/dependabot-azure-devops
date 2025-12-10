@@ -4,4 +4,3 @@ export * from './credentials';
 export * from './delete';
 export * from './leave';
 export * from './secrets';
-export * from './webhooks';

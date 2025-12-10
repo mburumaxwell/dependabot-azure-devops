@@ -1,9 +1,12 @@
 'use server';
 
+import { AzureDevOpsClientWrapper, extractOrganizationUrl } from '@paklo/core/azure';
 import { requestSync } from '@/actions/sync';
 import { PakloId } from '@/lib/ids';
+import { logger } from '@/lib/logger';
 import { getOrganizationTierInfo } from '@/lib/organizations/tiers';
 import { prisma } from '@/lib/prisma';
+import { getWebhooksUrl, HEADER_NAME_ORGANIZATION, HEADER_NAME_PROJECT } from '@/lib/webhooks';
 import type { AvailableProject } from './available';
 
 export async function connectProjects({
@@ -53,9 +56,24 @@ export async function connectProjects({
 
   // create service hooks on azure
   if (organization.type === 'azure') {
+    const url = extractOrganizationUrl({ organisationUrl: organization.url });
+    const credential = await prisma.organizationCredential.findUniqueOrThrow({
+      where: { id: organizationId },
+    });
+    const client = new AzureDevOpsClientWrapper(url, credential.token);
     const created = await prisma.project.findMany({ where: { id: { in: projectIds } } });
-    for (const _project of created) {
-      // TODO: implement service hook creation
+    for (const project of created) {
+      logger.info(`Creating service hooks for project ${project.id} (${project.url})`);
+      await client.createOrUpdateHookSubscriptions({
+        url: getWebhooksUrl(organization),
+        headers: {
+          Authorization: credential.webhooksToken,
+          [HEADER_NAME_ORGANIZATION]: organizationId,
+          [HEADER_NAME_PROJECT]: project.id,
+        },
+        project: project.providerId,
+      });
+      logger.info(`Service hooks created for project ${project.id} (${project.url})`);
     }
   }
 

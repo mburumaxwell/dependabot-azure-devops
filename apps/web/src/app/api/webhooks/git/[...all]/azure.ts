@@ -10,57 +10,48 @@ import {
   AzdoEventSchema,
 } from '@paklo/core/azure';
 import { Hono } from 'hono';
-import { basicAuth } from 'hono/basic-auth';
+import { bearerAuth } from 'hono/bearer-auth';
 import { requestSync } from '@/actions/sync';
-import { PakloId } from '@/lib/ids';
 import { logger } from '@/lib/logger';
 import { type Organization, type Project, prisma, type Repository } from '@/lib/prisma';
+import { HEADER_NAME_ORGANIZATION, HEADER_NAME_PROJECT } from '@/lib/webhooks';
+
+// https://hono.dev/docs/api/context#contextvariablemap
+declare module 'hono' {
+  interface ContextVariableMap {
+    organization: Organization;
+    project: Project;
+  }
+}
 
 export const app = new Hono();
 
-const authMiddleware = basicAuth({
-  async verifyUser(username, password, context) {
-    const organizationId = context.req.param('organizationId');
-    if (!organizationId || !username || !password) {
-      logger.trace('Missing username or password for Azdo webhook');
-      return false;
-    }
-
-    // the username is the project id, the password is the webhookToken of the organization
-
-    let id: PakloId;
-    try {
-      id = PakloId.parse(username);
-    } catch {
-      logger.trace(
-        `Invalid username for Azdo webhook: '${username}'. It must be a valid Paklo ID for organization or project.`,
-      );
-      return false;
-    }
-
-    // ensure the type is project
-    if (id.type !== 'project') {
-      logger.trace(`Invalid username for Azdo webhook: '${username}'. It must be a valid Paklo project ID.`);
+const authMiddleware = bearerAuth({
+  async verifyToken(token, context) {
+    const organizationId = context.req.header(HEADER_NAME_ORGANIZATION);
+    const projectId = context.req.header(HEADER_NAME_PROJECT);
+    if (!organizationId || !projectId || !token) {
+      logger.trace('Missing required headers or token for webhook');
       return false;
     }
 
     // fetch the organization
     const organization = await prisma.organization.findFirst({ where: { id: organizationId } });
     if (!organization) {
-      logger.trace(`No organization found for Azdo webhook with id: '${organizationId}'`);
-      return false;
-    }
-
-    // fetch the project
-    const project = await prisma.project.findFirst({ where: { id: username } });
-    if (!project) {
-      logger.trace(`No project found for Azdo webhook with id: '${username}'`);
+      logger.trace(`No organization found for webhook with id: '${organizationId}'`);
       return false;
     }
 
     // ensure this is an azure organization
     if (organization.type !== 'azure') {
-      logger.trace(`Organization for Azdo webhook with id: '${username}' is not of type 'azure'`);
+      logger.warn(`Organization for webhook with id: '${organization.id}' is not of type 'azure'`);
+      return false;
+    }
+
+    // fetch the project
+    const project = await prisma.project.findFirst({ where: { id: projectId } });
+    if (!project) {
+      logger.trace(`No project found for webhook with id: '${projectId}'`);
       return false;
     }
 
@@ -69,9 +60,9 @@ const authMiddleware = basicAuth({
       where: { id: organization.id },
     });
 
-    // verify the password matches the webhookToken
-    if (credential.webhooksToken !== password) {
-      logger.trace(`Invalid password for Azdo webhook for organization id: '${username}'`);
+    // verify the token matches the webhookToken
+    if (credential.webhooksToken !== token) {
+      logger.trace(`Invalid token for webhook for organization id: '${organizationId}'`);
       return false;
     }
 
@@ -83,74 +74,69 @@ const authMiddleware = basicAuth({
   },
 });
 
-app.post(
-  '/:organizationId',
-  authMiddleware,
-  zValidator('json', AzdoEventSchema),
-  async (context): Promise<Response> => {
-    // ensure organization is set in context
-    const [organization, project] = [context.get('organization'), context.get('project')];
-    if (!organization || !project) {
-      logger.error('Organization or project not found in context for Azdo webhook which should not happen!');
-      return context.body(null, 204); // indicate success to avoid Azure disabling the webhook
+app.post('/', authMiddleware, zValidator('json', AzdoEventSchema), async (context): Promise<Response> => {
+  // ensure organization is set in context
+  const [organization, project] = [context.get('organization'), context.get('project')];
+  if (!organization || !project) {
+    logger.error('Organization or project not found in context for Azdo webhook which should not happen!');
+    return context.body(null, 204); // indicate success to avoid Azure disabling the webhook
+  }
+
+  // get the validated event
+  const event = context.req.valid('json');
+  const { subscriptionId, notificationId, eventType, resource } = event;
+  logger.debug(`Received ${eventType} notification ${notificationId} on subscription ${subscriptionId}`);
+
+  // find the provider repository based on event type
+  const providerRepositoryId: string | undefined = (() => {
+    switch (eventType) {
+      case 'git.pullrequest.updated':
+      case 'git.pullrequest.merged':
+      case 'git.push':
+      case 'git.repo.created':
+      case 'git.repo.renamed':
+      case 'git.repo.statuschanged':
+        return resource.repository.id;
+      case 'git.repo.deleted':
+        return resource.repositoryId;
+      case 'ms.vss-code.git-pullrequest-comment-event':
+        return resource.pullRequest.repository.id;
+      default:
+        return undefined;
     }
+  })();
+  if (!providerRepositoryId) {
+    logger.error(`Could not determine provider repository for event type: '${eventType}' which should not happen.`);
+    return context.body(null, 204); // indicate success to avoid Azure disabling the webhook
+  }
 
-    // get the validated event
-    const event = context.req.valid('json');
-    const { subscriptionId, notificationId, eventType, resource } = event;
-    logger.debug(`Received ${eventType} notification ${notificationId} on subscription ${subscriptionId}`);
+  // fetch the repository exists (may not exist depending on event type)
+  const repository = await prisma.repository.findFirst({
+    where: { projectId: project.id, providerId: providerRepositoryId },
+  });
 
-    // find the provider repository based on event type
-    const providerRepositoryId: string | undefined = (() => {
-      switch (eventType) {
-        case 'git.pullrequest.updated':
-        case 'git.pullrequest.merged':
-        case 'git.push':
-        case 'git.repo.created':
-        case 'git.repo.renamed':
-        case 'git.repo.statuschanged':
-          return resource.repository.id;
-        case 'git.repo.deleted':
-          return resource.repositoryId;
-        case 'ms.vss-code.git-pullrequest-comment-event':
-          return resource.pullRequest.repository.id;
-        default:
-          return undefined;
-      }
-    })();
-    if (!providerRepositoryId) {
-      logger.error(`Could not determine provider repository for event type: '${eventType}' which should not happen.`);
-      return context.body(null, 204); // indicate success to avoid Azure disabling the webhook
-    }
+  // handle the event types
+  const options: HandlerOptions = { organization, project, repository, resource };
+  if (eventType === 'git.push') {
+    await handleCodePushEvent({ ...options, resource });
+  } else if (eventType === 'git.pullrequest.updated') {
+    await handlePrUpdatedEvent({ ...options, resource });
+  } else if (eventType === 'git.pullrequest.merged') {
+    await handlePrMergeEvent({ ...options, resource });
+  } else if (eventType === 'git.repo.created') {
+    await handleRepoCreatedEvent({ ...options, resource });
+  } else if (eventType === 'git.repo.renamed') {
+    await handleRepoRenamedEvent({ ...options, resource });
+  } else if (eventType === 'git.repo.deleted') {
+    await handleRepoDeletedEvent({ ...options, resource });
+  } else if (eventType === 'git.repo.statuschanged') {
+    await handleRepoStatusChangedEvent({ ...options, resource });
+  } else if (eventType === 'ms.vss-code.git-pullrequest-comment-event') {
+    await handleCommentEvent({ ...options, resource });
+  }
 
-    // fetch the repository exists (may not exist depending on event type)
-    const repository = await prisma.repository.findFirst({
-      where: { projectId: project.id, providerId: providerRepositoryId },
-    });
-
-    // handle the event types
-    const options: HandlerOptions = { organization, project, repository, resource };
-    if (eventType === 'git.push') {
-      await handleCodePushEvent({ ...options, resource });
-    } else if (eventType === 'git.pullrequest.updated') {
-      await handlePrUpdatedEvent({ ...options, resource });
-    } else if (eventType === 'git.pullrequest.merged') {
-      await handlePrMergeEvent({ ...options, resource });
-    } else if (eventType === 'git.repo.created') {
-      await handleRepoCreatedEvent({ ...options, resource });
-    } else if (eventType === 'git.repo.renamed') {
-      await handleRepoRenamedEvent({ ...options, resource });
-    } else if (eventType === 'git.repo.deleted') {
-      await handleRepoDeletedEvent({ ...options, resource });
-    } else if (eventType === 'git.repo.statuschanged') {
-      await handleRepoStatusChangedEvent({ ...options, resource });
-    } else if (eventType === 'ms.vss-code.git-pullrequest-comment-event') {
-      await handleCommentEvent({ ...options, resource });
-    }
-
-    return context.body(null, 204);
-  },
-);
+  return context.body(null, 204);
+});
 
 type HandlerOptions<T = unknown> = {
   organization: Organization;

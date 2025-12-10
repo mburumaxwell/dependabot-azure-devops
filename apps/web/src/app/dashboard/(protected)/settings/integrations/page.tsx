@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { headers as requestHeaders } from 'next/headers';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { GitHubSection, PrimaryIntegrationSection, WebhooksSection } from './page.client';
+import { GitHubSection, PrimaryIntegrationSection } from './page.client';
 
 export const metadata: Metadata = {
   title: 'Integrations',
@@ -40,7 +40,6 @@ export default async function IntegrationsPage() {
 
       <PrimaryIntegrationSection organization={organization} />
       <GitHubSection organizationId={organization.id} hasToken={hasGithubToken} />
-      <WebhooksSection organization={organization} />
     </div>
   );
 }

@@ -86,10 +86,7 @@ export function create(options: LoggerCreateOptions = {}) {
   // create and return the logger
   const resolvedLevel = level || process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'warn' : 'debug');
   return pino(
-    {
-      level: resolvedLevel,
-      timestamp,
-    },
+    { level: resolvedLevel, timestamp },
     pino.multistream([
       // add streams conditionally
       // without setting the level on each stream, some logs seem to be skipped

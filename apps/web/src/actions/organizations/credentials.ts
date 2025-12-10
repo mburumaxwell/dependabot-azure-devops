@@ -53,7 +53,7 @@ export async function validateOrganizationCredentials({
     };
   }
 
-  // TODO: check for other permissions here so that we ensure it will keep working
+  // TODO: check for all needed permissions here so that we ensure it will keep working
 
   // ensure there is no other organization with the same URL
   const existing = await prisma.organization.findFirst({

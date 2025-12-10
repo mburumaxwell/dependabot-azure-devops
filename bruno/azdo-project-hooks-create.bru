@@ -1,0 +1,43 @@
+meta {
+  name: azdo-project-hooks-create
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://dev.azure.com/tingle/_apis/hooks/subscriptions?api-version=5.0
+  body: json
+  auth: basic
+}
+
+params:query {
+  api-version: 5.0
+}
+
+auth:basic {
+  username: 
+  password: {{AZURE_DEVOPS_PAT}}
+}
+
+body:json {
+  {
+    "status": "enabled",
+    "eventType": "git.pullrequest.merged",
+    "resourceVersion": "1.0",
+    "publisherId": "tfs",
+    "publisherId": "tfs",
+    "publisherInputs": {
+      "projectId": "4c8e78d1-0580-41f5-961b-2210c090883a",
+      "mergeResult": "Conflicts",
+    },
+    "consumerId": "webHooks",
+    "consumerActionId": "httpRequest",
+    "consumerInputs": {
+      "url": "https://www.paklo.app/api/webhooks/git/azure",
+      "acceptUntrustedCerts": "false",
+      "httpHeaders": "Authorization: Bearer 123\nX-Paklo-Organization: org_123\nX-Paklo-Project: prj_456",
+      "messagesToSend": "none",
+      "detailedMessagesToSend": "none",
+    },
+  }
+}

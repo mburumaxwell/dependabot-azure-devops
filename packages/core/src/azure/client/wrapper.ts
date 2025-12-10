@@ -2,13 +2,13 @@ import { logger } from '@/logger';
 import type { AzdoEvent, AzdoEventType } from '../events';
 import type { AzureDevOpsOrganizationUrl } from '../url-parts';
 import { AzureDevOpsClient } from './client';
-import { SUBSCRIBER_ID } from './constants';
 import type {
   AzdoFileChange,
   AzdoGitUserDate,
   AzdoIdentityRefWithVote,
   AzdoPrExtractedWithProperties,
   AzdoPullRequestMergeStrategy,
+  AzdoSubscriptionsQuery,
 } from './types';
 import { normalizeBranchName, normalizeFilePath } from './utils';
 
@@ -562,13 +562,14 @@ export class AzureDevOpsClientWrapper {
    */
   public async createOrUpdateHookSubscriptions({
     url,
-    token,
+    headers,
     project,
   }: {
     url: string;
-    token: string;
+    headers: Record<string, string>;
     project: string;
   }) {
+    // events are registered per project because, the git.repo.* events do not support global subscriptions
     const subscriptionTypes = new Map<AzdoEventType, AzdoEvent['resourceVersion']>([
       ['git.push', '1.0'],
       ['git.pullrequest.updated', '1.0'],
@@ -580,29 +581,15 @@ export class AzureDevOpsClientWrapper {
       ['ms.vss-code.git-pullrequest-comment-event', '2.0'],
     ]);
 
-    const subscriptions = await this.client.subscriptions.query({
-      publisherId: 'tfs',
-      publisherInputFilters: [
-        {
-          conditions: [{ operator: 'equals', inputId: 'projectId', inputValue: project }],
-        },
-      ],
-      subscriberId: SUBSCRIBER_ID,
-
-      consumerId: 'webHooks',
-      consumerActionId: 'httpRequest',
-    });
+    const query = this.buildSubscriptionsQuery({ url, project });
+    const subscriptions = await this.client.subscriptions.query(query);
 
     // iterate each subscription checking if creation or update is required
     const ids: string[] = [];
     for (const [eventType, resourceVersion] of subscriptionTypes) {
       // find existing one
       const existing = subscriptions.find((sub) => {
-        return (
-          sub.eventType === eventType &&
-          sub.resourceVersion === resourceVersion &&
-          sub.consumerInputs.url?.toLowerCase() === url.toLowerCase()
-        );
+        return sub.eventType === eventType && sub.resourceVersion === resourceVersion;
       });
 
       let subscription: typeof existing;
@@ -613,8 +600,8 @@ export class AzureDevOpsClientWrapper {
         existing.status = 'enabled';
         existing.eventType = eventType;
         existing.resourceVersion = resourceVersion;
-        existing.publisherInputs = this.makeTfsPublisherInputs(eventType, project);
-        existing.consumerInputs = this.makeWebhookConsumerInputs({ token, url, project });
+        existing.publisherInputs = this.makeTfsPublisherInputs({ eventType, project });
+        existing.consumerInputs = this.makeWebhookConsumerInputs({ url, headers });
         subscription = await this.client.subscriptions.replace(existing.id, existing);
       } else {
         subscription = await this.client.subscriptions.create({
@@ -623,17 +610,38 @@ export class AzureDevOpsClientWrapper {
           resourceVersion,
 
           publisherId: 'tfs',
-          publisherInputs: this.makeTfsPublisherInputs(eventType, project),
+          publisherInputs: this.makeTfsPublisherInputs({ eventType, project }),
           consumerId: 'webHooks',
           consumerActionId: 'httpRequest',
-          consumerInputs: this.makeWebhookConsumerInputs({ token, url, project }),
+          consumerInputs: this.makeWebhookConsumerInputs({ url, headers }),
         });
       }
 
       ids.push(subscription.id);
     }
 
-    return ids;
+    // delete any other existing subscriptions that are not in our desired list
+    for (const sub of subscriptions) {
+      if (!ids.includes(sub.id)) {
+        await this.client.subscriptions.delete(sub.id);
+      }
+    }
+  }
+
+  /**
+   * Remove all webhook subscriptions for a specific URL.
+   * This finds all subscriptions matching the provided URL and deletes them.
+   *
+   * Requires scope "Service Hooks (Read & Write)" (vso.hooks_write).
+   */
+  public async deleteHookSubscriptions({ url, project }: { url: string; project: string }) {
+    const query = this.buildSubscriptionsQuery({ url, project });
+    const subscriptions = await this.client.subscriptions.query(query);
+
+    // iterate each subscription and delete it
+    for (const sub of subscriptions) {
+      await this.client.subscriptions.delete(sub.id);
+    }
   }
 
   private mergeCommitMessage(id: number, title: string, description: string): string {
@@ -664,14 +672,36 @@ export class AzureDevOpsClientWrapper {
     return regex.test(guid);
   }
 
-  private makeTfsPublisherInputs(eventType: AzdoEventType, project: string): Record<string, string> {
+  private buildSubscriptionsQuery({ url, project }: { url: string; project: string }): AzdoSubscriptionsQuery {
+    return {
+      publisherId: 'tfs',
+      publisherInputFilters: [
+        {
+          conditions: [{ operator: 'equals', inputId: 'projectId', caseSensitive: false, inputValue: project }],
+        },
+      ],
+      consumerId: 'webHooks',
+      consumerActionId: 'httpRequest',
+      consumerInputFilters: [
+        {
+          conditions: [{ operator: 'equals', inputId: 'url', caseSensitive: false, inputValue: url }],
+        },
+      ],
+    };
+  }
+
+  private makeTfsPublisherInputs({
+    eventType,
+    project,
+  }: {
+    eventType: AzdoEventType;
+    project: string;
+  }): Record<string, string> {
     // possible inputs are available via an authenticated request to
     // https://dev.azure.com/{organization}/_apis/hooks/publishers/tfs
 
     return {
-      // always include the project identifier, to restrict events from that project
-      projectId: project, // Team Project to restrict events to
-      subscriberId: SUBSCRIBER_ID, // Subscriber id of the group the subscription is associated with
+      projectId: project, // project to restrict events to
 
       ...(eventType === 'git.pullrequest.updated' && {
         // only trigger on updates to the pull request status (e.g. active, abandoned, completed)
@@ -679,19 +709,17 @@ export class AzureDevOpsClientWrapper {
       }),
       ...(eventType === 'git.pullrequest.merged' && {
         // only trigger on conflicts
-        notificationType: 'Conflicts',
+        mergeResult: 'Conflicts',
       }),
     };
   }
 
   private makeWebhookConsumerInputs({
-    token,
     url,
-    project,
+    headers,
   }: {
-    token: string;
     url: string;
-    project: string;
+    headers: Record<string, string>;
   }): Record<string, string> {
     return {
       // possible inputs are available via an authenticated request to
@@ -699,10 +727,9 @@ export class AzureDevOpsClientWrapper {
 
       url,
       acceptUntrustedCerts: 'false',
-      // TODO: find out if we can pass without basic auth username and password
-      basicAuthUsername: project,
-      basicAuthPassword: token,
-      httpHeaders: `Authorization: ${token}`,
+      httpHeaders: Object.entries(headers)
+        .map(([key, value]) => `${key}:${value}`)
+        .join('\n'),
       messagesToSend: 'none',
       detailedMessagesToSend: 'none',
     };

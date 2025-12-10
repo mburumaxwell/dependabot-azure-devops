@@ -1,0 +1,51 @@
+meta {
+  name: azdo-project-hooks-query
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://dev.azure.com/tingle/_apis/hooks/subscriptionsquery?api-version=5.0
+  body: json
+  auth: basic
+}
+
+params:query {
+  api-version: 5.0
+}
+
+auth:basic {
+  username: 
+  password: {{AZURE_DEVOPS_PAT}}
+}
+
+body:json {
+  {
+    "publisherId": "tfs",
+    "publisherInputsFilters": [
+      {
+        "conditions": [
+          {
+            "operator": "equals",
+            "inputId": "projectId",
+            "inputValue": "4c8e78d1-0580-41f5-961b-2210c090883a"
+          }
+        ]
+      }
+    ],
+    "consumerId": "webHooks",
+    "consumerActionId": "httpRequest",
+    "consumerInputFilters": [
+      {
+        "conditions": [
+          {
+            "operator": "equals",
+            "inputId": "url",
+            "caseSensitive": false,
+            "inputValue": "https://www.paklo.app/api/webhooks/git/azure"
+          }
+        ]
+      }
+    ],
+  }
+}
