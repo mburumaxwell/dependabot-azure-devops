@@ -1,8 +1,6 @@
 export * from './client';
 export * from './config';
 export * from './events';
-export * from './models';
-export * from './types';
 export {
   type AzureDevOpsOrganizationUrl,
   type AzureDevOpsProjectUrl,
@@ -11,4 +9,3 @@ export {
   extractProjectUrl,
   extractRepositoryUrl,
 } from './url-parts';
-export * from './utils';

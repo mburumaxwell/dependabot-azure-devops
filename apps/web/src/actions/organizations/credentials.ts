@@ -2,8 +2,8 @@
 
 import {
   ANONYMOUS_USER_ID,
+  AzureDevOpsClient,
   type AzureDevOpsOrganizationUrl,
-  AzureDevOpsWebApiClient,
   extractOrganizationUrl,
 } from '@paklo/core/azure';
 import { createGitHubClient } from '@paklo/core/github';
@@ -36,9 +36,9 @@ export async function validateOrganizationCredentials({
 
   // ensure the token is valid and is not anonymous
   let userId: string;
-  const client = new AzureDevOpsWebApiClient(url, token);
+  const client = new AzureDevOpsClient(url, token);
   try {
-    userId = await client.getUserId();
+    userId = (await client.connection.get()).authenticatedUser.id;
 
     if (!userId || userId === ANONYMOUS_USER_ID) {
       return {

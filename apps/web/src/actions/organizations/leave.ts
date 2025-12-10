@@ -1,8 +1,8 @@
 'use server';
 
 import { headers as requestHeaders } from 'next/headers';
+import { storeFeedback } from '@/actions/feedback';
 import { auth, BetterAuthApiError } from '@/lib/auth';
-import { storeFeedback } from '../feedback';
 
 export type OrganizationLeaveOptions = {
   organizationId: string;

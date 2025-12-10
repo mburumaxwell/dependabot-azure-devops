@@ -77,7 +77,7 @@ export const AzdoRepositorySchema = z.object({
 });
 export type AzdoRepository = z.infer<typeof AzdoRepositorySchema>;
 
-export type AzdoListResponse<T> = {
+export type AzdoResponse<T> = {
   value?: T;
   count: number;
 };
@@ -132,7 +132,7 @@ export const AzdoGitChangeSchema = z.object({
 });
 export type AzdoGitChange = z.infer<typeof AzdoGitChangeSchema>;
 export const AzdoGitCommitRefSchema = z.object({
-  commitId: z.string().optional(),
+  commitId: z.string(),
   author: AzdoGitUserDateSchema.optional(),
   committer: AzdoGitUserDateSchema.optional(),
   changes: AzdoGitChangeSchema.array().optional(),
@@ -143,14 +143,15 @@ export const AzdoGitPushSchema = z.object({
   refUpdates: AzdoGitRefSchema.array(),
 });
 export type AzdoGitPush = z.infer<typeof AzdoGitPushSchema>;
+export const AzdoGitRefUpdateSchema = z.object({
+  name: z.string(),
+  oldObjectId: z.string(),
+  newObjectId: z.string().optional(),
+  isLocked: z.boolean().optional(),
+});
+export type AzdoGitRefUpdate = z.infer<typeof AzdoGitRefUpdateSchema>;
 export const AzdoGitPushCreateSchema = z.object({
-  refUpdates: z
-    .object({
-      name: z.string(),
-      oldObjectId: z.string(),
-      newObjectId: z.string().optional(),
-    })
-    .array(),
+  refUpdates: AzdoGitRefUpdateSchema.array(),
   commits: z
     .object({
       comment: z.string(),
@@ -174,29 +175,6 @@ export const AzdoRepositoryItemSchema = z.object({
 });
 export type AzdoRepositoryItem = z.infer<typeof AzdoRepositoryItemSchema>;
 
-export const AzdoPullRequestSchema = z.object({
-  pullRequestId: z.number(),
-  status: AzdoPullRequestStatusSchema,
-  isDraft: z.boolean(),
-  sourceRefName: z.string(),
-  targetRefName: z.string(),
-  lastMergeCommit: AzdoGitCommitRefSchema,
-  lastMergeSourceCommit: AzdoGitCommitRefSchema,
-  mergeStatus: AzdoPullRequestAsyncStatusSchema,
-  autoCompleteSetBy: AzdoIdentityRefSchema.optional(),
-  closedBy: AzdoIdentityRefSchema.optional(),
-});
-export type AzdoPullRequest = z.infer<typeof AzdoPullRequestSchema>;
-
-export const AdoPropertiesSchema = z.record(
-  z.string(),
-  z.object({
-    $type: z.string(),
-    $value: z.string(),
-  }),
-);
-export type AdoProperties = z.infer<typeof AdoPropertiesSchema>;
-
 export const AzdoIdentityRefWithVoteSchema = z.object({
   id: z.string().optional(),
   displayName: z.string().optional(),
@@ -207,12 +185,49 @@ export const AzdoIdentityRefWithVoteSchema = z.object({
 });
 export type AzdoIdentityRefWithVote = z.infer<typeof AzdoIdentityRefWithVoteSchema>;
 
+export const AzdoPullRequestSchema = z.object({
+  pullRequestId: z.number(),
+  status: AzdoPullRequestStatusSchema,
+  isDraft: z.boolean(),
+  sourceRefName: z.string(),
+  targetRefName: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+  lastMergeCommit: AzdoGitCommitRefSchema,
+  lastMergeSourceCommit: AzdoGitCommitRefSchema,
+  mergeStatus: AzdoPullRequestAsyncStatusSchema,
+  reviewers: AzdoIdentityRefWithVoteSchema.array().optional(),
+  workItemRefs: z.object({ id: z.string() }).array().optional(),
+  labels: z.object({ name: z.string() }).array().optional(),
+  autoCompleteSetBy: AzdoIdentityRefSchema.optional(),
+  completionOptions: z
+    .object({
+      autoCompleteIgnoreConfigIds: z.number().array().optional(),
+      deleteSourceBranch: z.boolean().optional(),
+      mergeCommitMessage: z.string().optional(),
+      mergeStrategy: AzdoPullRequestMergeStrategySchema.optional(),
+      transitionWorkItems: z.boolean().optional(),
+    })
+    .optional(),
+  closedBy: AzdoIdentityRefSchema.optional(),
+});
+export type AzdoPullRequest = z.infer<typeof AzdoPullRequestSchema>;
+
+export const AzdoPropertiesSchema = z.record(
+  z.string(),
+  z.object({
+    $type: z.string(),
+    $value: z.string(),
+  }),
+);
+export type AzdoProperties = z.infer<typeof AzdoPropertiesSchema>;
+
 export const AzdoPullRequestCommentSchema = z.object({
-  id: z.number(),
-  parentCommentId: z.number().nullable(),
+  id: z.number().optional(),
+  parentCommentId: z.number().optional(),
   content: z.string(),
   commentType: AzdoCommentTypeSchema,
-  publishedDate: z.string(),
+  publishedDate: z.string().optional(),
   author: AzdoIdentityRefSchema,
 });
 export type AzdoPullRequestComment = z.infer<typeof AzdoPullRequestCommentSchema>;
@@ -224,7 +239,7 @@ export const AzdoPullRequestCommentThreadSchema = z.object({
 export type AzdoPullRequestCommentThread = z.infer<typeof AzdoPullRequestCommentThreadSchema>;
 
 export const AzdoSubscriptionSchema = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   status: z.enum(['enabled', 'onProbation', 'disabledByUser', 'disabledBySystem', 'disabledByInactiveIdentity']),
   publisherId: z.string(),
   publisherInputs: z.record(z.string(), z.string()),
@@ -266,3 +281,15 @@ export const AzdoSubscriptionsQuerySchema = z.object({
   subscriberId: z.string().optional(),
 });
 export type AzdoSubscriptionsQuery = z.infer<typeof AzdoSubscriptionsQuerySchema>;
+
+export type AzdoPrExtractedWithProperties = {
+  pullRequestId: number;
+  properties?: { name: string; value: string }[];
+};
+
+export type AzdoFileChange = {
+  changeType: AzdoVersionControlChangeType;
+  path: string;
+  content?: string;
+  encoding?: 'utf-8' | 'base64';
+};

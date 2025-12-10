@@ -1,6 +1,6 @@
 'use server';
 
-import { AzureDevOpsWebApiClient, extractOrganizationUrl } from '@paklo/core/azure';
+import { AzureDevOpsClient, extractOrganizationUrl } from '@paklo/core/azure';
 import { type OrganizationType, prisma } from '@/lib/prisma';
 
 export type AvailableProject = {
@@ -78,9 +78,9 @@ async function getAvailableForAzure({
       select: { token: true },
     })
   ).token;
-  const client = new AzureDevOpsWebApiClient(url, token);
+  const client = new AzureDevOpsClient(url, token);
 
-  return ((await client.getProjects())?.value || [])
+  return ((await client.projects.list()) || [])
     .filter((project) => project.state === 'wellFormed')
     .map((project) => ({
       name: project.name,

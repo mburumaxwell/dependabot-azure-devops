@@ -1,12 +1,12 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: testing
 
 import {
-  AzureDevOpsWebApiClient,
-  DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
-  DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
-  DEVOPS_PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
+  type AzdoPrExtractedWithProperties,
+  AzureDevOpsClientWrapper,
   extractRepositoryUrl,
-  type IPullRequestProperties,
+  PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
+  PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
+  PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
 } from '@paklo/core/azure';
 import { DEFAULT_EXPERIMENTS, type DependabotConfig, type DependabotUpdate } from '@paklo/core/dependabot';
 import { GitHubSecurityAdvisoryClient } from '@paklo/core/github';
@@ -25,7 +25,7 @@ vi.mock('@paklo/core/azure', async () => {
   const actual = await vi.importActual('@paklo/core/azure');
   return {
     ...actual,
-    AzureDevOpsWebApiClient: vi.fn(),
+    AzureDevOpsClientWrapper: vi.fn(),
   };
 });
 vi.mock('../../run', () => ({
@@ -39,7 +39,7 @@ vi.mock('./server', () => ({
 class TestableAzureLocalJobsRunner extends AzureLocalJobsRunner {
   public async testAbandonPullRequestsWhereSourceRefIsDeleted(
     existingBranchNames?: string[],
-    existingPullRequests?: IPullRequestProperties[],
+    existingPullRequests?: AzdoPrExtractedWithProperties[],
   ): Promise<void> {
     return (this as any).abandonPullRequestsWhereSourceRefIsDeleted(existingBranchNames, existingPullRequests);
   }
@@ -47,7 +47,7 @@ class TestableAzureLocalJobsRunner extends AzureLocalJobsRunner {
   public async testPerformUpdates(
     server: any,
     updates: DependabotUpdate[],
-    existingPullRequests: IPullRequestProperties[],
+    existingPullRequests: AzdoPrExtractedWithProperties[],
     dependabotApiUrl: string,
     dependabotApiDockerUrl?: string,
     command?: any,
@@ -67,8 +67,8 @@ describe('AzureLocalJobsRunner', () => {
   let jobsRunner: TestableAzureLocalJobsRunner;
   let options: AzureLocalJobsRunnerOptions;
   let existingBranchNames: string[];
-  let existingPullRequests: IPullRequestProperties[];
-  let mockAuthorClient: AzureDevOpsWebApiClient;
+  let existingPullRequests: AzdoPrExtractedWithProperties[];
+  let mockAuthorClient: AzureDevOpsClientWrapper;
   let mockServer: any;
 
   beforeEach(() => {
@@ -77,10 +77,10 @@ describe('AzureLocalJobsRunner', () => {
     existingBranchNames = [];
     existingPullRequests = [
       {
-        id: 1,
+        pullRequestId: 1,
         properties: [
           {
-            name: DEVOPS_PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
+            name: PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
             value: 'dependabot/nuget/dependency1-1.0.0',
           },
         ],
@@ -115,16 +115,16 @@ describe('AzureLocalJobsRunner', () => {
       experiments: DEFAULT_EXPERIMENTS,
     };
 
-    // Mock AzureDevOpsWebApiClient
+    // Mock AzureDevOpsClientWrapper
     mockAuthorClient = {
       getBranchNames: vi.fn().mockResolvedValue(existingBranchNames),
       getActivePullRequestProperties: vi.fn().mockResolvedValue(existingPullRequests),
       getUserId: vi.fn().mockResolvedValue('user-123'),
       abandonPullRequest: vi.fn().mockResolvedValue(true),
-    } as unknown as AzureDevOpsWebApiClient;
+    } as unknown as AzureDevOpsClientWrapper;
 
-    vi.mocked(AzureDevOpsWebApiClient).mockImplementation(function MockAzureDevOpsWebApiClient() {
-      return mockAuthorClient as AzureDevOpsWebApiClient;
+    vi.mocked(AzureDevOpsClientWrapper).mockImplementation(function MockAzureDevOpsClientWrapper() {
+      return mockAuthorClient as AzureDevOpsClientWrapper;
     } as any);
 
     // Mock AzureLocalDependabotServer
@@ -181,10 +181,10 @@ describe('AzureLocalJobsRunner', () => {
       existingBranchNames = ['dependabot/nuget/dependency1-1.0.0'];
       existingPullRequests = [
         {
-          id: 1,
+          pullRequestId: 1,
           properties: [
             {
-              name: DEVOPS_PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
+              name: PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
               value: 'refs/heads/dependabot/nuget/dependency1-1.0.0',
             },
           ],
@@ -248,14 +248,14 @@ describe('AzureLocalJobsRunner', () => {
       options.config.updates[0]!['open-pull-requests-limit'] = 1;
       const existingPRs = [
         {
-          id: 1,
+          pullRequestId: 1,
           properties: [
             {
-              name: DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
+              name: PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
               value: 'npm_and_yarn',
             },
             {
-              name: DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
+              name: PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
               value: JSON.stringify([{ 'dependency-name': 'dependency1' }]),
             },
           ],
@@ -321,14 +321,14 @@ describe('AzureLocalJobsRunner', () => {
       options.config.updates[0]!['open-pull-requests-limit'] = 1;
       const existingPRs = [
         {
-          id: 1,
+          pullRequestId: 1,
           properties: [
             {
-              name: DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
+              name: PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
               value: 'npm_and_yarn',
             },
             {
-              name: DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
+              name: PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
               value: JSON.stringify([{ 'dependency-name': 'dependency1' }]),
             },
           ],
@@ -432,14 +432,14 @@ describe('AzureLocalJobsRunner', () => {
       options.dryRun = true;
       const existingPRs = [
         {
-          id: 1,
+          pullRequestId: 1,
           properties: [
             {
-              name: DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
+              name: PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
               value: 'npm_and_yarn',
             },
             {
-              name: DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
+              name: PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
               value: JSON.stringify([{ 'dependency-name': 'dependency1' }]),
             },
           ],

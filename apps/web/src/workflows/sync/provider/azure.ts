@@ -1,7 +1,7 @@
 import {
   type AzdoRepository,
   type AzdoRepositoryItem,
-  AzureDevOpsWebApiClient,
+  AzureDevOpsClient,
   extractOrganizationUrl,
 } from '@paklo/core/azure';
 import { POSSIBLE_CONFIG_FILE_PATHS } from '@paklo/core/dependabot';
@@ -14,24 +14,24 @@ import {
 
 export class AzureSyncProvider implements ISyncProvider {
   private readonly organizationSlug: string;
-  private readonly client: AzureDevOpsWebApiClient;
+  private readonly client: AzureDevOpsClient;
 
   constructor(organisationUrl: string, token: string) {
     const url = extractOrganizationUrl({ organisationUrl });
     this.organizationSlug = url.organisation;
-    this.client = new AzureDevOpsWebApiClient(url, token);
+    this.client = new AzureDevOpsClient(url, token);
   }
 
   getProject(id: string): Promise<SynchronizerProject | undefined> {
-    return this.client.getProject(id);
+    return this.client.projects.get(id);
   }
 
   async getRepositories(projectId: string): Promise<SynchronizerRepository[] | undefined> {
-    return (await this.client.getRepositories(projectId))?.value?.map((repo) => this.convertRepo(repo));
+    return (await this.client.repositories.list(projectId))?.map((repo) => this.convertRepo(repo));
   }
 
   async getRepository(projectId: string, repositoryId: string): Promise<SynchronizerRepository | undefined> {
-    const repo = await this.client.getRepository(projectId, repositoryId);
+    const repo = await this.client.repositories.get(projectId, repositoryId);
     if (!repo) return undefined;
     return this.convertRepo(repo);
   }
@@ -45,7 +45,7 @@ export class AzureSyncProvider implements ISyncProvider {
     let path: string | undefined;
     for (const filePath of POSSIBLE_CONFIG_FILE_PATHS) {
       path = filePath;
-      item = await this.client.getRepositoryItem(project.id, repo.id, path);
+      item = await this.client.git.getItem(project.id, repo.id, path);
       if (item) break;
     }
 

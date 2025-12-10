@@ -10,13 +10,8 @@ import {
   DependabotExistingPRSchema,
   type DependabotUpdatePullRequest,
 } from '@/dependabot';
-import {
-  DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
-  DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
-  type IFileChange,
-  type IPullRequestProperties,
-} from './models';
-import type { AzdoVersionControlChangeType } from './types';
+import { PR_PROPERTY_DEPENDABOT_DEPENDENCIES, PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER } from './constants';
+import type { AzdoFileChange, AzdoPrExtractedWithProperties, AzdoVersionControlChangeType } from './types';
 
 export function normalizeFilePath(path: string): string {
   // Convert backslashes to forward slashes, convert './' => '/' and ensure the path starts with a forward slash if it doesn't already, this is how DevOps paths are formatted
@@ -41,18 +36,18 @@ export function buildPullRequestProperties(
 ) {
   return [
     {
-      name: DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
+      name: PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
       value: packageManager,
     },
     {
-      name: DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
+      name: PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
       value: JSON.stringify(dependencies),
     },
   ];
 }
 
 export function parsePullRequestProperties(
-  pullRequests: IPullRequestProperties[],
+  pullRequests: AzdoPrExtractedWithProperties[],
   packageManager: string | null,
 ): Record<string, DependabotExistingPR[] | DependabotExistingGroupPR> {
   return Object.fromEntries(
@@ -60,15 +55,15 @@ export function parsePullRequestProperties(
       .filter((pr) => {
         return pr.properties?.find(
           (p) =>
-            p.name === DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER &&
+            p.name === PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER &&
             (packageManager === null || p.value === packageManager),
         );
       })
       .map((pr) => {
         return [
-          pr.id,
+          pr.pullRequestId,
           DependenciesPrPropertySchema.parse(
-            JSON.parse(pr.properties!.find((p) => p.name === DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES)!.value),
+            JSON.parse(pr.properties!.find((p) => p.name === PR_PROPERTY_DEPENDABOT_DEPENDENCIES)!.value),
           ),
         ];
       }),
@@ -76,18 +71,16 @@ export function parsePullRequestProperties(
 }
 
 export function getPullRequestForDependencyNames(
-  existingPullRequests: IPullRequestProperties[],
+  existingPullRequests: AzdoPrExtractedWithProperties[],
   packageManager: string,
   dependencyNames: string[],
-): IPullRequestProperties | undefined {
+): AzdoPrExtractedWithProperties | undefined {
   return existingPullRequests.find((pr) => {
     return (
-      pr.properties?.find(
-        (p) => p.name === DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER && p.value === packageManager,
-      ) &&
+      pr.properties?.find((p) => p.name === PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER && p.value === packageManager) &&
       pr.properties?.find(
         (p) =>
-          p.name === DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES &&
+          p.name === PR_PROPERTY_DEPENDABOT_DEPENDENCIES &&
           areEqual(getDependencyNames(DependenciesPrPropertySchema.parse(JSON.parse(p.value))), dependencyNames),
       )
     );
@@ -104,9 +97,7 @@ function areEqual(a: string[], b: string[]): boolean {
   return a.every((name) => b.includes(name));
 }
 
-export function getPullRequestChangedFilesForOutputData(
-  data: DependabotCreatePullRequest | DependabotUpdatePullRequest,
-): IFileChange[] {
+export function getPullRequestChangedFiles(data: DependabotCreatePullRequest | DependabotUpdatePullRequest) {
   return data['updated-dependency-files']
     .filter((file) => file.type === 'file')
     .map((file) => {
@@ -123,11 +114,11 @@ export function getPullRequestChangedFilesForOutputData(
         path: path.join(file.directory, file.name),
         content: file.content ?? undefined,
         encoding: file.content_encoding || 'utf-8', // default to 'utf-8' if nullish or empty string
-      } satisfies IFileChange;
+      } satisfies AzdoFileChange;
     });
 }
 
-export function getPullRequestCloseReasonForOutputData(data: DependabotClosePullRequest): string | undefined {
+export function getPullRequestCloseReason(data: DependabotClosePullRequest): string | undefined {
   // The first dependency is the "lead" dependency in a multi-dependency update
   const leadDependencyName = data['dependency-names'][0];
   let reason: string | undefined;
@@ -154,7 +145,7 @@ export function getPullRequestCloseReasonForOutputData(data: DependabotClosePull
   return reason;
 }
 
-export function getPullRequestDependenciesPropertyValueForOutputData(
+export function getPullRequestDependenciesPropertyValue(
   data: DependabotCreatePullRequest,
 ): DependabotExistingPR[] | DependabotExistingGroupPR {
   const dependencies = data.dependencies?.map((dep) => {
