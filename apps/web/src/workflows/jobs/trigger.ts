@@ -39,6 +39,7 @@ import {
   managedAppEnvironmentId,
   resourceGroupNameJobs,
 } from '@/lib/azure';
+import { environment } from '@/lib/environment';
 import { enableDependabotConnectivityCheck } from '@/lib/flags';
 import { SequenceNumber } from '@/lib/ids';
 import { logger } from '@/lib/logger';
@@ -72,7 +73,11 @@ export async function triggerUpdateJobs(options: TriggerUpdateJobsWorkflowOption
 
   const { workflowRunId } = getWorkflowMetadata();
   const { ids } = await getOrCreateUpdateJobs({ workflowRunId, ...options });
-  await Promise.all(ids.map((id) => runUpdateJob({ id })));
+  if (!environment.production) {
+    console.info('Skipping scheduling update jobs in non-production environment.');
+  } else {
+    await Promise.all(ids.map((id) => runUpdateJob({ id })));
+  }
 
   return { ids };
 }
