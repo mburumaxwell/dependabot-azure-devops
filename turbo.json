@@ -3,14 +3,11 @@
   "globalDependencies": ["**/.env", "**/.env.*", "**/biome.json", "**/vitest.config.*"],
   "globalEnv": [
     "NODE_ENV",
-    "BETTER_AUTH_SECRET",
-    "CRON_SECRET",
-    "MONGO_DATABASE_URL",
-    "ADMIN_DASHBOARD_PASSWORD",
     "ADMIN_USER_IDS"
   ],
   "globalPassThroughEnv": [
     "LOG_LEVEL",
+    "ADMIN_DASHBOARD_PASSWORD",
     "APPLICATIONINSIGHTS_CONNECTION_STRING",
     "AZURE_TENANT_ID",
     "AZURE_CLIENT_ID",
@@ -21,9 +18,16 @@
     "AZURE_KEY_VAULT_URL",
     "AZURE_BLOB_STORAGE_URL",
     "AXIOM_API_KEY",
+    "BETTER_AUTH_SECRET",
+    "CRON_SECRET",
+    "GITHUB_REF_NAME",
+    "GITHUB_SHA",
+    "MONGO_DATABASE_URL",
     "RESEND_API_KEY",
     "STRIPE_SECRET_KEY",
-    "STRIPE_WEBHOOK_SECRET"
+    "STRIPE_WEBHOOK_SECRET",
+    "VERCEL_GIT_COMMIT_REF",
+    "VERCEL_GIT_COMMIT_SHA"
   ],
   "tasks": {
     "build": {
