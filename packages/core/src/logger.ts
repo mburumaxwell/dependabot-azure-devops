@@ -66,7 +66,7 @@ export function create(options: LoggerCreateOptions = {}) {
     ? pretty({
         colorize: prettyColorize,
         ignore: 'pid,hostname',
-        customPrettifiers: prettyIncludeLevel ? undefined : { level: () => '' },
+        customPrettifiers: prettyIncludeLevel ? {} : { level: () => '' },
         // these colors only apply to the log level which we may be hiding above
         // support for custom colors in the message itself is not yet supported
         // https://github.com/pinojs/pino-pretty/issues/430
