@@ -168,7 +168,7 @@ export class AzureDevOpsClientWrapper {
   /**
    * Create a new pull request with the specified changes.
    * This method performs the following operations:
-   * 1. Resolves assignee identities fo assignees (if specified)
+   * 1. Resolves assignee identities for assignees (if specified)
    * 2. Creates a new branch and pushes changes
    * 3. Creates the pull request with assignees (optional reviewers), labels, and work items
    * 4. Sets pull request properties for dependency metadata
