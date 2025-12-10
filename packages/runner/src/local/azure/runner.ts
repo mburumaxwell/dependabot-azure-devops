@@ -1,10 +1,10 @@
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import {
-  AzureDevOpsWebApiClient,
-  DEVOPS_PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
-  type IPullRequestProperties,
+  type AzdoPrExtractedWithProperties,
+  AzureDevOpsClientWrapper,
   normalizeBranchName,
+  PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
   parsePullRequestProperties,
 } from '@paklo/core/azure';
 import {
@@ -42,8 +42,8 @@ export type AzureLocalJobsRunnerOptions = LocalJobsRunnerOptions &
 export class AzureLocalJobsRunner extends LocalJobsRunner {
   // biome-ignore-start lint/correctness/noUnusedPrivateClassMembers: variables are used
   private readonly options: AzureLocalJobsRunnerOptions;
-  private readonly authorClient: AzureDevOpsWebApiClient;
-  private readonly approverClient?: AzureDevOpsWebApiClient;
+  private readonly authorClient: AzureDevOpsClientWrapper;
+  private readonly approverClient?: AzureDevOpsClientWrapper;
   // biome-ignore-end lint/correctness/noUnusedPrivateClassMembers: variables are used
 
   constructor(options: AzureLocalJobsRunnerOptions) {
@@ -52,9 +52,9 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
     const { url, gitToken, autoApprove, debug } = this.options;
 
     // Initialise the DevOps API clients (one for authoring the other for auto-approving (if configured))
-    this.authorClient = new AzureDevOpsWebApiClient(url, gitToken, debug);
+    this.authorClient = new AzureDevOpsClientWrapper(url, gitToken, debug);
     this.approverClient = autoApprove
-      ? new AzureDevOpsWebApiClient(url, options.autoApproveToken || gitToken, debug)
+      ? new AzureDevOpsClientWrapper(url, options.autoApproveToken || gitToken, debug)
       : undefined;
   }
 
@@ -84,12 +84,12 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
     }
 
     // Fetch the active pull requests created by the author user
-    const existingBranchNames = await authorClient.getBranchNames(url.project, url.repository);
-    const existingPullRequests = await authorClient.getActivePullRequestProperties(
-      url.project,
-      url.repository,
-      await authorClient.getUserId(),
-    );
+    const existingBranchNames = await authorClient.getBranchNames({ project: url.project, repository: url.repository });
+    const existingPullRequests = await authorClient.getActivePullRequestProperties({
+      project: url.project,
+      repository: url.repository,
+      creatorId: await authorClient.getUserId(),
+    });
 
     // Prepare local server
     const serverOptions: AzureLocalDependabotServerOptions = {
@@ -156,7 +156,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
    */
   private async abandonPullRequestsWhereSourceRefIsDeleted(
     existingBranchNames?: string[],
-    existingPullRequests?: IPullRequestProperties[],
+    existingPullRequests?: AzdoPrExtractedWithProperties[],
   ): Promise<void> {
     if (!existingBranchNames || !existingPullRequests) return;
 
@@ -167,18 +167,18 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
     for (const pullRequestIndex in existingPullRequests) {
       const pullRequest = existingPullRequests[pullRequestIndex]!;
       const pullRequestSourceRefName = normalizeBranchName(
-        pullRequest.properties?.find((x) => x.name === DEVOPS_PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME)?.value,
+        pullRequest.properties?.find((x) => x.name === PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME)?.value,
       );
       if (pullRequestSourceRefName && !existingBranchNames.includes(pullRequestSourceRefName)) {
         // The source branch for the pull request has been deleted; abandon the pull request (if not dry run)
         if (!dryRun) {
           logger.warn(
-            `Detected source branch for PR #${pullRequest.id} has been deleted; The pull request will be abandoned`,
+            `Detected source branch for PR #${pullRequest.pullRequestId} has been deleted; The pull request will be abandoned`,
           );
           await authorClient.abandonPullRequest({
             project: url.project,
             repository: url.repository,
-            pullRequestId: pullRequest.id,
+            pullRequestId: pullRequest.pullRequestId,
             // comment:
             //   'OK, I won't notify you again about this release, but will get in touch when a new version is available. ' +
             //   'If you'd rather skip all updates until the next major or minor version, add an ' +
@@ -205,7 +205,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
   private async performUpdates(
     server: AzureLocalDependabotServer,
     updates: DependabotUpdate[],
-    existingPullRequests: IPullRequestProperties[],
+    existingPullRequests: AzdoPrExtractedWithProperties[],
     dependabotApiUrl: string,
     dependabotApiDockerUrl?: string,
     command?: DependabotJobConfig['command'],

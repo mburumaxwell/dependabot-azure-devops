@@ -1,12 +1,12 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: test file
 // biome-ignore-all lint/complexity/useLiteralKeys: test file
 
-import type { AzureDevOpsWebApiClient } from '@paklo/core/azure';
+import type { AzureDevOpsClientWrapper } from '@paklo/core/azure';
 import {
-  DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
-  DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
+  type AzdoPrExtractedWithProperties,
   extractRepositoryUrl,
-  type IPullRequestProperties,
+  PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
+  PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
 } from '@paklo/core/azure';
 import type { DependabotJobBuilderOutput, DependabotUpdate } from '@paklo/core/dependabot';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -18,10 +18,10 @@ vi.mock('./logger');
 describe('AzureLocalDependabotServer', () => {
   let server: AzureLocalDependabotServer;
   let options: AzureLocalDependabotServerOptions;
-  let authorClient: AzureDevOpsWebApiClient;
-  let approverClient: AzureDevOpsWebApiClient;
+  let authorClient: AzureDevOpsClientWrapper;
+  let approverClient: AzureDevOpsClientWrapper;
   let existingBranchNames: string[];
-  let existingPullRequests: IPullRequestProperties[];
+  let existingPullRequests: AzdoPrExtractedWithProperties[];
 
   beforeEach(() => {
     authorClient = {
@@ -31,11 +31,11 @@ describe('AzureLocalDependabotServer', () => {
       addCommentThread: vi.fn(),
       approvePullRequest: vi.fn(),
       getDefaultBranch: vi.fn(),
-    } as unknown as AzureDevOpsWebApiClient;
+    } as unknown as AzureDevOpsClientWrapper;
 
     approverClient = {
       approvePullRequest: vi.fn(),
-    } as unknown as AzureDevOpsWebApiClient;
+    } as unknown as AzureDevOpsClientWrapper;
 
     existingBranchNames = [];
     existingPullRequests = [];
@@ -184,12 +184,12 @@ describe('AzureLocalDependabotServer', () => {
       update['open-pull-requests-limit'] = 1;
       jobBuilderOutput.job['package-manager'] = packageManager;
       existingPullRequests.push({
-        id: 1,
+        pullRequestId: 1,
         properties: [
-          { name: DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER, value: packageManager },
-          { name: DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES, value: '[]' },
+          { name: PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER, value: packageManager },
+          { name: PR_PROPERTY_DEPENDABOT_DEPENDENCIES, value: '[]' },
         ],
-      } as IPullRequestProperties);
+      } as AzdoPrExtractedWithProperties);
 
       server = new AzureLocalDependabotServer(options);
       server.add({
@@ -300,11 +300,11 @@ describe('AzureLocalDependabotServer', () => {
       jobBuilderOutput.job['package-manager'] = 'npm_and_yarn';
 
       existingPullRequests.push({
-        id: 11,
+        pullRequestId: 11,
         properties: [
-          { name: DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER, value: 'npm_and_yarn' },
+          { name: PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER, value: 'npm_and_yarn' },
           {
-            name: DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
+            name: PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
             value: JSON.stringify([{ 'dependency-name': 'dependency1' }]),
           },
         ],
@@ -374,11 +374,11 @@ describe('AzureLocalDependabotServer', () => {
     it('should process "close_pull_request"', async () => {
       jobBuilderOutput.job['package-manager'] = 'npm_and_yarn';
       existingPullRequests.push({
-        id: 11,
+        pullRequestId: 11,
         properties: [
-          { name: DEVOPS_PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER, value: 'npm_and_yarn' },
+          { name: PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER, value: 'npm_and_yarn' },
           {
-            name: DEVOPS_PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
+            name: PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
             value: JSON.stringify([{ 'dependency-name': 'dependency1' }]),
           },
         ],

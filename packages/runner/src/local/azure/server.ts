@@ -1,10 +1,14 @@
-import type { AzureDevOpsRepositoryUrl, AzureDevOpsWebApiClient, IPullRequestProperties } from '@paklo/core/azure';
+import type {
+  AzdoPrExtractedWithProperties,
+  AzureDevOpsClientWrapper,
+  AzureDevOpsRepositoryUrl,
+} from '@paklo/core/azure';
 import {
   type AzdoPullRequestMergeStrategy,
   buildPullRequestProperties,
-  getPullRequestChangedFilesForOutputData,
-  getPullRequestCloseReasonForOutputData,
-  getPullRequestDependenciesPropertyValueForOutputData,
+  getPullRequestChangedFiles,
+  getPullRequestCloseReason,
+  getPullRequestDependenciesPropertyValue,
   getPullRequestDescription,
   getPullRequestForDependencyNames,
   parsePullRequestProperties,
@@ -15,14 +19,14 @@ import { LocalDependabotServer, type LocalDependabotServerOptions } from '../ser
 
 export type AzureLocalDependabotServerOptions = LocalDependabotServerOptions & {
   url: AzureDevOpsRepositoryUrl;
-  authorClient: AzureDevOpsWebApiClient;
+  authorClient: AzureDevOpsClientWrapper;
   autoApprove: boolean;
-  approverClient?: AzureDevOpsWebApiClient;
+  approverClient?: AzureDevOpsClientWrapper;
   setAutoComplete: boolean;
   mergeStrategy?: AzdoPullRequestMergeStrategy;
   autoCompleteIgnoreConfigIds: number[];
   existingBranchNames: string[] | undefined;
-  existingPullRequests: IPullRequestProperties[];
+  existingPullRequests: AzdoPrExtractedWithProperties[];
 };
 
 export class AzureLocalDependabotServer extends LocalDependabotServer {
@@ -93,9 +97,9 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           return true;
         }
 
-        const changedFiles = getPullRequestChangedFilesForOutputData(data);
-        const dependencies = getPullRequestDependenciesPropertyValueForOutputData(data);
-        const targetBranch = update['target-branch'] || (await authorClient.getDefaultBranch(project, repository));
+        const changedFiles = getPullRequestChangedFiles(data);
+        const dependencies = getPullRequestDependenciesPropertyValue(data);
+        const targetBranch = update['target-branch'] || (await authorClient.getDefaultBranch({ project, repository }));
         const sourceBranch = getBranchNameForUpdate(
           update['package-ecosystem'],
           targetBranch,
@@ -190,13 +194,10 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         const pullRequestWasUpdated = await authorClient.updatePullRequest({
           project: project,
           repository: repository,
-          pullRequestId: pullRequestToUpdate.id,
+          pullRequestId: pullRequestToUpdate.pullRequestId,
           commit: data['base-commit-sha'] || job.source.commit!,
           author,
-          changes: getPullRequestChangedFilesForOutputData(data),
-          skipIfDraft: true,
-          skipIfCommitsFromAuthorsOtherThan: author.email,
-          skipIfNotBehindTargetBranch: true,
+          changes: getPullRequestChangedFiles(data),
         });
 
         // Re-approve the pull request, if required
@@ -204,12 +205,12 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           await approverClient.approvePullRequest({
             project: project,
             repository: repository,
-            pullRequestId: pullRequestToUpdate.id,
+            pullRequestId: pullRequestToUpdate.pullRequestId,
           });
         }
 
         if (pullRequestWasUpdated) {
-          affectedPullRequestIds.get(id)!.updated.push(pullRequestToUpdate.id);
+          affectedPullRequestIds.get(id)!.updated.push(pullRequestToUpdate.pullRequestId);
           return true;
         }
         return false;
@@ -241,12 +242,12 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         const success = await authorClient.abandonPullRequest({
           project: project,
           repository: repository,
-          pullRequestId: pullRequestToClose.id,
-          comment: getPullRequestCloseReasonForOutputData(data),
+          pullRequestId: pullRequestToClose.pullRequestId,
+          comment: getPullRequestCloseReason(data),
           deleteSourceBranch: true,
         });
         if (success) {
-          affectedPullRequestIds.get(id)!.closed.push(pullRequestToClose.id);
+          affectedPullRequestIds.get(id)!.closed.push(pullRequestToClose.pullRequestId);
           return true;
         }
         return false;

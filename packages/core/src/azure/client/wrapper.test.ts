@@ -2,20 +2,19 @@
 
 import ky from 'ky';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { AzureDevOpsWebApiClient } from './client';
-import type { ICreatePullRequest } from './models';
-import { extractRepositoryUrl } from './url-parts';
+import { extractRepositoryUrl } from '../url-parts';
+import { AzureDevOpsClientWrapper } from './wrapper';
 
 vi.mock('ky');
 
-describe('AzureDevOpsWebApiClient', () => {
+describe('AzureDevOpsClientWrapper', () => {
   const url = extractRepositoryUrl({
     organisationUrl: 'https://dev.azure.com/mock-organization',
     project: 'project',
     repository: 'repository',
   });
   const accessToken = 'mock-access-token';
-  let client: AzureDevOpsWebApiClient;
+  let client: AzureDevOpsClientWrapper;
   let mockKyInstance: any;
 
   beforeEach(() => {
@@ -32,37 +31,10 @@ describe('AzureDevOpsWebApiClient', () => {
     // Mock ky.create to return our mock instance
     vi.mocked(ky.create).mockReturnValue(mockKyInstance as any);
 
-    client = new AzureDevOpsWebApiClient(url, accessToken);
+    client = new AzureDevOpsClientWrapper(url, accessToken);
   });
 
   describe('createPullRequest', () => {
-    let pr: ICreatePullRequest;
-
-    beforeEach(() => {
-      pr = {
-        project: 'project',
-        repository: 'repository',
-        source: {
-          branch: 'update-branch',
-          commit: 'commit-id',
-        },
-        target: {
-          branch: 'main',
-        },
-        title: 'PR Title',
-        description: 'PR Description',
-        commitMessage: 'Commit Message',
-        changes: [
-          {
-            path: 'file.txt',
-            content: 'hello world',
-            encoding: 'utf-8',
-            changeType: 'add',
-          },
-        ],
-      };
-    });
-
     it('should create a pull request without duplicate reviewer and assignee identities', async () => {
       // Arrange
       vi.spyOn(client, 'getUserId').mockResolvedValue('my-user-id');
@@ -95,8 +67,25 @@ describe('AzureDevOpsWebApiClient', () => {
       });
 
       // Act
-      pr.assignees = ['user1', 'user2'];
-      const pullRequestId = await client.createPullRequest(pr);
+      const pullRequestId = await client.createPullRequest({
+        project: 'project',
+        repository: 'repository',
+        source: { branch: 'update-branch', commit: 'commit-id' },
+        target: { branch: 'main' },
+        author: { name: 'Author Name', email: 'author@example.com' },
+        title: 'PR Title',
+        description: 'PR Description',
+        commitMessage: 'Commit Message',
+        changes: [
+          {
+            path: 'file.txt',
+            content: 'hello world',
+            encoding: 'utf-8',
+            changeType: 'add',
+          },
+        ],
+        assignees: ['user1', 'user2'],
+      });
 
       // Assert
       expect(mockKyInstance.post).toHaveBeenCalledTimes(2);

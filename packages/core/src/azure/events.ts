@@ -5,7 +5,7 @@ import {
   AzdoPullRequestAsyncStatusSchema,
   AzdoPullRequestCommentSchema,
   AzdoPullRequestStatusSchema,
-} from './types';
+} from './client/types';
 
 export const AzdoEventTypeSchema = z.enum([
   // Code is pushed to a Git repository.
