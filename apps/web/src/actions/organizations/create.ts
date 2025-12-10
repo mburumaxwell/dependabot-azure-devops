@@ -4,7 +4,6 @@ import { extractOrganizationUrl } from '@paklo/core/azure';
 import { Keygen } from '@paklo/core/keygen';
 import { headers as requestHeaders } from 'next/headers';
 import { auth, type Organization } from '@/lib/auth';
-import { getOrganizationTierInfo } from '@/lib/organizations';
 import { type OrganizationType, prisma } from '@/lib/prisma';
 import type { RegionCode } from '@/lib/regions';
 
@@ -30,7 +29,6 @@ export async function createOrganizationWithCredential(
       type,
       url,
       region,
-      tier: 'free', // default to free tier
       billingInterval: 'monthly', // not supporting any other frequency yet
       ...getProviderStuff(options),
 
@@ -43,12 +41,6 @@ export async function createOrganizationWithCredential(
     return { error: { message: 'Failed to create organization' } };
   }
 
-  const tierInfo = getOrganizationTierInfo(organization.tier);
-  await prisma.organization.update({
-    where: { id: organization.id },
-    data: { maxProjects: tierInfo.maxProjects },
-  });
-
   // generate webhook token
   const webhooksToken = Keygen.generate({ length: 32, encoding: 'base62' });
 
@@ -57,7 +49,7 @@ export async function createOrganizationWithCredential(
     data: { id: organization.id, token, webhooksToken },
   });
 
-  // no billing to be created for free tier
+  // TODO; create billing objects in Stripe
 
   return { data: organization };
 }

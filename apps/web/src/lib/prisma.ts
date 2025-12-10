@@ -16,7 +16,6 @@ export type {
   OrganizationBillingInterval,
   OrganizationCredential,
   OrganizationSecret,
-  OrganizationTier,
   OrganizationType,
   Passkey,
   Project,

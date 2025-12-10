@@ -100,14 +100,6 @@ enum SubscriptionStatus {
   @@map("subscription_status")
 }
 
-enum OrganizationTier {
-  free
-  pro
-  enterprise
-
-  @@map("organization_tier")
-}
-
 enum OrganizationBillingInterval {
   monthly
   yearly
@@ -125,7 +117,6 @@ model Organization {
   type                OrganizationType
   url                 String
   region              String
-  tier                OrganizationTier
   billingInterval     OrganizationBillingInterval
   providerHostname    String
   providerApiEndpoint String
@@ -133,7 +124,6 @@ model Organization {
   customerId          String?
   subscriptionId      String?
   subscriptionStatus  SubscriptionStatus?
-  maxProjects         Int
   members             Member[]
   invitations         Invitation[]
   credential          OrganizationCredential?
@@ -266,7 +256,6 @@ model Project {
   permalink             String
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
-  maxRepositories       Int                   @default(0) // zero until updated after billing setup
   synchronizationStatus SynchronizationStatus
   synchronizedAt        DateTime?
   repositories          Repository[]
@@ -309,22 +298,22 @@ model Repository {
 }
 
 model RepositoryUpdate {
-  id                    String           @id @map("_id")
-  createdAt             DateTime         @default(now())
-  updatedAt             DateTime         @updatedAt
-  repository            Repository       @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
-  repositoryId          String
-  enabled               Boolean
-  ecosystem             String
-  directory             String?
-  directories           String[]
+  id              String     @id @map("_id")
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  repository      Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repositoryId    String
+  enabled         Boolean
+  ecosystem       String
+  directory       String?
+  directories     String[]
   /// Either the original directory or merger of directories.
-  directoryKey          String
+  directoryKey    String
   /// Cron schedule for running this update
-  cron                  String
-  timezone              String
-  files                 String[]
-  nextUpdateJobAt       DateTime?
+  cron            String
+  timezone        String
+  files           String[]
+  nextUpdateJobAt DateTime?
 
   @@unique([repositoryId, ecosystem, directoryKey])
   @@index([repositoryId])

@@ -1,6 +1,7 @@
 import { type DependabotConfig, makeDirectoryKey, parseDependabotConfig } from '@paklo/core/dependabot';
 import { requestTriggerUpdateJobs } from '@/actions/repositories/trigger';
 import { generateCron } from '@/lib/cron';
+import { environment } from '@/lib/environment';
 import { PakloId } from '@/lib/ids';
 import { logger } from '@/lib/logger';
 import { type Organization, type OrganizationCredential, type Project, prisma, type Repository } from '@/lib/prisma';
@@ -8,6 +9,8 @@ import { type ISyncProvider, type SynchronizerConfigurationItem, toSynchronizerP
 
 export type SyncResult = { count: number; deleted: number; updated: number };
 export type SyncSingleResult = { skipped?: boolean; updated: boolean };
+
+const MAX_NON_PROD_REPOS = 1;
 
 export class Synchronizer {
   constructor(
@@ -78,10 +81,8 @@ export class Synchronizer {
 
       // track for further synchronization
       syncPairs.push([sci, repository]);
-      if (syncPairs.filter(([item]) => item.hasConfiguration).length >= this.project.maxRepositories) {
-        logger.debug(
-          `Reached maximum number of repositories (${this.project.maxRepositories}) for project ${this.project.id}. Stopping further discovery.`,
-        );
+      if (!environment.production && syncPairs.filter(([item]) => item.hasConfiguration).length >= MAX_NON_PROD_REPOS) {
+        logger.debug(`Development mode: limiting to syncing ${MAX_NON_PROD_REPOS} repository.`);
         break;
       }
 
@@ -105,7 +106,6 @@ export class Synchronizer {
     let updated = 0;
     for (const [sci, repository] of syncPairs) {
       const { updated: repoUpdated } = await this.synchronizeInner({
-        project,
         repository,
         providerInfo: sci,
       });
@@ -137,7 +137,6 @@ export class Synchronizer {
 
     // perform synchronization
     return await this.synchronizeInner({
-      project,
       repository,
       providerInfo: sci,
     });
@@ -172,21 +171,19 @@ export class Synchronizer {
 
     // perform synchronization
     return await this.synchronizeInner({
-      project,
       repository,
       providerInfo: sci,
     });
   }
 
   private async synchronizeInner({
-    project,
     repository,
     providerInfo,
   }: {
-    project: Project;
     repository: Repository | null;
     providerInfo: SynchronizerConfigurationItem;
   }): Promise<SyncSingleResult> {
+    const { organization, project, trigger } = this;
     // ensure not null (can be null when deleted and an event is sent)
     if (!providerInfo.hasConfiguration) {
       // delete repository
@@ -209,9 +206,9 @@ export class Synchronizer {
     if (!repository) {
       // check if adding this repository would exceed the limit
       const existingCount = await prisma.repository.count({ where: { projectId: project.id } });
-      if (existingCount + 1 > project.maxRepositories) {
+      if (!environment.production && existingCount + 1 > MAX_NON_PROD_REPOS) {
         logger.debug(
-          `Skipping creation of repository '${providerInfo.slug}' in project ${project.id} as it would exceed the maximum limit.`,
+          `Development mode: skipping creation of repository '${providerInfo.slug}' as it would exceed the limit.`,
         );
         return { skipped: true, updated: false };
       }
@@ -335,9 +332,9 @@ export class Synchronizer {
     }
 
     // trigger update jobs for the whole repository, if requested
-    if (this.trigger) {
+    if (trigger) {
       await requestTriggerUpdateJobs({
-        organizationId: this.organization.id,
+        organizationId: organization.id,
         projectId: project.id,
         repositoryId: repository.id,
         repositoryUpdateIds: undefined, // run all updates

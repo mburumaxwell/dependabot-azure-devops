@@ -13,7 +13,7 @@ import {
 import { environment } from '@/lib/environment';
 import { PakloId } from '@/lib/ids';
 import { logger } from '@/lib/logger';
-import { OrganizationBillingIntervalSchema, OrganizationTierSchema, OrganizationTypeSchema } from '@/lib/organizations';
+import { OrganizationBillingIntervalSchema, OrganizationTypeSchema } from '@/lib/organizations';
 import { prisma as prismaClient } from '@/lib/prisma';
 import { RegionCodeSchema } from '@/lib/regions';
 import { config } from '@/site-config';
@@ -67,11 +67,6 @@ export const auth = betterAuth({
             },
             url: { type: 'string', required: true, unique: true },
             region: { type: 'string', required: true, validator: { input: RegionCodeSchema } },
-            tier: {
-              type: ['free', 'pro', 'enterprise'],
-              required: true,
-              validator: { input: OrganizationTierSchema },
-            },
             billingInterval: {
               type: ['monthly', 'yearly'],
               required: true,
@@ -83,7 +78,6 @@ export const auth = betterAuth({
             customerId: { type: 'string', required: false, input: false },
             subscriptionId: { type: 'string', required: false, input: false },
             subscriptionStatus: { type: 'string', required: false, input: false },
-            maxProjects: { type: 'number', required: true, input: false },
           },
         },
       },

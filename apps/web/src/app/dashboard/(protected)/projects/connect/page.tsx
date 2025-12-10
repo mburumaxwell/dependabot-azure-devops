@@ -22,7 +22,6 @@ export default async function ProjectConnectPage() {
   });
   if (!organization) return null;
 
-  const { maxProjects } = organization;
   const projects = await listAvailableProjects(organization);
 
   return (
@@ -34,12 +33,7 @@ export default async function ProjectConnectPage() {
         </div>
       </div>
 
-      <ConnectProjectsView
-        organizationId={organization.id}
-        type={organization.type}
-        projects={projects}
-        maxProjects={maxProjects}
-      />
+      <ConnectProjectsView organizationId={organization.id} type={organization.type} projects={projects} />
     </div>
   );
 }

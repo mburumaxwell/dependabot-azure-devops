@@ -19,10 +19,9 @@ type ProjectViewProps = {
   organizationId: string;
   type: OrganizationType;
   projects: AvailableProject[];
-  maxProjects: number;
 };
 
-export function ConnectProjectsView({ organizationId, type, projects, maxProjects }: ProjectViewProps) {
+export function ConnectProjectsView({ organizationId, type, projects }: ProjectViewProps) {
   const router = useRouter();
   const [selectedProjects, setSelectedProjects] = useState<Set<string>>(new Set());
   const [connecting, setConnecting] = useState(false);
@@ -30,7 +29,6 @@ export function ConnectProjectsView({ organizationId, type, projects, maxProject
   const orgTypeInfo = getOrganizationTypeInfo(type);
   const connectedCount = projects.filter((p) => p.connected).length;
   const totalCount = connectedCount + selectedProjects.size;
-  const canSelectMore = totalCount < maxProjects;
 
   function handleToggleProject(providerId: string) {
     setSelectedProjects((prev) => {
@@ -38,9 +36,7 @@ export function ConnectProjectsView({ organizationId, type, projects, maxProject
       if (newSet.has(providerId)) {
         newSet.delete(providerId);
       } else {
-        if (totalCount < maxProjects) {
-          newSet.add(providerId);
-        }
+        newSet.add(providerId);
       }
       return newSet;
     });
@@ -83,10 +79,10 @@ export function ConnectProjectsView({ organizationId, type, projects, maxProject
           </div>
           <div className='text-right'>
             <p className='text-sm font-medium'>
-              {totalCount} of {maxProjects} projects
+              {totalCount} of {projects.length} projects
             </p>
             <p className='text-xs text-muted-foreground'>
-              {maxProjects - totalCount} slot{maxProjects - totalCount !== 1 ? 's' : ''} remaining
+              {projects.length - totalCount} project{projects.length - totalCount !== 1 ? 's' : ''} available
             </p>
           </div>
         </div>
@@ -99,7 +95,7 @@ export function ConnectProjectsView({ organizationId, type, projects, maxProject
                 <Checkbox
                   id={project.providerId}
                   checked={project.connected || selectedProjects.has(project.providerId)}
-                  disabled={project.connected || (!selectedProjects.has(project.providerId) && !canSelectMore)}
+                  disabled={project.connected}
                   onCheckedChange={() => handleToggleProject(project.providerId)}
                 />
                 <Label htmlFor={project.providerId} className='flex items-center gap-3 flex-1 cursor-pointer'>
@@ -120,18 +116,6 @@ export function ConnectProjectsView({ organizationId, type, projects, maxProject
             </div>
           ))}
         </div>
-
-        {!canSelectMore && (
-          <div className='p-4 bg-muted rounded-lg'>
-            <p className='text-sm text-muted-foreground'>
-              You've reached your project limit. To connect more projects,{' '}
-              <Link href='/dashboard/settings/billing' className='text-primary hover:underline'>
-                increase your limit
-              </Link>
-              .
-            </p>
-          </div>
-        )}
 
         <div className='flex justify-end gap-3 pt-4'>
           <Button variant='outline' asChild>

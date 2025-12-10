@@ -53,7 +53,6 @@ const groups: MenuGroup[] = [
     label: 'Settings',
     href: '/dashboard/settings',
     items: [
-      { label: 'Usage', href: '/dashboard/settings/usage' },
       { label: 'Team', href: '/dashboard/settings/team' },
       { label: 'Billing', href: '/dashboard/settings/billing' },
       { label: 'Integrations', href: '/dashboard/settings/integrations' },
