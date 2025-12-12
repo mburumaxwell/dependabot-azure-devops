@@ -256,8 +256,8 @@ importers:
         specifier: 2.15.4
         version: 2.15.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       resend:
-        specifier: 6.5.2
-        version: 6.5.2(@react-email/render@2.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3))
+        specifier: 6.6.0
+        version: 6.6.0(@react-email/render@2.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3))
       sonner:
         specifier: 2.0.7
         version: 2.0.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -3723,8 +3723,8 @@ packages:
   '@types/node@18.19.130':
     resolution: {integrity: sha512-GRaXQx6jGfL8sKfaIDD6OupbIHBr9jv7Jnaml9tB7l4v068PAOXqfcujMMo5PhbIs6ggR1XODELqahT2R8v0fg==}
 
-  '@types/node@22.19.1':
-    resolution: {integrity: sha512-LCCV0HdSZZZb34qifBsyWlUmok6W7ouER+oQIGBScS8EsZsQbrtFTUrDX4hOl+CS6p7cnNC4td+qrSVGSCTUfQ==}
+  '@types/node@22.19.2':
+    resolution: {integrity: sha512-LPM2G3Syo1GLzXLGJAKdqoU35XvrWzGJ21/7sgZTUpbkBaOasTj8tjwn6w+hCkqaa1TfJ/w67rJSwYItlJ2mYw==}
 
   '@types/node@24.10.1':
     resolution: {integrity: sha512-GNWcUTRBgIRJD5zj+Tq0fKOJ5XZajIiBroOF0yvj2bSU1WvNdYS/dn9UxwsujGW4JX06dnHyjV2y9rRaybH0iQ==}
@@ -7616,8 +7616,8 @@ packages:
   requires-port@1.0.0:
     resolution: {integrity: sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==}
 
-  resend@6.5.2:
-    resolution: {integrity: sha512-Yl83UvS8sYsjgmF8dVbNPzlfpmb3DkLUk3VwsAbkaEFo9UMswpNuPGryHBXGk+Ta4uYMv5HmjVk3j9jmNkcEDg==}
+  resend@6.6.0:
+    resolution: {integrity: sha512-d1WoOqSxj5x76JtQMrieNAG1kZkh4NU4f+Je1yq4++JsDpLddhEwnJlNfvkCzvUuZy9ZquWmMMAm2mENd2JvRw==}
     engines: {node: '>=20'}
     peerDependencies:
       '@react-email/render': '*'
@@ -12694,7 +12694,7 @@ snapshots:
     dependencies:
       undici-types: 5.26.5
 
-  '@types/node@22.19.1':
+  '@types/node@22.19.2':
     dependencies:
       undici-types: 6.21.0
 
@@ -17148,7 +17148,7 @@ snapshots:
 
   requires-port@1.0.0: {}
 
-  resend@6.5.2(@react-email/render@2.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)):
+  resend@6.6.0(@react-email/render@2.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)):
     dependencies:
       svix: 1.76.1
     optionalDependencies:
@@ -17757,7 +17757,7 @@ snapshots:
   svix@1.76.1:
     dependencies:
       '@stablelib/base64': 1.0.1
-      '@types/node': 22.19.1
+      '@types/node': 22.19.2
       es6-promise: 4.2.8
       fast-sha256: 1.3.0
       url-parse: 1.5.10
