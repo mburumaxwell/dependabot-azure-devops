@@ -72,7 +72,7 @@ async function handleSubscriptionCancelled({
   await prisma.organization.update({
     where: { id: organization.id },
     data: {
-      // customerId is not removed to allow re-using the same customer in future subscriptions
+      // customerId is not removed to allow reusing the same customer in future subscriptions
       subscriptionId: null,
       subscriptionStatus: null,
     },
