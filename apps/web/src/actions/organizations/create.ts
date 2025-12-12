@@ -49,8 +49,6 @@ export async function createOrganizationWithCredential(
     data: { id: organization.id, token, webhooksToken },
   });
 
-  // TODO; create billing objects in Stripe
-
   return { data: organization };
 }
 

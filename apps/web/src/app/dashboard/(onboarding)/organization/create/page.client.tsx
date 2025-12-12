@@ -473,7 +473,7 @@ export function CreateOrganizationPage() {
                           />
                           <div className='flex items-center gap-4 flex-1'>
                             <div className='size-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0'>
-                              <Globe className='size-6 text-primary' />
+                              <Globe className='size-6' />
                             </div>
                             <div className='flex-1'>
                               <div className='font-semibold'>{region.label}</div>

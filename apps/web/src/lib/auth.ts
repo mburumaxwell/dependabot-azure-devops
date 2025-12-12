@@ -74,7 +74,6 @@ export const auth = betterAuth({
             },
             providerHostname: { type: 'string', required: true },
             providerApiEndpoint: { type: 'string', required: true },
-            billingEmail: { type: 'string', required: false, input: false },
             customerId: { type: 'string', required: false, input: false },
             subscriptionId: { type: 'string', required: false, input: false },
             subscriptionStatus: { type: 'string', required: false, input: false },

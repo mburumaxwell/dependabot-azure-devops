@@ -27,15 +27,17 @@ const config: NextConfig = {
         headers: [
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' }, // 1 year
           {
+            // "*.js.stripe.com" and "maps.googleapis.com" allow Stripe.js to improve performance by starting frames on different origins, where possible
+            // https://docs.stripe.com/security/guide#content-security-policy
             key: 'Content-Security-Policy',
             value: `
               default-src 'self';
               img-src 'self' data: https:;
-              script-src 'self' 'unsafe-inline' https://*.vercel-scripts.com https://vercel.live;
+              script-src 'self' 'unsafe-inline' https://*.vercel-scripts.com https://vercel.live https://*.js.stripe.com https://js.stripe.com https://maps.googleapis.com;
               style-src 'self' 'unsafe-inline';
               font-src 'self';
-              connect-src 'self' https://*.vercel-scripts.com;
-              frame-src https://vercel.live;
+              connect-src 'self' https://*.vercel-scripts.com https://api.stripe.com https://maps.googleapis.com;
+              frame-src https://vercel.live https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com;
               frame-ancestors 'none';
               object-src 'none';
               `

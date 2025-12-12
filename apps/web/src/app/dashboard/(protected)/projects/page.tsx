@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { headers as requestHeaders } from 'next/headers';
+import { BillingNotConfiguredView } from '@/components/billing-not-configured';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { ProjectsView } from './page.client';
@@ -16,6 +17,14 @@ export default async function ProjectsPage() {
 
   const organizationId = session.session.activeOrganizationId;
   if (!organizationId) return null;
+
+  const organization = await prisma.organization.findUniqueOrThrow({
+    where: { id: organizationId },
+  });
+
+  if (!organization.subscriptionId) {
+    return <BillingNotConfiguredView />;
+  }
 
   const projects = await prisma.project.findMany({
     where: { organizationId }, // for the active organization

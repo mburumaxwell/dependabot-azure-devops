@@ -14,10 +14,15 @@ export async function connectProjects({
 }: {
   organizationId: string;
   projects: AvailableProject[];
-}) {
+}): Promise<{ count?: number; error?: { message: string } }> {
   const organization = await prisma.organization.findUniqueOrThrow({
     where: { id: organizationId },
   });
+
+  // ensure billing is setup
+  if (!organization.subscriptionId) {
+    return { error: { message: 'Organization must have an active subscription' } };
+  }
 
   // create projects
   const projectIds = projects.map(() => PakloId.generate('project')); // generate a new ID for each project
@@ -67,5 +72,5 @@ export async function connectProjects({
     }
   }
 
-  return result.count;
+  return { count: result.count };
 }

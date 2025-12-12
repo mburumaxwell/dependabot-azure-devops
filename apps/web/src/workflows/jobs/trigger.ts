@@ -45,6 +45,7 @@ import { SequenceNumber } from '@/lib/ids';
 import { logger } from '@/lib/logger';
 import { prisma, type UpdateJob, type UpdateJobTrigger } from '@/lib/prisma';
 import { type RegionCode, toAzureLocation } from '@/lib/regions';
+import { METER_EVENT_NAME_USAGE, stripe } from '@/lib/stripe';
 import { streamToString } from '@/lib/utils';
 import { config } from '@/site-config';
 
@@ -314,7 +315,7 @@ async function runUpdateJob({ id }: { id: string }) {
   await collectJobResourceLogs({ id, resourceName, startedAt, finishedAt });
 
   // report for billing
-  await reportUsageBilling();
+  await reportUsageBilling({ id });
 }
 
 const SECRET_NAME_PROXY_CONFIG = 'proxy-config';
@@ -695,8 +696,26 @@ export async function collectJobResourceLogs({
   logger.debug(`Uploaded logs for job '${id}' to blob storage (${filesize(mergedLogLength)}).`);
 }
 
-export async function reportUsageBilling() {
+export async function reportUsageBilling({ id }: { id: string }) {
   'use step';
 
-  // TODO: implement usage reporting
+  // fetch the job and related organization
+  const job = await prisma.updateJob.findUniqueOrThrow({ where: { id } });
+  const organization = await prisma.organization.findUniqueOrThrow({ where: { id: job.organizationId } });
+
+  // duration is stored in milliseconds, we report in full minutes
+  const durationMinutes = Math.ceil(job.duration! / 60_000).toFixed(0);
+  logger.info(`Reporting usage for job '${id}': ${durationMinutes} minutes of execution time.`);
+
+  // report to stripe billing meter
+  await stripe.billing.meterEvents.create({
+    event_name: METER_EVENT_NAME_USAGE,
+    payload: {
+      stripe_customer_id: organization.customerId!,
+      value: durationMinutes,
+    },
+    identifier: job.id,
+  });
+
+  logger.info(`Reported usage meter event to Stripe for job '${id}'.`);
 }

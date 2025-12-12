@@ -1,7 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env", "**/.env.*", "**/biome.json", "**/vitest.config.*"],
-  "globalEnv": ["NEXT_RUNTIME", "NODE_ENV", "ADMIN_USER_IDS"],
+  "globalEnv": ["NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", "NEXT_RUNTIME", "NODE_ENV", "ADMIN_USER_IDS"],
   "globalPassThroughEnv": [
     "LOG_LEVEL",
     "ADMIN_DASHBOARD_PASSWORD",

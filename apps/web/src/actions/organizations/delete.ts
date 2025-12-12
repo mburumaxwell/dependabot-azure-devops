@@ -13,21 +13,15 @@ export async function deleteOrganization({
   // fetch organization so that we can delete billing first
   const organization = await prisma.organization.findUniqueOrThrow({ where: { id: organizationId } });
 
-  // if organization has a subscriptionId, cancel the subscription first
+  // the organization should not have any projects
+  const projectCount = await prisma.project.count({ where: { organizationId: organization.id } });
+  if (projectCount > 0) {
+    return { success: false, error: { message: 'Organization still has projects. Please delete them first.' } };
+  }
+
+  // the organization should not have an active subscription
   if (organization.subscriptionId) {
-    try {
-      await stripe.subscriptions.cancel(organization.subscriptionId);
-    } catch (error) {
-      // it was already canceled
-      if (!(error instanceof stripe.errors.StripeInvalidRequestError)) {
-        return { success: false, error: { message: 'Failed to cancel organization billing.' } };
-      }
-    }
-    // update org to remove subscription
-    await prisma.organization.update({
-      where: { id: organizationId },
-      data: { subscriptionId: null, subscriptionStatus: null },
-    });
+    return { success: false, error: { message: 'Organization has an active subscription. Please cancel it first.' } };
   }
 
   // if organization has a customerId, delete the customer

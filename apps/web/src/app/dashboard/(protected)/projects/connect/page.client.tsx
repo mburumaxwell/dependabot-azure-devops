@@ -47,26 +47,26 @@ export function ConnectProjectsView({ organizationId, type, projects }: ProjectV
     const selected = Array.from(selectedProjects).map((id) => projects.find((p) => p.providerId === id)!);
 
     setConnecting(true);
-    try {
-      const count = await connectProjects({ organizationId, projects: selected });
-      if (count === 0) {
-        toast.warning('No projects were connected', {
-          description: 'Please try again later.',
-        });
-        return;
-      }
-
-      toast.success('Connected', {
-        description: `Successfully connected ${count} project${count > 1 ? 's' : ''}`,
-      });
-      router.push('/dashboard/projects');
-    } catch (error) {
+    const { count, error } = await connectProjects({ organizationId, projects: selected });
+    setConnecting(false);
+    if (error) {
       toast.error('Failed to connect projects', {
         description: (error as Error).message,
       });
-    } finally {
-      setConnecting(false);
+      return;
     }
+
+    if (!count) {
+      toast.warning('No projects were connected', {
+        description: 'Please try again later.',
+      });
+      return;
+    }
+
+    toast.success('Connected', {
+      description: `Successfully connected ${count} project${count > 1 ? 's' : ''}`,
+    });
+    router.push('/dashboard/projects');
   }
 
   return (

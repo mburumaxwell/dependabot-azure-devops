@@ -16,7 +16,7 @@ export type Environment = {
   test: boolean;
 
   /** The current platform. */
-  platform: Platform;
+  platform?: Platform;
 
   /** The current commit SHA. */
   sha?: string;

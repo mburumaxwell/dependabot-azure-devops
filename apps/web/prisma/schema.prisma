@@ -120,7 +120,6 @@ model Organization {
   billingInterval     OrganizationBillingInterval
   providerHostname    String
   providerApiEndpoint String
-  billingEmail        String?
   customerId          String?
   subscriptionId      String?
   subscriptionStatus  SubscriptionStatus?
@@ -190,6 +189,7 @@ model Passkey {
 enum FeedbackAction {
   organization_leave @map("organization.leave")
   user_delete        @map("user.delete")
+  billing_cancel     @map("billing.cancel")
 
   @@map("feedback_action")
 }
