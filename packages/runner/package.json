@@ -51,7 +51,7 @@
   },
   "homepage": "https://github.com/mburumaxwell/dependabot-azure-devops#readme",
   "dependencies": {
-    "@hono/node-server": "1.19.6",
+    "@hono/node-server": "1.19.7",
     "@paklo/core": "workspace:*",
     "dockerode": "4.0.9",
     "ky": "1.14.1",
