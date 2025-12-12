@@ -60,7 +60,7 @@ jobs:
 
       - name: Restore .next/cache
         id: cache-next-restore
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ${{ github.workspace }}/apps/web/.next/cache
           key: ${{ runner.os }}-next-web-${{ github.sha }}
@@ -84,7 +84,7 @@ jobs:
 
       - name: Save .next/cache
         if: always() && steps.cache-next-restore.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: ${{ github.workspace }}/apps/web/.next/cache
           key: ${{ steps.cache-next-restore.outputs.cache-primary-key }}
