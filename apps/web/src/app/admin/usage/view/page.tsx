@@ -40,6 +40,7 @@ export default async function Page(props: PageProps<'/admin/usage/view'>) {
   };
   const telemetries = await collection
     .find(query)
+    .sort({ started: -1 })
     .project<SlimTelemetry>({
       _id: 1,
       owner: 1,

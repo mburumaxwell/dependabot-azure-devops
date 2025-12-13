@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -20,15 +20,11 @@ const ITEMS_PER_PAGE = 10;
 export function TelemetryTable({ telemetries }: TelemetryTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
 
-  const sortedData = useMemo(() => {
-    return [...telemetries].sort((a, b) => b.started.getTime() - a.started.getTime());
-  }, [telemetries]);
-
-  const totalPages = Math.ceil(sortedData.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(telemetries.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedData = sortedData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedData = telemetries.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  const formatDate = (date: Date) => {
+  function formatDate(date: Date) {
     return date.toLocaleString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -36,11 +32,11 @@ export function TelemetryTable({ telemetries }: TelemetryTableProps) {
       hour: '2-digit',
       minute: '2-digit',
     });
-  };
+  }
 
-  const shortenOwner = (owner: string) => {
+  function shortenOwner(owner: string) {
     return owner.replace('https://', '').replace('http://', '');
-  };
+  }
 
   return (
     <Card className='p-6'>
@@ -49,8 +45,8 @@ export function TelemetryTable({ telemetries }: TelemetryTableProps) {
           <div>
             <h3 className='text-lg font-semibold text-foreground'>Recent Runs</h3>
             <p className='text-sm text-muted-foreground'>
-              Showing {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, sortedData.length)} of {sortedData.length}{' '}
-              runs
+              Showing {startIndex + 1}-{Math.min(startIndex + ITEMS_PER_PAGE, telemetries.length)} of{' '}
+              {telemetries.length} runs
             </p>
           </div>
           <div className='flex items-center gap-2'>
