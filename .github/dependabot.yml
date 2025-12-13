@@ -44,28 +44,12 @@ updates:
       time: '02:00'
     open-pull-requests-limit: 20
     groups:
-      azure:
-        patterns: ['@azure/*']
-      better-auth:
-        patterns:
-          - 'better-auth'
-          - '@better-auth/*'
-      dockerode:
-        patterns:
-          - '@types/dockerode'
-          - 'dockerode'
-      fumadocs:
-        patterns:
-          - 'fumadocs-*'
-          - '@fumadocs/*'
-      hono:
-        patterns:
-          - '@hono/*'
-          - 'hono'
-      js-yaml:
-        patterns:
-          - '@types/js-yaml'
-          - 'js-yaml'
+      azure: { patterns: ['@azure/*'] }
+      better-auth: { patterns: ['better-auth', '@better-auth/*'] }
+      dockerode: { patterns: ['@types/dockerode', 'dockerode'] }
+      fumadocs: { patterns: ['fumadocs-*', '@fumadocs/*'] }
+      hono: { patterns: ['@hono/*', 'hono'] }
+      js-yaml: { patterns: ['@types/js-yaml', 'js-yaml'] }
       next-and-react:
         patterns:
           - '@next/*'
@@ -75,50 +59,23 @@ updates:
           - 'react'
           - 'react-dom'
           - 'react-router-dom'
-      node-forge:
-        patterns:
-          - '@types/node-forge'
-          - 'node-forge'
-      opentelemetry:
-        patterns: ['@opentelemetry/*']
-      pino:
-        patterns:
-          - 'pino'
-          - 'pino-*'
-      prisma:
-        patterns:
-          - 'prisma'
-          - '@prisma/*'
-      radix-ui:
-        patterns: ['@radix-ui*', 'radix-*']
-      react-email:
-        patterns:
-          - '@react-email/*'
-          - 'react-email'
-      validator:
-        patterns:
-          - '@types/validator'
-          - 'validator'
+      node-forge: { patterns: ['@types/node-forge', 'node-forge'] }
+      opentelemetry: { patterns: ['@opentelemetry/*'] }
+      pino: { patterns: ['pino', 'pino-*'] }
+      prisma: { patterns: ['prisma', '@prisma/*'] }
+      radix-ui: { patterns: ['@radix-ui*', 'radix-*'] }
+      react-email: { patterns: ['@react-email/*', 'react-email'] }
+      validator: { patterns: ['@types/validator', 'validator'] }
       vercel:
-        patterns:
-          - '@vercel/*'
-          - 'vercel'
+        patterns: ['@vercel/*', 'vercel']
         exclude-patterns: ['@vercel/ncc']
       tailwind:
         patterns:
           - 'tailwindcss'
           - 'tailwind-merge'
           - '@tailwindcss/*'
-      tar-stream:
-        patterns:
-          - '@types/tar-stream'
-          - 'tar-stream'
-      vite-and-vitest:
-        patterns:
-          - 'vite'
-          - 'vite-*'
-          - '@vitejs/*'
-          - 'vitest'
+      tar-stream: { patterns: ['@types/tar-stream', 'tar-stream'] }
+      vite-and-vitest: { patterns: ['vite', 'vite-*', '@vitejs/*', 'vitest'] }
     ignore:
       - dependency-name: recharts
         update-types: [version-update:semver-major] # shadcn still doesn't support (https://github.com/shadcn-ui/ui/issues/7669)
