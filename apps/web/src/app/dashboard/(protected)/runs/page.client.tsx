@@ -160,30 +160,41 @@ export default function RunsView({ projects, jobs }: { projects: SlimProject[]; 
             </TableRow>
           </TableHeader>
           <TableBody>
-            {jobs.map((job) => (
-              <TableRow
-                key={job.id}
-                className='cursor-pointer hover:bg-accent/50'
-                onClick={() => router.push(`/dashboard/runs/${job.id}`)}
-              >
-                <TableCell className='text-medium'>
-                  <div className='flex items-center gap-2'>
-                    <EcosystemIcon ecosystem={job.ecosystem} className='size-5' />
-                    <span className='text-wrap wrap-break-word'>{job.repositorySlug}</span>
+            {jobs.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className='text-center py-12'>
+                  <div className='space-y-2'>
+                    <Funnel className='size-8 text-muted-foreground mx-auto' />
+                    <p className='text-muted-foreground'>No jobs found matching your filters</p>
                   </div>
                 </TableCell>
-                <TableCell>
-                  <UpdateJobStatusBadge status={job.status} />
-                </TableCell>
-                <TableCell>
-                  <div className='flex items-center gap-2'>
-                    <UpdateJobTriggerIcon trigger={job.trigger} className='size-3.5' />
-                    {(job.createdAt && <TimeAgo date={job.createdAt} />) || '—'}
-                  </div>
-                </TableCell>
-                <TableCell>{(job.duration && formatDuration(job.duration)) || '—'}</TableCell>
               </TableRow>
-            ))}
+            ) : (
+              jobs.map((job) => (
+                <TableRow
+                  key={job.id}
+                  className='cursor-pointer hover:bg-accent/50'
+                  onClick={() => router.push(`/dashboard/runs/${job.id}`)}
+                >
+                  <TableCell className='text-medium'>
+                    <div className='flex items-center gap-2'>
+                      <EcosystemIcon ecosystem={job.ecosystem} className='size-5' />
+                      <span className='text-wrap wrap-break-word'>{job.repositorySlug}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <UpdateJobStatusBadge status={job.status} />
+                  </TableCell>
+                  <TableCell>
+                    <div className='flex items-center gap-2'>
+                      <UpdateJobTriggerIcon trigger={job.trigger} className='size-4' />
+                      {(job.createdAt && <TimeAgo date={job.createdAt} />) || '—'}
+                    </div>
+                  </TableCell>
+                  <TableCell>{(job.duration && formatDuration(job.duration)) || '—'}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
