@@ -1,12 +1,13 @@
 'use client';
 
 import type { DependabotPackageManager } from '@paklo/core/dependabot';
-import { Calendar } from 'lucide-react';
+import { Calendar, Funnel, FunnelX } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Item, ItemActions, ItemContent, ItemMedia } from '@/components/ui/item';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { type TimeRange, timeRangeOptions } from '@/lib/aggregation';
 import { packageManagerOptions, type WithAll } from '@/lib/enums';
@@ -37,8 +38,8 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
   const selectedPackageManager = (searchParams.get('packageManager') as WithAll<DependabotPackageManager>) ?? 'all';
   const successFilter = (searchParams.get('success') as WithAll<'false' | 'true'>) ?? 'all';
 
-  function updateFilters(updates: Record<string, string>) {
-    const params = new URLSearchParams(searchParams.toString());
+  function updateFilters(updates: Record<string, string>, clear: boolean = false) {
+    const params = new URLSearchParams(clear ? '' : searchParams.toString());
     Object.entries(updates).forEach(([key, value]) => {
       if (value && value !== 'all') {
         params.set(key, value);
@@ -102,106 +103,111 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
       </div>
 
       {/* Filters */}
-      <Card className='p-4'>
-        <div className='flex flex-wrap gap-3'>
-          <Select value={timeRange} onValueChange={(value) => updateFilters({ timeRange: value })}>
-            <SelectTrigger className='w-[180px]'>
-              <Calendar className='size-4 mr-2' />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {timeRangeOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <div className='relative w-[280px]'>
-            <Input
-              placeholder='Filter by owner (type to search)...'
-              value={ownerSearch || selectedOwner.replace('https://', '').replace('http://', '')}
-              onChange={(e) => {
-                setOwnerSearch(e.target.value);
-                setShowOwnerSuggestions(true);
-              }}
-              onFocus={() => setShowOwnerSuggestions(true)}
-              onBlur={() => setTimeout(() => setShowOwnerSuggestions(false), 200)}
-              className='w-full'
-            />
-            {showOwnerSuggestions && filteredOwners.length > 0 && ownerSearch && (
-              <Card className='absolute top-full mt-1 w-full max-h-[300px] overflow-y-auto z-50 p-1'>
-                {filteredOwners.map((owner) => (
-                  <button
-                    key={owner}
-                    className='w-full text-left px-3 py-2 text-sm hover:bg-accent rounded-sm transition-colors'
-                    type='button'
-                    onClick={() => {
-                      updateFilters({ owner });
-                      setOwnerSearch(owner.replace('https://', '').replace('http://', ''));
-                      setShowOwnerSuggestions(false);
-                    }}
-                  >
-                    {owner.replace('https://', '').replace('http://', '')}
-                  </button>
+      <Item variant='outline'>
+        <ItemMedia variant='icon'>
+          <Funnel />
+        </ItemMedia>
+        <ItemContent>
+          <div className='flex flex-wrap gap-3'>
+            <Select value={timeRange} onValueChange={(value) => updateFilters({ timeRange: value })}>
+              <SelectTrigger className='w-[180px]'>
+                <Calendar className='size-4 mr-2' />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {timeRangeOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
                 ))}
-              </Card>
-            )}
-            {selectedOwner && (
-              <Button
-                variant='ghost'
-                size='sm'
-                className='absolute right-1 top-1/2 -translate-y-1/2 h-7 px-2'
-                onClick={() => {
-                  updateFilters({ owner: '' });
-                  setOwnerSearch('');
+              </SelectContent>
+            </Select>
+
+            <div className='relative w-[280px]'>
+              <Input
+                placeholder='Filter by owner (type to search)...'
+                value={ownerSearch || selectedOwner.replace('https://', '').replace('http://', '')}
+                onChange={(e) => {
+                  setOwnerSearch(e.target.value);
+                  setShowOwnerSuggestions(true);
                 }}
-              >
-                Clear
-              </Button>
-            )}
+                onFocus={() => setShowOwnerSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowOwnerSuggestions(false), 200)}
+                className='w-full'
+              />
+              {showOwnerSuggestions && filteredOwners.length > 0 && ownerSearch && (
+                <Card className='absolute top-full mt-1 w-full max-h-[300px] overflow-y-auto z-50 p-1'>
+                  {filteredOwners.map((owner) => (
+                    <button
+                      key={owner}
+                      className='w-full text-left px-3 py-2 text-sm hover:bg-accent rounded-sm transition-colors'
+                      type='button'
+                      onClick={() => {
+                        updateFilters({ owner });
+                        setOwnerSearch(owner.replace('https://', '').replace('http://', ''));
+                        setShowOwnerSuggestions(false);
+                      }}
+                    >
+                      {owner.replace('https://', '').replace('http://', '')}
+                    </button>
+                  ))}
+                </Card>
+              )}
+              {selectedOwner && (
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  className='absolute right-1 top-1/2 -translate-y-1/2 h-7 px-2'
+                  onClick={() => {
+                    updateFilters({ owner: '' });
+                    setOwnerSearch('');
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
+
+            <Select value={selectedPackageManager} onValueChange={(value) => updateFilters({ packageManager: value })}>
+              <SelectTrigger className='w-[200px]'>
+                <SelectValue placeholder='All Package Managers' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='all'>All Package Managers</SelectItem>
+                {packageManagerOptions.map((pm) => (
+                  <SelectItem key={pm.value} value={pm.value}>
+                    {pm.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={successFilter} onValueChange={(value) => updateFilters({ success: value })}>
+              <SelectTrigger className='w-[140px]'>
+                <SelectValue placeholder='All Status' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='all'>All Status</SelectItem>
+                <SelectItem value='true'>Success Only</SelectItem>
+                <SelectItem value='false'>Failure Only</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-
-          <Select value={selectedPackageManager} onValueChange={(value) => updateFilters({ packageManager: value })}>
-            <SelectTrigger className='w-[200px]'>
-              <SelectValue placeholder='All Package Managers' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='all'>All Package Managers</SelectItem>
-              {packageManagerOptions.map((pm) => (
-                <SelectItem key={pm.value} value={pm.value}>
-                  {pm.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={successFilter} onValueChange={(value) => updateFilters({ success: value })}>
-            <SelectTrigger className='w-[140px]'>
-              <SelectValue placeholder='All Status' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='all'>All Status</SelectItem>
-              <SelectItem value='true'>Success Only</SelectItem>
-              <SelectItem value='false'>Failure Only</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {(selectedOwner || selectedPackageManager !== 'all' || successFilter !== 'all') && (
-            <Button
-              variant='ghost'
-              size='sm'
-              onClick={() => {
-                router.push('/admin/usage');
-                setOwnerSearch('');
-              }}
-            >
-              Clear Filters
-            </Button>
-          )}
-        </div>
-      </Card>
+        </ItemContent>
+        <ItemActions>
+          <Button
+            variant='ghost'
+            size='icon-sm'
+            onClick={() => {
+              updateFilters({}, true);
+              setOwnerSearch('');
+            }}
+            disabled={!(selectedOwner || selectedPackageManager !== 'all' || successFilter !== 'all')}
+          >
+            <FunnelX />
+          </Button>
+        </ItemActions>
+      </Item>
 
       {/* Key Metrics */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4'>
