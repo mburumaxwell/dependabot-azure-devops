@@ -12,7 +12,7 @@ export type RequestSyncOptions = SyncWorkflowOptions;
  */
 export async function requestSync(options: RequestSyncOptions) {
   await start(synchronizeWithProvider, [options]);
-  await prisma.project.update({
+  return await prisma.project.update({
     where: { id: options.projectId, organizationId: options.organizationId },
     data: { synchronizationStatus: 'pending' },
   });

@@ -10,6 +10,16 @@ import { SynchronizationStatusBadge } from '@/components/icons';
 import { TimeAgo } from '@/components/time-ago';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Field, FieldContent, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getNextManualSyncTime, isManualSyncAllowed } from '@/lib/organizations';
@@ -37,15 +48,24 @@ export function RepositoriesView({
 }) {
   const router = useRouter();
   const [project, setProject] = useState(initialProject);
+  const [showSyncDialog, setShowSyncDialog] = useState(false);
+  const [isRequestingSync, setIsRequestingSync] = useState(false);
+  const [triggerUpdateJobs, setTriggerUpdateJobs] = useState(false);
 
   async function handleSync(project: SimpleProject) {
-    // TODO: pop a dialog to ask if they want to sync repositories as well (false by default) and if to trigger update jobs
-    await requestSync({
-      organizationId: project.organizationId,
-      projectId: project.id,
-      scope: 'project',
-    });
-    setProject((prev) => ({ ...prev, synchronizationStatus: 'pending' }));
+    setIsRequestingSync(true);
+    try {
+      const updatedProject = await requestSync({
+        organizationId: project.organizationId,
+        projectId: project.id,
+        scope: 'project',
+        trigger: triggerUpdateJobs,
+      });
+      setProject(updatedProject);
+      setShowSyncDialog(false);
+    } finally {
+      setIsRequestingSync(false);
+    }
   }
 
   async function handleDisconnect(project: SimpleProject) {
@@ -89,7 +109,7 @@ export function RepositoriesView({
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end' className='w-52'>
               <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => handleSync(project)} disabled={!isManualSyncAllowed(project)}>
+                <DropdownMenuItem onClick={() => setShowSyncDialog(true)} disabled={!isManualSyncAllowed(project)}>
                   {project.synchronizationStatus === 'pending' ? (
                     <>
                       <Spinner />
@@ -122,6 +142,47 @@ export function RepositoriesView({
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Dialog open={showSyncDialog} onOpenChange={setShowSyncDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Sync Project</DialogTitle>
+                <DialogDescription>
+                  This will start a synchronization process for all repositories in this project.
+                </DialogDescription>
+              </DialogHeader>
+              <FieldGroup className='py-3'>
+                <Field orientation='horizontal'>
+                  <Checkbox
+                    id='trigger'
+                    checked={triggerUpdateJobs}
+                    onCheckedChange={(v) => v !== 'indeterminate' && setTriggerUpdateJobs(v)}
+                  />
+                  <FieldContent>
+                    <FieldLabel htmlFor='trigger'>Trigger update jobs after synchronization</FieldLabel>
+                    <FieldDescription>
+                      If checked, new update jobs will be run for each repository update configuration after
+                      synchronization.
+                    </FieldDescription>
+                  </FieldContent>
+                </Field>
+              </FieldGroup>
+              <DialogFooter>
+                <DialogClose asChild disabled={isRequestingSync}>
+                  <Button variant='outline'>Cancel</Button>
+                </DialogClose>
+                <Button onClick={() => handleSync(project)} disabled={isRequestingSync}>
+                  {isRequestingSync ? (
+                    <>
+                      <Spinner className='mr-2' />
+                      Requesting...{' '}
+                    </>
+                  ) : (
+                    'Confirm'
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </ButtonGroup>
       </div>
 
