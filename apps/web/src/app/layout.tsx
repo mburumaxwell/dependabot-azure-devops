@@ -2,7 +2,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata, Viewport } from 'next';
 import type { TemplateString } from 'next/dist/lib/metadata/types/metadata-types';
-import { Inter } from 'next/font/google';
+import { Geist } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -10,9 +10,7 @@ import './globals.css';
 
 import { config, socials } from '@/site-config';
 
-const inter = Inter({
-  subsets: ['latin'],
-});
+const geist = Geist({ subsets: ['latin'] });
 
 const titleTemplate: TemplateString = {
   default: config.title,
@@ -44,7 +42,7 @@ export const viewport: Viewport = {
 
 export default function Layout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang='en' className={inter.className} suppressHydrationWarning>
+    <html lang='en' className={geist.className} suppressHydrationWarning>
       <body>
         <ThemeProvider>
           <TooltipProvider>{children}</TooltipProvider>

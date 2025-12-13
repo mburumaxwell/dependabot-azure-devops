@@ -1,6 +1,19 @@
 'use client';
 
-import { BadgeCheck, ChevronsUpDown, LogOut, Plus } from 'lucide-react';
+import {
+  Activity,
+  BadgeCheck,
+  Blocks,
+  ChevronsUpDown,
+  CircleGauge,
+  CreditCard,
+  Folder,
+  Key,
+  LogOut,
+  type LucideIcon,
+  Plus,
+  Users,
+} from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -20,13 +33,12 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarRail,
   useSidebar,
 } from '@/components/ui/sidebar';
@@ -34,28 +46,26 @@ import { authClient, type Organization, type Session } from '@/lib/auth-client';
 import { getOrganizationTypeInfo } from '@/lib/organizations';
 import { cn, getInitials, type InitialsType } from '@/lib/utils';
 
-type MenuItem = { label: string; href: Route };
-type MenuGroup = { label: string; href: Route; items?: MenuItem[] };
+type MenuItem = { label: string; href: Route; icon?: LucideIcon };
+type MenuGroup = { label: string; items?: MenuItem[] };
 
 const groups: MenuGroup[] = [
   {
-    label: 'Dashboard',
-    href: '/dashboard',
+    label: 'Home',
     items: [
-      { label: 'Activity', href: '/dashboard/activity' },
-      { label: 'Projects', href: '/dashboard/projects' },
-      { label: 'Runs', href: '/dashboard/runs' },
-      // { label: 'Advisories', href: '/dashboard/advisories' },
-      { label: 'Secrets', href: '/dashboard/secrets' },
+      { label: 'Dashboard', href: '/dashboard/activity', icon: CircleGauge },
+      { label: 'Projects', href: '/dashboard/projects', icon: Folder },
+      { label: 'Runs', href: '/dashboard/runs', icon: Activity },
+      // { label: 'Advisories', href: '/dashboard/advisories', icon: ShieldAlert },
+      { label: 'Secrets', href: '/dashboard/secrets', icon: Key },
     ],
   },
   {
     label: 'Settings',
-    href: '/dashboard/settings',
     items: [
-      { label: 'Team', href: '/dashboard/settings/team' },
-      { label: 'Billing', href: '/dashboard/settings/billing' },
-      { label: 'Integrations', href: '/dashboard/settings/integrations' },
+      { label: 'Team', href: '/dashboard/settings/team', icon: Users },
+      { label: 'Billing', href: '/dashboard/settings/billing', icon: CreditCard },
+      { label: 'Integrations', href: '/dashboard/settings/integrations', icon: Blocks },
     ],
   },
 ];
@@ -80,8 +90,8 @@ export function AppSidebar({ session, organizations, ...props }: AppSidebarProps
   }
 
   return (
-    <Sidebar {...props}>
-      <SidebarHeader>
+    <Sidebar collapsible='icon' {...props}>
+      <SidebarHeader className='border-b'>
         <OrganizationSwitcher
           isMobile={isMobile}
           organizations={organizations}
@@ -89,30 +99,25 @@ export function AppSidebar({ session, organizations, ...props }: AppSidebarProps
         />
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarMenu>
-            {groups.map((group) => (
-              <SidebarMenuItem key={group.label}>
-                <SidebarMenuButton asChild isActive={isActive(group.href)}>
-                  <Link href={group.href} className='font-medium'>
-                    {group.label}
-                  </Link>
-                </SidebarMenuButton>
-                {group.items?.length ? (
-                  <SidebarMenuSub key={group.label}>
-                    {group.items.map((item) => (
-                      <SidebarMenuSubItem key={item.label}>
-                        <SidebarMenuSubButton asChild isActive={isActive(item.href)}>
-                          <Link href={item.href}>{item.label}</Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                ) : null}
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
+        {groups.map((group) => (
+          <SidebarGroup key={group.label}>
+            <SidebarGroupContent>
+              <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+              <SidebarMenu>
+                {group.items?.map((item) => (
+                  <SidebarMenuItem key={item.label}>
+                    <SidebarMenuButton tooltip={item.label} isActive={isActive(item.href)} asChild>
+                      <Link href={item.href}>
+                        {item.icon && <item.icon />}
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
