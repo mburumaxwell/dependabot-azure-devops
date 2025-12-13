@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getDateTimeRange, type TimeRange } from '@/lib/aggregation';
+import { type Filter, getMongoCollection, type UsageTelemetry } from '@/lib/mongodb';
 import { loggedIn } from '../actions';
-import { fetchTelemetryData } from './actions';
 import { TelemetryDashboard } from './part-dashboard';
 
 export const metadata: Metadata = {
@@ -23,16 +23,21 @@ export default async function Page(props: PageProps<'/admin/usage/view'>) {
     packageManager?: string;
     success?: string;
   };
-  const { timeRange = '24h', owner, packageManager, success } = searchParams;
+  const { timeRange = '24h', owner, packageManager: selectedPackageManager, success: successFilter } = searchParams;
   const { start, end } = getDateTimeRange(timeRange);
 
-  const data = await fetchTelemetryData({
-    start,
-    end,
-    owner,
-    packageManager,
-    success,
-  });
+  const success = successFilter === 'success' ? true : successFilter === 'failure' ? false : undefined;
+  const packageManager =
+    selectedPackageManager && selectedPackageManager !== 'all' ? selectedPackageManager : undefined;
+
+  const collection = await getMongoCollection('usage_telemetry');
+  const query: Filter<UsageTelemetry> = {
+    started: { $gte: start, $lte: end },
+    ...(owner ? { owner } : {}),
+    ...(packageManager ? { packageManager } : {}),
+    ...(success !== undefined ? { success: success } : {}),
+  };
+  const data = await collection.find(query).toArray();
 
   return (
     <div className='min-h-screen bg-background'>
