@@ -14,11 +14,15 @@ import { PackageManagerChart } from './part-package-manager-chart';
 import { RunsChart } from './part-runs-chart';
 import { TelemetryTable } from './part-telemetry-table';
 
-interface TelemetryDashboardProps {
-  initialData: UsageTelemetry[];
-}
+export type SlimTelemetry = Pick<
+  UsageTelemetry,
+  '_id' | 'owner' | 'packageManager' | 'started' | 'success' | 'duration' | 'version'
+>;
+type TelemetryDashboardProps = {
+  telemetries: SlimTelemetry[];
+};
 
-export function TelemetryDashboard({ initialData }: TelemetryDashboardProps) {
+export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -44,9 +48,9 @@ export function TelemetryDashboard({ initialData }: TelemetryDashboardProps) {
 
   // Extract unique values for filters
   const owners = useMemo(() => {
-    const unique = Array.from(new Set(initialData.map((d) => d.owner)));
+    const unique = Array.from(new Set(telemetries.map((d) => d.owner)));
     return unique.sort();
-  }, [initialData]);
+  }, [telemetries]);
 
   const filteredOwners = useMemo(() => {
     if (!ownerSearch) return owners;
@@ -55,20 +59,20 @@ export function TelemetryDashboard({ initialData }: TelemetryDashboardProps) {
   }, [owners, ownerSearch]);
 
   const packageManagers = useMemo(() => {
-    const unique = Array.from(new Set(initialData.map((d) => d.packageManager)));
+    const unique = Array.from(new Set(telemetries.map((d) => d.packageManager)));
     return unique.sort();
-  }, [initialData]);
+  }, [telemetries]);
 
   const metrics = useMemo(() => {
-    const totalRuns = initialData.length;
-    const successfulRuns = initialData.filter((d) => d.success).length;
+    const totalRuns = telemetries.length;
+    const successfulRuns = telemetries.filter((d) => d.success).length;
     const failedRuns = totalRuns - successfulRuns;
     const successRate = totalRuns > 0 ? (successfulRuns / totalRuns) * 100 : 0;
 
     // Calculate median duration
     let medianDuration = 0;
     if (totalRuns > 0) {
-      const sortedDurations = [...initialData].map((d) => d.duration).sort((a, b) => a - b);
+      const sortedDurations = [...telemetries].map((d) => d.duration).sort((a, b) => a - b);
       const mid = Math.floor(sortedDurations.length / 2);
       medianDuration =
         sortedDurations.length % 2 === 0
@@ -76,7 +80,7 @@ export function TelemetryDashboard({ initialData }: TelemetryDashboardProps) {
           : sortedDurations[mid]!;
     }
 
-    const totalDuration = initialData.reduce((sum, d) => sum + d.duration, 0);
+    const totalDuration = telemetries.reduce((sum, d) => sum + d.duration, 0);
 
     // Format total duration to human-readable format
     const formatDuration = (ms: number) => {
@@ -105,7 +109,7 @@ export function TelemetryDashboard({ initialData }: TelemetryDashboardProps) {
       totalDuration,
       formattedTotalDuration: formatDuration(totalDuration),
     };
-  }, [initialData]);
+  }, [telemetries]);
 
   return (
     <div className='flex flex-col gap-6 p-6'>
@@ -252,12 +256,12 @@ export function TelemetryDashboard({ initialData }: TelemetryDashboardProps) {
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
-        <RunsChart data={initialData} timeRange={timeRange} />
-        <PackageManagerChart data={initialData} />
+        <RunsChart telemetries={telemetries} timeRange={timeRange} />
+        <PackageManagerChart telemetries={telemetries} />
       </div>
 
       {/* Data Table */}
-      <TelemetryTable data={initialData} />
+      <TelemetryTable telemetries={telemetries} />
     </div>
   );
 }

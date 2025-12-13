@@ -7,13 +7,13 @@ import { isHourlyRange, type TimeRange } from '@/lib/aggregation';
 import type { UsageTelemetry } from '@/lib/mongodb';
 
 interface RunsChartProps {
-  data: UsageTelemetry[];
+  telemetries: Pick<UsageTelemetry, 'started' | 'success'>[];
   timeRange: TimeRange;
 }
 
-export function RunsChart({ data, timeRange }: RunsChartProps) {
+export function RunsChart({ telemetries, timeRange }: RunsChartProps) {
   const chartData = useMemo(() => {
-    const grouped = data.reduce(
+    const grouped = telemetries.reduce(
       (acc, item) => {
         let key: string;
         if (isHourlyRange(timeRange)) {
@@ -40,7 +40,7 @@ export function RunsChart({ data, timeRange }: RunsChartProps) {
     );
 
     return Object.values(grouped).sort((a, b) => a.date.localeCompare(b.date));
-  }, [data, timeRange]);
+  }, [telemetries, timeRange]);
 
   const xAxisFormatter = (value: string) => {
     if (isHourlyRange(timeRange)) {

@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { getDateTimeRange, type TimeRange } from '@/lib/aggregation';
 import { type Filter, getMongoCollection, type UsageTelemetry } from '@/lib/mongodb';
 import { loggedIn } from '../actions';
-import { TelemetryDashboard } from './part-dashboard';
+import { type SlimTelemetry, TelemetryDashboard } from './part-dashboard';
 
 export const metadata: Metadata = {
   title: 'Usage Statistics',
@@ -37,11 +37,22 @@ export default async function Page(props: PageProps<'/admin/usage/view'>) {
     ...(packageManager ? { packageManager } : {}),
     ...(success !== undefined ? { success: success } : {}),
   };
-  const data = await collection.find(query).toArray();
+  const telemetries = await collection
+    .find(query)
+    .project<SlimTelemetry>({
+      _id: 1,
+      owner: 1,
+      packageManager: 1,
+      started: 1,
+      success: 1,
+      duration: 1,
+      version: 1,
+    })
+    .toArray();
 
   return (
     <div className='min-h-screen bg-background'>
-      <TelemetryDashboard initialData={data} />
+      <TelemetryDashboard telemetries={telemetries} />
     </div>
   );
 }

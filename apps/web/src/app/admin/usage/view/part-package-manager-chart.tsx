@@ -6,12 +6,12 @@ import { Card } from '@/components/ui/card';
 import type { UsageTelemetry } from '@/lib/mongodb';
 
 interface PackageManagerChartProps {
-  data: UsageTelemetry[];
+  telemetries: Pick<UsageTelemetry, 'packageManager' | 'success'>[];
 }
 
-export function PackageManagerChart({ data }: PackageManagerChartProps) {
+export function PackageManagerChart({ telemetries }: PackageManagerChartProps) {
   const chartData = useMemo(() => {
-    const grouped = data.reduce(
+    const grouped = telemetries.reduce(
       (acc, item) => {
         if (!acc[item.packageManager]) {
           acc[item.packageManager] = { name: item.packageManager, success: 0, failure: 0 };
@@ -27,7 +27,7 @@ export function PackageManagerChart({ data }: PackageManagerChartProps) {
     );
 
     return Object.values(grouped).sort((a, b) => b.success + b.failure - (a.success + a.failure));
-  }, [data]);
+  }, [telemetries]);
 
   return (
     <Card className='p-6'>

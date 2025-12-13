@@ -8,17 +8,20 @@ import { Card } from '@/components/ui/card';
 import type { UsageTelemetry } from '@/lib/mongodb';
 
 interface TelemetryTableProps {
-  data: UsageTelemetry[];
+  telemetries: Pick<
+    UsageTelemetry,
+    '_id' | 'packageManager' | 'started' | 'success' | 'duration' | 'owner' | 'version'
+  >[];
 }
 
 const ITEMS_PER_PAGE = 10;
 
-export function TelemetryTable({ data }: TelemetryTableProps) {
+export function TelemetryTable({ telemetries }: TelemetryTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
 
   const sortedData = useMemo(() => {
-    return [...data].sort((a, b) => b.started.getTime() - a.started.getTime());
-  }, [data]);
+    return [...telemetries].sort((a, b) => b.started.getTime() - a.started.getTime());
+  }, [telemetries]);
 
   const totalPages = Math.ceil(sortedData.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
