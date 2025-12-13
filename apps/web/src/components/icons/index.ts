@@ -1,2 +1,3 @@
-export * from './ecosystem-icon';
-export * from './job-status-icon';
+export * from './ecosystem';
+export * from './sync-status';
+export * from './update-jobs';

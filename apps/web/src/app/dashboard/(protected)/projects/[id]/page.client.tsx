@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { disconnectProject } from '@/actions/projects';
 import { requestSync } from '@/actions/sync';
-import { SynchronizationStatusBadge } from '@/components/sync-status-badge';
+import { SynchronizationStatusBadge } from '@/components/icons';
 import { TimeAgo } from '@/components/time-ago';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';

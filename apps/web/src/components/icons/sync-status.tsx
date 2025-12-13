@@ -8,17 +8,17 @@ export function SynchronizationStatusBadge({
   ...props
 }: { status: SynchronizationStatus } & React.ComponentProps<typeof Badge>) {
   const variants = {
-    success: { variant: 'default' as const, text: 'Synced', icon: Activity },
-    failed: { variant: 'destructive' as const, text: 'Failed', icon: Activity },
-    pending: { variant: 'secondary' as const, text: 'Syncing...', icon: Spinner },
+    success: { variant: 'default' as const, label: 'Synced', icon: Activity },
+    failed: { variant: 'destructive' as const, label: 'Failed', icon: Activity },
+    pending: { variant: 'secondary' as const, label: 'Syncing...', icon: Spinner },
   };
 
-  const { variant, text, icon: Icon } = variants[status];
+  const { variant, label, icon: Icon } = variants[status];
 
   return (
     <Badge variant={variant} {...props}>
       <Icon />
-      {text}
+      {label}
     </Badge>
   );
 }

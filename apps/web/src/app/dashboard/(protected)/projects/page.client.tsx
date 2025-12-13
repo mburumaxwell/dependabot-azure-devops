@@ -3,7 +3,7 @@
 import { ArrowUpRightIcon, Calendar, ChevronRightIcon, Folder, FolderGit2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { SynchronizationStatusBadge } from '@/components/sync-status-badge';
+import { SynchronizationStatusBadge } from '@/components/icons';
 import { TimeAgo } from '@/components/time-ago';
 import { Button } from '@/components/ui/button';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';

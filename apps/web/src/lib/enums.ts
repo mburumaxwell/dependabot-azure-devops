@@ -1,4 +1,5 @@
 import type { DependabotPackageManager } from '@paklo/core/dependabot';
+import type { UpdateJobStatus, UpdateJobTrigger } from '@/lib/prisma';
 
 export type WithAll<T> = T | 'all';
 
@@ -15,29 +16,47 @@ const packageManagerLabelMap: Record<DependabotPackageManager, string> = {
   docker: 'Docker',
   elm: 'Elm',
   github_actions: 'GitHub Actions',
-  submodules: 'Submodules',
+  submodules: 'Git Submodules',
   go_modules: 'Go Modules',
   gradle: 'Gradle',
   maven: 'Maven',
   hex: 'Hex',
   nuget: 'NuGet',
-  npm_and_yarn: 'NPM and Yarn',
+  npm_and_yarn: 'npm & Yarn',
   pip: 'Pip',
   rust_toolchain: 'Rust Toolchain',
   swift: 'Swift',
   terraform: 'Terraform',
   devcontainers: 'Devcontainers',
-  dotnet_sdk: 'Dotnet SDK',
+  dotnet_sdk: '.NET SDK',
   bun: 'Bun',
   docker_compose: 'Docker Compose',
-  uv: 'UV',
+  uv: 'uv',
   vcpkg: 'vcpkg',
   helm: 'Helm',
   julia: 'Julia',
   bazel: 'Bazel',
   opentofu: 'OpenTofu',
 };
-
 export const packageManagerOptions: { value: DependabotPackageManager; label: string }[] = Object.entries(
   packageManagerLabelMap,
 ).map(([value, label]) => ({ value: value as DependabotPackageManager, label }));
+
+const updateJobStatusLabelMap: Record<UpdateJobStatus, string> = {
+  scheduled: 'Scheduled',
+  running: 'Running',
+  succeeded: 'Succeeded',
+  failed: 'Failed',
+};
+export const updateJobStatusOptions: { value: UpdateJobStatus; label: string }[] = Object.entries(
+  updateJobStatusLabelMap,
+).map(([value, label]) => ({ value: value as UpdateJobStatus, label }));
+
+const updateJobTriggerLabelMap: Record<UpdateJobTrigger, string> = {
+  scheduled: 'Scheduled',
+  synchronization: 'Synchronization',
+  manual: 'Manual',
+};
+export const updateJobTriggerOptions: { value: UpdateJobTrigger; label: string }[] = Object.entries(
+  updateJobTriggerLabelMap,
+).map(([value, label]) => ({ value: value as UpdateJobTrigger, label }));

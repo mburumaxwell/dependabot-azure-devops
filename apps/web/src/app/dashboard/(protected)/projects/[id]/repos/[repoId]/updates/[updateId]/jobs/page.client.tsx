@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { requestTriggerUpdateJobs } from '@/actions/repositories';
-import { EcosystemIcon, JobStatusIcon } from '@/components/icons';
+import { EcosystemIcon, UpdateJobStatusIcon } from '@/components/icons';
 import { TimeAgo } from '@/components/time-ago';
 import { Button } from '@/components/ui/button';
 import {
@@ -169,7 +169,7 @@ export function UpdateJobsView({
             <ItemSeparator />
             <Item>
               <ItemMedia key={job.id} variant='image'>
-                <JobStatusIcon status={job.status} className='size-5' />
+                <UpdateJobStatusIcon status={job.status} className='size-5' />
               </ItemMedia>
               <ItemContent>
                 <ItemTitle>Version update {job.id}</ItemTitle>

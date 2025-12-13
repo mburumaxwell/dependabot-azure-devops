@@ -2,7 +2,7 @@
 
 import { Download, MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
-import { EcosystemIcon, JobStatusIcon } from '@/components/icons';
+import { EcosystemIcon, UpdateJobStatusIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -142,7 +142,7 @@ export function RepositoryView({
                 <ItemActions>
                   {/* Show icon if the latest update job status is not succeeded */}
                   {update.latestUpdateJob?.status && update.latestUpdateJob.status !== 'succeeded' && (
-                    <JobStatusIcon status={update.latestUpdateJob.status} className='size-5' />
+                    <UpdateJobStatusIcon status={update.latestUpdateJob.status} className='size-5' />
                   )}
                   <Link
                     href={`/dashboard/projects/${project.id}/repos/${repository.id}/updates/${update.id}/jobs`}

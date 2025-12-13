@@ -46,6 +46,11 @@ export async function streamToString(readable: NodeJS.ReadableStream | undefined
 }
 
 import prettyMs from 'pretty-ms';
-export function formatDuration(milliseconds: number) {
-  return prettyMs(milliseconds, { unitCount: 2 });
+/**
+ * Formats a duration in milliseconds to a human-readable string.
+ * @param value The value in milliseconds
+ * @param compact Whether to only show the most significant unit
+ */
+export function formatDuration(value: number, compact: boolean = false): string {
+  return prettyMs(value, { unitCount: 2, compact });
 }
