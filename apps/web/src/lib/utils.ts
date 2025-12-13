@@ -44,3 +44,21 @@ export async function streamToString(readable: NodeJS.ReadableStream | undefined
   }
   return Buffer.concat(chunks).toString('utf-8');
 }
+
+// Format total duration to human-readable format
+export function formatDuration(ms: number) {
+  const seconds = ms / 1000;
+  const minutes = seconds / 60;
+  const hours = minutes / 60;
+  const days = hours / 24;
+
+  if (days >= 1) {
+    return `${days.toFixed(1)} days`;
+  } else if (hours >= 1) {
+    return `${hours.toFixed(1)} hrs`;
+  } else if (minutes >= 1) {
+    return `${minutes.toFixed(1)} min`;
+  } else {
+    return `${seconds.toFixed(1)} sec`;
+  }
+}

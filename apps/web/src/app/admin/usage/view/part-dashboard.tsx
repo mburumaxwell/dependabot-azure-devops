@@ -1,5 +1,6 @@
 'use client';
 
+import type { DependabotPackageManager } from '@paklo/core/dependabot';
 import { Calendar } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
@@ -8,7 +9,9 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { type TimeRange, timeRangeOptions } from '@/lib/aggregation';
+import { packageManagerOptions, type WithAll } from '@/lib/enums';
 import type { UsageTelemetry } from '@/lib/mongodb';
+import { formatDuration } from '@/lib/utils';
 import { MetricCard } from './part-metric-card';
 import { PackageManagerChart } from './part-package-manager-chart';
 import { RunsChart } from './part-runs-chart';
@@ -31,10 +34,10 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
 
   const timeRange = (searchParams.get('timeRange') as TimeRange) ?? '24h';
   const selectedOwner = searchParams.get('owner') ?? '';
-  const selectedPackageManager = searchParams.get('packageManager') ?? 'all';
-  const successFilter = searchParams.get('success') ?? 'all';
+  const selectedPackageManager = (searchParams.get('packageManager') as WithAll<DependabotPackageManager>) ?? 'all';
+  const successFilter = (searchParams.get('success') as WithAll<'false' | 'true'>) ?? 'all';
 
-  const updateFilters = (updates: Record<string, string>) => {
+  function updateFilters(updates: Record<string, string>) {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(updates).forEach(([key, value]) => {
       if (value && value !== 'all') {
@@ -44,7 +47,7 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
       }
     });
     router.push(`?${params.toString()}`);
-  };
+  }
 
   // Extract unique values for filters
   const owners = useMemo(() => {
@@ -57,11 +60,6 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
     const search = ownerSearch.toLowerCase();
     return owners.filter((owner) => owner.toLowerCase().includes(search)).slice(0, 10);
   }, [owners, ownerSearch]);
-
-  const packageManagers = useMemo(() => {
-    const unique = Array.from(new Set(telemetries.map((d) => d.packageManager)));
-    return unique.sort();
-  }, [telemetries]);
 
   const metrics = useMemo(() => {
     const totalRuns = telemetries.length;
@@ -81,24 +79,6 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
     }
 
     const totalDuration = telemetries.reduce((sum, d) => sum + d.duration, 0);
-
-    // Format total duration to human-readable format
-    const formatDuration = (ms: number) => {
-      const seconds = ms / 1000;
-      const minutes = seconds / 60;
-      const hours = minutes / 60;
-      const days = hours / 24;
-
-      if (days >= 1) {
-        return `${days.toFixed(1)} days`;
-      } else if (hours >= 1) {
-        return `${hours.toFixed(1)} hrs`;
-      } else if (minutes >= 1) {
-        return `${minutes.toFixed(1)} min`;
-      } else {
-        return `${seconds.toFixed(1)} sec`;
-      }
-    };
 
     return {
       totalRuns,
@@ -189,9 +169,9 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='all'>All Package Managers</SelectItem>
-              {packageManagers.map((pm) => (
-                <SelectItem key={pm} value={pm}>
-                  {pm}
+              {packageManagerOptions.map((pm) => (
+                <SelectItem key={pm.value} value={pm.value}>
+                  {pm.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -203,8 +183,8 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='all'>All Status</SelectItem>
-              <SelectItem value='success'>Success Only</SelectItem>
-              <SelectItem value='failure'>Failure Only</SelectItem>
+              <SelectItem value='true'>Success Only</SelectItem>
+              <SelectItem value='false'>Failure Only</SelectItem>
             </SelectContent>
           </Select>
 

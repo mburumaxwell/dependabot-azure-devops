@@ -1,6 +1,8 @@
+import type { DependabotPackageManager } from '@paklo/core/dependabot';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getDateTimeRange, type TimeRange } from '@/lib/aggregation';
+import { unwrapWithAll, type WithAll } from '@/lib/enums';
 import { type Filter, getMongoCollection, type UsageTelemetry } from '@/lib/mongodb';
 import { loggedIn } from '../actions';
 import { type SlimTelemetry, TelemetryDashboard } from './part-dashboard';
@@ -20,15 +22,14 @@ export default async function Page(props: PageProps<'/admin/usage/view'>) {
   const searchParams = (await props.searchParams) as {
     timeRange?: TimeRange;
     owner?: string;
-    packageManager?: string;
-    success?: string;
+    packageManager?: WithAll<DependabotPackageManager>;
+    success?: WithAll<'true' | 'false'>;
   };
   const { timeRange = '24h', owner, packageManager: selectedPackageManager, success: successFilter } = searchParams;
   const { start, end } = getDateTimeRange(timeRange);
 
-  const success = successFilter === 'success' ? true : successFilter === 'failure' ? false : undefined;
-  const packageManager =
-    selectedPackageManager && selectedPackageManager !== 'all' ? selectedPackageManager : undefined;
+  const packageManager = unwrapWithAll(selectedPackageManager);
+  const success = successFilter === 'true' ? true : successFilter === 'false' ? false : undefined;
 
   const collection = await getMongoCollection('usage_telemetry');
   const query: Filter<UsageTelemetry> = {
