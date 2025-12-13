@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import type { UsageTelemetry } from '@/lib/mongodb';
+import { formatDuration } from '@/lib/utils';
 
 interface TelemetryTableProps {
   telemetries: Pick<
@@ -26,11 +27,6 @@ export function TelemetryTable({ telemetries }: TelemetryTableProps) {
   const totalPages = Math.ceil(sortedData.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedData = sortedData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
-  const formatDuration = (ms: number) => {
-    if (ms < 1000) return `${ms}ms`;
-    return `${(ms / 1000).toFixed(2)}s`;
-  };
 
   const formatDate = (date: Date) => {
     return date.toLocaleString('en-US', {
