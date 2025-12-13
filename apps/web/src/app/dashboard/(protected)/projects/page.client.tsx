@@ -75,7 +75,7 @@ export function ProjectsView({ projects }: { projects: SimpleProject[] }) {
                       {project.synchronizedAt && (
                         <span className='flex items-center gap-1'>
                           <Calendar className='size-3' />
-                          Last synchronized: <TimeAgo date={project.synchronizedAt} />
+                          Last synchronized: <TimeAgo value={project.synchronizedAt} />
                         </span>
                       )}
                     </ItemDescription>

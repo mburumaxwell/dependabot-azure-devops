@@ -188,7 +188,7 @@ export default function RunsView({ projects, jobs }: { projects: SlimProject[]; 
                   <TableCell>
                     <div className='flex items-center gap-2'>
                       <UpdateJobTriggerIcon trigger={job.trigger} className='size-4' />
-                      {(job.createdAt && <TimeAgo date={job.createdAt} />) || '—'}
+                      {(job.createdAt && <TimeAgo value={job.createdAt} />) || '—'}
                     </div>
                   </TableCell>
                   <TableCell>{(job.duration && formatDuration(job.duration)) || '—'}</TableCell>

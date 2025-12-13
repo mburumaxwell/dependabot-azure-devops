@@ -203,7 +203,7 @@ export function SecretsView({ organizationId, secrets: initialSecrets }: Secrets
                   <TableRow key={secret.id} className='group'>
                     <TableCell className='font-mono font-medium'>{secret.name}</TableCell>
                     <TableCell>
-                      <TimeAgo date={secret.updatedAt} />
+                      <TimeAgo value={secret.updatedAt} />
                     </TableCell>
                     <TableCell>
                       <div className='flex items-center justify-end gap-1'>

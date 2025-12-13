@@ -218,7 +218,7 @@ export function MembersSection({
                   <ItemContent>
                     <ItemTitle>{invite.email}</ItemTitle>
                     <ItemDescription>
-                      {invite.expiresAt < new Date() ? 'Expired' : 'Expires'} <TimeAgo date={invite.expiresAt} /> •{' '}
+                      {invite.expiresAt < new Date() ? 'Expired' : 'Expires'} <TimeAgo value={invite.expiresAt} /> •{' '}
                       <span className='capitalize'>{invite.role}</span>
                     </ItemDescription>
                   </ItemContent>

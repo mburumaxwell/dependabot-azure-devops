@@ -236,7 +236,7 @@ export function PasskeysSection({ passkeys: initialPasskeys }: { passkeys: Passk
                   <ItemContent>
                     <ItemTitle>{passkey.name || 'no name'}</ItemTitle>
                     <ItemDescription>
-                      Added <TimeAgo date={passkey.createdAt} />
+                      Added <TimeAgo value={passkey.createdAt} />
                     </ItemDescription>
                   </ItemContent>
                   <ItemActions>
@@ -383,7 +383,7 @@ export function SessionsSection({
                     )}
                   </ItemTitle>
                   <ItemDescription>
-                    {session.ipAddress} • <TimeAgo date={session.updatedAt} />
+                    {session.ipAddress} • <TimeAgo value={session.updatedAt} />
                   </ItemDescription>
                 </ItemContent>
                 <ItemActions>

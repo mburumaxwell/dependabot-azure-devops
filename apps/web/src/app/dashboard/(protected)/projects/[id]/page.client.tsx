@@ -75,7 +75,7 @@ export function RepositoriesView({
             {project.synchronizedAt && (
               <span className='flex items-center gap-1 mt-1'>
                 <Calendar className='size-3' />
-                Last synchronized: <TimeAgo date={project.synchronizedAt} />
+                Last synchronized: <TimeAgo value={project.synchronizedAt} />
               </span>
             )}
           </p>
@@ -103,7 +103,7 @@ export function RepositoriesView({
                         if (nextSync) {
                           return (
                             <div className='flex flex-col'>
-                              Project sync recently done. Try again <TimeAgo date={nextSync} />
+                              Project sync recently done. Try again <TimeAgo value={nextSync} />
                             </div>
                           );
                         }
@@ -143,7 +143,7 @@ export function RepositoriesView({
               >
                 <TableCell>{repo.name}</TableCell>
                 <TableCell className='text-right'>
-                  <TimeAgo date={repo.updatedAt} />
+                  <TimeAgo value={repo.updatedAt} />
                 </TableCell>
                 <TableCell className='text-right'>
                   <SynchronizationStatusBadge status={repo.synchronizationStatus} />

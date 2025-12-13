@@ -221,7 +221,7 @@ export function UpdateJobsView({
                       </>
                     )}
                     <Separator orientation='vertical' />
-                    <TimeAgo date={job.finishedAt ?? job.createdAt} />
+                    <TimeAgo value={job.finishedAt ?? job.createdAt} />
                     <Separator orientation='vertical' />
                     <Link
                       href={`/dashboard/runs/${job.id}`}
