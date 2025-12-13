@@ -25,11 +25,9 @@ import {
   YarnOriginal,
 } from 'devicons-react';
 import { Package } from 'lucide-react';
+import type { IconProps } from './types';
 
-export function EcosystemIcon({
-  ecosystem,
-  ...props
-}: { ecosystem: string | PackageEcosystem } & React.ComponentPropsWithoutRef<'svg'>) {
+export function EcosystemIcon({ ecosystem, ...props }: { ecosystem: string | PackageEcosystem } & IconProps) {
   switch (ecosystem) {
     // case 'bundler':
     // case 'cargo':

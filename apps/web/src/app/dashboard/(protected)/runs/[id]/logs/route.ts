@@ -35,11 +35,17 @@ export async function GET(_req: Request, params: RouteContext<'/dashboard/runs/[
       return Response.json({ error: 'No log content available' }, { status: 404 });
     }
 
+    // Logs for completed jobs are immutable and can be cached in the user's browser
+    const cacheControl = updateJob.finishedAt
+      ? 'private, max-age=31536000, immutable' // 1 year for finished jobs
+      : 'private, no-cache, no-store, must-revalidate'; // No caching for running jobs
+
     // Stream the blob content as plain text
     return new Response(download.readableStreamBody as unknown as ReadableStream, {
       headers: {
         'content-type': download.contentType ?? 'text/plain; charset=utf-8',
         'content-disposition': download.contentDisposition ?? `inline; filename="${id}.txt"`,
+        'cache-control': cacheControl,
         ...(download.contentLength && { 'content-length': download.contentLength.toString() }),
       },
     });

@@ -93,3 +93,7 @@ export function toVercelRegion(code: RegionCode | undefined): string | undefined
 export function fromExternalRegion(value: string | undefined): RegionCode | undefined {
   return fromVercelRegion(value) ?? fromAzureLocation(value);
 }
+
+export function getRegionInfo(code: RegionCode) {
+  return REGIONS.find((r) => r.code === code);
+}

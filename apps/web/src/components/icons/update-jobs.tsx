@@ -3,12 +3,9 @@ import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import type { UpdateJobStatus, UpdateJobTrigger } from '@/lib/prisma';
 import { cn } from '@/lib/utils';
+import type { IconProps } from './types';
 
-export function UpdateJobStatusIcon({
-  status,
-  className,
-  ...props
-}: { status: UpdateJobStatus } & React.ComponentPropsWithoutRef<'svg'>) {
+export function UpdateJobStatusIcon({ status, className, ...props }: { status: UpdateJobStatus } & IconProps) {
   switch (status) {
     case 'succeeded':
       return <CircleCheckBig className={cn('text-green-500', className)} {...props} />;
@@ -50,11 +47,7 @@ export function UpdateJobStatusBadge({
   );
 }
 
-export function UpdateJobTriggerIcon({
-  trigger,
-  className,
-  ...props
-}: { trigger: UpdateJobTrigger } & React.ComponentPropsWithoutRef<'svg'>) {
+export function UpdateJobTriggerIcon({ trigger, className, ...props }: { trigger: UpdateJobTrigger } & IconProps) {
   switch (trigger) {
     case 'scheduled':
       return <Calendar className={cn('text-muted-foreground', className)} {...props} />;

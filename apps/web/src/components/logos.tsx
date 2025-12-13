@@ -1,4 +1,6 @@
-export function AppleLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
+import type { IconProps } from '@/components/icons';
+
+export function AppleLogo(props: IconProps) {
   return (
     <svg viewBox='0 0 24 24' aria-hidden='true' {...props}>
       <path
@@ -9,7 +11,7 @@ export function AppleLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
   );
 }
 
-export function GoogleLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
+export function GoogleLogo(props: IconProps) {
   return (
     <svg viewBox='0 0 24 24' aria-hidden='true' {...props}>
       <path
@@ -20,7 +22,7 @@ export function GoogleLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
   );
 }
 
-export function AzureDevOpsLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
+export function AzureDevOpsLogo(props: IconProps) {
   return (
     <svg viewBox='0 0 16 16' aria-hidden='true' {...props}>
       <path
@@ -31,7 +33,7 @@ export function AzureDevOpsLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
   );
 }
 
-export function BitbucketLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
+export function BitbucketLogo(props: IconProps) {
   return (
     <svg viewBox='0 0 24 24' aria-hidden='true' {...props}>
       <path
@@ -42,7 +44,7 @@ export function BitbucketLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
   );
 }
 
-export function GitlabLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
+export function GitlabLogo(props: IconProps) {
   return (
     <svg viewBox='0 0 24 24' aria-hidden='true' {...props}>
       <path

@@ -3,6 +3,7 @@ import { headers as requestHeaders } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { InfoSection, LogsSection } from './page.client';
 
 export async function generateMetadata(props: PageProps<'/dashboard/runs/[id]'>): Promise<Metadata> {
   const { id } = await props.params;
@@ -25,15 +26,10 @@ export default async function RunPage(props: PageProps<'/dashboard/runs/[id]'>) 
     notFound();
   }
 
-  // TODO: implement this page
   return (
-    <div className='flex flex-1 flex-col gap-4 p-4'>
-      <div className='grid auto-rows-min gap-4 md:grid-cols-3'>
-        <div className='bg-muted/50 aspect-video rounded-xl' />
-        <div className='bg-muted/50 aspect-video rounded-xl' />
-        <div className='bg-muted/50 aspect-video rounded-xl' />
-      </div>
-      <div className='bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min' />
+    <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
+      <InfoSection job={job} />
+      <LogsSection job={job} />
     </div>
   );
 }
@@ -51,6 +47,15 @@ async function getUpdateJob({ id }: { id: string }) {
     where: { organizationId, id },
     select: {
       id: true,
+      ecosystem: true,
+      repositorySlug: true,
+      trigger: true,
+      status: true,
+      region: true,
+      createdAt: true,
+      startedAt: true,
+      finishedAt: true,
+      duration: true,
     },
   });
 
