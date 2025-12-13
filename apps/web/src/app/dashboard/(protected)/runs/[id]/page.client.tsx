@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertCircle, Calendar, Download, GitBranch, MapPin, PlayCircle, Timer } from 'lucide-react';
+import { AlertCircle, Calendar, Download, GitBranch, MapPinHouse, PlayCircle, Timer } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
@@ -38,7 +38,7 @@ export function InfoSection({ job }: { job: SlimUpdateJob }) {
     icon: Icon;
   }[] = [
     { label: 'Repository', value: job.repositorySlug, icon: GitBranch },
-    { label: 'Region', value: <RegionLabel code={job.region} />, icon: MapPin },
+    { label: 'Region', value: <RegionLabel code={job.region} />, icon: MapPinHouse },
     { label: 'Ecosystem', value: job.ecosystem, icon: () => <EcosystemIcon ecosystem={job.ecosystem} /> },
     { label: 'Trigger', value: job.trigger, icon: () => <UpdateJobTriggerIcon trigger={job.trigger} /> },
     { label: 'Status', value: job.status, icon: () => <UpdateJobStatusIcon status={job.status} /> },

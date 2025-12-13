@@ -141,9 +141,10 @@ export function RepositoryView({
                 </ItemContent>
                 <ItemActions>
                   {/* Show icon if the latest update job status is not succeeded */}
-                  {update.latestUpdateJob?.status && update.latestUpdateJob.status !== 'succeeded' && (
-                    <UpdateJobStatusIcon status={update.latestUpdateJob.status} className='size-5' />
-                  )}
+                  {update.latestUpdateJob?.status &&
+                    !['succeeded', 'scheduled'].includes(update.latestUpdateJob.status) && (
+                      <UpdateJobStatusIcon status={update.latestUpdateJob.status} className='size-5' />
+                    )}
                   <Link
                     href={`/dashboard/projects/${project.id}/repos/${repository.id}/updates/${update.id}/jobs`}
                     className='hover:underline underline-offset-4 text-blue-500'

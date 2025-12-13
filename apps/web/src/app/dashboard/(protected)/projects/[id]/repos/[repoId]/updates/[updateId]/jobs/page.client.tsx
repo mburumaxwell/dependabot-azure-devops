@@ -99,8 +99,12 @@ export function UpdateJobsView({
   return (
     <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
       <div>
-        <h1 className='text-3xl font-semibold mb-2'>Update Jobs</h1>
-        <p className='text-muted-foreground'>Monitor your organization's resource usage</p>
+        <h1 className='text-2xl font-semibold mb-2'>Repository: {repository.name}</h1>
+        <p className='text-muted-foreground text-sm'>
+          <a href={repository.url} target='_blank' rel='noreferrer' className='hover:underline underline-offset-4'>
+            {repository.slug}
+          </a>
+        </p>
       </div>
 
       <ItemGroup>
