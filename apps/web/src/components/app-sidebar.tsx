@@ -80,13 +80,17 @@ export function AppSidebar({ session, organizations, ...props }: AppSidebarProps
   const isActive = (href: Route) => pathname === href;
   const { isMobile } = useSidebar();
 
-  function handleLogout(): void {
-    authClient.signOut({
-      fetchOptions: {
-        // redirect to login page
-        onSuccess: () => router.push('/login'),
-      },
-    });
+  async function handleLogout() {
+    const { data, error } = await authClient.signOut();
+    if (!data?.success || error) {
+      toast.error('Failed to log out', {
+        description: error?.message || 'Please try again later.',
+      });
+      return;
+    }
+
+    // redirect to login page
+    router.push('/login');
   }
 
   return (
