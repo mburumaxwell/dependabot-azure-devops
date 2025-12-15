@@ -73,12 +73,16 @@ export function LogsSection({ job }: { job: SlimUpdateJob }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    const controller = new AbortController();
+
     const fetchLogs = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const response = await fetch(url);
+        const response = await fetch(url, { signal: controller.signal });
+        if (cancelled) return;
 
         if (response.status === 404) {
           setError('Logs not found');
@@ -87,18 +91,27 @@ export function LogsSection({ job }: { job: SlimUpdateJob }) {
           throw new Error(`Failed to fetch logs: ${response.statusText}`);
         } else {
           const logText = await response.text();
+          if (cancelled) return;
           setLogs(logText);
         }
       } catch (error) {
+        if (cancelled) return;
+        if (error instanceof Error && error.name === 'AbortError') return;
         console.error('[v0] Error fetching logs:', error);
         setError(error instanceof Error ? error.message : 'Failed to load logs');
         setLogs('');
-      } finally {
+      }
+
+      if (!cancelled) {
         setLoading(false);
       }
     };
 
     fetchLogs();
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, [url]);
 
   return (

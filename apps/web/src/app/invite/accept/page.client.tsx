@@ -1,7 +1,7 @@
 'use client';
 
 import { CheckCircle2, XCircle } from 'lucide-react';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
@@ -11,10 +11,18 @@ export function InviteAcceptView({ invitationId }: { invitationId: string }) {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [countdown, setCountdown] = useState(5);
   const [errorMessage, setErrorMessage] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
+    let cancelled = false;
+    const controller = new AbortController();
+
     const acceptInvite = async () => {
-      const { data, error } = await authClient.organization.acceptInvitation({ invitationId });
+      const { data, error } = await authClient.organization.acceptInvitation({
+        invitationId,
+        fetchOptions: { signal: controller.signal },
+      });
+      if (cancelled) return;
 
       if (error || !data) {
         setStatus('error');
@@ -26,6 +34,11 @@ export function InviteAcceptView({ invitationId }: { invitationId: string }) {
     };
 
     acceptInvite();
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, [invitationId]);
 
   useEffect(() => {
@@ -34,7 +47,7 @@ export function InviteAcceptView({ invitationId }: { invitationId: string }) {
         setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(timer);
-            redirect(status === 'success' ? '/dashboard' : '/dashboard/account');
+            router.push(status === 'success' ? '/dashboard' : '/dashboard/account');
             return 0;
           }
           return prev - 1;
@@ -43,7 +56,7 @@ export function InviteAcceptView({ invitationId }: { invitationId: string }) {
 
       return () => clearInterval(timer);
     }
-  }, [status]);
+  }, [status, router]);
 
   return (
     <div className='flex min-h-screen items-center justify-center p-4'>

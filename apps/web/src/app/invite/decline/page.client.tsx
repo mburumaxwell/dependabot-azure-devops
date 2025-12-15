@@ -14,8 +14,16 @@ export function InviteDeclineView({ invitationId }: { invitationId: string }) {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
+    let cancelled = false;
+    const controller = new AbortController();
+
     const declineInvite = async () => {
-      const { data, error } = await authClient.organization.rejectInvitation({ invitationId });
+      const { data, error } = await authClient.organization.rejectInvitation({
+        invitationId,
+        fetchOptions: { signal: controller.signal },
+      });
+      if (cancelled) return;
+
       if (error || !data) {
         setStatus('error');
         setErrorMessage(error?.message || 'Invitation does not exist or has already been responded to.');
@@ -26,6 +34,11 @@ export function InviteDeclineView({ invitationId }: { invitationId: string }) {
     };
 
     declineInvite();
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, [invitationId]);
 
   useEffect(() => {
