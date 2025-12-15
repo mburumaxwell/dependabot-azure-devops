@@ -1,4 +1,5 @@
 import { type Document, MongoClient } from 'mongodb';
+import { z } from 'zod';
 
 const url = process.env.MONGO_DATABASE_URL!;
 const client = new MongoClient(url);
@@ -10,6 +11,13 @@ export async function getMongoClient() {
     connected = true;
   }
   return client;
+}
+
+export async function closeMongoClient() {
+  if (connected) {
+    await client.close();
+    connected = false;
+  }
 }
 
 type EnsureDocumentMap<T extends Record<string, Document>> = T;
@@ -32,25 +40,26 @@ export async function getMongoCollection<K extends keyof Collections>(name: K) {
 // await collection.createIndex({ duration: 1 }, {})
 // await collection.createIndex({ success: 1 }, {})
 // await collection.createIndex({ region: 1 }, {})
-export type UsageTelemetry = {
-  _id: string;
-  country: string | null;
-  region: string | null;
-  hostPlatform: string;
-  hostRelease: string;
-  hostArch: string;
-  hostMachineHash: string;
-  hostDockerContainer?: boolean;
-  version: string;
-  trigger: string;
-  provider: string;
-  owner: string;
-  project: string | null; // TODO: remove nullable after older records are cleared (90 days after 2025-Oct-21 i.e. 2026-Jan-19)
-  packageManager: string;
-  started: Date;
-  duration: number;
-  success: boolean;
-  error?: { message: string };
-};
+export const UsageTelemetrySchema = z.object({
+  _id: z.string(),
+  country: z.string().nullish(),
+  region: z.string().nullish(),
+  hostPlatform: z.string(),
+  hostRelease: z.string(),
+  hostArch: z.string(),
+  hostMachineHash: z.string(),
+  hostDockerContainer: z.boolean().nullish(),
+  version: z.string(),
+  trigger: z.string(),
+  provider: z.string(),
+  owner: z.string(),
+  project: z.string().nullish(), // TODO: remove nullable after older records are cleared (90 days after 2025-Oct-21 i.e. 2026-Jan-19)
+  packageManager: z.string(),
+  started: z.coerce.date(),
+  duration: z.coerce.number(),
+  success: z.coerce.boolean(),
+  error: z.object({ message: z.string() }).nullish(),
+});
+export type UsageTelemetry = z.infer<typeof UsageTelemetrySchema>;
 
-export type { Filter } from 'mongodb';
+export type { AnyBulkWriteOperation, Filter } from 'mongodb';

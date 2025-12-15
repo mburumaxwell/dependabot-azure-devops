@@ -82,6 +82,7 @@
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "cron-parser": "5.4.0",
+    "csv-parse": "6.1.0",
     "devicons-react": "1.5.0",
     "filesize": "11.0.13",
     "flags": "4.0.2",
