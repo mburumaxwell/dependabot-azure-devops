@@ -167,7 +167,7 @@ export function ManageSection({ organization, projects }: { organization: Simple
             </AlertDialog>
           </>
         ) : (
-          <Button onClick={handleSetupBilling} disabled={isHandling} size='lg'>
+          <Button onClick={handleSetupBilling} disabled={isHandling} size='sm'>
             {isHandlingSetup ? (
               <>
                 <Spinner className='mr-2' />

@@ -704,18 +704,25 @@ export async function reportUsageBilling({ id }: { id: string }) {
   const organization = await prisma.organization.findUniqueOrThrow({ where: { id: job.organizationId } });
 
   // duration is stored in milliseconds, we report in full minutes
-  const durationMinutes = Math.ceil(job.duration! / 60_000).toFixed(0);
+  const durationMinutes = (job.duration! / 60_000).toFixed(0);
   logger.info(`Reporting usage for job '${id}': ${durationMinutes} minutes of execution time.`);
 
   // report to stripe billing meter
-  await stripe.billing.meterEvents.create({
-    event_name: METER_EVENT_NAME_USAGE,
-    payload: {
-      stripe_customer_id: organization.customerId!,
-      value: durationMinutes,
+  await stripe.billing.meterEvents.create(
+    {
+      event_name: METER_EVENT_NAME_USAGE,
+      payload: {
+        stripe_customer_id: organization.customerId!,
+        minutes: durationMinutes,
+      },
+      identifier: job.id,
     },
-    identifier: job.id,
-  });
+    {
+      // set idempotency key to avoid duplicate meter events for the same job
+      // this allows retry safely and it also means we get the same event if we retry
+      idempotencyKey: environment.production ? `update-job:${job.id}` : undefined,
+    },
+  );
 
   logger.info(`Reported usage meter event to Stripe for job '${id}'.`);
 }

@@ -100,15 +100,8 @@ enum SubscriptionStatus {
   @@map("subscription_status")
 }
 
-enum OrganizationBillingInterval {
-  monthly
-  yearly
-
-  @@map("organization_billing_interval")
-}
-
 model Organization {
-  id                  String                      @id @map("_id")
+  id                  String                  @id @map("_id")
   name                String
   slug                String
   logo                String?
@@ -117,7 +110,6 @@ model Organization {
   type                OrganizationType
   url                 String
   region              String
-  billingInterval     OrganizationBillingInterval
   providerHostname    String
   providerApiEndpoint String
   customerId          String?

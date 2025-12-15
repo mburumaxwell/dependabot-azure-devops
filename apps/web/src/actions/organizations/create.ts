@@ -29,7 +29,6 @@ export async function createOrganizationWithCredential(
       type,
       url,
       region,
-      billingInterval: 'monthly', // not supporting any other frequency yet
       ...getProviderStuff(options),
 
       // change current active organization to the new one

@@ -49,4 +49,4 @@ export function stripeSubscriptionStatusToSubscriptionStatus(
 }
 
 export const INCLUDED_USAGE_MINUTES = 1000;
-export const METER_EVENT_NAME_USAGE = 'job_execution_time';
+export const METER_EVENT_NAME_USAGE = 'job_execution_minutes';

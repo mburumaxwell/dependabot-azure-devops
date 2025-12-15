@@ -13,7 +13,7 @@ import {
 import { environment } from '@/lib/environment';
 import { PakloId } from '@/lib/ids';
 import { logger } from '@/lib/logger';
-import { OrganizationBillingIntervalSchema, OrganizationTypeSchema } from '@/lib/organizations';
+import { OrganizationTypeSchema } from '@/lib/organizations';
 import { prisma as prismaClient } from '@/lib/prisma';
 import { RegionCodeSchema } from '@/lib/regions';
 import { config } from '@/site-config';
@@ -67,11 +67,6 @@ export const auth = betterAuth({
             },
             url: { type: 'string', required: true, unique: true },
             region: { type: 'string', required: true, validator: { input: RegionCodeSchema } },
-            billingInterval: {
-              type: ['monthly', 'yearly'],
-              required: true,
-              validator: { input: OrganizationBillingIntervalSchema },
-            },
             providerHostname: { type: 'string', required: true },
             providerApiEndpoint: { type: 'string', required: true },
             customerId: { type: 'string', required: false, input: false },
