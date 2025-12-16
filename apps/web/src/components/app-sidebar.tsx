@@ -47,7 +47,7 @@ import { authClient, type Organization, type Session } from '@/lib/auth-client';
 import { getOrganizationTypeInfo } from '@/lib/organizations';
 import { cn, getInitials, type InitialsType } from '@/lib/utils';
 
-type MenuItem = { label: string; href: Route; icon?: LucideIcon };
+type MenuItem = { label: string; href: Route; icon: LucideIcon };
 type MenuGroup = { label: string; items?: MenuItem[] };
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
@@ -81,7 +81,7 @@ export function AppSidebar({ session, organizations, pakloAdmin, ...props }: App
           { label: 'Integrations', href: '/dashboard/settings/integrations', icon: Blocks },
         ],
       },
-    ] as MenuGroup[]),
+    ] satisfies MenuGroup[]),
 
     // Admin group, only for Paklo admins
     ...(pakloAdmin
@@ -90,7 +90,7 @@ export function AppSidebar({ session, organizations, pakloAdmin, ...props }: App
             label: 'Admin',
             items: [{ label: 'Usage Telemetry', href: '/dashboard/usage', icon: Combine }],
           },
-        ] as MenuGroup[])
+        ] satisfies MenuGroup[])
       : []),
   ];
 
@@ -109,7 +109,7 @@ export function AppSidebar({ session, organizations, pakloAdmin, ...props }: App
 
   return (
     <Sidebar collapsible='icon' {...props}>
-      <SidebarHeader className='border-b'>
+      <SidebarHeader className='border-b h-16'>
         <OrganizationSwitcher
           isMobile={isMobile}
           organizations={organizations}

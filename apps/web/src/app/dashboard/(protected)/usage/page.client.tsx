@@ -291,7 +291,9 @@ function PackageManagerChart({ telemetries }: PackageManagerChartProps) {
       },
       {} as Record<string, { name: string; success: number; failure: number }>,
     ),
-  ).sort((a, b) => b.success + b.failure - (a.success + a.failure));
+  )
+    .sort((a, b) => b.success + b.failure - (a.success + a.failure))
+    .slice(0, 10);
 
   return (
     <Card className='p-6'>
