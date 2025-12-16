@@ -49,14 +49,14 @@ export function OrganizationInvite({
               <Row>
                 <Text className='text-[14px] text-[#666666] mt-2'>
                   This invitation link expires on{' '}
-                  {expires.toLocaleDateString('en-US', {
+                  {expires.toLocaleDateString(undefined, {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
                   })}{' '}
                   at{' '}
-                  {expires.toLocaleTimeString('en-US', {
+                  {expires.toLocaleTimeString(undefined, {
                     hour: 'numeric',
                     minute: '2-digit',
                     timeZoneName: 'short',

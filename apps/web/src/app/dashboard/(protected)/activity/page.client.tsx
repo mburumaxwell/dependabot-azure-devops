@@ -145,7 +145,7 @@ export function ChartsSection({ data }: { data: ChartData }) {
               content={
                 <ChartTooltipContent
                   labelFormatter={(value) =>
-                    new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                    new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
                   }
                   formatter={(value, name) => {
                     const label =
