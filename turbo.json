@@ -1,11 +1,12 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env", "**/.env.*", "**/biome.json", "**/vitest.config.*"],
-  "globalEnv": ["NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", "NEXT_RUNTIME", "NODE_ENV", "ADMIN_USER_IDS"],
+  "globalEnv": ["NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", "NEXT_RUNTIME", "NODE_ENV"],
   "globalPassThroughEnv": [
     "LOG_LEVEL",
-    "ADMIN_DASHBOARD_PASSWORD",
     "APPLICATIONINSIGHTS_CONNECTION_STRING",
+    "AUTH_ADMIN_USER_IDS",
+    "AUTH_ADMIN_EMAILS",
     "AZURE_TENANT_ID",
     "AZURE_CLIENT_ID",
     "AZURE_SUBSCRIPTION_ID",

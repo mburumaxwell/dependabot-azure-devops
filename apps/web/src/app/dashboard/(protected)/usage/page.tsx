@@ -1,40 +1,40 @@
 import type { DependabotPackageManager } from '@paklo/core/dependabot';
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
+import { headers as requestHeaders } from 'next/headers';
+import { forbidden } from 'next/navigation';
 import { getDateFromTimeRange, type TimeRange } from '@/lib/aggregation';
+import { auth, isPakloAdmin } from '@/lib/auth';
 import { unwrapWithAll, type WithAll } from '@/lib/enums';
 import { type Filter, getMongoCollection, type UsageTelemetry } from '@/lib/mongodb';
-import { loggedIn } from '../actions';
-import { type SlimTelemetry, TelemetryDashboard } from './part-dashboard';
+import { type SlimTelemetry, TelemetryDashboard } from './page.client';
 
 export const metadata: Metadata = {
   title: 'Usage Statistics',
   description: 'View usage statistics',
-  openGraph: { url: `/admin/usage/view` },
+  openGraph: { url: `/dashboard/usage` },
 };
 
-export default async function Page(props: PageProps<'/admin/usage/view'>) {
-  const isLoggedIn = await loggedIn();
-  if (!isLoggedIn) {
-    redirect('/admin/usage');
+export default async function Page(props: PageProps<'/dashboard/usage'>) {
+  const headers = await requestHeaders();
+  const session = (await auth.api.getSession({ headers }))!;
+  if (!isPakloAdmin(session)) {
+    forbidden();
   }
 
   const searchParams = (await props.searchParams) as {
     timeRange?: TimeRange;
-    owner?: string;
     packageManager?: WithAll<DependabotPackageManager>;
     success?: WithAll<'true' | 'false'>;
   };
-  const { timeRange = '24h', owner, packageManager: selectedPackageManager, success: successFilter } = searchParams;
+  const { timeRange = '24h', packageManager: selectedPackageManager, success: successFilter } = searchParams;
   const { start, end } = getDateFromTimeRange(timeRange);
 
   const packageManager = unwrapWithAll(selectedPackageManager);
   const success = successFilter === 'true' ? true : successFilter === 'false' ? false : undefined;
 
-  const collection = await getMongoCollection('usage_telemetry');
+  const collection = await getMongoCollection('usage_telemetry', process.env.MONGO_DB_NAME_LOCAL);
   const query: Filter<UsageTelemetry> = {
     started: { $gte: start, $lte: end },
-    ...(owner ? { owner } : {}),
     ...(packageManager ? { packageManager } : {}),
     ...(success !== undefined ? { success: success } : {}),
   };
@@ -43,7 +43,6 @@ export default async function Page(props: PageProps<'/admin/usage/view'>) {
     .sort({ started: -1 })
     .project<SlimTelemetry>({
       _id: 1,
-      owner: 1,
       packageManager: 1,
       started: 1,
       success: 1,

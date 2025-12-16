@@ -6,6 +6,7 @@ import {
   Blocks,
   ChevronsUpDown,
   CircleGauge,
+  Combine,
   CreditCard,
   Folder,
   Key,
@@ -49,36 +50,49 @@ import { cn, getInitials, type InitialsType } from '@/lib/utils';
 type MenuItem = { label: string; href: Route; icon?: LucideIcon };
 type MenuGroup = { label: string; items?: MenuItem[] };
 
-const groups: MenuGroup[] = [
-  {
-    label: 'Home',
-    items: [
-      { label: 'Dashboard', href: '/dashboard/activity', icon: CircleGauge },
-      { label: 'Projects', href: '/dashboard/projects', icon: Folder },
-      { label: 'Runs', href: '/dashboard/runs', icon: Activity },
-      // { label: 'Advisories', href: '/dashboard/advisories', icon: ShieldAlert },
-      { label: 'Secrets', href: '/dashboard/secrets', icon: Key },
-    ],
-  },
-  {
-    label: 'Settings',
-    items: [
-      { label: 'Team', href: '/dashboard/settings/team', icon: Users },
-      { label: 'Billing', href: '/dashboard/settings/billing', icon: CreditCard },
-      { label: 'Integrations', href: '/dashboard/settings/integrations', icon: Blocks },
-    ],
-  },
-];
-
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   session: Session;
   organizations: Organization[];
+  pakloAdmin: boolean;
 }
-export function AppSidebar({ session, organizations, ...props }: AppSidebarProps) {
+export function AppSidebar({ session, organizations, pakloAdmin, ...props }: AppSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const isActive = (href: Route) => pathname === href;
   const { isMobile } = useSidebar();
+
+  const groups: MenuGroup[] = [
+    ...([
+      {
+        label: 'Home',
+        items: [
+          { label: 'Dashboard', href: '/dashboard/activity', icon: CircleGauge },
+          { label: 'Projects', href: '/dashboard/projects', icon: Folder },
+          { label: 'Runs', href: '/dashboard/runs', icon: Activity },
+          // { label: 'Advisories', href: '/dashboard/advisories', icon: ShieldAlert },
+          { label: 'Secrets', href: '/dashboard/secrets', icon: Key },
+        ],
+      },
+      {
+        label: 'Settings',
+        items: [
+          { label: 'Team', href: '/dashboard/settings/team', icon: Users },
+          { label: 'Billing', href: '/dashboard/settings/billing', icon: CreditCard },
+          { label: 'Integrations', href: '/dashboard/settings/integrations', icon: Blocks },
+        ],
+      },
+    ] as MenuGroup[]),
+
+    // Admin group, only for Paklo admins
+    ...(pakloAdmin
+      ? ([
+          {
+            label: 'Admin',
+            items: [{ label: 'Usage Telemetry', href: '/dashboard/usage', icon: Combine }],
+          },
+        ] as MenuGroup[])
+      : []),
+  ];
 
   async function handleLogout() {
     const { data, error } = await authClient.signOut();

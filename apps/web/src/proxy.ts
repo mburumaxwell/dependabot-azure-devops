@@ -19,7 +19,7 @@ export async function proxy(request: NextRequest) {
   // redirect to /dashboard where they get prompted to choose a default organization or create a new one.
   if (
     pathname.startsWith('/dashboard') && // only apply this rule to /dashboard routes
-    !['/dashboard', '/dashboard/account', '/dashboard/organizations/create'].includes(pathname)
+    !['/dashboard', '/dashboard/account', '/dashboard/organizations/create', '/dashboard/usage'].includes(pathname)
   ) {
     if (!session.session.activeOrganizationId) {
       const dashboardUrl = new URL('/dashboard', url);

@@ -11,6 +11,9 @@ const config: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     unoptimized: true, // hoping this improves site performance
   },
+  experimental: {
+    authInterrupts: true, // needed to use forbidden() and unauthorized()
+  },
   serverExternalPackages: [
     // needed for logging
     'pino',

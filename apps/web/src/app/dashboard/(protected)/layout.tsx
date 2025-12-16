@@ -5,7 +5,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { Breadcrumb, BreadcrumbList } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { auth } from '@/lib/auth';
+import { auth, isPakloAdmin } from '@/lib/auth';
 import { config } from '@/site-config';
 
 const titleTemplate: TemplateString = {
@@ -29,10 +29,11 @@ export default async function Layout({ children }: LayoutProps<'/'>) {
   const headers = await requestHeaders();
   const session = (await auth.api.getSession({ headers }))!;
   const organizations = await auth.api.listOrganizations({ headers });
+  const pakloAdmin = isPakloAdmin(session);
 
   return (
     <SidebarProvider>
-      <AppSidebar session={session} organizations={organizations} />
+      <AppSidebar session={session} organizations={organizations} pakloAdmin={pakloAdmin} />
       <SidebarInset>
         <header className='flex h-16 shrink-0 items-center gap-2 border-b px-4'>
           <SidebarTrigger className='-ml-1' />
