@@ -1,7 +1,7 @@
 import type { DependabotPackageManager } from '@paklo/core/dependabot';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { getDateTimeRange, type TimeRange } from '@/lib/aggregation';
+import { getDateFromTimeRange, type TimeRange } from '@/lib/aggregation';
 import { unwrapWithAll, type WithAll } from '@/lib/enums';
 import { type Filter, getMongoCollection, type UsageTelemetry } from '@/lib/mongodb';
 import { loggedIn } from '../actions';
@@ -26,7 +26,7 @@ export default async function Page(props: PageProps<'/admin/usage/view'>) {
     success?: WithAll<'true' | 'false'>;
   };
   const { timeRange = '24h', owner, packageManager: selectedPackageManager, success: successFilter } = searchParams;
-  const { start, end } = getDateTimeRange(timeRange);
+  const { start, end } = getDateFromTimeRange(timeRange);
 
   const packageManager = unwrapWithAll(selectedPackageManager);
   const success = successFilter === 'true' ? true : successFilter === 'false' ? false : undefined;

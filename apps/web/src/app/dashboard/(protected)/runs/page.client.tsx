@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { type TimeRange, timeRangeOptions } from '@/lib/aggregation';
 import { packageManagerOptions, updateJobStatusOptions, updateJobTriggerOptions, type WithAll } from '@/lib/enums';
 import type { Project, UpdateJob, UpdateJobStatus, UpdateJobTrigger } from '@/lib/prisma';
-import { formatDuration } from '@/lib/utils';
+import { formatDuration, updateFiltersInSearchParams } from '@/lib/utils';
 
 type SlimProject = Pick<Project, 'id' | 'name'>;
 type SlimUpdateJob = Pick<
@@ -37,17 +37,8 @@ export default function RunsView({ projects, jobs }: { projects: SlimProject[]; 
   const triggerFilter = (searchParams.get('trigger') as WithAll<UpdateJobTrigger>) ?? 'all';
   const selectedPackageManager = (searchParams.get('packageManager') as WithAll<DependabotPackageManager>) ?? 'all';
 
-  function updateFilters(updates: Record<string, string>, clear: boolean = false) {
-    const params = new URLSearchParams(clear ? '' : searchParams.toString());
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value && value !== 'all') {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
-    });
-    router.push(`?${params.toString()}`);
-  }
+  const updateFilters = (updates: Record<string, string>, clear: boolean = false) =>
+    updateFiltersInSearchParams(router, searchParams, updates, clear);
 
   return (
     <>

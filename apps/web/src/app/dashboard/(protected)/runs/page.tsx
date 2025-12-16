@@ -2,7 +2,7 @@ import type { DependabotPackageManager } from '@paklo/core/dependabot';
 import type { Metadata } from 'next';
 import { headers as requestHeaders } from 'next/headers';
 import { unauthorized } from 'next/navigation';
-import { getDateTimeRange, type TimeRange } from '@/lib/aggregation';
+import { getDateFromTimeRange, type TimeRange } from '@/lib/aggregation';
 import { auth } from '@/lib/auth';
 import { unwrapWithAll, type WithAll } from '@/lib/enums';
 import { prisma, type UpdateJobStatus, type UpdateJobTrigger } from '@/lib/prisma';
@@ -36,7 +36,7 @@ export default async function RunsPage(props: PageProps<'/dashboard/runs'>) {
     trigger: selectedTrigger,
     packageManager: selectedPackageManager,
   } = searchParams;
-  const { start, end } = getDateTimeRange(timeRange);
+  const { start, end } = getDateFromTimeRange(timeRange);
 
   const project = unwrapWithAll(selectedProject);
   const status = unwrapWithAll(selectedStatus);

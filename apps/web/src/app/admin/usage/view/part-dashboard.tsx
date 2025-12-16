@@ -4,6 +4,7 @@ import type { DependabotPackageManager } from '@paklo/core/dependabot';
 import { Calendar, Funnel, FunnelX } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
+import { MetricCard } from '@/components/metric-card';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,8 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { type TimeRange, timeRangeOptions } from '@/lib/aggregation';
 import { packageManagerOptions, type WithAll } from '@/lib/enums';
 import type { UsageTelemetry } from '@/lib/mongodb';
-import { formatDuration } from '@/lib/utils';
-import { MetricCard } from './part-metric-card';
+import { formatDuration, updateFiltersInSearchParams } from '@/lib/utils';
 import { PackageManagerChart } from './part-package-manager-chart';
 import { RunsChart } from './part-runs-chart';
 import { TelemetryTable } from './part-telemetry-table';
@@ -38,17 +38,8 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
   const selectedPackageManager = (searchParams.get('packageManager') as WithAll<DependabotPackageManager>) ?? 'all';
   const successFilter = (searchParams.get('success') as WithAll<'false' | 'true'>) ?? 'all';
 
-  function updateFilters(updates: Record<string, string>, clear: boolean = false) {
-    const params = new URLSearchParams(clear ? '' : searchParams.toString());
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value && value !== 'all') {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
-    });
-    router.push(`?${params.toString()}`);
-  }
+  const updateFilters = (updates: Record<string, string>, clear: boolean = false) =>
+    updateFiltersInSearchParams(router, searchParams, updates, clear);
 
   // Extract unique values for filters
   const owners = useMemo(() => {
@@ -215,13 +206,13 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
           title='Total Runs'
           value={metrics.totalRuns.toLocaleString()}
           trend={metrics.totalRuns > 0 ? '+12%' : undefined}
-          trendUp={true}
+          direction='up'
         />
         <MetricCard
           title='Success Rate'
           value={`${metrics.successRate.toFixed(1)}%`}
           trend={metrics.successRate > 90 ? 'Excellent' : metrics.successRate > 75 ? 'Good' : 'Needs attention'}
-          trendUp={metrics.successRate > 90}
+          direction={metrics.successRate > 90 ? 'up' : 'down'}
         />
         <MetricCard
           title='Total Duration'
@@ -237,7 +228,7 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
           title='Failed Runs'
           value={metrics.failedRuns.toLocaleString()}
           trend={metrics.failedRuns > 0 ? `${((metrics.failedRuns / metrics.totalRuns) * 100).toFixed(1)}%` : '0%'}
-          trendUp={false}
+          direction='down'
         />
       </div>
 
