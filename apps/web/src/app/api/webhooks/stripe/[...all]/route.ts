@@ -48,7 +48,7 @@ app.post('/', async (context) => {
   }
 });
 
-export const { POST } = toNextJsHandler(app);
+export const { POST, OPTIONS } = toNextJsHandler(app);
 
 async function handleSubscriptionCancelled({
   customerId,

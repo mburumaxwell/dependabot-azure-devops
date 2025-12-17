@@ -1,8 +1,11 @@
 import {
   DEFAULT_EXPERIMENTS,
+  type DependabotCommand,
   type DependabotConfig,
   type DependabotCredential,
   DependabotJobBuilder,
+  type DependabotPersistedPr,
+  DependabotPersistedPrSchema,
   type DependabotProxyConfig,
   type FileFetcherInput,
   type FileUpdaterInput,
@@ -11,6 +14,7 @@ import {
   type PackageEcosystem,
   parseDependabotConfig,
 } from '@paklo/core/dependabot';
+import type { SecurityVulnerability } from '@paklo/core/github';
 import { Keygen } from '@paklo/core/keygen';
 import {
   CA_CERT_FILENAME,
@@ -33,6 +37,7 @@ import { getGithubToken, getSecretValue } from '@/actions/organizations';
 import {
   AzureRestError,
   type ContainerAppJob,
+  type ContainerResources,
   consoleLogsContainer,
   containerAppsClient,
   logsContainer,
@@ -53,13 +58,28 @@ export type TriggerUpdateJobsWorkflowOptions = {
   organizationId: string;
   projectId: string;
   repositoryId: string;
-  /**
-   * Optional identifiers of the repository updates.
-   * When `undefined` or an empty array all updates in the repository are scheduled to run.
-   */
-  repositoryUpdateIds?: string[];
   trigger: UpdateJobTrigger;
-};
+  command?: DependabotCommand;
+} & (
+  | {
+      /**
+       * Optional identifiers of the repository updates.
+       * When `undefined` or an empty array all updates in the repository are scheduled to run.
+       */
+      repositoryUpdateIds?: string[];
+    }
+  | {
+      /** Identifier of a specific repository update. */
+      repositoryUpdateId: string;
+    }
+  | {
+      /** Identifier of a specific repository update for the pull request to update. */
+      repositoryUpdateId: string;
+
+      /** Identifier of the specific pull request to update. */
+      repositoryPullRequestId: string;
+    }
+);
 
 /** Result of hook waiting for job completion */
 export type UpdateJobHookResult = {
@@ -87,7 +107,7 @@ type GetOrCreateUpdateJobOptions = TriggerUpdateJobsWorkflowOptions & Pick<Workf
 async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
   'use step';
 
-  const { organizationId, projectId, repositoryId, repositoryUpdateIds, trigger, workflowRunId } = options;
+  const { organizationId, projectId, repositoryId, trigger, workflowRunId, command } = options;
 
   // fetch related entities in parallel
   const [organization, organizationCredential, project, repository] = await Promise.all([
@@ -101,12 +121,20 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
   }
 
   // if no specific repository updates are provided, fetch all updates for the repository
+  const repositoryUpdateIds = (() => {
+    if ('repositoryUpdateIds' in options) {
+      return options.repositoryUpdateIds;
+    } else if ('repositoryUpdateId' in options) {
+      return [options.repositoryUpdateId];
+    } else return undefined;
+  })();
   const hasRequestedSpecificUpdates = repositoryUpdateIds && repositoryUpdateIds.length > 0;
   const repositoryUpdates = await prisma.repositoryUpdate.findMany({
     where: {
       id: hasRequestedSpecificUpdates ? { in: repositoryUpdateIds } : undefined,
       repositoryId: hasRequestedSpecificUpdates ? undefined : repositoryId,
     },
+    omit: { deps: true },
   });
 
   let config: DependabotConfig | undefined;
@@ -116,10 +144,13 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
   const existingUpdateJobs: UpdateJob[] = [];
   const createdUpdateJobs: UpdateJob[] = [];
   for (const repoUpdate of repositoryUpdates) {
-    // a job is already existing for this run if it matches: ecosystem, directoryKey, workflowRunId
+    const ecosystem = repoUpdate.ecosystem as PackageEcosystem;
+    const packageManager = mapPackageEcosystemToPackageManager(ecosystem);
+
+    // a job is already existing for this run if it matches: packageManager, directoryKey, workflowRunId
     const directoryKey = makeDirectoryKey(repoUpdate);
     const existingJob = await prisma.updateJob.findFirst({
-      where: { ecosystem: repoUpdate.ecosystem, directoryKey, workflowRunId },
+      where: { packageManager, directoryKey, workflowRunId },
     });
 
     // if job already exists, skip to next
@@ -159,10 +190,14 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
       continue;
     }
 
+    const securityVulnerabilities: SecurityVulnerability[] = [];
+    const dependencyNamesToUpdate: string[] = [];
     const openPullRequestsLimit = update['open-pull-requests-limit']!;
     const securityUpdatesOnly = openPullRequestsLimit === 0;
     if (securityUpdatesOnly) {
-      // TODO: handle security-only updates once we are storing "dependency graph"
+      // TODO: pull security vulnerabilities once we are storing "dependency graph"
+
+      dependencyNamesToUpdate.push(...Array.from(new Set(securityVulnerabilities.map((v) => v.package.name))));
 
       // we skip security updates only for now
       logger.warn(
@@ -171,10 +206,38 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
       continue;
     }
 
-    // determine existing PR count (TODO: implement properly)
-    const openPullRequestsCount = 0;
-    if (openPullRequestsLimit > 0 && openPullRequestsCount >= openPullRequestsLimit) {
-      // skip creating job as limit is reached
+    // fetch existing open PRs for this repository and package manager
+    const existingPullRequestsRaw = await prisma.repositoryPullRequest.findMany({
+      where: {
+        repositoryId: repository.id,
+        packageManager,
+        status: 'open',
+      },
+    });
+    const existingPullRequestsMap: Map<string, DependabotPersistedPr> = new Map(
+      existingPullRequestsRaw.map((pr) => [pr.id, DependabotPersistedPrSchema.parse(pr.data)]),
+    );
+    const existingPullRequests = existingPullRequestsMap.values().toArray();
+    const pullRequestToUpdate =
+      'repositoryPullRequestId' in options && options.repositoryPullRequestId
+        ? existingPullRequestsMap.get(options.repositoryPullRequestId)
+        : undefined;
+
+    // skip creating a job if the open PRs limit is reached
+    const openPullRequestsCount = existingPullRequests.length;
+    const hasReachedOpenPullRequestLimit = openPullRequestsLimit > 0 && openPullRequestsCount >= openPullRequestsLimit;
+    if (hasReachedOpenPullRequestLimit) {
+      logger.debug(
+        `Open pull requests limit of ${openPullRequestsLimit} reached for update '${repoUpdate.id}'. Current open PRs: ${openPullRequestsCount}. Skipping job creation.`,
+      );
+      continue;
+    }
+
+    // skip if security-only mode with no vulnerable dependencies
+    if (securityUpdatesOnly && !(dependencyNamesToUpdate.length && securityVulnerabilities.length)) {
+      logger.debug(
+        `No dependencies with known vulnerabilities to update for update '${repoUpdate.id}'. Skipping job creation.`,
+      );
       continue;
     }
 
@@ -195,11 +258,11 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
     });
     const { job, credentials } = builder.forUpdate({
       id,
-      // TODO: figure out how to pass appropriate values here
-      command: undefined,
-      dependencyNamesToUpdate: undefined,
-      existingPullRequests: [],
-      securityVulnerabilities: undefined,
+      command,
+      dependencyNamesToUpdate,
+      existingPullRequests,
+      securityVulnerabilities,
+      pullRequestToUpdate,
     });
 
     const jobConfig: FileFetcherInput | FileUpdaterInput = { job };
@@ -219,8 +282,8 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
         workflowRunId,
 
         commit: repository.latestCommit!,
-        ecosystem: repoUpdate.ecosystem,
-        packageManager: mapPackageEcosystemToPackageManager(repoUpdate.ecosystem as PackageEcosystem),
+        ecosystem,
+        packageManager,
         directory: repoUpdate.directory,
         directories: repoUpdate.directories,
         directoryKey,
@@ -233,15 +296,15 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
           },
         },
 
-        config: JSON.stringify(jobConfig),
-        credentials: JSON.stringify(credentials),
+        config,
+        jobConfig,
+        credentials,
         region: organization.region,
 
         startedAt: null,
         finishedAt: null,
         duration: null,
-        errorType: null,
-        errorDetails: null,
+        errors: null,
       },
     });
     createdUpdateJobs.push(newJob);
@@ -321,6 +384,14 @@ async function runUpdateJob({ id }: { id: string }) {
 const SECRET_NAME_PROXY_CONFIG = 'proxy-config';
 const SECRET_NAME_CA_CERT = 'ca-cert';
 const SECRET_NAME_JOB_CONFIG = 'job-config';
+// The proxy needs the least amount of resources we are allowed to specify.
+// For the updater (we use 8GB in packages/runner) we set what fits the bill.
+// This affects the available ephemeral storage as well (dependabot checks out repos in ephemeral storage).
+// https://learn.microsoft.com/en-us/azure/container-apps/storage-mounts?tabs=smb&pivots=azure-cli#ephemeral-storage
+// Total usage below is 1.25 CPU and 2.5Gi memory.
+// See private billing note on cost forecasts.
+const CONTAINER_RESOURCES_PROXY: ContainerResources = { cpu: 0.25, memory: '0.5Gi' };
+const CONTAINER_RESOURCES_UPDATER: ContainerResources = { cpu: 1, memory: '2Gi' };
 export async function createAndStartJobResources({
   id,
   resourceName,
@@ -334,8 +405,8 @@ export async function createAndStartJobResources({
   const job = await prisma.updateJob.findUniqueOrThrow({ where: { id } });
   const secret = await prisma.updateJobSecret.findUniqueOrThrow({ where: { id: job.id } });
 
-  const jobConfig = JSON.parse(job.config) as FileFetcherInput | FileUpdaterInput;
-  const jobCredentials = JSON.parse(job.credentials) as DependabotCredential[];
+  const jobConfig = job.jobConfig as FileFetcherInput | FileUpdaterInput;
+  const jobCredentials = job.credentials as DependabotCredential[];
 
   const { region } = job;
   try {
@@ -380,7 +451,7 @@ export async function createAndStartJobResources({
         {
           name: 'proxy',
           image: PROXY_IMAGE_NAME,
-          resources: { cpu: 0.25, memory: '0.5Gi' },
+          resources: CONTAINER_RESOURCES_PROXY,
           env: [
             { name: 'JOB_ID', value: job.id },
             { name: 'JOB_TOKEN', secretRef: 'job-token' },
@@ -395,10 +466,7 @@ export async function createAndStartJobResources({
         {
           name: 'updater',
           image: updaterImage,
-          // TODO: decide if this is really enough (we use 8GB in runner); consider billing
-          // This affects the available ephemeral storage as well
-          // https://learn.microsoft.com/en-us/azure/container-apps/storage-mounts?tabs=smb&pivots=azure-cli#ephemeral-storage
-          resources: { cpu: 1, memory: '2Gi' },
+          resources: CONTAINER_RESOURCES_UPDATER,
           env: [
             { name: 'DEPENDABOT_JOB_ID', value: job.id },
             { name: 'DEPENDABOT_JOB_TOKEN', value: '' },
@@ -503,7 +571,7 @@ async function saveUpdateJobStatus({
 
   // a job is failed if the resource status is 'Failed' or if there is an error recorded in the job
   const updateJob = await prisma.updateJob.findUniqueOrThrow({ where: { id } });
-  const failed = executionStatus === 'Failed' || !!updateJob.errorType || !!updateJob.errorDetails;
+  const failed = executionStatus === 'Failed' || !!updateJob.errors;
 
   // update the job based on the resource status
   await prisma.updateJob.update({

@@ -8,10 +8,15 @@ import {
   type AzdoEventRepositoryRenamedResource,
   type AzdoEventRepositoryStatusChangedResource,
   AzdoEventSchema,
+  type AzdoGitPush,
 } from '@paklo/core/azure';
+import { CONFIG_FILE_PATHS_AZURE } from '@paklo/core/dependabot';
 import { Hono } from 'hono';
 import { bearerAuth } from 'hono/bearer-auth';
+import { createAzdoClient } from '@/actions/organizations';
+import { requestTriggerUpdateJobs } from '@/actions/repositories';
 import { requestSync } from '@/actions/sync';
+import { author } from '@/lib/author';
 import { logger } from '@/lib/logger';
 import { type Organization, type Project, prisma, type Repository } from '@/lib/prisma';
 import { HEADER_NAME_ORGANIZATION, HEADER_NAME_PROJECT } from '@/lib/webhooks';
@@ -117,13 +122,7 @@ app.post('/', authMiddleware, zValidator('json', AzdoEventSchema), async (contex
 
   // handle the event types
   const options: HandlerOptions = { organization, project, repository, resource };
-  if (eventType === 'git.push') {
-    await handleCodePushEvent({ ...options, resource });
-  } else if (eventType === 'git.pullrequest.updated') {
-    await handlePrUpdatedEvent({ ...options, resource });
-  } else if (eventType === 'git.pullrequest.merged') {
-    await handlePrMergeEvent({ ...options, resource });
-  } else if (eventType === 'git.repo.created') {
+  if (eventType === 'git.repo.created') {
     await handleRepoCreatedEvent({ ...options, resource });
   } else if (eventType === 'git.repo.renamed') {
     await handleRepoRenamedEvent({ ...options, resource });
@@ -131,6 +130,12 @@ app.post('/', authMiddleware, zValidator('json', AzdoEventSchema), async (contex
     await handleRepoDeletedEvent({ ...options, resource });
   } else if (eventType === 'git.repo.statuschanged') {
     await handleRepoStatusChangedEvent({ ...options, resource });
+  } else if (eventType === 'git.push') {
+    await handleCodePushEvent({ ...options, resource });
+  } else if (eventType === 'git.pullrequest.updated') {
+    await handlePrUpdatedEvent({ ...options, resource });
+  } else if (eventType === 'git.pullrequest.merged') {
+    await handlePrMergeEvent({ ...options, resource });
   } else if (eventType === 'ms.vss-code.git-pullrequest-comment-event') {
     await handleCommentEvent({ ...options, resource });
   }
@@ -144,66 +149,6 @@ type HandlerOptions<T = unknown> = {
   repository?: Repository | null;
   resource: T;
 };
-
-async function handleCodePushEvent(options: HandlerOptions<AzdoEventCodePushResource>) {
-  const {
-    organization,
-    project,
-    repository,
-    resource: {
-      refUpdates,
-      repository: { id: providerRepositoryId, remoteUrl, defaultBranch },
-    },
-  } = options;
-
-  // ignore pushes to non-default branches
-  if (defaultBranch && !refUpdates.some((ref) => ref.name.endsWith(defaultBranch))) {
-    logger.trace(`Ignoring push event to non-default branch for repository ${remoteUrl} (default: ${defaultBranch})`);
-    return;
-  }
-
-  // figure out if we need to trigger a sync
-  const triggerSync = false;
-  // get the push or check the commits for changes
-  // the repository might not exist and if there are no changes to target files, no sync is needed
-  // TODO: figure out how to do this
-
-  // trigger sync
-  if (!triggerSync) {
-    logger.debug(`No relevant changes in push to ${remoteUrl}`);
-    return;
-  }
-
-  // trigger sync for the repository
-  logger.debug(`Triggering sync for repository ${remoteUrl} due to push event`);
-  await requestSync({
-    organizationId: organization.id,
-    projectId: project.id,
-    repositoryId: repository?.id,
-    repositoryProviderId: repository ? undefined : providerRepositoryId,
-    scope: 'repository',
-    trigger: true, // trigger update jobs
-  });
-}
-
-async function handlePrUpdatedEvent(options: HandlerOptions<AzdoEventPullRequestResource>) {
-  const {
-    resource: { repository: adoRepository, pullRequestId: prId, status },
-  } = options;
-
-  logger.debug(`PR ${prId} in ${adoRepository.remoteUrl} status updated to ${status}`);
-
-  // TODO: handle the logic for merge conflicts here using events
-}
-
-async function handlePrMergeEvent(options: HandlerOptions<AzdoEventPullRequestResource>) {
-  const { resource } = options;
-
-  const { repository: adoRepository, pullRequestId: prId, status, mergeStatus } = resource;
-  logger.debug(`PR ${prId} (${status}) in ${adoRepository.remoteUrl} merge status changed to ${mergeStatus}`);
-
-  // TODO: handle the logic for updating other PRs to find merge conflicts (restart merge or attempt merge)
-}
 
 async function handleRepoCreatedEvent(options: HandlerOptions<AzdoEventRepositoryCreatedResource>) {
   const { organization, project, resource } = options;
@@ -265,21 +210,225 @@ async function handleRepoStatusChangedEvent(options: HandlerOptions<AzdoEventRep
   });
 }
 
-async function handleCommentEvent(options: HandlerOptions<AzdoEventPullRequestCommentEventResource>) {
+async function handleCodePushEvent(options: HandlerOptions<AzdoEventCodePushResource>) {
   const {
+    organization,
+    project,
+    repository,
     resource: {
-      comment,
-      pullRequest: { repository: adoRepository, pullRequestId: prId, status },
+      refUpdates,
+      pushId,
+      repository: { id: providerRepositoryId, remoteUrl, defaultBranch },
     },
   } = options;
 
-  // ensure the comment starts with @dependabot
-  const content = comment.content.trim();
-  if (!content || !content.startsWith('@dependabot')) {
+  // ignore pushes to non-default branches
+  if (!defaultBranch || !refUpdates.some((ref) => ref.name.endsWith(defaultBranch))) {
+    logger.trace(`Ignoring push event to non-default branch for repository ${remoteUrl} (default: ${defaultBranch})`);
     return;
   }
 
-  logger.debug(`PR ${prId} (${status}) in ${adoRepository.remoteUrl} was commented on: ${content}`);
+  // fetch the push details from Azure DevOps
+  const client = await createAzdoClient({ organization });
+  const commitsCount = options.resource.commits.length;
+  let push: AzdoGitPush;
+  try {
+    push = await client.git.getPush(
+      project.name,
+      repository ? repository.name : providerRepositoryId,
+      pushId,
+      commitsCount,
+    );
+  } catch (e) {
+    logger.error(`Failed to fetch push ${pushId} for repository ${remoteUrl}: ${(e as Error).message}`);
+    return;
+  }
 
-  // TODO: handle the logic for comments here using events
+  // find the changed files in the push hence determine if we need to trigger a sync
+  const paths = Array.from(
+    new Set(
+      push.commits
+        .flatMap((commit) => commit.changes ?? [])
+        .flatMap((change) => [change.originalPath!, change.item!].filter(Boolean)),
+    ).values(),
+  );
+  const triggerSync = paths.some((p) => CONFIG_FILE_PATHS_AZURE.some((cp) => p.endsWith(cp)));
+
+  // trigger sync
+  if (!triggerSync) {
+    logger.debug(`No relevant changes in push to ${remoteUrl}`);
+    return;
+  }
+
+  // trigger sync for the repository
+  logger.debug(`Triggering sync for repository ${remoteUrl} due to push event`);
+  await requestSync({
+    organizationId: organization.id,
+    projectId: project.id,
+    repositoryId: repository?.id,
+    repositoryProviderId: repository ? undefined : providerRepositoryId,
+    scope: 'repository',
+    trigger: true, // trigger update jobs
+  });
+}
+
+async function handlePrUpdatedEvent(options: HandlerOptions<AzdoEventPullRequestResource>) {
+  const {
+    repository,
+    resource: { repository: adoRepository, pullRequestId: prId, status },
+  } = options;
+
+  logger.debug(`PR ${prId} in ${adoRepository.remoteUrl} status updated to ${status}`);
+
+  // fetch the pull request from our database
+  const pullRequest = await prisma.repositoryPullRequest.findFirst({
+    where: { repositoryId: repository!.id, providerId: prId },
+  });
+  if (!pullRequest) {
+    logger.trace(`PR ${prId} in ${adoRepository.remoteUrl} not found in database on update event`);
+    return;
+  }
+
+  // skip if the PR is not open
+  if (pullRequest.status !== 'open') {
+    logger.trace(`PR ${prId} in ${adoRepository.remoteUrl} is not open in database on update event`);
+    return;
+  }
+
+  // if abandoned, update the PR status to closed
+  if (status === 'abandoned') {
+    await prisma.repositoryPullRequest.update({
+      where: { id: pullRequest.id },
+      data: { status: 'closed' },
+    });
+    return;
+  }
+}
+
+async function handlePrMergeEvent(options: HandlerOptions<AzdoEventPullRequestResource>) {
+  const { organization, project, repository, resource } = options;
+
+  const { repository: adoRepository, pullRequestId: prId, status, mergeStatus } = resource;
+  logger.debug(`PR ${prId} (${status}) in ${adoRepository.remoteUrl} merge status changed to ${mergeStatus}`);
+
+  // fetch the pull request from our database
+  const pullRequest = await prisma.repositoryPullRequest.findFirst({
+    where: { repositoryId: repository!.id, providerId: prId },
+  });
+  if (!pullRequest) {
+    logger.trace(`PR ${prId} in ${adoRepository.remoteUrl} not found in database on merge event`);
+    return;
+  }
+
+  // skip if the PR is not open
+  if (pullRequest.status !== 'open') {
+    logger.trace(`PR ${prId} in ${adoRepository.remoteUrl} is not open in database on merge event`);
+    return;
+  }
+
+  // if merged successfully, update the PR status to merged
+  if (mergeStatus === 'succeeded') {
+    await prisma.repositoryPullRequest.update({
+      where: { id: pullRequest.id },
+      data: { status: 'merged' },
+    });
+    return;
+  }
+
+  // if there are merge conflicts, trigger a job to handle them
+  if (mergeStatus === 'conflicts') {
+    // skip if the pull request has been modified by another author
+    const client = await createAzdoClient({ organization });
+    const commits = await client.pullRequests.getCommits(project.name, repository!.name, prId);
+    if (commits?.some((c) => c.author?.email !== author.email)) {
+      logger.trace(
+        `PR ${prId} in ${adoRepository.remoteUrl} has been modified by another author, skipping conflict handling`,
+      );
+      return;
+    }
+
+    // request trigger update job to handle merge conflicts for this PR
+    logger.trace(`PR ${prId} in ${adoRepository.remoteUrl} has merge conflicts, handling them`);
+    await requestTriggerUpdateJobs({
+      organizationId: organization.id,
+      projectId: project.id,
+      repositoryId: repository!.id,
+      repositoryPullRequestId: pullRequest.id,
+      trigger: 'conflicts',
+    });
+    return;
+  }
+}
+
+async function handleCommentEvent(options: HandlerOptions<AzdoEventPullRequestCommentEventResource>) {
+  const {
+    organization,
+    project,
+    repository,
+    resource: {
+      comment,
+      pullRequest: { repository: adoRepository, pullRequestId: prId },
+    },
+  } = options;
+
+  // fetch the pull request from our database
+  const pullRequest = await prisma.repositoryPullRequest.findFirst({
+    where: { repositoryId: repository!.id, providerId: prId },
+  });
+  if (!pullRequest) {
+    logger.trace(`PR ${prId} in ${adoRepository.remoteUrl} not found in database on comment event`);
+    return;
+  }
+
+  // skip if the PR is not open
+  if (pullRequest.status !== 'open') {
+    logger.trace(`PR ${prId} in ${adoRepository.remoteUrl} is not open in database on comment event`);
+    return;
+  }
+
+  // ensure the comment matches the format we expect i.e. "@dependabot <rebase|recreate>"
+  const content = comment.content.trim();
+  const commentFormat = /^@dependabot\s+(rebase|recreate)$/i;
+  if (!content || !commentFormat.test(content)) {
+    return;
+  }
+
+  const command = content.match(commentFormat)![1]!.toLowerCase() as 'rebase' | 'recreate';
+  logger.debug(`PR ${prId} in ${adoRepository.remoteUrl} was commented on with command: ${command}`);
+
+  if (command === 'recreate') {
+    logger.debug(`Recreating PR ${prId} in ${adoRepository.remoteUrl} as per comment command`);
+    await requestTriggerUpdateJobs({
+      organizationId: options.organization.id,
+      projectId: options.project.id,
+      repositoryId: repository!.id,
+      repositoryPullRequestId: pullRequest.id,
+      trigger: 'comment',
+    });
+  } else if (command === 'rebase') {
+    // comment that there are additional commits if the pull request has been modified by another author
+    const client = await createAzdoClient({ organization }, true);
+    const commits = await client.inner.pullRequests.getCommits(project.name, repository!.name, prId);
+    if (commits?.some((c) => c.author?.email !== author.email)) {
+      // post comment that there are additional commits and they should use recreate instead
+      await client.addCommentThread({
+        project: project.name,
+        repository: repository!.providerId,
+        pullRequestId: prId,
+        content:
+          'Cannot rebase this pull request as it has been modified by other authors. Please use `@dependabot recreate` to recreate the pull request which will override additional commits.',
+      });
+      return;
+    }
+
+    // request trigger update job to handle the rebase for this PR
+    logger.trace(`PR ${prId} in ${adoRepository.remoteUrl} is being rebased as per comment command`);
+    await requestTriggerUpdateJobs({
+      organizationId: options.organization.id,
+      projectId: options.project.id,
+      repositoryId: repository!.id,
+      repositoryPullRequestId: pullRequest.id,
+      trigger: 'comment',
+    });
+  }
 }

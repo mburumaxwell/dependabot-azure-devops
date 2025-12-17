@@ -17,8 +17,8 @@ export async function cleanupDatabase() {
   'use workflow';
 
   await deleteUsageTelemetry();
-  await deleteExpiredInvitations();
-  await deleteExpiredVerifications();
+  await deleteExpiredRecords();
+  await deleteOldRecords();
 }
 
 /**
@@ -43,34 +43,47 @@ async function deleteUsageTelemetry() {
   );
 }
 
-/**
- * Deletes organization invitations that have expired.
- * An invitation is considered expired if its `expiresAt` date is earlier than the current date.
- * This step removes all such expired invitations from the database.
- */
-async function deleteExpiredInvitations() {
+/** Deletes expired records from the database. */
+async function deleteExpiredRecords() {
   'use step';
 
-  // Delete organization invitations that have expired (date in the database)
-  const result = await prisma.invitation.deleteMany({
-    where: { expiresAt: { lt: new Date() } },
-  });
+  const now = new Date();
 
+  /**
+   * Delete organization invitations that have expired
+   * An invitation is considered expired if its `expiresAt` date is earlier than the current date.
+   */
+  let result = await prisma.invitation.deleteMany({
+    where: { expiresAt: { lt: now } },
+  });
   logger.info(`Expired invitations cleanup completed: deleted ${result.count} expired invitations`);
+
+  /**
+   * Delete verifications that have expired
+   * A verification is considered expired if its `expiresAt` date is earlier than the current date.
+   */
+  result = await prisma.verification.deleteMany({
+    where: { expiresAt: { lt: now } },
+  });
+  logger.info(`Expired verifications cleanup completed: deleted ${result.count} expired verifications`);
 }
 
-/**
- * Deletes verifications that have expired.
- * A verification is considered expired if its `expiresAt` date is earlier than the current date.
- * This step removes all such expired verifications from the database.
- */
-async function deleteExpiredVerifications() {
+/** Deletes old records (deletable) from the database. */
+async function deleteOldRecords() {
   'use step';
 
-  // Delete verifications that have expired (date in the database)
-  const result = await prisma.verification.deleteMany({
-    where: { expiresAt: { lt: new Date() } },
-  });
+  // we keep deletable data for 90 days
+  const threshold = new Date();
+  threshold.setDate(threshold.getDate() - 90); // 90 days ago
 
-  logger.info(`Expired verifications cleanup completed: deleted ${result.count} expired verifications`);
+  // remove completed pull requests older than threshold
+  const result = await prisma.repositoryPullRequest.deleteMany({
+    where: {
+      updatedAt: { lt: threshold },
+      status: { in: ['merged', 'closed'] },
+    },
+  });
+  logger.info(
+    `Old pull requests cleanup completed: deleted ${result.count} pull requests updated before ${threshold.toISOString()}`,
+  );
 }

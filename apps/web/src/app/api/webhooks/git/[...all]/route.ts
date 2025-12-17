@@ -11,4 +11,4 @@ app.route('/azure', azure);
 app.route('/bitbucket', bitbucket);
 app.route('/gitlab', gitlab);
 
-export const { POST } = toNextJsHandler(app);
+export const { POST, OPTIONS } = toNextJsHandler(app);

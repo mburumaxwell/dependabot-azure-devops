@@ -40,8 +40,7 @@ export default async function RepositoryUpdateJobsPage(
       status: true,
       createdAt: true,
       finishedAt: true,
-      errorType: true,
-      errorDetails: true,
+      errors: true,
       affectedPrIds: true,
     },
   });
@@ -96,12 +95,7 @@ async function getRepositoryUpdate({
   const update = await prisma.repositoryUpdate.findUnique({
     // must belong to the repository
     where: { repositoryId: repositoryId, id: updateId },
-    select: {
-      id: true,
-      updatedAt: true,
-      ecosystem: true,
-      files: true,
-    },
+    select: { id: true, updatedAt: true, ecosystem: true, files: true },
   });
 
   return { project, repository, update };

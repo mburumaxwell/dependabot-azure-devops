@@ -1,10 +1,5 @@
-import {
-  type AzdoRepository,
-  type AzdoRepositoryItem,
-  AzureDevOpsClient,
-  extractOrganizationUrl,
-} from '@paklo/core/azure';
-import { POSSIBLE_CONFIG_FILE_PATHS } from '@paklo/core/dependabot';
+import type { AzdoRepository, AzdoRepositoryItem, AzureDevOpsClient } from '@paklo/core/azure';
+import { CONFIG_FILE_PATHS_AZURE } from '@paklo/core/dependabot';
 import {
   type ISyncProvider,
   SynchronizerConfigurationItem,
@@ -13,14 +8,7 @@ import {
 } from './base';
 
 export class AzureSyncProvider implements ISyncProvider {
-  private readonly organizationSlug: string;
-  private readonly client: AzureDevOpsClient;
-
-  constructor(organisationUrl: string, token: string) {
-    const url = extractOrganizationUrl({ organisationUrl });
-    this.organizationSlug = url.organisation;
-    this.client = new AzureDevOpsClient(url, token);
-  }
+  constructor(private readonly client: AzureDevOpsClient) {}
 
   getProject(id: string): Promise<SynchronizerProject | undefined> {
     return this.client.projects.get(id);
@@ -43,7 +31,7 @@ export class AzureSyncProvider implements ISyncProvider {
     // try all known paths
     let item: AzdoRepositoryItem | undefined;
     let path: string | undefined;
-    for (const filePath of POSSIBLE_CONFIG_FILE_PATHS) {
+    for (const filePath of CONFIG_FILE_PATHS_AZURE) {
       path = filePath;
       item = await this.client.git.getItem(project.id, repo.id, path);
       if (item) break;
@@ -65,6 +53,6 @@ export class AzureSyncProvider implements ISyncProvider {
   }
 
   private makeSlug(project: SynchronizerProject, repo: SynchronizerRepository) {
-    return `${this.organizationSlug}/${project.name}/_git/${repo.name}`;
+    return `${this.client.organizationSlug}/${project.name}/_git/${repo.name}`;
   }
 }

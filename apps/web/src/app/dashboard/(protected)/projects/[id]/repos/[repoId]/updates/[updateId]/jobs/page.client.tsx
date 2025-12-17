@@ -1,5 +1,6 @@
 'use client';
 
+import type { DependabotJobError } from '@paklo/core/dependabot';
 import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -38,10 +39,7 @@ type SimpleRepository = Pick<
   'id' | 'name' | 'slug' | 'url' | 'updatedAt' | 'synchronizationStatus' | 'synchronizedAt'
 >;
 type SimpleRepositoryUpdate = Pick<RepositoryUpdate, 'id' | 'updatedAt' | 'ecosystem' | 'files'>;
-type SimpleJob = Pick<
-  UpdateJob,
-  'id' | 'status' | 'createdAt' | 'finishedAt' | 'errorType' | 'errorDetails' | 'affectedPrIds'
->;
+type SimpleJob = Pick<UpdateJob, 'id' | 'status' | 'createdAt' | 'finishedAt' | 'errors' | 'affectedPrIds'>;
 
 export function UpdateJobsView({
   project,
@@ -88,7 +86,7 @@ export function UpdateJobsView({
       organizationId: project.organizationId,
       projectId: project.id,
       repositoryId: repository.id,
-      repositoryUpdateIds: [update.id],
+      repositoryUpdateId: update.id,
       trigger: 'manual',
     });
 
@@ -181,7 +179,23 @@ export function UpdateJobsView({
                   {(job.status === 'running' || job.status === 'scheduled') && <>Running ...</>}
                   {job.status === 'failed' && (
                     <>
-                      {job.errorType}: {job.errorDetails}
+                      {/* TODO: improve this UI */}
+                      {(job.errors as DependabotJobError[]) ? (
+                        <>
+                          Failed with {((job.errors as DependabotJobError[]).length || 0) > 1 ? 'errors' : 'an error'}:{' '}
+                          <ul className='list-disc list-inside'>
+                            {(job.errors as DependabotJobError[]).map((error, index) => (
+                              // biome-ignore lint/suspicious/noArrayIndexKey: no other id available
+                              <li key={index}>
+                                {error['error-type']}
+                                {error['error-details'] ? `: ${JSON.stringify(error['error-details'])}` : ''}
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      ) : (
+                        <>Failed with unknown error.</>
+                      )}
                     </>
                   )}
                 </ItemDescription>

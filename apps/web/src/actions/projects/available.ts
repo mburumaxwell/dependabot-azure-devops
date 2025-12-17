@@ -1,6 +1,6 @@
 'use server';
 
-import { AzureDevOpsClient, extractOrganizationUrl } from '@paklo/core/azure';
+import { createAzdoClient } from '@/actions/organizations';
 import { type OrganizationType, prisma } from '@/lib/prisma';
 
 export type AvailableProject = {
@@ -67,25 +67,15 @@ const providerProjectsFetchers = new Map<OrganizationType, ProviderProjectsFetch
   // future organization types can be added here
 ]);
 
-async function getAvailableForAzure({
-  id,
-  url: inputUrl,
-}: ListProviderProjectsOptions): Promise<AvailableProviderProject[]> {
-  const url = extractOrganizationUrl({ organisationUrl: inputUrl });
-  const token = (
-    await prisma.organizationCredential.findUniqueOrThrow({
-      where: { id },
-      select: { token: true },
-    })
-  ).token;
-  const client = new AzureDevOpsClient(url, token);
+async function getAvailableForAzure({ id }: ListProviderProjectsOptions): Promise<AvailableProviderProject[]> {
+  const client = await createAzdoClient({ id });
 
   return ((await client.projects.list()) || [])
     .filter((project) => project.state === 'wellFormed')
     .map((project) => ({
       name: project.name,
       description: project.description,
-      url: `${url.value}/${project.name}`,
+      url: `${client.organizationUrl}/${project.name}`,
       permalink: project.url,
       providerId: project.id,
     }));

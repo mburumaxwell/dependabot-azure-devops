@@ -259,11 +259,11 @@ model Project {
 }
 
 model Repository {
-  id                    String                @id @map("_id")
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @updatedAt
+  id                    String                  @id @map("_id")
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
   projectId             String
-  project               Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project               Project                 @relation(fields: [projectId], references: [id], onDelete: Cascade)
   providerId            String
   name                  String
   url                   String
@@ -281,6 +281,7 @@ model Repository {
   synchronizationStatus SynchronizationStatus
   synchronizedAt        DateTime?
   updates               RepositoryUpdate[]
+  pullRequests          RepositoryPullRequest[]
 
   @@unique([projectId, providerId])
   @@unique([url])
@@ -301,20 +302,52 @@ model RepositoryUpdate {
   directories     String[]
   /// Either the original directory or merger of directories.
   directoryKey    String
-  /// Cron schedule for running this update
+  /// Cron schedule for running this update.
   cron            String
   timezone        String
+  nextUpdateJobAt DateTime
   files           String[]
-  nextUpdateJobAt DateTime?
+
+  /// Maps to `DependabotPersistedDep[]`.
+  deps Json?
 
   @@unique([repositoryId, ecosystem, directoryKey])
   @@index([repositoryId])
   @@map("repository_update")
 }
 
+enum RepositoryPullRequestStatus {
+  open
+  closed
+  merged
+
+  @@map("repository_pull_request_status")
+}
+
+model RepositoryPullRequest {
+  id             String                      @id @map("_id")
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+  repository     Repository                  @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repositoryId   String
+  providerId     Int
+  packageManager String
+  status         RepositoryPullRequestStatus
+
+  /// Maps to `DependabotPersistedPr`.
+  data Json
+
+  @@index([repositoryId])
+  @@index([repositoryId, providerId])
+  @@index([repositoryId, packageManager, status])
+  @@map("repository_pull_request")
+}
+
 enum UpdateJobTrigger {
-  scheduled
   synchronization
+  scheduled
+  conflicts
+  comment
   manual
 
   @@map("update_job_trigger")
@@ -355,19 +388,25 @@ model UpdateJob {
   /// Either the original directory or merger of directories.
   directoryKey   String
   workflowRunId  String
-  config         String // JSON stringified DependabotJobConfig
-  credentials    String // JSON stringified DependabotCredential[]
+  /// Maps to `DependabotConfig` as of the time the job was created.
+  config         Json
+  /// Maps to `DependabotJobConfig`.
+  jobConfig      Json
+  /// Maps to `DependabotCredential[]`.
+  credentials    Json
   secret         UpdateJobSecret?
   region         String
   startedAt      DateTime?
   finishedAt     DateTime?
   /// Duration in milliseconds.
   duration       Int?
-  errorType      String?
-  errorDetails   String? // JSON stringified Record<string, any>
+  /// Maps to `DependabotJobError[]`.
+  errors         Json?
+  /// Maps to `DependabotRecordUpdateJobWarning[]`.
+  warnings       Json?
   affectedPrIds  Int[]
 
-  @@unique([ecosystem, directoryKey, workflowRunId])
+  @@unique([packageManager, directoryKey, workflowRunId])
   @@index([organizationId])
   @@index([projectId])
   @@index([repositoryId])

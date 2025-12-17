@@ -8,6 +8,7 @@ import { getNextRunDate } from '@/lib/cron';
 import { MIN_AUTO_SYNC_INTERVAL_PROJECT } from '@/lib/organizations';
 import { prisma } from '@/lib/prisma';
 import { cleanupDatabase } from '@/workflows/cleanup-database';
+import { scanVulnerabilities } from '@/workflows/scan-vulnerabilities';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,6 +55,7 @@ app.get('/trigger-update-jobs', async (context) => {
   const dueRepositoryUpdates = await prisma.repositoryUpdate.findMany({
     where: { enabled: true, nextUpdateJobAt: { lte: new Date() } },
     orderBy: { nextUpdateJobAt: 'asc' },
+    omit: { deps: true },
     take: 500,
   });
 
@@ -87,10 +89,16 @@ app.get('/trigger-update-jobs', async (context) => {
       organizationId: organization.id,
       projectId: project.id,
       repositoryId: repository.id,
-      repositoryUpdateIds: [update.id],
+      repositoryUpdateId: update.id,
       trigger: 'scheduled',
     });
   }
+  return context.body(null, 204);
+});
+
+// CRON: 0 12 * * *
+app.get('/scan-vulnerabilities', async (context) => {
+  await start(scanVulnerabilities, []);
   return context.body(null, 204);
 });
 

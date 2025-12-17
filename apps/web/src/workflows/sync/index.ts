@@ -128,7 +128,7 @@ async function makeSynchronizer(organization: Organization, project: Project, tr
     where: { id: organization.id },
   });
 
-  const provider = createSyncProvider(organization, credential);
+  const provider = await createSyncProvider(organization, credential);
   const synchronizer = new Synchronizer(organization, credential, provider, project, trigger);
   return { provider, synchronizer };
 }

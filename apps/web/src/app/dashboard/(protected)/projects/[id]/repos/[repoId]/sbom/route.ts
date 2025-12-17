@@ -5,7 +5,7 @@ import * as spdx from '@spdx/tools';
 import { notFound } from 'next/navigation';
 
 import { getSpdxDocumentName } from '@/lib/organizations';
-import { prisma } from '@/lib/prisma';
+import { type DependabotPersistedDep, prisma } from '@/lib/prisma';
 
 export const revalidate = 0; // always revalidate to get the latest SBOM
 
@@ -33,15 +33,37 @@ export async function GET(_req: Request, params: RouteContext<'/dashboard/projec
   const document = spdx.createDocument(getSpdxDocumentName({ type, slug: repository.slug }));
   document.creationInfo.creators.push(
     ...[
-      new spdx.Actor(`Paklo.com-Dependency-Graph`, spdx.ActorType.Tool),
+      new spdx.Actor(`Paklo.app-Dependency-Graph`, spdx.ActorType.Tool),
       new spdx.Actor(`Automatic Dependency Submission`, spdx.ActorType.Tool),
     ],
   );
 
-  // TODO: add packages known for this repository (likely from its updates)
-  // ref: https://github.com/mburumaxwell/dependabot-azure-devops/dependency-graph/sbom
-  const pkg = document.addPackage('my-package');
-  document.addRelationship(document, pkg, 'DESCRIBES');
+  // get all deps from repository updates
+  const deps = (
+    await prisma.repositoryUpdate.findMany({
+      where: { repositoryId },
+      select: { deps: true },
+    })
+  ).flatMap((u) => u.deps as DependabotPersistedDep[]);
+
+  // add each dep to the SBOM
+  for (const dep of deps) {
+    // ref: https://github.com/mburumaxwell/dependabot-azure-devops/dependency-graph/sbom
+    const pkg = document.addPackage(dep.name, {
+      version: dep.version ?? 'NOASSERTION',
+      downloadLocation: 'NOASSERTION',
+    });
+    document.addRelationship(document, pkg, 'DESCRIBES');
+  }
+
+  // if there are no deps, add a dummy package to indicate no dependencies found
+  if (!deps.length) {
+    const pkg = document.addPackage('no-dependencies-found', {
+      version: '0.0.0',
+      downloadLocation: 'NOASSERTION',
+    });
+    document.addRelationship(document, pkg, 'DESCRIBES');
+  }
 
   // serialize (the library only supports writing to file), delete temp file after reading
   const tmpFile = join(tmpdir(), `sbom-${repositoryId}.json`);

@@ -295,6 +295,7 @@ export class Synchronizer {
     const updatesMap = Object.fromEntries(updates.map((u) => [makeDirectoryKey(u), u]));
     const repositoryUpdates = await prisma.repositoryUpdate.findMany({
       where: { repositoryId: repository.id },
+      omit: { deps: true },
     });
     const updatesToDelete = repositoryUpdates.filter((u) => !updatesMap[makeDirectoryKey(u)]);
     const { count: deleted } = await prisma.repositoryUpdate.deleteMany({
@@ -321,13 +322,18 @@ export class Synchronizer {
           ecosystem: update['package-ecosystem'],
           directory: update.directory,
           directories: update.directories,
+          directoryKey,
           cron,
           timezone,
-          directoryKey,
+          nextUpdateJobAt,
           files: [], // will be populated when running update jobs
+        },
+        update: {
+          enabled: true,
+          cron,
+          timezone,
           nextUpdateJobAt,
         },
-        update: { enabled: true, cron, timezone, nextUpdateJobAt },
       });
     }
 

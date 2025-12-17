@@ -1,6 +1,6 @@
 'use server';
 
-import { AzureDevOpsClientWrapper, extractOrganizationUrl } from '@paklo/core/azure';
+import { createAzdoClient } from '@/actions/organizations';
 import { requestSync } from '@/actions/sync';
 import { PakloId } from '@/lib/ids';
 import { logger } from '@/lib/logger';
@@ -51,11 +51,10 @@ export async function connectProjects({
 
   // create service hooks on azure
   if (organization.type === 'azure') {
-    const url = extractOrganizationUrl({ organisationUrl: organization.url });
     const credential = await prisma.organizationCredential.findUniqueOrThrow({
       where: { id: organizationId },
     });
-    const client = new AzureDevOpsClientWrapper(url, credential.token);
+    const client = await createAzdoClient({ organization, credential }, true);
     const created = await prisma.project.findMany({ where: { id: { in: projectIds } } });
     for (const project of created) {
       logger.info(`Creating service hooks for project ${project.id} (${project.url})`);

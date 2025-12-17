@@ -1,4 +1,4 @@
-import { type Job as ContainerAppJob, ContainerAppsAPIClient } from '@azure/arm-appcontainers';
+import { type Job as ContainerAppJob, ContainerAppsAPIClient, type ContainerResources } from '@azure/arm-appcontainers';
 import { ComputeManagementClient } from '@azure/arm-compute';
 import { RestError } from '@azure/core-rest-pipeline';
 import { ClientAssertionCredential, DefaultAzureCredential, type TokenCredential } from '@azure/identity';
@@ -43,7 +43,7 @@ export const resourceGroupNameJobs = process.env.AZURE_RESOURCE_GROUP_JOBS!;
 export const managedAppEnvironmentId = process.env.AZURE_MANAGED_ENVIRONMENT_ID!;
 
 export { RestError as AzureRestError };
-export type { ContainerAppJob };
+export type { ContainerAppJob, ContainerResources };
 
 /**
  * Get a secret from Azure Key Vault

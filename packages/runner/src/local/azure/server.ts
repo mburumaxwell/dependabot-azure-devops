@@ -294,8 +294,9 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
 
       case 'record_update_job_error':
       case 'record_update_job_unknown_error':
+        const unknown = type === 'record_update_job_unknown_error';
         logger.error(
-          `Update${type === 'record_update_job_unknown_error' ? ' (unknown) ' : ''})job error: ${data['error-type']} ${JSON.stringify(data['error-details'])}`,
+          `Update${unknown ? ' unknown ' : ''})job error: ${data['error-type']} ${JSON.stringify(data['error-details'])}`,
         );
         return true;
 

@@ -1,15 +1,11 @@
 'use server';
 
-import {
-  ANONYMOUS_USER_ID,
-  AzureDevOpsClient,
-  type AzureDevOpsOrganizationUrl,
-  extractOrganizationUrl,
-} from '@paklo/core/azure';
+import { ANONYMOUS_USER_ID, type AzureDevOpsOrganizationUrl, extractOrganizationUrl } from '@paklo/core/azure';
 import { createGitHubClient } from '@paklo/core/github';
 import { RequestError } from 'octokit';
 import { getKeyVaultSecret, setKeyVaultSecret } from '@/lib/azure';
 import { type OrganizationType, prisma } from '@/lib/prisma';
+import { createAzdoClient } from './client';
 
 export async function validateOrganizationCredentials({
   type,
@@ -36,7 +32,7 @@ export async function validateOrganizationCredentials({
 
   // ensure the token is valid and is not anonymous
   let userId: string;
-  const client = new AzureDevOpsClient(url, token);
+  const client = await createAzdoClient({ url, token });
   try {
     userId = (await client.connection.get()).authenticatedUser.id;
 

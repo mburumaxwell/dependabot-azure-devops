@@ -65,7 +65,7 @@ async function run(signal: AbortSignal) {
       if (documents.length >= 2_000) {
         await saveToDatabase(documents);
         logger.debug(`Processed ${count.toLocaleString()} records so far...`);
-        documents.splice(0, documents.length);
+        documents.splice(0);
       }
 
       parser.resume();

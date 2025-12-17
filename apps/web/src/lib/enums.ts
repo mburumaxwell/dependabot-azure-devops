@@ -55,6 +55,8 @@ export const updateJobStatusOptions: { value: UpdateJobStatus; label: string }[]
 const updateJobTriggerLabelMap: Record<UpdateJobTrigger, string> = {
   scheduled: 'Scheduled',
   synchronization: 'Synchronization',
+  comment: 'Comment',
+  conflicts: 'Conflicts',
   manual: 'Manual',
 };
 export const updateJobTriggerOptions: { value: UpdateJobTrigger; label: string }[] = Object.entries(

@@ -1,6 +1,6 @@
 'use server';
 
-import { AzureDevOpsClientWrapper, extractOrganizationUrl } from '@paklo/core/azure';
+import { createAzdoClient } from '@/actions/organizations';
 import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { getWebhooksUrl } from '@/lib/webhooks';
@@ -18,11 +18,7 @@ export async function disconnectProject({ organizationId, projectId }: { organiz
 
   // delete service hooks for the given project on azure
   if (organization.type === 'azure') {
-    const url = extractOrganizationUrl({ organisationUrl: organization.url });
-    const credential = await prisma.organizationCredential.findUniqueOrThrow({
-      where: { id: organizationId },
-    });
-    const client = new AzureDevOpsClientWrapper(url, credential.token);
+    const client = await createAzdoClient({ organization }, true);
     logger.info(`Deleting service hooks for project ID ${project.id} (${project.url})`);
     await client.deleteHookSubscriptions({
       url: getWebhooksUrl(organization),

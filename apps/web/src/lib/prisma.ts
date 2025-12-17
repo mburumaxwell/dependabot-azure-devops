@@ -19,6 +19,8 @@ export type {
   Passkey,
   Project,
   Repository,
+  RepositoryPullRequest,
+  RepositoryPullRequestStatus,
   RepositoryUpdate,
   Session,
   SubscriptionStatus,
@@ -32,5 +34,19 @@ export type {
 } from '@/../.prisma/client';
 
 export { Prisma, PrismaClient } from '@/../.prisma/client';
+
+export type {
+  InputJsonArray,
+  InputJsonObject,
+  InputJsonValue,
+  JsonArray,
+  JsonObject,
+  JsonValue,
+} from '@/../.prisma/runtime/library';
+
+export type DependabotPersistedDep = {
+  name: string;
+  version?: string;
+};
 
 if (process.env.NODE_ENV === 'development') globalForPrisma.prisma = prisma;

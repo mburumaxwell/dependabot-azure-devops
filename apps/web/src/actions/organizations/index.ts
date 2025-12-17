@@ -1,4 +1,5 @@
 export * from './billing';
+export * from './client';
 export * from './create';
 export * from './credentials';
 export * from './delete';

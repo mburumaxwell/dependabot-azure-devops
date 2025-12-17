@@ -31,11 +31,7 @@ export default async function RepositoryPage(props: PageProps<'/dashboard/projec
   const updates = await prisma.repositoryUpdate.findMany({
     // must belong to the repository
     where: { repositoryId },
-    select: {
-      id: true,
-      ecosystem: true,
-      files: true,
-    },
+    select: { id: true, ecosystem: true, files: true },
   });
 
   const enrichedUpdates = await Promise.all(
