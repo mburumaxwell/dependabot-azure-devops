@@ -6,14 +6,21 @@ import type { DependabotExistingPR } from './job';
 // Docs: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#groups--
 // -> An identifier for a group is used in branch names and pull request titles.
 
-export function getBranchNameForUpdate(
-  packageEcosystem: PackageEcosystem,
-  targetBranchName: string | undefined,
-  directory: string | undefined,
-  dependencyGroupName: string | undefined,
-  dependencies: DependabotExistingPR[],
-  separator: string = '/',
-): string {
+export function getBranchNameForUpdate({
+  packageEcosystem,
+  targetBranchName,
+  directory,
+  dependencyGroupName,
+  dependencies,
+  separator = '/',
+}: {
+  packageEcosystem: PackageEcosystem;
+  targetBranchName?: string;
+  directory?: string;
+  dependencyGroupName?: string;
+  dependencies: DependabotExistingPR[];
+  separator?: string;
+}): string {
   // Based on dependabot-core implementation:
   // https://github.com/dependabot/dependabot-core/blob/main/common/lib/dependabot/pull_request_creator/branch_namer/solo_strategy.rb
   // https://github.com/dependabot/dependabot-core/blob/main/common/lib/dependabot/pull_request_creator/branch_namer/dependency_group_strategy.rb

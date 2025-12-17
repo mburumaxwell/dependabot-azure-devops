@@ -4,8 +4,8 @@ import * as path from 'node:path';
 import ky from 'ky';
 
 import {
+  CONFIG_FILE_PATHS_AZURE,
   type DependabotConfig,
-  POSSIBLE_CONFIG_FILE_PATHS,
   parseDependabotConfig,
   type VariableFinderFn,
 } from '@/dependabot';
@@ -14,7 +14,7 @@ import type { AzureDevOpsRepositoryUrl } from './url-parts';
 
 /**
  * Parse the dependabot config YAML file to specify update configuration.
- * The file should be located at any of `POSSIBLE_CONFIG_FILE_PATHS`.
+ * The file should be located at any of `CONFIG_FILE_PATHS_AZURE`.
  *
  * To view YAML file format, visit
  * https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates#allow
@@ -49,7 +49,7 @@ export async function getDependabotConfig({
 
   if (remote) {
     logger.debug(`Attempting to fetch configuration file via REST API ...`);
-    for (const fp of POSSIBLE_CONFIG_FILE_PATHS) {
+    for (const fp of CONFIG_FILE_PATHS_AZURE) {
       // make HTTP request
       const requestUrl = `${url.value}${url.project}/_apis/git/repositories/${url.repository}/items?path=/${fp}`;
       logger.debug(`GET ${requestUrl}`);
@@ -87,7 +87,7 @@ export async function getDependabotConfig({
       }
     }
   } else {
-    for (const fp of POSSIBLE_CONFIG_FILE_PATHS) {
+    for (const fp of CONFIG_FILE_PATHS_AZURE) {
       const filePath = path.join(rootDir, fp);
       if (existsSync(filePath)) {
         logger.debug(`Found configuration file cloned at ${filePath}`);
@@ -102,7 +102,7 @@ export async function getDependabotConfig({
 
   // Ensure we have file contents. Otherwise throw a well readable error.
   if (!configContents || !configPath || typeof configContents !== 'string') {
-    throw new Error(`Configuration file not found at possible locations: ${POSSIBLE_CONFIG_FILE_PATHS.join(', ')}`);
+    throw new Error(`Configuration file not found at possible locations: ${CONFIG_FILE_PATHS_AZURE.join(', ')}`);
   } else {
     logger.trace('Configuration file contents read.');
   }

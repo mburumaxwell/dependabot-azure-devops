@@ -154,7 +154,8 @@ export const DependabotPackageManagerSchema = z.enum([
 ]);
 export type DependabotPackageManager = z.infer<typeof DependabotPackageManagerSchema>;
 
-export const DependabotCommandSchema = z.enum(['graph', 'version', 'recreate']);
+export const DEPENDABOT_COMMANDS = ['graph', 'version', 'recreate'] as const;
+export const DependabotCommandSchema = z.enum(DEPENDABOT_COMMANDS);
 export type DependabotCommand = z.infer<typeof DependabotCommandSchema>;
 
 // See: https://github.com/dependabot/cli/blob/main/internal/model/job.go
@@ -215,3 +216,6 @@ export type FileFetcherInput = {
 export type FileUpdaterInput = FetchedFiles & {
   job: DependabotJobConfig;
 };
+
+export const DependabotPersistedPrSchema = DependabotExistingPRSchema.array().or(DependabotExistingGroupPRSchema);
+export type DependabotPersistedPr = z.infer<typeof DependabotPersistedPrSchema>;

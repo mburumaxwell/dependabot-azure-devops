@@ -7,13 +7,17 @@ import {
   type AzdoPullRequestMergeStrategy,
   buildPullRequestProperties,
   getPullRequestChangedFiles,
-  getPullRequestCloseReason,
-  getPullRequestDependenciesPropertyValue,
-  getPullRequestDescription,
   getPullRequestForDependencyNames,
+  PR_DESCRIPTION_MAX_LENGTH,
   parsePullRequestProperties,
 } from '@paklo/core/azure';
-import { type DependabotRequest, getBranchNameForUpdate } from '@paklo/core/dependabot';
+import {
+  type DependabotRequest,
+  getBranchNameForUpdate,
+  getPullRequestCloseReason,
+  getPullRequestDependencies,
+  getPullRequestDescription,
+} from '@paklo/core/dependabot';
 import { logger } from '@paklo/core/logger';
 import { LocalDependabotServer, type LocalDependabotServerOptions } from '../server';
 
@@ -98,16 +102,16 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         }
 
         const changedFiles = getPullRequestChangedFiles(data);
-        const dependencies = getPullRequestDependenciesPropertyValue(data);
+        const dependencies = getPullRequestDependencies(data);
         const targetBranch = update['target-branch'] || (await authorClient.getDefaultBranch({ project, repository }));
-        const sourceBranch = getBranchNameForUpdate(
-          update['package-ecosystem'],
-          targetBranch,
-          update.directory || update.directories?.find((dir) => changedFiles[0]?.path?.startsWith(dir)),
-          !Array.isArray(dependencies) ? dependencies['dependency-group-name'] : undefined,
-          !Array.isArray(dependencies) ? dependencies.dependencies : dependencies,
-          update['pull-request-branch-name']?.separator,
-        );
+        const sourceBranch = getBranchNameForUpdate({
+          packageEcosystem: update['package-ecosystem'],
+          targetBranchName: targetBranch,
+          directory: update.directory || update.directories?.find((dir) => changedFiles[0]?.path?.startsWith(dir)),
+          dependencyGroupName: !Array.isArray(dependencies) ? dependencies['dependency-group-name'] : undefined,
+          dependencies: !Array.isArray(dependencies) ? dependencies.dependencies : dependencies,
+          separator: update['pull-request-branch-name']?.separator,
+        });
 
         // Check if the source branch already exists or conflicts with an existing branch
         const existingBranch = existingBranchNames?.find((branch) => sourceBranch === branch) || [];
@@ -138,7 +142,12 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           },
           author,
           title,
-          description: getPullRequestDescription(packageManager, data['pr-body'], data.dependencies),
+          description: getPullRequestDescription({
+            packageManager,
+            body: data['pr-body'],
+            dependencies: data.dependencies,
+            maxDescriptionLength: PR_DESCRIPTION_MAX_LENGTH,
+          }),
           commitMessage: data['commit-message'],
           autoComplete: setAutoComplete
             ? {
@@ -163,12 +172,11 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         }
 
         // Store the new pull request ID, so we can keep track of the total number of open pull requests
-        if (newPullRequestId && newPullRequestId > 0) {
+        if (newPullRequestId) {
           affectedPullRequestIds.get(id)!.created.push(newPullRequestId);
           return true;
-        } else {
-          return false;
         }
+        return false;
       }
 
       case 'update_pull_request': {
@@ -285,11 +293,10 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         return true;
 
       case 'record_update_job_error':
-        logger.error(`Update job error: ${data['error-type']} ${JSON.stringify(data['error-details'])}`);
-        return true;
-
       case 'record_update_job_unknown_error':
-        logger.error(`Update job unknown error: ${data['error-type']}, ${JSON.stringify(data['error-details'])}`);
+        logger.error(
+          `Update${type === 'record_update_job_unknown_error' ? ' (unknown) ' : ''})job error: ${data['error-type']} ${JSON.stringify(data['error-details'])}`,
+        );
         return true;
 
       default:

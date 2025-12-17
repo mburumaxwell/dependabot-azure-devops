@@ -15,11 +15,11 @@ import type {
   DependabotCondition,
   DependabotCredential,
   DependabotExistingGroupPR,
-  DependabotExistingPR,
   DependabotExperiments,
   DependabotGroupJob,
   DependabotJobConfig,
   DependabotPackageManager,
+  DependabotPersistedPr,
   DependabotSecurityAdvisory,
   DependabotSource,
   DependabotSourceProvider,
@@ -142,8 +142,8 @@ export class DependabotJobBuilder {
     id: string;
     command: DependabotJobConfig['command'];
     dependencyNamesToUpdate?: string[];
-    existingPullRequests: (DependabotExistingPR[] | DependabotExistingGroupPR)[];
-    pullRequestToUpdate?: DependabotExistingPR[] | DependabotExistingGroupPR;
+    existingPullRequests: DependabotPersistedPr[];
+    pullRequestToUpdate?: DependabotPersistedPr;
     securityVulnerabilities?: SecurityVulnerability[];
   }): DependabotJobBuilderOutput {
     const securityOnlyUpdate = this.update['open-pull-requests-limit'] === 0;

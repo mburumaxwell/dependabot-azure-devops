@@ -40,7 +40,7 @@ export class GitClient extends BaseAzureDevOpsClient {
     }
   }
 
-  public async push(
+  public async createPush(
     projectIdOrName: string,
     repositoryIdOrName: string,
     push: AzdoGitPushCreate,
@@ -51,6 +51,26 @@ export class GitClient extends BaseAzureDevOpsClient {
           `${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/pushes`,
         ),
         { json: push },
+      )
+      .json();
+  }
+
+  public async getPush(
+    projectIdOrName: string,
+    repositoryIdOrName: string,
+    pushId: number,
+    includeCommits?: number,
+    includeRefUpdates?: boolean,
+  ): Promise<AzdoGitPush> {
+    return await this.client
+      .get<AzdoGitPush>(
+        this.makeUrl(
+          `${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/pushes`,
+          {
+            includeCommits,
+            includeRefUpdates,
+          },
+        ),
       )
       .json();
   }

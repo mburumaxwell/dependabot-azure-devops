@@ -15,6 +15,7 @@ export class BaseAzureDevOpsClient {
     }
 
     const queryString = Object.entries({ 'api-version': apiVersion, ...params })
+      .filter(([, value]) => value)
       .map(([key, value]) => `${key}=${value}`)
       .join('&');
     return `${path}?${queryString}`;

@@ -10,8 +10,10 @@ import {
 } from '@paklo/core/azure';
 import {
   DEFAULT_EXPERIMENTS,
+  DEPENDABOT_COMMANDS,
   DEPENDABOT_DEFAULT_AUTHOR_EMAIL,
   DEPENDABOT_DEFAULT_AUTHOR_NAME,
+  DependabotCommandSchema,
   type DependabotRequestType,
   parseExperiments,
 } from '@paklo/core/dependabot';
@@ -21,14 +23,13 @@ import { Command, Option } from 'commander';
 import { z } from 'zod';
 import { type HandlerOptions, handlerOptions } from './base';
 
-const COMMANDS = ['graph', 'version', 'recreate'] as const;
 const schema = z.object({
   organisationUrl: z.string(),
   project: z.string(),
   repository: z.string(),
   gitToken: z.string(),
   githubToken: z.string().optional(),
-  command: z.enum(COMMANDS).optional(),
+  command: DependabotCommandSchema.optional(),
   jobTokenOverride: z.string().optional(),
   credentialsTokenOverride: z.string().optional(),
   port: z.coerce.number().min(1).max(65535).optional(),
@@ -215,7 +216,7 @@ export const command = new Command('run')
     '--updater-image <UPDATER-IMAGE>',
     'The dependabot-updater docker image to use for updates. e.g. ghcr.io/dependabot/dependabot-updater-{ecosystem}:latest',
   )
-  .addOption(new Option('--command <COMMAND>', 'The command to run for the update.').choices(COMMANDS))
+  .addOption(new Option('--command <COMMAND>', 'The command to run for the update.').choices(DEPENDABOT_COMMANDS))
   .option('--inspect', 'Whether to enable request inspection. Only for troubleshooting.')
   .option('--port <PORT>', 'Port to run the API server on.')
   .option('--debug', 'Whether to enable debug logging.', false)

@@ -111,10 +111,14 @@ export const DependabotMarkAsProcessedSchema = z.object({
 });
 export type DependabotMarkAsProcessed = z.infer<typeof DependabotMarkAsProcessedSchema>;
 
-export const DependabotRecordUpdateJobErrorSchema = z.object({
+export const DependabotJobErrorSchema = z.object({
   'error-type': z.string(),
   'error-details': z.record(z.string(), z.any()).nullish(),
+  unknown: z.boolean().nullish(), // own property to differentiate between known and unknown errors
 });
+export type DependabotJobError = z.infer<typeof DependabotJobErrorSchema>;
+
+export const DependabotRecordUpdateJobErrorSchema = DependabotJobErrorSchema.extend({});
 export type DependabotRecordUpdateJobError = z.infer<typeof DependabotRecordUpdateJobErrorSchema>;
 
 export const DependabotRecordUpdateJobWarningSchema = z.object({
@@ -124,10 +128,7 @@ export const DependabotRecordUpdateJobWarningSchema = z.object({
 });
 export type DependabotRecordUpdateJobWarning = z.infer<typeof DependabotRecordUpdateJobWarningSchema>;
 
-export const DependabotRecordUpdateJobUnknownErrorSchema = z.object({
-  'error-type': z.string(),
-  'error-details': z.record(z.string(), z.any()).nullish(),
-});
+export const DependabotRecordUpdateJobUnknownErrorSchema = DependabotJobErrorSchema.extend({});
 export type DependabotRecordUpdateJobUnknownError = z.infer<typeof DependabotRecordUpdateJobUnknownErrorSchema>;
 
 export const DependabotRecordEcosystemVersionsSchema = z.object({

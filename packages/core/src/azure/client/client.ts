@@ -10,6 +10,8 @@ import { RepositoriesClient } from './client-repositories';
 import { HookSubscriptionsClient } from './client-subscriptions';
 
 export class AzureDevOpsClient {
+  public readonly organizationSlug: string;
+  public readonly organizationUrl: string;
   public readonly connection: ConnectionClient;
   public readonly identity: IdentityClient;
   public readonly projects: ProjectsClient;
@@ -19,9 +21,11 @@ export class AzureDevOpsClient {
   public readonly subscriptions: HookSubscriptionsClient;
 
   constructor(url: AzureDevOpsOrganizationUrl, accessToken: string, debug: boolean = false) {
-    const organisationApiUrl = url.value.toString().replace(/\/$/, ''); // trim trailing slash
+    this.organizationSlug = url.organisation;
+    const organizationUrl = url.value.toString().replace(/\/$/, ''); // trim trailing slash
+    this.organizationUrl = organizationUrl;
     const mainClientOptions = AzureDevOpsClient.createClientOptions(accessToken, debug, {
-      prefixUrl: organisationApiUrl,
+      prefixUrl: organizationUrl,
     });
     const mainClient = ky.create(mainClientOptions);
     this.connection = new ConnectionClient(mainClient);

@@ -123,12 +123,14 @@ export const AzdoGitRefUpdateResultSchema = AzdoGitRefSchema.extend({
 export type AzdoGitRefUpdateResult = z.infer<typeof AzdoGitRefUpdateResultSchema>;
 export const AzdoGitChangeSchema = z.object({
   changeType: AzdoVersionControlChangeTypeSchema,
+  item: z.string().optional(), // current version (path)
   newContent: z
     .object({
       content: z.string(),
       contentType: z.enum(['rawtext', 'base64encoded']),
     })
     .optional(),
+  originalPath: z.string().optional(), // original path of the item if different from current path
 });
 export type AzdoGitChange = z.infer<typeof AzdoGitChangeSchema>;
 export const AzdoGitCommitRefSchema = z.object({
@@ -156,9 +158,9 @@ export const AzdoGitPushCreateSchema = z.object({
     .object({
       comment: z.string(),
       author: AzdoGitUserDateSchema.optional(),
-      changes: AzdoGitChangeSchema.extend({
-        item: z.object({ path: z.string() }),
-      }).array(),
+      changes: AzdoGitChangeSchema.omit({ item: true })
+        .extend({ item: z.object({ path: z.string() }) })
+        .array(),
     })
     .array(),
 });

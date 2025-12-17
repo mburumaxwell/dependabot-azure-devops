@@ -1,3 +1,4 @@
+import { normalizeBranchName, normalizeFilePath } from '@/dependabot';
 import { logger } from '@/logger';
 import type { AzdoEvent, AzdoEventType } from '../events';
 import type { AzureDevOpsOrganizationUrl } from '../url-parts';
@@ -10,7 +11,6 @@ import type {
   AzdoPullRequestMergeStrategy,
   AzdoSubscriptionsQuery,
 } from './types';
-import { normalizeBranchName, normalizeFilePath } from './utils';
 
 type AzdoRepositoryOptions = { project: string; repository: string };
 
@@ -51,7 +51,7 @@ type AzdoPullRequestCommentCreateOptions = AzdoPullRequestOptions & {
 };
 
 export class AzureDevOpsClientWrapper {
-  public readonly client: AzureDevOpsClient;
+  public readonly inner: AzureDevOpsClient;
 
   private authenticatedUserId?: string;
   private resolvedUserIds: Record<string, string> = {};
@@ -63,7 +63,7 @@ export class AzureDevOpsClientWrapper {
    * @param debug Enable debug logging for API requests (default: false)
    */
   constructor(url: AzureDevOpsOrganizationUrl, accessToken: string, debug: boolean = false) {
-    this.client = new AzureDevOpsClient(url, accessToken, debug);
+    this.inner = new AzureDevOpsClient(url, accessToken, debug);
   }
 
   /**
@@ -72,7 +72,7 @@ export class AzureDevOpsClientWrapper {
    */
   public async getUserId(): Promise<string> {
     if (!this.authenticatedUserId) {
-      const connectionData = await this.client.connection.get();
+      const connectionData = await this.inner.connection.get();
       this.authenticatedUserId = connectionData?.authenticatedUser?.id;
       if (!this.authenticatedUserId) {
         throw new Error('Failed to get authenticated user ID');
@@ -94,7 +94,7 @@ export class AzureDevOpsClientWrapper {
       return this.resolvedUserIds[identifier];
     }
     try {
-      const identities = await this.client.identity.get(identifier);
+      const identities = await this.inner.identity.get(identifier);
       if (!identities || identities.length === 0) {
         return undefined;
       }
@@ -115,9 +115,7 @@ export class AzureDevOpsClientWrapper {
    * @returns The normalized default branch name (e.g., "main"), or undefined if not found
    */
   public async getDefaultBranch(options: AzdoRepositoryOptions): Promise<string | undefined> {
-    return normalizeBranchName(
-      (await this.client.repositories.get(options.project, options.repository))?.defaultBranch,
-    );
+    return normalizeBranchName((await this.inner.repositories.get(options.project, options.repository))?.defaultBranch);
   }
 
   /**
@@ -128,7 +126,7 @@ export class AzureDevOpsClientWrapper {
    * @returns Array of normalized branch names, or undefined if not found
    */
   public async getBranchNames(options: AzdoRepositoryOptions): Promise<string[] | undefined> {
-    return (await this.client.repositories.getRefs(options.project, options.repository))?.map((r) =>
+    return (await this.inner.repositories.getRefs(options.project, options.repository))?.map((r) =>
       normalizeBranchName(r.name),
     );
   }
@@ -147,14 +145,14 @@ export class AzureDevOpsClientWrapper {
     creatorId,
   }: AzdoRepositoryOptions & { creatorId: string }): Promise<AzdoPrExtractedWithProperties[]> {
     try {
-      const pullRequests = await this.client.pullRequests.list(project, repository, creatorId, 'active');
+      const pullRequests = await this.inner.pullRequests.list(project, repository, creatorId, 'active');
       if (!pullRequests || pullRequests.length === 0) {
         return [];
       }
 
       return await Promise.all(
         pullRequests.map(async (pr) => {
-          const properties = await this.client.pullRequests.getProperties(project, repository, pr.pullRequestId);
+          const properties = await this.inner.pullRequests.getProperties(project, repository, pr.pullRequestId);
           return { pullRequestId: pr.pullRequestId, properties };
         }),
       );
@@ -201,7 +199,7 @@ export class AzureDevOpsClientWrapper {
 
       // Create the source branch and push a commit with the dependency file changes
       logger.info(` - Pushing ${options.changes.length} file change(s) to branch '${options.source.branch}'...`);
-      const push = await this.client.git.push(options.project, options.repository, {
+      const push = await this.inner.git.createPush(options.project, options.repository, {
         refUpdates: [
           {
             name: `refs/heads/${options.source.branch}`,
@@ -237,7 +235,7 @@ export class AzureDevOpsClientWrapper {
 
       // Create the pull request
       logger.info(` - Creating pull request to merge '${options.source.branch}' into '${options.target.branch}'...`);
-      const pullRequest = await this.client.pullRequests.create(options.project, options.repository, {
+      const pullRequest = await this.inner.pullRequests.create(options.project, options.repository, {
         sourceRefName: `refs/heads/${options.source.branch}`,
         targetRefName: `refs/heads/${options.target.branch}`,
         title: options.title,
@@ -254,7 +252,7 @@ export class AzureDevOpsClientWrapper {
       // Add the pull request properties
       if (options.properties && options.properties.length > 0) {
         logger.info(` - Adding dependency metadata to pull request properties...`);
-        const newProperties = await this.client.pullRequests.setProperties(
+        const newProperties = await this.inner.pullRequests.setProperties(
           options.project,
           options.repository,
           pullRequest.pullRequestId,
@@ -272,7 +270,7 @@ export class AzureDevOpsClientWrapper {
       // Set the pull request auto-complete status
       if (options.autoComplete) {
         logger.info(` - Updating auto-complete options...`);
-        const updatedPullRequest = await this.client.pullRequests.update(
+        const updatedPullRequest = await this.inner.pullRequests.update(
           options.project,
           options.repository,
           pullRequest.pullRequestId,
@@ -321,17 +319,13 @@ export class AzureDevOpsClientWrapper {
     logger.info(`Updating pull request #${options.pullRequestId}...`);
     try {
       // Get the pull request details
-      const pullRequest = await this.client.pullRequests.get(
-        options.project,
-        options.repository,
-        options.pullRequestId,
-      );
+      const pullRequest = await this.inner.pullRequests.get(options.project, options.repository, options.pullRequestId);
       if (!pullRequest) {
         throw new Error(`Pull request #${options.pullRequestId} not found`);
       }
 
       // Skip if the pull request has been modified by another author
-      const commits = await this.client.pullRequests.getCommits(
+      const commits = await this.inner.pullRequests.getCommits(
         options.project,
         options.repository,
         options.pullRequestId,
@@ -342,7 +336,7 @@ export class AzureDevOpsClientWrapper {
       }
 
       // Get the branch stats to check if the source branch is behind the target branch
-      const stats = await this.client.repositories.getBranchStats(
+      const stats = await this.inner.repositories.getBranchStats(
         options.project,
         options.repository,
         normalizeBranchName(pullRequest.sourceRefName),
@@ -364,7 +358,7 @@ export class AzureDevOpsClientWrapper {
         logger.info(
           ` - Rebasing '${targetBranchName}' into '${sourceBranchName}' (${stats.behindCount} commit(s) behind)...`,
         );
-        const rebase = await this.client.git.updateRef(options.project, options.repository, [
+        const rebase = await this.inner.git.updateRef(options.project, options.repository, [
           {
             name: pullRequest.sourceRefName,
             oldObjectId: pullRequest.lastMergeSourceCommit.commitId,
@@ -378,7 +372,7 @@ export class AzureDevOpsClientWrapper {
 
       // Push all file changes to the source branch
       logger.info(` - Pushing ${options.changes.length} file change(s) to branch '${pullRequest.sourceRefName}'...`);
-      const push = await this.client.git.push(options.project, options.repository, {
+      const push = await this.inner.git.createPush(options.project, options.repository, {
         refUpdates: [
           {
             name: pullRequest.sourceRefName,
@@ -438,7 +432,7 @@ export class AzureDevOpsClientWrapper {
       // Approve the pull request
       logger.info(` - Updating reviewer vote on pull request...`);
       const userId = await this.getUserId();
-      const userVote = await this.client.pullRequests.approve(
+      const userVote = await this.inner.pullRequests.approve(
         options.project,
         options.repository,
         options.pullRequestId,
@@ -488,7 +482,7 @@ export class AzureDevOpsClientWrapper {
 
       // Abandon the pull request
       logger.info(` - Abandoning pull request...`);
-      const abandonedPullRequest = await this.client.pullRequests.abandon(
+      const abandonedPullRequest = await this.inner.pullRequests.abandon(
         options.project,
         options.repository,
         options.pullRequestId,
@@ -501,7 +495,7 @@ export class AzureDevOpsClientWrapper {
       // Delete the source branch if required
       if (options.deleteSourceBranch) {
         logger.info(` - Deleting source branch...`);
-        const deletedBranch = await this.client.git.updateRef(options.project, options.repository, [
+        const deletedBranch = await this.inner.git.updateRef(options.project, options.repository, [
           {
             name: abandonedPullRequest.sourceRefName,
             oldObjectId: abandonedPullRequest.lastMergeSourceCommit.commitId,
@@ -533,7 +527,7 @@ export class AzureDevOpsClientWrapper {
    */
   public async addCommentThread(options: AzdoPullRequestCommentCreateOptions): Promise<number | undefined> {
     const userId = options.userId ?? (await this.getUserId());
-    const thread = await this.client.pullRequests.createCommentThread(
+    const thread = await this.inner.pullRequests.createCommentThread(
       options.project,
       options.repository,
       options.pullRequestId,
@@ -582,7 +576,7 @@ export class AzureDevOpsClientWrapper {
     ]);
 
     const query = this.buildSubscriptionsQuery({ url, project });
-    const subscriptions = await this.client.subscriptions.query(query);
+    const subscriptions = await this.inner.subscriptions.query(query);
 
     // iterate each subscription checking if creation or update is required
     const ids: string[] = [];
@@ -602,9 +596,9 @@ export class AzureDevOpsClientWrapper {
         existing.resourceVersion = resourceVersion;
         existing.publisherInputs = this.makeTfsPublisherInputs({ eventType, project });
         existing.consumerInputs = this.makeWebhookConsumerInputs({ url, headers });
-        subscription = await this.client.subscriptions.replace(existing.id, existing);
+        subscription = await this.inner.subscriptions.replace(existing.id, existing);
       } else {
-        subscription = await this.client.subscriptions.create({
+        subscription = await this.inner.subscriptions.create({
           status: 'enabled',
           eventType,
           resourceVersion,
@@ -623,7 +617,7 @@ export class AzureDevOpsClientWrapper {
     // delete any other existing subscriptions that are not in our desired list
     for (const sub of subscriptions) {
       if (!ids.includes(sub.id)) {
-        await this.client.subscriptions.delete(sub.id);
+        await this.inner.subscriptions.delete(sub.id);
       }
     }
   }
@@ -636,11 +630,11 @@ export class AzureDevOpsClientWrapper {
    */
   public async deleteHookSubscriptions({ url, project }: { url: string; project: string }) {
     const query = this.buildSubscriptionsQuery({ url, project });
-    const subscriptions = await this.client.subscriptions.query(query);
+    const subscriptions = await this.inner.subscriptions.query(query);
 
     // iterate each subscription and delete it
     for (const sub of subscriptions) {
-      await this.client.subscriptions.delete(sub.id);
+      await this.inner.subscriptions.delete(sub.id);
     }
   }
 

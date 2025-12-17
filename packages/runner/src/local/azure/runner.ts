@@ -3,7 +3,6 @@ import { readFile } from 'node:fs/promises';
 import {
   type AzdoPrExtractedWithProperties,
   AzureDevOpsClientWrapper,
-  normalizeBranchName,
   PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME,
   parsePullRequestProperties,
 } from '@paklo/core/azure';
@@ -13,6 +12,7 @@ import {
   type DependabotJobConfig,
   type DependabotUpdate,
   mapPackageEcosystemToPackageManager,
+  normalizeBranchName,
 } from '@paklo/core/dependabot';
 import {
   filterVulnerabilities,
@@ -264,9 +264,10 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       // that need updating and check each one for vulnerabilities. This is because Dependabot requires the list of vulnerable dependencies
       // to be supplied in the job definition of security-only update job, it will not automatically discover them like a versioned update does.
       // https://docs.github.com/en/code-security/dependabot/dependabot-security-updates/configuring-dependabot-security-updates#overriding-the-default-behavior-with-a-configuration-file
-      let securityVulnerabilities: SecurityVulnerability[] = [];
-      let dependencyNamesToUpdate: string[] = [];
-      const securityUpdatesOnly = update['open-pull-requests-limit'] === 0;
+      const securityVulnerabilities: SecurityVulnerability[] = [];
+      const dependencyNamesToUpdate: string[] = [];
+      const openPullRequestsLimit = update['open-pull-requests-limit']!;
+      const securityUpdatesOnly = openPullRequestsLimit === 0;
       if (securityUpdatesOnly) {
         // Run an update job to discover all dependencies
         const id = makeRandomJobId();
@@ -298,7 +299,9 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
             const filePath = securityAdvisoriesFile;
             if (existsSync(filePath)) {
               const fileContents = await readFile(filePath, 'utf-8');
-              securityVulnerabilities = await SecurityVulnerabilitySchema.array().parseAsync(JSON.parse(fileContents));
+              securityVulnerabilities.push(
+                ...(await SecurityVulnerabilitySchema.array().parseAsync(JSON.parse(fileContents))),
+              );
             } else {
               logger.info(`Private security advisories file '${filePath}' does not exist`);
             }
@@ -317,10 +320,12 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
             );
           }
 
-          securityVulnerabilities = filterVulnerabilities(securityVulnerabilities);
+          const filtered = filterVulnerabilities(securityVulnerabilities);
+          securityVulnerabilities.splice(0); // clear array
+          securityVulnerabilities.push(...filtered);
 
           // Only update dependencies that have vulnerabilities
-          dependencyNamesToUpdate = Array.from(new Set(securityVulnerabilities.map((v) => v.package.name)));
+          dependencyNamesToUpdate.push(...Array.from(new Set(securityVulnerabilities.map((v) => v.package.name))));
           logger.info(
             `Detected ${securityVulnerabilities.length} vulnerabilities affecting ${dependencyNamesToUpdate.length} dependencies`,
           );
@@ -337,7 +342,6 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       }
 
       // Run an update job for "all dependencies"; this will create new pull requests for dependencies that need updating
-      const openPullRequestsLimit = update['open-pull-requests-limit']!;
       const openPullRequestsCount = Object.entries(existingPullRequestsForPackageManager).length;
       const hasReachedOpenPullRequestLimit =
         openPullRequestsLimit > 0 && openPullRequestsCount >= openPullRequestsLimit;

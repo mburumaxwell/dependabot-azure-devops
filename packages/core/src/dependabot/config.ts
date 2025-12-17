@@ -458,15 +458,13 @@ export function validateConfiguration(updates: DependabotUpdate[], registries: R
   }
 }
 
-/**
- * Possible paths to the dependabot config file.
- * Remember to prefix with a forward slash when querying API endpoints or where necessary.
- */
-export const POSSIBLE_CONFIG_FILE_PATHS = [
-  '.azuredevops/dependabot.yml',
-  '.azuredevops/dependabot.yaml',
-  '.github/dependabot.yaml',
-  '.github/dependabot.yml',
+/** Possible paths to the dependabot config file for GitHub. */
+export const CONFIG_FILE_NAMES = ['dependabot.yaml', 'dependabot.yml'];
+export const CONFIG_FILE_PATHS_GITHUB = CONFIG_FILE_NAMES.map((name) => `.github/${name}`);
+/** Possible paths to the dependabot config file for Azure. */
+export const CONFIG_FILE_PATHS_AZURE = [
+  ...CONFIG_FILE_NAMES.map((name) => `.azuredevops/${name}`),
+  ...CONFIG_FILE_PATHS_GITHUB,
 ];
 
 /**
