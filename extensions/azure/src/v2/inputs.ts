@@ -54,9 +54,6 @@ export type TaskInputs = {
   dependabotApiPort?: number;
   /** The dependabot-updater docker image to use for updates. e.g. ghcr.io/dependabot/dependabot-updater-{ecosystem}:latest */
   dependabotUpdaterImage?: string;
-
-  /* Path to a certificate the proxy will trust */
-  proxyCertPath?: string;
 };
 
 /** Extract task inputs (a.k.a. shared variables). */
@@ -137,8 +134,6 @@ export function getTaskInputs(): TaskInputs {
     }
   }
 
-  const proxyCertPath: string | undefined = tl.getInput('proxyCertPath');
-
   const inputs: TaskInputs = {
     url: urlParts,
     repositoryOverridden,
@@ -169,8 +164,6 @@ export function getTaskInputs(): TaskInputs {
 
     dependabotApiPort,
     dependabotUpdaterImage,
-
-    proxyCertPath,
   };
 
   // Mask environment, organisation, and project specific variables from the logs.

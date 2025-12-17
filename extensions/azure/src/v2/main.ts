@@ -60,16 +60,7 @@ async function run() {
       githubToken: inputs.githubAccessToken,
       author,
       autoApproveToken: inputs.autoApproveUserToken,
-      // TODO: pass proxyCertPath support if needed hence remove warning below
     };
-
-    if (inputs.proxyCertPath) {
-      tl.warning(
-        'In a recent major update, the job logic was changed to replace dependabot-cli and follow dependabot-action closely. ' +
-          'As a result, the proxy certificate path has not yet been fully integrated.' +
-          'If this affects your setup and there is no alternative, please let me known by opening an issue on GitHub.',
-      );
-    }
 
     // Run the Azure Local Jobs Runner
     const runner = new AzureLocalJobsRunner(runnerOptions);
