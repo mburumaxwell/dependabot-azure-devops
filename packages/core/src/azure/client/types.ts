@@ -123,7 +123,7 @@ export const AzdoGitRefUpdateResultSchema = AzdoGitRefSchema.extend({
 export type AzdoGitRefUpdateResult = z.infer<typeof AzdoGitRefUpdateResultSchema>;
 export const AzdoGitChangeSchema = z.object({
   changeType: AzdoVersionControlChangeTypeSchema,
-  item: z.string().optional(), // current version (path)
+  item: z.object({ path: z.string() }).optional(), // current version (path)
   newContent: z
     .object({
       content: z.string(),
@@ -158,9 +158,7 @@ export const AzdoGitPushCreateSchema = z.object({
     .object({
       comment: z.string(),
       author: AzdoGitUserDateSchema.optional(),
-      changes: AzdoGitChangeSchema.omit({ item: true })
-        .extend({ item: z.object({ path: z.string() }) })
-        .array(),
+      changes: AzdoGitChangeSchema.array(),
     })
     .array(),
 });
@@ -170,6 +168,13 @@ export const AzdoGitBranchStatsSchema = z.object({
   behindCount: z.number(),
 });
 export type AzdoGitBranchStats = z.infer<typeof AzdoGitBranchStatsSchema>;
+export const AzdoGitCommitDiffsSchema = z.object({
+  allChangesIncluded: z.boolean(),
+  baseCommit: z.string(),
+  changes: AzdoGitChangeSchema.array(),
+  targetCommit: z.string(),
+});
+export type AzdoGitCommitDiffs = z.infer<typeof AzdoGitCommitDiffsSchema>;
 
 export const AzdoRepositoryItemSchema = z.object({
   latestProcessedChange: AzdoGitCommitRefSchema.optional(),

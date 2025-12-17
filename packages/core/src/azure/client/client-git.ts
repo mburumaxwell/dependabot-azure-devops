@@ -1,6 +1,7 @@
 import { isHTTPError } from 'ky';
 import { BaseAzureDevOpsClient } from './client-base';
 import type {
+  AzdoGitCommitDiffs,
   AzdoGitPush,
   AzdoGitPushCreate,
   AzdoGitRefUpdate,
@@ -40,6 +41,26 @@ export class GitClient extends BaseAzureDevOpsClient {
     }
   }
 
+  public async getPush(
+    projectIdOrName: string,
+    repositoryIdOrName: string,
+    pushId: number,
+    includeCommits?: number,
+    includeRefUpdates?: boolean,
+  ): Promise<AzdoGitPush> {
+    return await this.client
+      .get<AzdoGitPush>(
+        this.makeUrl(
+          `${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/pushes/${pushId}`,
+          {
+            includeCommits,
+            includeRefUpdates,
+          },
+        ),
+      )
+      .json();
+  }
+
   public async createPush(
     projectIdOrName: string,
     repositoryIdOrName: string,
@@ -55,20 +76,21 @@ export class GitClient extends BaseAzureDevOpsClient {
       .json();
   }
 
-  public async getPush(
+  public async getDiffCommits(
     projectIdOrName: string,
     repositoryIdOrName: string,
-    pushId: number,
-    includeCommits?: number,
-    includeRefUpdates?: boolean,
-  ): Promise<AzdoGitPush> {
+    baseVersion: string,
+    targetVersion: string,
+  ): Promise<AzdoGitCommitDiffs> {
     return await this.client
-      .get<AzdoGitPush>(
+      .get<AzdoGitCommitDiffs>(
         this.makeUrl(
-          `${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/pushes`,
+          `${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/diffs/commits`,
           {
-            includeCommits,
-            includeRefUpdates,
+            baseVersion,
+            baseVersionType: 'commit',
+            targetVersion,
+            targetVersionType: 'commit',
           },
         ),
       )
