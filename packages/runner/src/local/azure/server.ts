@@ -293,12 +293,13 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         return true;
 
       case 'record_update_job_error':
-      case 'record_update_job_unknown_error':
+      case 'record_update_job_unknown_error': {
         const unknown = type === 'record_update_job_unknown_error';
         logger.error(
           `Update${unknown ? ' unknown ' : ''})job error: ${data['error-type']} ${JSON.stringify(data['error-details'])}`,
         );
         return true;
+      }
 
       default:
         logger.warn(`Unknown dependabot request type '${type}', ignoring...`);

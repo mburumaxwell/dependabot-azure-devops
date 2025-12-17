@@ -1,0 +1,22 @@
+meta {
+  name: azdo-repository-push-get
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://dev.azure.com/tingle/dependabot/_apis/git/repositories/repro-1551/pushes/247278?includeCommits=1&includeRefUpdates=true&api-version=5.0
+  body: none
+  auth: basic
+}
+
+params:query {
+  includeCommits: 1
+  includeRefUpdates: true
+  api-version: 5.0
+}
+
+auth:basic {
+  username: 
+  password: {{AZURE_DEVOPS_PAT}}
+}

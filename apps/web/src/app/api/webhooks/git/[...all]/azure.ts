@@ -8,7 +8,7 @@ import {
   type AzdoEventRepositoryRenamedResource,
   type AzdoEventRepositoryStatusChangedResource,
   AzdoEventSchema,
-  type AzdoGitPush,
+  type AzdoGitCommitDiffs,
 } from '@paklo/core/azure';
 import { CONFIG_FILE_PATHS_AZURE } from '@paklo/core/dependabot';
 import { Hono } from 'hono';
@@ -229,15 +229,15 @@ async function handleCodePushEvent(options: HandlerOptions<AzdoEventCodePushReso
   }
 
   // fetch the push details from Azure DevOps
+  const targetRefUpdate = refUpdates.find((ref) => ref.name.endsWith(defaultBranch))!;
   const client = await createAzdoClient({ organization });
-  const commitsCount = options.resource.commits.length;
-  let push: AzdoGitPush;
+  let diffs: AzdoGitCommitDiffs;
   try {
-    push = await client.git.getPush(
+    diffs = await client.git.getDiffCommits(
       project.name,
       repository ? repository.name : providerRepositoryId,
-      pushId,
-      commitsCount,
+      targetRefUpdate.oldObjectId!,
+      targetRefUpdate.newObjectId!,
     );
   } catch (e) {
     logger.error(`Failed to fetch push ${pushId} for repository ${remoteUrl}: ${(e as Error).message}`);
@@ -247,9 +247,7 @@ async function handleCodePushEvent(options: HandlerOptions<AzdoEventCodePushReso
   // find the changed files in the push hence determine if we need to trigger a sync
   const paths = Array.from(
     new Set(
-      push.commits
-        .flatMap((commit) => commit.changes ?? [])
-        .flatMap((change) => [change.originalPath!, change.item!].filter(Boolean)),
+      (diffs.changes ?? []).flatMap((change) => [change.originalPath, change.item?.path].filter(Boolean) as string[]),
     ).values(),
   );
   const triggerSync = paths.some((p) => CONFIG_FILE_PATHS_AZURE.some((cp) => p.endsWith(cp)));

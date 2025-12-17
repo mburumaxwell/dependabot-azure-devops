@@ -1,0 +1,24 @@
+meta {
+  name: azdo-repository-diff-commits
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://dev.azure.com/tingle/dependabot/_apis/git/repositories/repro-1551/diffs/commits?baseVersion=084c5bfb73d9fa4596922a71a19722cf1cf5af14&baseVersionType=commit&targetVersion=893773218bb2fdfe9e81b3b50020abdb9acd4273&targetVersionType=commit&api-version=5.0
+  body: none
+  auth: basic
+}
+
+params:query {
+  baseVersion: 084c5bfb73d9fa4596922a71a19722cf1cf5af14
+  baseVersionType: commit
+  targetVersion: 893773218bb2fdfe9e81b3b50020abdb9acd4273
+  targetVersionType: commit
+  api-version: 5.0
+}
+
+auth:basic {
+  username: 
+  password: {{AZURE_DEVOPS_PAT}}
+}
