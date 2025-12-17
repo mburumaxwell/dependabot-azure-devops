@@ -180,7 +180,7 @@ We aim to support all [official configuration options](https://docs.github.com/e
 
 #### `dependabot@2`
 
-- [`schedule`](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#schedule-) is ignored, use [pipeline scheduled triggers](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/scheduled-triggers?view=azure-devops&tabs=yaml#scheduled-triggers) instead.
+- [`schedule`](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#schedule-) is required for schema conformity though not used. Use [pipeline scheduled triggers](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/scheduled-triggers?view=azure-devops&tabs=yaml#scheduled-triggers) to determine when your job gets executed.
 
 #### `dependabot@1`
 
