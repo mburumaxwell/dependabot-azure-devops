@@ -2,6 +2,8 @@ import stream, { type Writable } from 'node:stream';
 
 // Code below is borrowed and adapted from dependabot-action
 
+export const nullStream: Writable = new stream.Writable({ write: (__, _, next) => next() });
+
 export const outStream = (prefix: string): Writable => {
   return new stream.Writable({
     write(chunk, _, next) {

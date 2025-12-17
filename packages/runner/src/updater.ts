@@ -23,6 +23,7 @@ export class Updater {
     private readonly params: JobParameters,
     private readonly job: DependabotJobConfig,
     private readonly credentials: DependabotCredential[],
+    private readonly debug: boolean,
   ) {
     this.docker = new Docker();
     this.job['credentials-metadata'] = this.generateCredentialsMetadata();
@@ -34,7 +35,7 @@ export class Updater {
   async runUpdater(): Promise<boolean> {
     const cachedMode = Object.hasOwn(this.job.experiments, 'proxy-cached') === true;
 
-    const proxyBuilder = new ProxyBuilder(this.docker, this.proxyImage, cachedMode);
+    const proxyBuilder = new ProxyBuilder(this.docker, this.proxyImage, cachedMode, this.debug);
 
     const proxy = await proxyBuilder.run(
       this.params.jobId,

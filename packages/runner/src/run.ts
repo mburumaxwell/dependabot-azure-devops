@@ -25,12 +25,14 @@ export type RunJobOptions = {
   credentialsToken: string;
   updaterImage?: string;
   secretMasker: SecretMasker;
+  debug: boolean;
   usage: Pick<UsageTelemetryRequestData, 'trigger' | 'provider' | 'owner' | 'project' | 'package-manager'>;
 };
 export type RunJobResult = { success: true; message?: string } | { success: false; message: string };
 
 export async function runJob(options: RunJobOptions): Promise<RunJobResult> {
-  const { jobId, dependabotApiUrl, dependabotApiDockerUrl, jobToken, credentialsToken, secretMasker, usage } = options;
+  const { jobId, dependabotApiUrl, dependabotApiDockerUrl, jobToken, credentialsToken, secretMasker, debug, usage } =
+    options;
 
   const started = new Date();
   let success = false;
@@ -71,7 +73,7 @@ export async function runJob(options: RunJobOptions): Promise<RunJobResult> {
 
     const credentials = (await apiClient.getCredentials()) || [];
 
-    const updater = new Updater(updaterImage, PROXY_IMAGE_NAME, params, job, credentials);
+    const updater = new Updater(updaterImage, PROXY_IMAGE_NAME, params, job, credentials, debug);
 
     try {
       // Using sendMetricsWithPackageManager wrapper to inject package manager tag to
