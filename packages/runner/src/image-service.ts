@@ -3,7 +3,7 @@ import { logger } from '@paklo/core/logger';
 import Docker from 'dockerode';
 
 const MAX_RETRIES = 5; // Maximum number of retries
-const INITIAL_DELAY_MS = 2000; // Initial delay in milliseconds for backoff
+const INITIAL_DELAY_MS = 5000; // Initial delay in milliseconds for backoff
 
 // Code below is borrowed and adapted from dependabot-action
 
