@@ -4,7 +4,7 @@ import { logger } from '@paklo/core/logger';
 import type Docker from 'dockerode';
 import type { Container, Network } from 'dockerode';
 import { ContainerService } from './container-service';
-import { errStream, outStream } from './utils';
+import { errStream, nullStream, outStream } from './utils';
 
 // Code below is borrowed and adapted from dependabot-action
 
@@ -37,6 +37,7 @@ export class ProxyBuilder {
     private readonly docker: Docker,
     private readonly proxyImage: string,
     private readonly cachedMode: boolean,
+    private readonly debug: boolean,
   ) {}
 
   async run(
@@ -80,7 +81,7 @@ export class ProxyBuilder {
       stdout: true,
       stderr: true,
     });
-    container.modem.demuxStream(stream, outStream('  proxy'), errStream('  proxy'));
+    container.modem.demuxStream(stream, this.debug ? outStream('  proxy') : nullStream, errStream('  proxy'));
 
     const url = async (): Promise<string> => {
       const containerInfo = await container.inspect();

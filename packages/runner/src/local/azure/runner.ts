@@ -260,6 +260,8 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       let jobToken: string;
       let credentialsToken: string;
 
+      const debug = this.options.debug;
+
       // If this is a security-only update (i.e. 'open-pull-requests-limit: 0'), then we first need to discover the dependencies
       // that need updating and check each one for vulnerabilities. This is because Dependabot requires the list of vulnerable dependencies
       // to be supplied in the job definition of security-only update job, it will not automatically discover them like a versioned update does.
@@ -282,6 +284,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
           credentialsToken,
           updaterImage,
           secretMasker,
+          debug,
           usage: makeUsageData(job),
         });
 
@@ -366,6 +369,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
             credentialsToken,
             updaterImage,
             secretMasker,
+            debug,
             usage: makeUsageData(job),
           });
           const affectedPrs = server.allAffectedPrs(id);
@@ -403,6 +407,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
               credentialsToken,
               updaterImage,
               secretMasker,
+              debug,
               usage: makeUsageData(job),
             });
             const affectedPrs = server.allAffectedPrs(id);
