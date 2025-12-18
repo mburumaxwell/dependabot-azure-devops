@@ -9,6 +9,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { PakloId } from '@/lib/ids';
 
 export function AppBreadcrumb() {
   const pathname = usePathname();
@@ -22,8 +23,8 @@ export function AppBreadcrumb() {
       const path = paths[i]!;
       const href = `/${paths.slice(0, i + 1).join('/')}`;
 
-      // Skip numeric IDs and certain paths
-      if (!Number.isNaN(path)) continue;
+      // Skip numeric IDs and PakloIds
+      if (Number.isNaN(path) || PakloId.isValid(path)) continue;
 
       // Format the breadcrumb label
       let label = path
@@ -31,11 +32,19 @@ export function AppBreadcrumb() {
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
 
-      //   // Handle special cases
-      //   if (path === "tools") label = "Tools"
-      if (path === 'clients') label = 'Clients';
-      //   if (path === "jobs") label = "Jobs"
-      //   if (path === "settings") label = "Settings"
+      // Handle special cases
+      if (path === 'account') label = 'Account';
+      if (path === 'activity') label = 'Activity';
+      if (path === 'advisories') label = 'Advisories';
+      if (path === 'projects') label = 'Projects';
+      if (path === 'connect') label = 'Connect';
+      if (path === 'repos') label = 'Repos';
+      if (path === 'updates') label = 'Updates';
+      if (path === 'jobs') label = 'Jobs';
+      if (path === 'runs') label = 'Runs';
+      if (path === 'secrets') label = 'Secrets';
+      if (path === 'settings') label = 'Settings';
+      if (path === 'usage') label = 'Usage Telemetry';
       breadcrumbs.push({ label, href, isLast: i === paths.length - 1 });
     }
 
