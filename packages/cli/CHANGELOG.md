@@ -1,5 +1,22 @@
 # paklo
 
+## 0.16.0
+
+### Minor Changes
+
+- 8d56957: Changes (renaming and moving things around) to support features in the hosted version
+
+### Patch Changes
+
+- Updated dependencies [a45dfdf]
+- Updated dependencies [3eb60b8]
+- Updated dependencies [a28b3cf]
+- Updated dependencies [8d56957]
+- Updated dependencies [d2fea4e]
+- Updated dependencies [8679f32]
+  - @paklo/runner@0.8.0
+  - @paklo/core@0.10.0
+
 ## 0.15.0
 
 ### Minor Changes
