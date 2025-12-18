@@ -184,8 +184,8 @@ importers:
         specifier: 0.1.0
         version: 0.1.0
       '@stripe/stripe-js':
-        specifier: 8.5.3
-        version: 8.5.3
+        specifier: 8.6.0
+        version: 8.6.0
       '@vercel/analytics':
         specifier: 1.6.1
         version: 1.6.1(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)
@@ -351,7 +351,7 @@ importers:
         version: 5.0.2
       shadcn:
         specifier: 3.6.2
-        version: 3.6.2(@types/node@25.0.1)(hono@4.11.0)(typescript@5.9.3)
+        version: 3.6.2(@types/node@25.0.1)(hono@4.11.1)(typescript@5.9.3)
       tailwindcss:
         specifier: 4.1.18
         version: 4.1.18
@@ -3540,8 +3540,8 @@ packages:
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
-  '@stripe/stripe-js@8.5.3':
-    resolution: {integrity: sha512-UM0GHAxlTN7v0lCK2P6t0VOlvBIdApIQxhnM3yZ2kupQ4PpSrLsK/n/NyYKtw2NJGMaNRRD1IicWS7fSL2sFtA==}
+  '@stripe/stripe-js@8.6.0':
+    resolution: {integrity: sha512-EB0/GGgs4hfezzkiMkinlRgWtjz8fSdwVQhwYS7Sg/RQrSvuNOz+ssPjD+lAzqaYTCB0zlbrt0fcqVziLJrufQ==}
     engines: {node: '>=12.16'}
 
   '@swc/core-darwin-arm64@1.15.3':
@@ -10695,9 +10695,9 @@ snapshots:
     dependencies:
       langium: 3.3.1
 
-  '@modelcontextprotocol/sdk@1.25.1(hono@4.11.0)(zod@3.25.76)':
+  '@modelcontextprotocol/sdk@1.25.1(hono@4.11.1)(zod@3.25.76)':
     dependencies:
-      '@hono/node-server': 1.19.7(hono@4.11.0)
+      '@hono/node-server': 1.19.7(hono@4.11.1)
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
@@ -12536,7 +12536,7 @@ snapshots:
 
   '@standard-schema/spec@1.1.0': {}
 
-  '@stripe/stripe-js@8.5.3': {}
+  '@stripe/stripe-js@8.6.0': {}
 
   '@swc/core-darwin-arm64@1.15.3':
     optional: true
@@ -17532,7 +17532,7 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shadcn@3.6.2(@types/node@25.0.1)(hono@4.11.0)(typescript@5.9.3):
+  shadcn@3.6.2(@types/node@25.0.1)(hono@4.11.1)(typescript@5.9.3):
     dependencies:
       '@antfu/ni': 25.0.0
       '@babel/core': 7.28.5
@@ -17540,7 +17540,7 @@ snapshots:
       '@babel/plugin-transform-typescript': 7.28.5(@babel/core@7.28.5)
       '@babel/preset-typescript': 7.28.5(@babel/core@7.28.5)
       '@dotenvx/dotenvx': 1.51.2
-      '@modelcontextprotocol/sdk': 1.25.1(hono@4.11.0)(zod@3.25.76)
+      '@modelcontextprotocol/sdk': 1.25.1(hono@4.11.1)(zod@3.25.76)
       browserslist: 4.28.1
       commander: 14.0.2
       cosmiconfig: 9.0.0(typescript@5.9.3)
