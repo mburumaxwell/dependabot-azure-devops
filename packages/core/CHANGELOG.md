@@ -1,5 +1,15 @@
 # @paklo/core
 
+## 0.11.0
+
+### Minor Changes
+
+- dd14205: Only output logs from proxy if in debug mode. This is meant to reduce unnecessary logs output in Azure pipelines hence avoid low/no disk space errors.
+
+### Patch Changes
+
+- c55d8d1: Refactor URL handling in Azure DevOps client or prevent double encoding of project and repository names
+
 ## 0.10.0
 
 ### Minor Changes
