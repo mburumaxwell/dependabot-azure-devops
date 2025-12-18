@@ -112,7 +112,7 @@
     "ua-parser-js": "2.0.7",
     "validator": "13.15.23",
     "workflow": "4.0.1-beta.29",
-    "zod": "4.1.13"
+    "zod": "4.2.1"
   },
   "devDependencies": {
     "@better-auth/cli": "1.4.6",
