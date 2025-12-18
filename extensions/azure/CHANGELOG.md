@@ -1,5 +1,15 @@
 # extension-azure-devops
 
+## 2.63.1
+
+### Patch Changes
+
+- c55d8d1: Refactor URL handling in Azure DevOps client or prevent double encoding of project and repository names
+- Updated dependencies [dd14205]
+- Updated dependencies [c55d8d1]
+  - @paklo/core@0.11.0
+  - @paklo/runner@0.8.1
+
 ## 2.63.0
 
 ### Minor Changes
