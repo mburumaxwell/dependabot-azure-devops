@@ -92,9 +92,9 @@ describe('extractRepositoryUrl', () => {
     });
     expect(url.hostname).toBe('dev.azure.com');
     expect(url['api-endpoint']).toBe('https://dev.azure.com/');
-    expect(url.project).toBe('prj%201');
-    expect(url.repository).toBe('repo%201');
-    expect(url['repository-slug']).toBe('contoso/prj%201/_git/repo%201');
+    expect(url.project).toBe('prj 1'); // Stored raw for client methods to encode
+    expect(url.repository).toBe('repo 1'); // Stored raw for client methods to encode
+    expect(url['repository-slug']).toBe('contoso/prj%201/_git/repo%201'); // Slug is encoded for display
   });
 
   it('works for azure devops domain without trailing slash', () => {
@@ -109,5 +109,18 @@ describe('extractRepositoryUrl', () => {
     expect(url.project).toBe('prj1');
     expect(url.repository).toBe('repo1');
     expect(url['repository-slug']).toBe('contoso/prj1/_git/repo1');
+  });
+
+  it('handles already-encoded project and repository names to prevent double-encoding', () => {
+    const url = extractRepositoryUrl({
+      organisationUrl: 'https://dev.azure.com/contoso/',
+      project: 'Markt%20-%20Project', // already encoded input
+      repository: 'repo%201', // already encoded input
+    });
+    expect(url.hostname).toBe('dev.azure.com');
+    expect(url['api-endpoint']).toBe('https://dev.azure.com/');
+    expect(url.project).toBe('Markt - Project'); // Decoded to raw value
+    expect(url.repository).toBe('repo 1'); // Decoded to raw value
+    expect(url['repository-slug']).toBe('contoso/Markt%20-%20Project/_git/repo%201'); // Slug re-encoded
   });
 });

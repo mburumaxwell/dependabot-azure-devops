@@ -60,10 +60,10 @@ export type TaskInputs = {
 export function getTaskInputs(): TaskInputs {
   let project = tl.getInput('targetProjectName');
   const projectOverridden = typeof project === 'string';
-  if (!projectOverridden) {
+  if (!projectOverridden || !project) {
     // We use the project name because it is very readable.
     // It may not work in all APIs and if it fails, we can switch from `System.TeamProject` to `System.TeamProjectId`.
-    project = tl.getVariable('System.TeamProject');
+    project = tl.getVariable('System.TeamProject')!;
     tl.debug(`No custom project provided; Running update for current project.`);
   } else {
     tl.debug(`Custom project provided; Running update for specified project.`);
@@ -74,15 +74,15 @@ export function getTaskInputs(): TaskInputs {
   if (projectOverridden && !repositoryOverridden) {
     throw new Error(`Target repository must be provided when target project is overridden`);
   }
-  if (!repositoryOverridden) {
-    repository = tl.getVariable('Build.Repository.Name');
+  if (!repositoryOverridden || !repository) {
+    repository = tl.getVariable('Build.Repository.Name')!;
     tl.debug(`No custom repository provided; Running update for local repository.`);
   } else {
     tl.debug(`Custom repository provided; Running update for remote repository.`);
   }
 
   const organisationUrl = tl.getVariable('System.TeamFoundationCollectionUri')!;
-  const urlParts = extractRepositoryUrl({ organisationUrl, project: project!, repository: repository! });
+  const urlParts = extractRepositoryUrl({ organisationUrl, project, repository });
 
   // Prepare the access credentials
   const githubAccessToken = getGithubAccessToken();
