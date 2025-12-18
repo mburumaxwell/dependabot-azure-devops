@@ -2,9 +2,7 @@ import { Stripe } from 'stripe';
 import type { SubscriptionStatus } from '@/lib/prisma';
 
 export const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-11-17.clover',
-});
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export const PRICE_LOOKUP_KEY_MANAGEMENT = 'management';
 export const PRICE_LOOKUP_KEY_USAGE = 'usage';
