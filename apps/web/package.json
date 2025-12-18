@@ -91,7 +91,7 @@
     "fumadocs-core": "16.2.5",
     "fumadocs-mdx": "14.1.0",
     "fumadocs-ui": "16.2.5",
-    "hono": "4.11.0",
+    "hono": "4.11.1",
     "lucide-react": "0.561.0",
     "mermaid": "11.12.2",
     "mongodb": "7.0.0",
