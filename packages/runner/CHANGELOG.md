@@ -1,5 +1,23 @@
 # @paklo/runner
 
+## 0.8.0
+
+### Minor Changes
+
+- 8d56957: Changes (renaming and moving things around) to support features in the hosted version
+- 8679f32: Do not log proxy output unless debug is enabled.
+  This should reduce the number of logs and avoid hitting the pipelines log file limit.
+
+### Patch Changes
+
+- a45dfdf: Bump dependabot-action from `e2b700a` to `fd57fff`
+  - Update image pull backoff params
+- 3eb60b8: Bumps github/dependabot-update-job-proxy/dependabot-update-job-proxy from v2.0.20251202213123 to v2.0.20251212184225.
+- d2fea4e: Bump the dependabot-core-images (29 updates) to from various versions to `v2.0.20251212192154`
+- Updated dependencies [a28b3cf]
+- Updated dependencies [8d56957]
+  - @paklo/core@0.10.0
+
 ## 0.7.0
 
 ### Minor Changes

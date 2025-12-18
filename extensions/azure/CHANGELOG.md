@@ -1,5 +1,22 @@
 # extension-azure-devops
 
+## 2.63.0
+
+### Minor Changes
+
+- b846ab7: Remove unused `proxyCertPath` support, no request for functionality and there are other means
+
+### Patch Changes
+
+- Updated dependencies [a45dfdf]
+- Updated dependencies [3eb60b8]
+- Updated dependencies [a28b3cf]
+- Updated dependencies [8d56957]
+- Updated dependencies [d2fea4e]
+- Updated dependencies [8679f32]
+  - @paklo/runner@0.8.0
+  - @paklo/core@0.10.0
+
 ## 2.62.0
 
 ### Minor Changes

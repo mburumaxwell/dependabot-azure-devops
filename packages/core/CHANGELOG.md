@@ -1,5 +1,12 @@
 # @paklo/core
 
+## 0.10.0
+
+### Minor Changes
+
+- a28b3cf: Add method to get diff from commits
+- 8d56957: Changes (renaming and moving things around) to support features in the hosted version
+
 ## 0.9.0
 
 ### Minor Changes
