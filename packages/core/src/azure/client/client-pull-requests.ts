@@ -26,10 +26,13 @@ export class PullRequestsClient extends BaseAzureDevOpsClient {
   ): Promise<AzdoPullRequest[] | undefined> {
     const response = await this.client
       .get<AzdoResponse<AzdoPullRequest[]>>(
-        this.makeUrl(`${projectIdOrName}/_apis/git/repositories/${repositoryIdOrName}/pullrequests`, {
-          'searchCriteria.creatorId': creatorId,
-          'searchCriteria.status': status,
-        }),
+        this.makeUrl(
+          `${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/pullrequests`,
+          {
+            'searchCriteria.creatorId': creatorId,
+            'searchCriteria.status': status,
+          },
+        ),
       )
       .json();
     return response?.value;
@@ -42,7 +45,9 @@ export class PullRequestsClient extends BaseAzureDevOpsClient {
   ): Promise<AzdoPullRequest | undefined> {
     return await this.client
       .get<AzdoPullRequest>(
-        this.makeUrl(`${projectIdOrName}/_apis/git/repositories/${repositoryIdOrName}/pullrequests/${pullRequestId}`),
+        this.makeUrl(
+          `${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/pullrequests/${pullRequestId}`,
+        ),
       )
       .json();
   }
@@ -54,7 +59,9 @@ export class PullRequestsClient extends BaseAzureDevOpsClient {
   ): Promise<AzdoPullRequest> {
     return await this.client
       .post<AzdoPullRequest>(
-        this.makeUrl(`${projectIdOrName}/_apis/git/repositories/${repositoryIdOrName}/pullrequests`),
+        this.makeUrl(
+          `${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/pullrequests`,
+        ),
         { json: pr },
       )
       .json();
@@ -68,7 +75,9 @@ export class PullRequestsClient extends BaseAzureDevOpsClient {
   ): Promise<AzdoPullRequest> {
     return await this.client
       .patch<AzdoPullRequest>(
-        this.makeUrl(`${projectIdOrName}/_apis/git/repositories/${repositoryIdOrName}/pullrequests/${pullRequestId}`),
+        this.makeUrl(
+          `${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/pullrequests/${pullRequestId}`,
+        ),
         { json: pr },
       )
       .json();
@@ -82,7 +91,7 @@ export class PullRequestsClient extends BaseAzureDevOpsClient {
     const response = await this.client
       .get<AzdoResponse<AzdoProperties>>(
         this.makeUrl(
-          `${projectIdOrName}/_apis/git/repositories/${repositoryIdOrName}/pullrequests/${pullRequestId}/properties`,
+          `${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/pullrequests/${pullRequestId}/properties`,
         ),
       )
       .json();
@@ -133,7 +142,7 @@ export class PullRequestsClient extends BaseAzureDevOpsClient {
     return await this.client
       .put<AzdoIdentityRefWithVote>(
         this.makeUrl(
-          `${projectIdOrName}/_apis/git/repositories/${repositoryIdOrName}/pullrequests/${pullRequestId}/reviewers/${userId}`,
+          `${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/pullrequests/${pullRequestId}/reviewers/${userId}`,
           // API version 7.1 is required to use the 'isReapprove' parameter
           // See: https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-request-reviewers/create-pull-request-reviewer?view=azure-devops-rest-7.1&tabs=HTTP#request-body
           //      https://learn.microsoft.com/en-us/azure/devops/integrate/concepts/rest-api-versioning?view=azure-devops#supported-versions
@@ -166,7 +175,9 @@ export class PullRequestsClient extends BaseAzureDevOpsClient {
   ): Promise<AzdoPullRequest> {
     return await this.client
       .patch<AzdoPullRequest>(
-        this.makeUrl(`${projectIdOrName}/_apis/git/repositories/${repositoryIdOrName}/pullrequests/${pullRequestId}`),
+        this.makeUrl(
+          `${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/pullrequests/${pullRequestId}`,
+        ),
         {
           json: {
             status: 'abandoned',
@@ -189,7 +200,7 @@ export class PullRequestsClient extends BaseAzureDevOpsClient {
     const response = await this.client
       .get<AzdoResponse<AzdoGitCommitRef[]>>(
         this.makeUrl(
-          `${projectIdOrName}/_apis/git/repositories/${repositoryIdOrName}/pullrequests/${pullRequestId}/commits`,
+          `${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/pullrequests/${pullRequestId}/commits`,
         ),
       )
       .json();
@@ -209,7 +220,7 @@ export class PullRequestsClient extends BaseAzureDevOpsClient {
     return await this.client
       .post<AzdoPullRequestCommentThread>(
         this.makeUrl(
-          `${projectIdOrName}/_apis/git/repositories/${repositoryIdOrName}/pullrequests/${pullRequestId}/threads`,
+          `${encodeURIComponent(projectIdOrName)}/_apis/git/repositories/${encodeURIComponent(repositoryIdOrName)}/pullrequests/${pullRequestId}/threads`,
         ),
         { json: thread },
       )

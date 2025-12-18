@@ -22,12 +22,18 @@ export type AzureDevOpsOrganizationUrl = {
 };
 
 export type AzureDevOpsProjectUrl = AzureDevOpsOrganizationUrl & {
-  /** Project ID or Name */
+  /**
+   * Project ID or Name.
+   * This value is not URL-encoded, clients must encode it when constructing URLs.
+   */
   project: string;
 };
 
 export type AzureDevOpsRepositoryUrl = AzureDevOpsProjectUrl & {
-  /** Repository ID or Name */
+  /**
+   * Repository ID or Name.
+   * This value is not URL-encoded, clients must encode it when constructing URLs.
+   */
   repository: string;
 
   /** Slug of the repository e.g. `contoso/prj1/_git/repo1`, `tfs/contoso/prj1/_git/repo1` */
@@ -73,11 +79,12 @@ export function extractProjectUrl({
   project: string;
 }): AzureDevOpsProjectUrl {
   const extracted = extractOrganizationUrl({ organisationUrl });
-  const escapedProject = encodeURI(project); // encode special characters like spaces
+  // Decode to handle already-encoded inputs, store raw for client methods to encode
+  const decodedProject = decodeURIComponent(project);
 
   return {
     ...extracted,
-    project: escapedProject,
+    project: decodedProject,
   };
 }
 
@@ -91,14 +98,16 @@ export function extractRepositoryUrl({
   repository: string;
 }): AzureDevOpsRepositoryUrl {
   const extracted = extractProjectUrl({ organisationUrl, project });
-  const { organisation, 'virtual-directory': virtualDirectory, project: escapedProject } = extracted;
+  const { organisation, 'virtual-directory': virtualDirectory, project: decodedProject } = extracted;
 
-  const escapedRepository = encodeURI(repository); // encode special characters like spaces
-  const repoSlug = `${virtualDirectory ? `${virtualDirectory}/` : ''}${organisation}/${escapedProject}/_git/${escapedRepository}`;
+  // Decode to handle already-encoded inputs, store raw for client methods to encode
+  const decodedRepository = decodeURIComponent(repository);
+  // For the slug, encode since it's used in display/logging contexts
+  const repoSlug = `${virtualDirectory ? `${virtualDirectory}/` : ''}${organisation}/${encodeURI(decodedProject)}/_git/${encodeURI(decodedRepository)}`;
 
   return {
     ...extracted,
-    repository: escapedRepository,
+    repository: decodedRepository,
     'repository-slug': repoSlug,
   };
 }
