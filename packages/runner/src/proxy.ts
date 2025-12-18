@@ -81,7 +81,13 @@ export class ProxyBuilder {
       stdout: true,
       stderr: true,
     });
-    container.modem.demuxStream(stream, this.debug ? outStream('  proxy') : nullStream, errStream('  proxy'));
+    container.modem.demuxStream(
+      stream,
+      // proxy generates lots of logs that we do not need unless debugging
+      // this should save on disk space in agents running Azure pipelines
+      this.debug ? outStream('  proxy') : nullStream,
+      this.debug ? errStream('  proxy') : nullStream,
+    );
 
     const url = async (): Promise<string> => {
       const containerInfo = await container.inspect();
