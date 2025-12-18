@@ -43,7 +43,7 @@
     "zod": "4.2.1"
   },
   "devDependencies": {
-    "@types/node": "25.0.1",
+    "@types/node": "25.0.3",
     "tsdown": "0.18.1"
   },
   "publishConfig": {
