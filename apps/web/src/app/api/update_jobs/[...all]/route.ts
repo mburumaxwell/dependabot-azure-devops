@@ -2,14 +2,8 @@ import { buildPullRequestProperties, getPullRequestChangedFiles, PR_DESCRIPTION_
 import {
   areEqual,
   createApiServerApp,
-  type DependabotConfig,
   type DependabotCredential,
-  DependabotCredentialSchema,
   type DependabotJobConfig,
-  DependabotJobConfigSchema,
-  type DependabotJobError,
-  type DependabotPersistedPr,
-  type DependabotRecordUpdateJobWarning,
   type DependabotRequest,
   type DependabotTokenType,
   getBranchNameForUpdate,
@@ -21,12 +15,10 @@ import {
 } from '@paklo/core/dependabot';
 import { toNextJsHandler } from '@paklo/core/hono';
 import { resumeHook } from 'workflow/api';
-import { z } from 'zod';
 import { createAzdoClient } from '@/actions/organizations';
 import { author } from '@/lib/author';
 import { logger } from '@/lib/logger';
 import {
-  type DependabotPersistedDep,
   type Organization,
   type Project,
   prisma,
@@ -60,37 +52,12 @@ async function authenticate(type: DependabotTokenType, id: string, value: string
 
 async function getJob(id: string): Promise<DependabotJobConfig | undefined> {
   const job = await prisma.updateJob.findUnique({ where: { id } });
-  return job ? getJobConfig(job) : undefined;
-}
-function getJobConfig(job: UpdateJob): DependabotJobConfig | undefined {
-  const { data, success, error } = DependabotJobConfigSchema.safeParse(job.jobConfig);
-  if (!success) {
-    logger.error(
-      `
-      Failed to parse DependabotJobConfig for job ID ${job.id}. This should not happen!
-      \n${z.prettifyError(error)}
-      `,
-    );
-    return undefined;
-  }
-  return data;
+  return job ? job.jobConfig : undefined;
 }
 
 async function getCredentials(id: string): Promise<DependabotCredential[] | undefined> {
   const job = await prisma.updateJob.findUnique({ where: { id } });
-  if (!job) return undefined;
-
-  const { data, success, error } = DependabotCredentialSchema.array().safeParse(job.credentials);
-  if (!success) {
-    logger.error(
-      `
-      Failed to parse DependabotCredential for job ID ${id}. This should not happen!
-      \n${z.prettifyError(error)}
-      `,
-    );
-    return undefined;
-  }
-  return data;
+  return job ? job.credentials : undefined;
 }
 
 async function handleRequest(id: string, request: DependabotRequest): Promise<boolean> {
@@ -124,10 +91,7 @@ async function handleRequest(id: string, request: DependabotRequest): Promise<bo
         where: { id: repositoryUpdate.id },
         data: {
           files: dependency_files ?? [],
-          deps:
-            dependencies?.map(
-              (d) => ({ name: d.name, version: d.version ?? undefined }) satisfies DependabotPersistedDep,
-            ) ?? [],
+          deps: dependencies?.map((d) => ({ name: d.name, version: d.version ?? undefined })) ?? [],
         },
       });
 
@@ -141,7 +105,7 @@ async function handleRequest(id: string, request: DependabotRequest): Promise<bo
     }
 
     case 'record_update_job_warning': {
-      const warnings = (job.warnings as DependabotRecordUpdateJobWarning[]) ?? [];
+      const { warnings } = job;
       warnings.push({ ...data });
       await prisma.updateJob.update({ where: { id: job.id }, data: { warnings } });
       return true;
@@ -158,7 +122,7 @@ async function handleRequest(id: string, request: DependabotRequest): Promise<bo
 
     case 'record_update_job_error':
     case 'record_update_job_unknown_error': {
-      const errors = (job.errors as DependabotJobError[]) ?? [];
+      const { errors } = job;
       errors.push({ ...data, unknown: type === 'record_update_job_unknown_error' });
       await prisma.updateJob.update({
         where: { id: job.id },
@@ -195,11 +159,9 @@ async function handlePrRequests(options: HandlePrRequestsOptions): Promise<boole
   });
 
   const authorClient = await createAzdoClient({ organization }, true);
-  const jobConfig = getJobConfig(job)!;
+  const { jobConfig } = job;
   const { type, data } = request;
-  const update = (job.config as DependabotConfig).updates.find(
-    (u) => makeDirectoryKey(u) === repositoryUpdate.directoryKey,
-  )!;
+  const update = job.config.updates.find((u) => makeDirectoryKey(u) === repositoryUpdate.directoryKey)!;
 
   switch (type) {
     case 'create_pull_request': {
@@ -259,7 +221,7 @@ async function handlePrRequests(options: HandlePrRequestsOptions): Promise<boole
 
       if (newPullRequestId) {
         // if there are warnings on the job create PR comments with those warnings
-        const warnings = (job.warnings as DependabotRecordUpdateJobWarning[]) ?? [];
+        const { warnings } = job;
         for (const warning of warnings) {
           await authorClient.addCommentThread({
             project: project.name,
@@ -360,9 +322,6 @@ function getPullRequestForDependencyNames(
   dependencyNames: string[],
 ): RepositoryPullRequest | undefined {
   return existingPullRequests.find((pr) => {
-    return (
-      pr.packageManager === packageManager &&
-      areEqual(getDependencyNames(pr.data as DependabotPersistedPr), dependencyNames)
-    );
+    return pr.packageManager === packageManager && areEqual(getDependencyNames(pr.data), dependencyNames);
   });
 }

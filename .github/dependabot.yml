@@ -83,3 +83,5 @@ updates:
         update-types: [version-update:semver-patch] # too much changes
       - dependency-name: 'vite*'
         update-types: [version-update:semver-patch] # too much changes
+      - dependency-name: '*prisma*'
+        update-types: [version-update:semver-major] # wait until mongo is supported

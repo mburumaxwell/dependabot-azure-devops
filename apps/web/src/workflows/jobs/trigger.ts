@@ -2,10 +2,8 @@ import {
   DEFAULT_EXPERIMENTS,
   type DependabotCommand,
   type DependabotConfig,
-  type DependabotCredential,
   DependabotJobBuilder,
   type DependabotPersistedPr,
-  DependabotPersistedPrSchema,
   type DependabotProxyConfig,
   type FileFetcherInput,
   type FileUpdaterInput,
@@ -215,7 +213,7 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
       },
     });
     const existingPullRequestsMap: Map<string, DependabotPersistedPr> = new Map(
-      existingPullRequestsRaw.map((pr) => [pr.id, DependabotPersistedPrSchema.parse(pr.data)]),
+      existingPullRequestsRaw.map((pr) => [pr.id, pr.data]),
     );
     const existingPullRequests = existingPullRequestsMap.values().toArray();
     const pullRequestToUpdate =
@@ -265,8 +263,6 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
       pullRequestToUpdate,
     });
 
-    const jobConfig: FileFetcherInput | FileUpdaterInput = { job };
-
     // create new job
     const newJob = await prisma.updateJob.create({
       data: {
@@ -297,14 +293,15 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
         },
 
         config,
-        jobConfig,
+        jobConfig: job,
         credentials,
         region: organization.region,
 
         startedAt: null,
         finishedAt: null,
         duration: null,
-        errors: null,
+        errors: [],
+        warnings: [],
       },
     });
     createdUpdateJobs.push(newJob);
@@ -405,8 +402,8 @@ export async function createAndStartJobResources({
   const job = await prisma.updateJob.findUniqueOrThrow({ where: { id } });
   const secret = await prisma.updateJobSecret.findUniqueOrThrow({ where: { id: job.id } });
 
-  const jobConfig = job.jobConfig as FileFetcherInput | FileUpdaterInput;
-  const jobCredentials = job.credentials as DependabotCredential[];
+  const jobConfig: FileFetcherInput | FileUpdaterInput = { job: job.jobConfig };
+  const jobCredentials = job.credentials;
 
   const { region } = job;
   try {
@@ -569,9 +566,9 @@ async function saveUpdateJobStatus({
 }) {
   'use step';
 
-  // a job is failed if the resource status is 'Failed' or if there is an error recorded in the job
+  // a job is failed if the resource status is 'Failed' or if there are errors recorded in the job
   const updateJob = await prisma.updateJob.findUniqueOrThrow({ where: { id } });
-  const failed = executionStatus === 'Failed' || !!updateJob.errors;
+  const failed = executionStatus === 'Failed' || updateJob.errors.length > 0;
 
   // update the job based on the resource status
   await prisma.updateJob.update({

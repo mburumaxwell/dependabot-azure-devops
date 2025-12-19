@@ -1,14 +1,21 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGO_DATABASE_URL")
+}
+
 generator client {
   provider = "prisma-client-js"
   output   = "../.prisma"
 }
 
-datasource db {
-  provider = "mongodb"
-  url      = env("MONGO_DATABASE_URL")
+// an alternative to https://github.com/prisma/prisma/issues/3219
+generator json {
+  provider  = "prisma-json-types-generator"
+  namespace = "PrismaJson"
+  allowAny  = false
 }
 
 model User {
@@ -308,8 +315,8 @@ model RepositoryUpdate {
   nextUpdateJobAt DateTime
   files           String[]
 
-  /// Maps to `DependabotPersistedDep[]`.
-  deps Json?
+  /// [DependabotPersistedDep]
+  deps Json[]
 
   @@unique([repositoryId, ecosystem, directoryKey])
   @@index([repositoryId])
@@ -334,7 +341,7 @@ model RepositoryPullRequest {
   packageManager String
   status         RepositoryPullRequestStatus
 
-  /// Maps to `DependabotPersistedPr`.
+  /// [DependabotPersistedPr]
   data Json
 
   @@index([repositoryId])
@@ -388,22 +395,22 @@ model UpdateJob {
   /// Either the original directory or merger of directories.
   directoryKey   String
   workflowRunId  String
-  /// Maps to `DependabotConfig` as of the time the job was created.
+  /// [DependabotConfig]
   config         Json
-  /// Maps to `DependabotJobConfig`.
+  /// [DependabotJobConfig]
   jobConfig      Json
-  /// Maps to `DependabotCredential[]`.
-  credentials    Json
+  /// [DependabotCredential]
+  credentials    Json[]
   secret         UpdateJobSecret?
   region         String
   startedAt      DateTime?
   finishedAt     DateTime?
   /// Duration in milliseconds.
   duration       Int?
-  /// Maps to `DependabotJobError[]`.
-  errors         Json?
-  /// Maps to `DependabotRecordUpdateJobWarning[]`.
-  warnings       Json?
+  /// [DependabotJobError]
+  errors         Json[]
+  /// [DependabotRecordUpdateJobWarning]
+  warnings       Json[]
   affectedPrIds  Int[]
 
   @@unique([packageManager, directoryKey, workflowRunId])

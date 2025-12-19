@@ -1,6 +1,5 @@
 'use client';
 
-import type { DependabotJobError } from '@paklo/core/dependabot';
 import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -178,24 +177,18 @@ export function UpdateJobsView({
                 <ItemDescription>
                   {(job.status === 'running' || job.status === 'scheduled') && <>Running ...</>}
                   {job.status === 'failed' && (
+                    // TODO: improve this UI
                     <>
-                      {/* TODO: improve this UI */}
-                      {(job.errors as DependabotJobError[]) ? (
-                        <>
-                          Failed with {((job.errors as DependabotJobError[]).length || 0) > 1 ? 'errors' : 'an error'}:{' '}
-                          <ul className='list-disc list-inside'>
-                            {(job.errors as DependabotJobError[]).map((error, index) => (
-                              // biome-ignore lint/suspicious/noArrayIndexKey: no other id available
-                              <li key={index}>
-                                {error['error-type']}
-                                {error['error-details'] ? `: ${JSON.stringify(error['error-details'])}` : ''}
-                              </li>
-                            ))}
-                          </ul>
-                        </>
-                      ) : (
-                        <>Failed with unknown error.</>
-                      )}
+                      Failed with {(job.errors.length || 0) > 1 ? 'errors' : 'an error'}:{' '}
+                      <ul className='list-disc list-inside'>
+                        {job.errors.map((error, index) => (
+                          // biome-ignore lint/suspicious/noArrayIndexKey: no other id available
+                          <li key={index}>
+                            {error['error-type']}
+                            {error['error-details'] ? `: ${JSON.stringify(error['error-details'])}` : ''}
+                          </li>
+                        ))}
+                      </ul>
                     </>
                   )}
                 </ItemDescription>

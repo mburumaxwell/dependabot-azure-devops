@@ -5,7 +5,7 @@ import * as spdx from '@spdx/tools';
 import { notFound } from 'next/navigation';
 
 import { getSpdxDocumentName } from '@/lib/organizations';
-import { type DependabotPersistedDep, prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 export const revalidate = 0; // always revalidate to get the latest SBOM
 
@@ -44,7 +44,10 @@ export async function GET(_req: Request, params: RouteContext<'/dashboard/projec
       where: { repositoryId },
       select: { deps: true },
     })
-  ).flatMap((u) => u.deps as DependabotPersistedDep[]);
+  )
+    .flatMap((u) => u.deps)
+    .filter(Boolean)
+    .map((d) => d!);
 
   // add each dep to the SBOM
   for (const dep of deps) {
