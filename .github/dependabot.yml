@@ -62,7 +62,7 @@ updates:
       node-forge: { patterns: ['@types/node-forge', 'node-forge'] }
       opentelemetry: { patterns: ['@opentelemetry/*'] }
       pino: { patterns: ['pino', 'pino-*'] }
-      prisma: { patterns: ['prisma', '@prisma/*'] }
+      prisma: { patterns: ['prisma*', '@prisma/*'] }
       radix-ui: { patterns: ['@radix-ui*', 'radix-*'] }
       react-email: { patterns: ['@react-email/*', 'react-email'] }
       validator: { patterns: ['@types/validator', 'validator'] }
@@ -77,11 +77,13 @@ updates:
       tar-stream: { patterns: ['@types/tar-stream', 'tar-stream'] }
       vite-and-vitest: { patterns: ['vite', 'vite-*', '@vitejs/*', 'vitest'] }
     ignore:
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-patch] # too many changes
+      - dependency-name: '@biomejs/biome'
+        update-types: [version-update:semver-patch] # too many changes
       - dependency-name: recharts
         update-types: [version-update:semver-major] # shadcn still doesn't support (https://github.com/shadcn-ui/ui/issues/7669)
-      - dependency-name: '@biomejs/biome'
-        update-types: [version-update:semver-patch] # too much changes
       - dependency-name: 'vite*'
-        update-types: [version-update:semver-patch] # too much changes
+        update-types: [version-update:semver-patch] # too many changes
       - dependency-name: '*prisma*'
         update-types: [version-update:semver-major] # wait until mongo is supported
