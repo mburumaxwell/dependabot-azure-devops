@@ -82,7 +82,7 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
         <ItemContent>
           <div className='flex flex-wrap gap-3'>
             <Select value={timeRange} onValueChange={(value) => updateFilters({ timeRange: value })}>
-              <SelectTrigger className='w-[180px]'>
+              <SelectTrigger className='w-45'>
                 <Calendar className='size-4 mr-2' />
                 <SelectValue />
               </SelectTrigger>
@@ -96,7 +96,7 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
             </Select>
 
             <Select value={selectedPackageManager} onValueChange={(value) => updateFilters({ packageManager: value })}>
-              <SelectTrigger className='w-[200px]'>
+              <SelectTrigger className='w-50'>
                 <SelectValue placeholder='All Package Managers' />
               </SelectTrigger>
               <SelectContent>
@@ -110,7 +110,7 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
             </Select>
 
             <Select value={successFilter} onValueChange={(value) => updateFilters({ success: value })}>
-              <SelectTrigger className='w-[140px]'>
+              <SelectTrigger className='w-35'>
                 <SelectValue placeholder='All Status' />
               </SelectTrigger>
               <SelectContent>
@@ -241,7 +241,7 @@ function RunsChart({ telemetries, timeRange }: RunsChartProps) {
           <h3 className='text-lg font-semibold text-foreground'>Pipeline Runs</h3>
           <p className='text-sm text-muted-foreground'>Total executions over time</p>
         </div>
-        <ChartContainer config={chartConfig} className='h-[300px] w-full'>
+        <ChartContainer config={chartConfig} className='h-75 w-full'>
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray='3 3' vertical={false} />
             <XAxis
@@ -302,7 +302,7 @@ function PackageManagerChart({ telemetries }: PackageManagerChartProps) {
           <h3 className='text-lg font-semibold text-foreground'>Package Manager Usage</h3>
           <p className='text-sm text-muted-foreground'>Distribution by package manager</p>
         </div>
-        <ChartContainer config={chartConfig} className='h-[300px] w-full'>
+        <ChartContainer config={chartConfig} className='h-75 w-full'>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray='3 3' vertical={false} />
             <XAxis

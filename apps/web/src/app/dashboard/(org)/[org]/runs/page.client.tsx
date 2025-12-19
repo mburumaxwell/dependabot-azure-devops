@@ -59,7 +59,7 @@ export default function RunsView({
         <ItemContent>
           <div className='flex flex-wrap gap-3'>
             <Select value={timeRange} onValueChange={(value) => updateFilters({ timeRange: value })}>
-              <SelectTrigger className='w-[180px]'>
+              <SelectTrigger className='w-45'>
                 <Calendar className='size-4 mr-2' />
                 <SelectValue />
               </SelectTrigger>
@@ -73,7 +73,7 @@ export default function RunsView({
             </Select>
 
             <Select value={projectFilter} onValueChange={(value) => updateFilters({ project: value })}>
-              <SelectTrigger className='w-[140px]'>
+              <SelectTrigger className='w-35'>
                 <SelectValue placeholder='All Projects' />
               </SelectTrigger>
               <SelectContent>
@@ -87,7 +87,7 @@ export default function RunsView({
             </Select>
 
             <Select value={statusFilter} onValueChange={(value) => updateFilters({ status: value })}>
-              <SelectTrigger className='w-[140px]'>
+              <SelectTrigger className='w-35'>
                 <SelectValue placeholder='All Statuses' />
               </SelectTrigger>
               <SelectContent>
@@ -101,7 +101,7 @@ export default function RunsView({
             </Select>
 
             <Select value={triggerFilter} onValueChange={(value) => updateFilters({ trigger: value })}>
-              <SelectTrigger className='w-[140px]'>
+              <SelectTrigger className='w-35'>
                 <SelectValue placeholder='All Triggers' />
               </SelectTrigger>
               <SelectContent>
@@ -115,7 +115,7 @@ export default function RunsView({
             </Select>
 
             <Select value={selectedPackageManager} onValueChange={(value) => updateFilters({ packageManager: value })}>
-              <SelectTrigger className='w-[200px]'>
+              <SelectTrigger className='w-50'>
                 <SelectValue placeholder='All Package Managers' />
               </SelectTrigger>
               <SelectContent>

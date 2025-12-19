@@ -56,7 +56,7 @@ export function Stepper({ steps, currentStep, className }: StepperProps) {
               {index < steps.length - 1 && (
                 <div
                   className={cn(
-                    "h-[2px] flex-1 transition-colors mx-2 mb-8",
+                    "h-0.5 flex-1 transition-colors mx-2 mb-8",
                     currentStep > stepNumber ? "bg-primary" : "bg-muted",
                   )}
                 />
