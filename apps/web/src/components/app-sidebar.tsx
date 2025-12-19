@@ -9,6 +9,7 @@ import {
   Combine,
   CreditCard,
   Folder,
+  Home,
   Key,
   LogOut,
   type LucideIcon,
@@ -47,41 +48,50 @@ import { authClient, type Organization, type Session } from '@/lib/auth-client';
 import { getOrganizationTypeInfo } from '@/lib/organizations';
 import { cn, getInitials, type InitialsType } from '@/lib/utils';
 
-type MenuItem = { label: string; href: Route; icon: LucideIcon };
+type MenuItem = { label: string; href: Route<`/dashboard/${string}`> | Route; icon: LucideIcon };
 type MenuGroup = { label: string; items?: MenuItem[] };
 
+type SimpleOrganization = Pick<Organization, 'id' | 'name' | 'slug' | 'type' | 'logo'> & { active: boolean };
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   session: Session;
-  organizations: Organization[];
+  organizations: SimpleOrganization[];
   pakloAdmin: boolean;
 }
 export function AppSidebar({ session, organizations, pakloAdmin, ...props }: AppSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const isActive = (href: Route) => pathname === href;
+  const isActive = (href: MenuItem['href']) => pathname === href;
   const { isMobile } = useSidebar();
+  const current = organizations.find((org) => org.active);
 
   const groups: MenuGroup[] = [
-    ...([
-      {
-        label: 'Home',
-        items: [
-          { label: 'Dashboard', href: '/dashboard/activity', icon: CircleGauge },
-          { label: 'Projects', href: '/dashboard/projects', icon: Folder },
-          { label: 'Runs', href: '/dashboard/runs', icon: Activity },
-          // { label: 'Advisories', href: '/dashboard/advisories', icon: ShieldAlert },
-          { label: 'Secrets', href: '/dashboard/secrets', icon: Key },
-        ],
-      },
-      {
-        label: 'Settings',
-        items: [
-          { label: 'Team', href: '/dashboard/settings/team', icon: Users },
-          { label: 'Billing', href: '/dashboard/settings/billing', icon: CreditCard },
-          { label: 'Integrations', href: '/dashboard/settings/integrations', icon: Blocks },
-        ],
-      },
-    ] satisfies MenuGroup[]),
+    ...(current
+      ? ([
+          {
+            label: 'Home',
+            items: [
+              { label: 'Dashboard', href: `/dashboard/${current.slug}`, icon: CircleGauge },
+              { label: 'Projects', href: `/dashboard/${current.slug}/projects`, icon: Folder },
+              { label: 'Runs', href: `/dashboard/${current.slug}/runs`, icon: Activity },
+              // { label: 'Advisories', href: `/dashboard/${current.slug}/advisories`, icon: ShieldAlert },
+              { label: 'Secrets', href: `/dashboard/${current.slug}/secrets`, icon: Key },
+            ],
+          },
+          {
+            label: 'Settings',
+            items: [
+              { label: 'Team', href: `/dashboard/${current.slug}/settings/team`, icon: Users },
+              { label: 'Billing', href: `/dashboard/${current.slug}/settings/billing`, icon: CreditCard },
+              { label: 'Integrations', href: `/dashboard/${current.slug}/settings/integrations`, icon: Blocks },
+            ],
+          },
+        ] satisfies MenuGroup[])
+      : ([
+          {
+            label: 'Home',
+            items: [{ label: 'Dashboard', href: '/dashboard', icon: Home }],
+          },
+        ] satisfies MenuGroup[])),
 
     // Admin group, only for Paklo admins
     ...(pakloAdmin
@@ -109,12 +119,8 @@ export function AppSidebar({ session, organizations, pakloAdmin, ...props }: App
 
   return (
     <Sidebar collapsible='icon' {...props}>
-      <SidebarHeader className='border-b h-16'>
-        <OrganizationSwitcher
-          isMobile={isMobile}
-          organizations={organizations}
-          activeOrganizationId={session.session.activeOrganizationId}
-        />
+      <SidebarHeader className={cn(current && 'border-b h-16')}>
+        {current && <OrganizationSwitcher isMobile={isMobile} organizations={organizations} current={current} />}
       </SidebarHeader>
       <SidebarContent>
         {groups.map((group) => (
@@ -238,22 +244,13 @@ function AvatarSnippetFooter({ title, subtitle }: AvatarSnippetProps) {
 function OrganizationSwitcher({
   isMobile,
   organizations,
-  activeOrganizationId,
-}: { isMobile: boolean; activeOrganizationId?: string | null } & Pick<AppSidebarProps, 'organizations'>) {
+  current,
+}: { isMobile: boolean; current: SimpleOrganization } & Pick<AppSidebarProps, 'organizations'>) {
   const router = useRouter();
-  const activeOrg = organizations.find((org) => org.id === activeOrganizationId)!;
 
-  async function handleOrgChange(organization: Organization) {
-    const { error } = await authClient.organization.setActive({ organizationId: organization.id });
-    if (error) {
-      toast.error('Failed to switch organization', {
-        description: error.message,
-      });
-      return;
-    }
-
-    // reload to reflect changes
-    router.refresh();
+  async function handleOrgChange(organization: SimpleOrganization) {
+    // redirect to dashboard activity page
+    router.push(`/dashboard/${organization.slug}`);
   }
 
   return (
@@ -267,15 +264,15 @@ function OrganizationSwitcher({
             >
               <div className='flex aspect-square size-8 items-center justify-center rounded-lg'>
                 <AvatarSnippetHeader
-                  title={activeOrg?.name || 'Organization'}
-                  subtitle={getOrganizationTypeInfo(activeOrg?.type)?.name}
-                  image={activeOrg?.logo}
+                  title={current.name || 'Organization'}
+                  subtitle={getOrganizationTypeInfo(current.type)?.name}
+                  image={current.logo}
                   size={8}
                 />
               </div>
               <AvatarSnippetFooter
-                title={activeOrg?.name || 'Organization'}
-                subtitle={getOrganizationTypeInfo(activeOrg?.type)?.name}
+                title={current.name || 'Organization'}
+                subtitle={getOrganizationTypeInfo(current.type)?.name}
               />
               <ChevronsUpDown className='ml-auto' />
             </SidebarMenuButton>

@@ -11,9 +11,7 @@ export const metadata: Metadata = {
 export default async function OrgInviteAcceptPage(props: PageProps<'/invite/accept'>) {
   const { id } = await props.searchParams;
   const invitationId = Array.isArray(id) ? id[0] : id;
-  if (!invitationId) {
-    notFound();
-  }
+  if (!invitationId) return notFound();
 
   return <InviteAcceptView invitationId={invitationId} />;
 }

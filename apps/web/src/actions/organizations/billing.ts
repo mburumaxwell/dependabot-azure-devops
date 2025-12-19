@@ -42,8 +42,8 @@ export async function createStripeCheckoutSession({
           },
         ],
         allow_promotion_codes: true,
-        success_url: `${baseUrl}/dashboard/settings/billing/success/{CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/dashboard/settings/billing`,
+        success_url: `${baseUrl}/dashboard/${organization.slug}/settings/billing/success/{CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/dashboard/${organization.slug}/settings/billing`,
         consent_collection: {
           terms_of_service: 'required',
           payment_method_reuse_agreement: { position: 'auto' },
@@ -85,7 +85,7 @@ export async function createStripeBillingPortalSession({
     const session = await stripe.billingPortal.sessions.create(
       {
         customer: organization.customerId,
-        return_url: `${baseUrl}/dashboard/settings/billing`,
+        return_url: `${baseUrl}/dashboard/${organization.slug}/settings/billing`,
       },
       {
         // set idempotency key to avoid duplicate sessions for the same organization in the day

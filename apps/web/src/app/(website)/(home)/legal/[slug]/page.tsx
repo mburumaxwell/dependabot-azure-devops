@@ -6,9 +6,7 @@ import { formatDate } from '@/lib/utils';
 export async function generateMetadata(props: PageProps<'/legal/[slug]'>): Promise<Metadata> {
   const { slug } = await props.params;
   const doc = legal.getPage([slug]);
-  if (!doc) {
-    notFound();
-  }
+  if (!doc) return notFound();
 
   return {
     title: doc.data.title,
@@ -19,9 +17,7 @@ export async function generateMetadata(props: PageProps<'/legal/[slug]'>): Promi
 export default async function LegalDocPage(props: PageProps<'/legal/[slug]'>) {
   const { slug } = await props.params;
   const doc = legal.getPage([slug]);
-  if (!doc) {
-    notFound();
-  }
+  if (!doc) return notFound();
 
   const MDX = doc.data.body;
 

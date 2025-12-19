@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 
-export function BillingNotConfiguredView() {
+export function BillingNotConfiguredView({ slug }: { slug: string }) {
   return (
     <div className='p-6 w-full max-w-5xl mx-auto space-y-6 min-h-screen flex'>
       <Empty>
@@ -17,7 +17,7 @@ export function BillingNotConfiguredView() {
         <EmptyContent>
           <div className='flex gap-2'>
             <Button asChild>
-              <Link href='/dashboard/settings/billing'>Configure Billing</Link>
+              <Link href={`/dashboard/${slug}/settings/billing`}>Configure Billing</Link>
             </Button>
           </div>
         </EmptyContent>

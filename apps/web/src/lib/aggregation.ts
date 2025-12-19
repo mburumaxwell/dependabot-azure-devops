@@ -84,3 +84,26 @@ export function granularityToMilliseconds(value: Granularity): number {
 export function isHourlyRange(timeRange: TimeRange) {
   return ['1h', '4h', '6h', '12h', '24h'].includes(timeRange);
 }
+
+export function getCompareLabels(range: TimeRange) {
+  const currentLabel = timeRangeOptions.find((o) => o.value === range)!.label;
+  // "Last 7 Days" -> "Previous 7 Days"
+  const previousLabel = `Previous ${currentLabel.slice(5)}`;
+  return { currentLabel, previousLabel };
+}
+
+export const statsTimeRangeOptions = timeRangeOptions.filter((o) => ['7d', '30d', '90d'].includes(o.value));
+export const defaultStatsTimeRangeOption = statsTimeRangeOptions[0]!;
+
+export function getStatsGranularity(range: TimeRange): Granularity {
+  switch (range) {
+    case '7d':
+      return '1h';
+    case '30d':
+      return '6h';
+    case '90d':
+      return '1d';
+    default:
+      throw new Error('Unsupported time range for granularity');
+  }
+}

@@ -117,7 +117,6 @@ export const auth = betterAuth({
 
 export type Session = typeof auth.$Infer.Session;
 export type Organization = typeof auth.$Infer.Organization;
-export type ActiveOrganization = typeof auth.$Infer.ActiveOrganization;
 export type Invitation = typeof auth.$Infer.Invitation;
 export type Member = typeof auth.$Infer.Member;
 export type MemberRole = Member['role'];

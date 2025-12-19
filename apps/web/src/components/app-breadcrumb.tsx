@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { PakloId } from '@/lib/ids';
 
-export function AppBreadcrumb() {
+export function AppBreadcrumb({ omit }: { omit?: string[] }) {
   const pathname = usePathname();
 
   function getBreadcrumbs() {
@@ -23,27 +23,19 @@ export function AppBreadcrumb() {
       const path = paths[i]!;
       const href = `/${paths.slice(0, i + 1).join('/')}`;
 
-      // Skip numeric IDs and PakloIds
+      // skip omitted paths
+      if (omit?.includes(path)) continue;
+
+      // skip numeric IDs and PakloIds
       if (Number.isNaN(path) || PakloId.isValid(path)) continue;
 
-      // Format the breadcrumb label
+      // format the breadcrumb label
       let label = path
         .split('-')
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
 
       // Handle special cases
-      if (path === 'account') label = 'Account';
-      if (path === 'activity') label = 'Activity';
-      if (path === 'advisories') label = 'Advisories';
-      if (path === 'projects') label = 'Projects';
-      if (path === 'connect') label = 'Connect';
-      if (path === 'repos') label = 'Repos';
-      if (path === 'updates') label = 'Updates';
-      if (path === 'jobs') label = 'Jobs';
-      if (path === 'runs') label = 'Runs';
-      if (path === 'secrets') label = 'Secrets';
-      if (path === 'settings') label = 'Settings';
       if (path === 'usage') label = 'Usage Telemetry';
       breadcrumbs.push({ label, href, isLast: i === paths.length - 1 });
     }
@@ -56,7 +48,7 @@ export function AppBreadcrumb() {
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href='/dashboard'>Dashboard</BreadcrumbLink>
+          <BreadcrumbLink href={breadcrumbs.length ? '/dashboard' : undefined}>Home</BreadcrumbLink>
         </BreadcrumbItem>
         {breadcrumbs.map((crumb) => (
           <div key={crumb.href} className='flex items-center gap-2'>

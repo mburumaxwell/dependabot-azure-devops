@@ -8,7 +8,7 @@ export const revalidate = false;
 export async function GET(_req: Request, props: RouteContext<'/og/docs/[...slug]'>) {
   const { slug } = await props.params;
   const doc = docs.getPage(slug.slice(0, -1));
-  if (!doc) notFound();
+  if (!doc) return notFound();
 
   return new ImageResponse(
     <DefaultImage title={doc.data.title} description={doc.data.description} site='Paklo Docs' />,

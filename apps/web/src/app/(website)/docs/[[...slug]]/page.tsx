@@ -9,7 +9,7 @@ import { getMDXComponents } from '@/mdx-components';
 export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): Promise<Metadata> {
   const { slug } = await props.params;
   const page = docs.getPage(slug);
-  if (!page) notFound();
+  if (!page) return notFound();
 
   return {
     title: page.data.title,
@@ -23,7 +23,7 @@ export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): P
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const { slug } = await props.params;
   const page = docs.getPage(slug);
-  if (!page) notFound();
+  if (!page) return notFound();
 
   const MDX = page.data.body;
 

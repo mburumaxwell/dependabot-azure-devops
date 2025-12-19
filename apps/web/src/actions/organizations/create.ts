@@ -18,7 +18,7 @@ export type OrganizationCreateOptions = {
 
 export async function createOrganizationWithCredential(
   options: OrganizationCreateOptions,
-): Promise<{ data?: Organization; error?: { message: string } }> {
+): Promise<{ data: Organization; error?: undefined } | { data?: undefined; error: { message: string } }> {
   const { name, slug, type, url, token, region } = options;
   const headers = await requestHeaders();
   const organization = await auth.api.createOrganization({
@@ -30,9 +30,6 @@ export async function createOrganizationWithCredential(
       url,
       region,
       ...getProviderStuff(options),
-
-      // change current active organization to the new one
-      keepCurrentActiveOrganization: false,
     },
   });
 

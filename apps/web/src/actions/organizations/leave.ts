@@ -21,10 +21,7 @@ export async function leaveOrganization(
   try {
     await auth.api.leaveOrganization({
       headers,
-      body: {
-        organizationId,
-        // feedback,
-      },
+      body: { organizationId },
     });
   } catch (error) {
     if (error instanceof BetterAuthApiError && error.body) {
