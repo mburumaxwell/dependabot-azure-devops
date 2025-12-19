@@ -1,16 +1,17 @@
 meta {
-  name: azdo-repositories-list
+  name: azdo-repo-pushes-list
   type: http
   seq: 1
 }
 
 get {
-  url: https://dev.azure.com/tingle/dependabot/_apis/git/repositories?api-version=5.0
+  url: https://dev.azure.com/tingle/dependabot/_apis/git/repositories/repro-1551/pushes?$top=1&api-version=5.0
   body: none
   auth: basic
 }
 
 params:query {
+  $top: 1
   api-version: 5.0
 }
 
