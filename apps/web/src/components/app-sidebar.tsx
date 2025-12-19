@@ -247,6 +247,7 @@ function OrganizationSwitcher({
   current,
 }: { isMobile: boolean; current: SimpleOrganization } & Pick<AppSidebarProps, 'organizations'>) {
   const router = useRouter();
+  const currentOrgTypeInfo = getOrganizationTypeInfo(current.type);
 
   async function handleOrgChange(organization: SimpleOrganization) {
     // redirect to dashboard activity page
@@ -265,15 +266,12 @@ function OrganizationSwitcher({
               <div className='flex aspect-square size-8 items-center justify-center rounded-lg'>
                 <AvatarSnippetHeader
                   title={current.name || 'Organization'}
-                  subtitle={getOrganizationTypeInfo(current.type)?.name}
+                  subtitle={currentOrgTypeInfo?.name}
                   image={current.logo}
                   size={8}
                 />
               </div>
-              <AvatarSnippetFooter
-                title={current.name || 'Organization'}
-                subtitle={getOrganizationTypeInfo(current.type)?.name}
-              />
+              <AvatarSnippetFooter title={current.name || 'Organization'} subtitle={currentOrgTypeInfo?.name} />
               <ChevronsUpDown className='ml-auto' />
             </SidebarMenuButton>
           </DropdownMenuTrigger>

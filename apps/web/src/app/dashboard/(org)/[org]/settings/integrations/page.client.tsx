@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle2, Eye, EyeOff, Globe, Shield, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, Copy, Eye, EyeOff, Shield, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import {
@@ -9,13 +9,14 @@ import {
   validateGitHubToken,
   validateOrganizationCredentials,
 } from '@/actions/organizations';
-import { Badge } from '@/components/ui/badge';
+import { GitHubLogo } from '@/components/logos';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
+import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { Spinner } from '@/components/ui/spinner';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { getOrganizationTypeInfo } from '@/lib/organizations';
 import type { Organization } from '@/lib/prisma';
 
 export function PrimaryIntegrationSection({ organization }: { organization: Organization }) {
@@ -24,6 +25,8 @@ export function PrimaryIntegrationSection({ organization }: { organization: Orga
   const [isValidating, setIsValidating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isTokenSaved, setIsTokenSaved] = useState(false);
+
+  const orgTypeInfo = getOrganizationTypeInfo(organization.type);
 
   async function handleValidateAndSaveToken() {
     if (!token.trim()) return;
@@ -64,30 +67,33 @@ export function PrimaryIntegrationSection({ organization }: { organization: Orga
     setToken('');
   }
 
+  function copyToClipboard(url: string): void {
+    navigator.clipboard.writeText(url);
+    toast.success('URL copied to clipboard');
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Primary Integration</CardTitle>
-        <CardDescription>Your organization's main source control integration</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <Item variant='outline'>
+      <ItemMedia variant='icon'>
+        <Tooltip>
+          <TooltipTrigger>
+            <orgTypeInfo.logo />
+          </TooltipTrigger>
+          <TooltipContent>{orgTypeInfo.name} Integration</TooltipContent>
+        </Tooltip>
+      </ItemMedia>
+      <ItemContent>
+        <ItemTitle>Primary Integration</ItemTitle>
+        <ItemDescription>Your organization's main source control integration</ItemDescription>
         <FieldSet>
           <FieldGroup>
             <Field>
-              <FieldLabel>Integration Type</FieldLabel>
-              <div className='flex items-center gap-2'>
-                <Input value={organization.type} disabled className='bg-muted' />
-                <Badge variant='secondary'>Active</Badge>
-              </div>
-            </Field>
-
-            <Field>
-              <FieldLabel>URL</FieldLabel>
+              {/* <FieldLabel>URL</FieldLabel> */}
               <InputGroup data-disabled>
-                <InputGroupAddon>
-                  <Globe className='size-4' />
-                </InputGroupAddon>
                 <InputGroupInput value={organization.url} disabled className='bg-muted' />
+                <InputGroupButton onClick={() => copyToClipboard(organization.url)}>
+                  <Copy className='size-4' />
+                </InputGroupButton>
               </InputGroup>
             </Field>
 
@@ -145,8 +151,8 @@ export function PrimaryIntegrationSection({ organization }: { organization: Orga
             </Field>
           </FieldGroup>
         </FieldSet>
-      </CardContent>
-    </Card>
+      </ItemContent>
+    </Item>
   );
 }
 
@@ -200,12 +206,18 @@ export function GitHubSection({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>GitHub Access Token</CardTitle>
-        <CardDescription>Optional token to avoid GitHub API rate limiting</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <Item variant='outline'>
+      <ItemMedia variant='icon'>
+        <Tooltip>
+          <TooltipTrigger>
+            <GitHubLogo />
+          </TooltipTrigger>
+          <TooltipContent>GitHub Integration</TooltipContent>
+        </Tooltip>
+      </ItemMedia>
+      <ItemContent>
+        <ItemTitle>GitHub Access Token</ItemTitle>
+        <ItemDescription>Optional token to avoid GitHub API rate limiting</ItemDescription>
         <FieldSet>
           <FieldGroup>
             <Field>
@@ -277,7 +289,7 @@ export function GitHubSection({
             </Field>
           </FieldGroup>
         </FieldSet>
-      </CardContent>
-    </Card>
+      </ItemContent>
+    </Item>
   );
 }
