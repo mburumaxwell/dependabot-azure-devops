@@ -14,14 +14,6 @@ const config: NextConfig = {
   experimental: {
     authInterrupts: true, // needed to use forbidden() and unauthorized()
   },
-  serverExternalPackages: [
-    // needed for logging
-    'pino',
-    'pino-pretty',
-    'thread-stream',
-    // needed for triggering runs
-    'cpu-features',
-  ],
   async headers() {
     return [
       // security headers
