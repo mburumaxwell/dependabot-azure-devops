@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.7/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -15,21 +15,8 @@
       "!package.json",
       "!package-lock.json",
       "!pnpm-lock.yaml",
-      "!next-env.d.ts",
-      "!.next",
-      "!out",
       "!dist",
-      "!build",
       "!.turbo",
-      "!.vercel",
-      "!.source",
-      "!.prisma",
-      "!.react-email",
-      "!public",
-      "!static",
-      "!**/src/components/ui",
-      "!**/src/hooks/use-mobile.ts",
-      "!**/src/components/stepper.tsx",
       "!dependabot-action",
       "!extensions/azure/tasks/*/task.json",
       "!extensions/azure/vss-extension.json",
@@ -60,10 +47,6 @@
       "suspicious": {
         "noUnknownAtRules": "off"
       }
-    },
-    "domains": {
-      "next": "recommended",
-      "react": "recommended"
     }
   },
   "javascript": {
@@ -77,14 +60,6 @@
       "bracketSameLine": false,
       "quoteStyle": "single",
       "attributePosition": "auto"
-    }
-  },
-  "css": {
-    "parser": {
-      "tailwindDirectives": true
-    },
-    "formatter": {
-      "quoteStyle": "single"
     }
   },
   "assist": {

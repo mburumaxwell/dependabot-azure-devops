@@ -5,6 +5,7 @@ import { ClientAssertionCredential, DefaultAzureCredential, type TokenCredential
 import { parseKeyVaultSecretIdentifier, SecretClient } from '@azure/keyvault-secrets';
 import { BlobServiceClient } from '@azure/storage-blob';
 import { getVercelOidcToken } from '@vercel/oidc';
+import { environment } from '@/lib/environment';
 
 /**
  * There are only 3 possible places we run the application:
@@ -16,17 +17,18 @@ import { getVercelOidcToken } from '@vercel/oidc';
  * Options 1 and 3 both use a chain from DefaultAzureCredential.
  * When running in Vercel (Option 2), we use client assertion with the Vercel OIDC token helper.
  */
-export const credential: TokenCredential = process.env.VERCEL
-  ? new ClientAssertionCredential(
-      // https://vercel.com/docs/oidc/azure
-      process.env.AZURE_TENANT_ID!,
-      process.env.AZURE_CLIENT_ID!,
-      getVercelOidcToken,
-    )
-  : new DefaultAzureCredential({
-      // this helps when I have many tenants in my dev environment
-      tenantId: process.env.AZURE_TENANT_ID,
-    });
+export const credential: TokenCredential =
+  environment.platform === 'vercel'
+    ? new ClientAssertionCredential(
+        // https://vercel.com/docs/oidc/azure
+        process.env.AZURE_TENANT_ID!,
+        process.env.AZURE_CLIENT_ID!,
+        getVercelOidcToken,
+      )
+    : new DefaultAzureCredential({
+        // this helps when I have many tenants in my dev environment
+        tenantId: process.env.AZURE_TENANT_ID,
+      });
 
 export const subscriptionId = process.env.AZURE_SUBSCRIPTION_ID!;
 

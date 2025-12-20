@@ -1,0 +1,42 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
+  "root": false,
+  "extends": "//",
+  "files": {
+    "includes": [
+      "!next-env.d.ts",
+      "!.next",
+      "!out",
+      "!build",
+      "!.vercel",
+      "!.source",
+      "!.prisma",
+      "!.react-email",
+      "!public",
+      "!static",
+      "!src/components/ui",
+      "!src/hooks/use-mobile.ts",
+      "!src/components/stepper.tsx"
+    ]
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "nursery": {
+        "noUndeclaredEnvVars": "error"
+      }
+    },
+    "domains": {
+      "next": "recommended",
+      "react": "recommended"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    },
+    "formatter": {
+      "quoteStyle": "single"
+    }
+  }
+}
