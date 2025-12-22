@@ -229,6 +229,7 @@ model OrganizationSecret {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   secretUrl      String?
+  description    String?
 
   @@unique([organizationId, name])
   @@index([organizationId])

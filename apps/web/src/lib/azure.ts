@@ -83,8 +83,11 @@ export async function setKeyVaultSecret({
   ...options
 }: ({ name: string } | { url: string }) & { value: string }): Promise<string> {
   let name: string;
-  if ('name' in options) name = options.name;
-  else {
+  if ('name' in options) {
+    name = options.name;
+    // remove any invalid characters from the name
+    name = name.replace(/[^0-9a-zA-Z-]/g, '-');
+  } else {
     // parse the URL
     try {
       name = parseKeyVaultSecretIdentifier(options.url).name;

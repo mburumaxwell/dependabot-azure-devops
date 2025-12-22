@@ -28,7 +28,7 @@ export default async function SecretsPage(props: PageProps<'/dashboard/[org]/sec
       name: true,
       createdAt: true,
       updatedAt: true,
-      secretUrl: false, // Do not select the url for listing
+      description: true,
     },
     orderBy: { name: 'asc' },
   });

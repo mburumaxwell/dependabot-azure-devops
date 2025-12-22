@@ -30,13 +30,17 @@ export async function validateSecretName({
   return { valid: true };
 }
 
-export type OrganizationSecretSafe = Pick<OrganizationSecret, 'id' | 'name' | 'createdAt' | 'updatedAt'>;
+export type OrganizationSecretSafe = Pick<
+  OrganizationSecret,
+  'id' | 'name' | 'createdAt' | 'updatedAt' | 'description'
+>;
 function makeSecretResult(secret: OrganizationSecret): OrganizationSecretSafe {
   return {
     id: secret.id,
     name: secret.name,
     createdAt: secret.createdAt,
     updatedAt: secret.updatedAt,
+    description: secret.description,
   };
 }
 
@@ -45,10 +49,12 @@ export async function createSecret({
   organizationId,
   name,
   value,
+  description,
 }: {
   organizationId: string;
   name: string;
   value: string;
+  description?: string;
 }): Promise<OrganizationSecretSafe> {
   let secret = await prisma.organizationSecret.create({
     data: {
@@ -64,7 +70,7 @@ export async function createSecret({
   // update the secret with the URL
   secret = await prisma.organizationSecret.update({
     where: { id: secret.id },
-    data: { secretUrl: url },
+    data: { secretUrl: url, description },
   });
 
   return makeSecretResult(secret);
@@ -75,10 +81,12 @@ export async function updateSecret({
   organizationId,
   id,
   value,
+  description,
 }: {
   organizationId: string;
   id: string;
   value: string;
+  description?: string;
 }): Promise<OrganizationSecretSafe> {
   let secret = await prisma.organizationSecret.findUniqueOrThrow({
     // organizationId just to make sure it matches the organization
@@ -89,11 +97,11 @@ export async function updateSecret({
   let { secretUrl: url } = secret;
   if (url) {
     await setKeyVaultSecret({ url, value });
-    // update the secret's updatedAt timestamp
+    // update the secret in the database
     secret = await prisma.organizationSecret.update({
       // organizationId just to make sure it matches the organization
       where: { organizationId, id },
-      data: { updatedAt: new Date() },
+      data: { description },
     });
   } else {
     // if no URL is set, create a new secret
@@ -102,7 +110,7 @@ export async function updateSecret({
     secret = await prisma.organizationSecret.update({
       // organizationId just to make sure it matches the organization
       where: { organizationId, id: secret.id },
-      data: { secretUrl: url },
+      data: { secretUrl: url, description },
     });
   }
 

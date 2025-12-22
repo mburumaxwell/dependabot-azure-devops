@@ -1,6 +1,6 @@
 'use client';
 
-import { Eye, EyeOff, Key, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, Key, NotepadText, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import {
@@ -39,6 +39,7 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '
 import { Spinner } from '@/components/ui/spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { Organization } from '@/lib/prisma';
 import { validateSecretNameFormat } from '@/lib/secrets';
 
@@ -56,12 +57,14 @@ export function SecretsView({ organization, secrets: initialSecrets }: SecretsVi
   // Form states for add/edit dialog
   const [secretName, setSecretName] = useState('');
   const [secretValue, setSecretValue] = useState('');
+  const [secretDescription, setSecretDescription] = useState('');
   const [showValue, setShowValue] = useState(false);
   const [nameError, setNameError] = useState('');
 
   function resetForm() {
     setSecretName('');
     setSecretValue('');
+    setSecretDescription('');
     setShowValue(false);
     setNameError('');
     setEditingSecret(null);
@@ -76,6 +79,7 @@ export function SecretsView({ organization, secrets: initialSecrets }: SecretsVi
     setEditingSecret(secret);
     setSecretName(secret.name);
     setSecretValue(''); // Value is not populated for editing (security)
+    setSecretDescription(secret.description || '');
     setShowValue(false);
     setNameError('');
   }
@@ -106,7 +110,8 @@ export function SecretsView({ organization, secrets: initialSecrets }: SecretsVi
       const secret = await updateSecret({
         organizationId: organization.id,
         id: editingSecret.id,
-        value: secretValue,
+        value: secretValue.trim(),
+        description: secretDescription?.trim() || undefined,
       });
       setSecrets((prev) => prev.map((s) => (s.id === editingSecret.id ? { ...s, ...secret } : s)));
       toast.success('Secret updated successfully');
@@ -115,6 +120,7 @@ export function SecretsView({ organization, secrets: initialSecrets }: SecretsVi
         organizationId: organization.id,
         name: name,
         value: secretValue,
+        description: secretDescription?.trim() || undefined,
       });
       setSecrets((prev) => [...prev, secret]);
       toast.success('Secret added successfully');
@@ -202,7 +208,19 @@ export function SecretsView({ organization, secrets: initialSecrets }: SecretsVi
               <TableBody>
                 {secrets.map((secret) => (
                   <TableRow key={secret.id} className='group'>
-                    <TableCell className='font-mono font-medium'>{secret.name}</TableCell>
+                    <TableCell className='font-mono font-medium'>
+                      <div className='flex items-center gap-2'>
+                        {secret.name}
+                        {secret.description && (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <NotepadText className='size-4' />
+                            </TooltipTrigger>
+                            <TooltipContent>{secret.description}</TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <TimeAgo value={secret.updatedAt} />
                     </TableCell>
@@ -331,6 +349,15 @@ export function SecretsView({ organization, secrets: initialSecrets }: SecretsVi
                     </InputGroupAddon>
                   </InputGroup>
                   {editingSecret && <FieldDescription>Enter a new value to update the secret.</FieldDescription>}
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor='description'>Description</FieldLabel>
+                  <Input
+                    id='description'
+                    placeholder={'Describe how you created this secret and how it is used'}
+                    value={secretDescription}
+                    onChange={(e) => setSecretDescription(e.target.value)}
+                  />
                 </Field>
               </FieldGroup>
             </FieldSet>
