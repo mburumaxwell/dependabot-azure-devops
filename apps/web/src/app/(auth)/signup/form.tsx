@@ -104,6 +104,9 @@ export function SignupForm({ className, redirectTo, ...props }: SignupFormProps)
               id='email'
               type='email'
               placeholder='chris.johnson@contoso.com'
+              autoCapitalize='none'
+              autoComplete='email'
+              autoCorrect='off'
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}

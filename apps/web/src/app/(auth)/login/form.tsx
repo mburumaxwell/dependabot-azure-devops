@@ -3,7 +3,7 @@
 import { Fingerprint, Mail } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { AppleLogo, GoogleLogo, PakloLogo } from '@/components/logos';
@@ -24,6 +24,7 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const router = useRouter();
 
   async function handlePasskeyLogin() {
     setIsLoading(true);
@@ -47,7 +48,7 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
     }
 
     // Redirect to dashboard or specified redirect URL after successful login
-    redirect((redirectTo || '/dashboard') as Route);
+    router.push((redirectTo || '/dashboard') as Route);
   }
 
   async function handleMagicLinkLogin(e: React.FormEvent) {
@@ -139,6 +140,9 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
                 id='email'
                 type='email'
                 placeholder='chris.johnson@contoso.com'
+                autoCapitalize='none'
+                autoComplete='email'
+                autoCorrect='off'
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

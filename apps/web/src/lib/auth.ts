@@ -23,9 +23,7 @@ const adminUserIds = process.env.AUTH_ADMIN_USER_IDS?.split(',') ?? [];
 const adminEmails = process.env.AUTH_ADMIN_EMAILS?.split(',') ?? [];
 
 export const auth = betterAuth({
-  database: prismaAdapter(prismaClient, {
-    provider: 'mongodb',
-  }),
+  database: prismaAdapter(prismaClient, { provider: 'mongodb' }),
   appName: app.name,
   advanced: {
     database: {

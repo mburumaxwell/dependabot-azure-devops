@@ -158,6 +158,9 @@ export function MembersSection({
                   placeholder='chris.johnson@contoso.com'
                   type='email'
                   className='md:col-span-4'
+                  autoCapitalize='none'
+                  autoComplete='off'
+                  autoCorrect='off'
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendInvite()}
