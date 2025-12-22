@@ -3,6 +3,7 @@ import {
   adminClient,
   inferAdditionalFields,
   inferOrgAdditionalFields,
+  lastLoginMethodClient,
   magicLinkClient,
   organizationClient,
 } from 'better-auth/client/plugins';
@@ -18,6 +19,7 @@ export const authClient = createAuthClient({
     passkeyClient(),
     organizationClient({ schema: inferOrgAdditionalFields<typeof auth>() }),
     adminClient(),
+    lastLoginMethodClient(),
   ],
 });
 

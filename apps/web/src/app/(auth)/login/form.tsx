@@ -4,8 +4,9 @@ import { Fingerprint, Mail } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { LastUsedIndicator } from '@/components/last-used-indicator';
 import { AppleLogo, GoogleLogo, PakloLogo } from '@/components/logos';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field';
@@ -19,12 +20,15 @@ interface LoginFormProps extends React.ComponentProps<'div'> {
 }
 
 export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
-  const thirdPartyLogins = false; // Might add 3rd-party login but not now!
+  const thirdPartyLogins = false; // Might add social login but not now!
 
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
+
+  useEffect(() => setIsMounted(true), []);
 
   async function handlePasskeyLogin() {
     setIsLoading(true);
@@ -97,14 +101,15 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
             size='lg'
             onClick={handlePasskeyLogin}
             disabled={isLoading}
-            className='h-12'
+            className='h-12 gap-2 flex relative'
           >
             {isLoading ? (
               <Spinner className='size-5' />
             ) : (
               <>
                 <Fingerprint className='size-5' />
-                Sign in with Passkey
+                <span>Sign in with Passkey</span>
+                {isMounted && authClient.isLastUsedLoginMethod('passkey') && <LastUsedIndicator />}
               </>
             )}
           </Button>
@@ -150,31 +155,40 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
               />
             </Field>
             <Field>
-              <Button type='submit' variant='secondary' disabled={isLoading || !email} size='lg'>
+              <Button
+                type='submit'
+                variant='secondary'
+                disabled={isLoading || !email}
+                size='lg'
+                className='gap-2 flex relative'
+              >
                 {isLoading ? (
                   <Spinner className='size-5' />
                 ) : (
                   <>
                     <Mail className='size-5' />
-                    Send magic link
+                    <span>Send magic link</span>
+                    {isMounted && authClient.isLastUsedLoginMethod('email') && <LastUsedIndicator />}
                   </>
                 )}
               </Button>
             </Field>
           </form>
         )}
-        {/* Might add 3rd-party login but not now! */}
+        {/* Might add social login but not now! */}
         {thirdPartyLogins ? (
           <>
-            <FieldSeparator>Or</FieldSeparator>
+            <FieldSeparator>OR</FieldSeparator>
             <Field className='grid gap-4 sm:grid-cols-2'>
-              <Button variant='outline' type='button' disabled>
+              <Button variant='outline' type='button' disabled className='gap-2 flex relative'>
                 <AppleLogo className='size-4' />
-                Continue with Apple
+                <span>Continue with Apple</span>
+                {isMounted && authClient.isLastUsedLoginMethod('apple') && <LastUsedIndicator />}
               </Button>
-              <Button variant='outline' type='button' disabled>
+              <Button variant='outline' type='button' disabled className='gap-2 flex relative'>
                 <GoogleLogo className='size-4' />
-                Continue with Google
+                <span>Continue with Google</span>
+                {isMounted && authClient.isLastUsedLoginMethod('google') && <LastUsedIndicator />}
               </Button>
             </Field>
           </>

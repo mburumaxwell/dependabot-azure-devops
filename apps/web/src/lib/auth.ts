@@ -3,7 +3,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { APIError } from 'better-auth/api';
 import { betterAuth } from 'better-auth/minimal';
 import { nextCookies } from 'better-auth/next-js';
-import { admin, magicLink, organization } from 'better-auth/plugins';
+import { admin, lastLoginMethod, magicLink, organization } from 'better-auth/plugins';
 import {
   sendMagicLinkEmail,
   sendOrganizationInviteDeclinedEmail,
@@ -109,6 +109,7 @@ export const auth = betterAuth({
         await sendMagicLinkEmail({ recipient: email, url });
       },
     }),
+    lastLoginMethod(),
     nextCookies(), // must be last to work with server actions/components
   ],
 });
