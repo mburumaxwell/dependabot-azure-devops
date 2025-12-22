@@ -33,7 +33,7 @@ export const auth = betterAuth({
         PakloId.isValidType(model) ? PakloId.generate(model) : PakloId.generateKidOnly(),
     },
     // since we have not set baseURL, we need to trust proxy headers on ACA
-    trustProxyHeaders: environment.platform === 'azure_container_apps',
+    trustedProxyHeaders: environment.platform === 'azure_container_apps',
   },
   user: {
     deleteUser: {

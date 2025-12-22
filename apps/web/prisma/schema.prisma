@@ -11,8 +11,9 @@ generator client {
   output   = "../.prisma"
 }
 
-// an alternative to https://github.com/prisma/prisma/issues/3219
 generator json {
+  // an alternative to https://github.com/prisma/prisma/issues/3219
+
   provider  = "prisma-json-types-generator"
   namespace = "PrismaJson"
   allowAny  = false
