@@ -35,7 +35,7 @@ export function AppBreadcrumb({ omit }: { omit?: string[] }) {
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
 
-      // Handle special cases
+      // handle special cases
       if (path === 'usage') label = 'Usage Telemetry';
       breadcrumbs.push({ label, href, isLast: i === paths.length - 1 });
     }
@@ -57,7 +57,7 @@ export function AppBreadcrumb({ omit }: { omit?: string[] }) {
               {crumb.isLast ? (
                 <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
               ) : (
-                <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
+                <BreadcrumbLink href={`/dashboard${crumb.href}`}>{crumb.label}</BreadcrumbLink>
               )}
             </BreadcrumbItem>
           </div>
