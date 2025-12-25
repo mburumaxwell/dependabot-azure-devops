@@ -381,8 +381,8 @@ importers:
         specifier: 0.38.4
         version: 0.38.4
       tfx-cli:
-        specifier: 0.22.2
-        version: 0.22.2
+        specifier: 0.22.6
+        version: 0.22.6
 
   packages/cli:
     dependencies:
@@ -608,8 +608,8 @@ packages:
     resolution: {integrity: sha512-rjaS6jrFksopXvNg6YeN+D1lYwhcByORNlFuYesFvaQNtPOufbE5tJL4GJ3TMXyaY0uFR28N5BHHITPyWWfH/g==}
     engines: {node: '>=18.0.0'}
 
-  '@aws-sdk/util-locate-window@3.953.0':
-    resolution: {integrity: sha512-mPxK+I1LcrgC/RSa3G5AMAn8eN2Ay0VOgw8lSRmV1jCtO+iYvNeCqOdxoJUjOW6I5BA4niIRWqVORuRP07776Q==}
+  '@aws-sdk/util-locate-window@3.957.0':
+    resolution: {integrity: sha512-nhmgKHnNV9K+i9daumaIz8JTLsIIML9PE/HUks5liyrjUzenjW/aHoc7WJ9/Td/gPZtayxFnXQSJRb/fDlBuJw==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/util-user-agent-browser@3.953.0':
@@ -8120,8 +8120,8 @@ packages:
   text-decoder@1.2.3:
     resolution: {integrity: sha512-3/o9z3X0X0fTupwsYvR03pJ/DjWuqqrfwBgTQzdWDiQSm9KitAyz/9WqsT2JQW7KV2m+bC2ol/zqpW37NHxLaA==}
 
-  tfx-cli@0.22.2:
-    resolution: {integrity: sha512-kFceaGFZ/QMvSX8Q0KsgNA0yP5kdI4J3CDavy/BcM1eeZUZEwTPvb3paicVWojLuEF0mgeOcOa0UxiAKg4fI2w==}
+  tfx-cli@0.22.6:
+    resolution: {integrity: sha512-Pkw0TEa3cbADck7IrhdtuWvAkzvZ0M/R0Jru9JyKevBAc1SeNJlTdeN8Eth5Rg0nFTICzymKdXmfEWOcFwwjAg==}
     engines: {node: '>=16.0.0'}
     hasBin: true
 
@@ -8896,7 +8896,7 @@ snapshots:
       '@aws-crypto/supports-web-crypto': 5.2.0
       '@aws-crypto/util': 5.2.0
       '@aws-sdk/types': 3.953.0
-      '@aws-sdk/util-locate-window': 3.953.0
+      '@aws-sdk/util-locate-window': 3.957.0
       '@smithy/util-utf8': 2.3.0
       tslib: 2.8.1
 
@@ -9243,7 +9243,7 @@ snapshots:
       '@smithy/util-endpoints': 3.2.7
       tslib: 2.8.1
 
-  '@aws-sdk/util-locate-window@3.953.0':
+  '@aws-sdk/util-locate-window@3.957.0':
     dependencies:
       tslib: 2.8.1
 
@@ -17830,7 +17830,7 @@ snapshots:
     transitivePeerDependencies:
       - react-native-b4a
 
-  tfx-cli@0.22.2:
+  tfx-cli@0.22.6:
     dependencies:
       app-root-path: 1.0.0
       archiver: 7.0.1
