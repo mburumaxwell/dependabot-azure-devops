@@ -28,7 +28,7 @@ export function NoOrganizationsView() {
           Organizations help you manage your projects, team members, and integrations all in one place.
         </p>
         <Button asChild className='w-full' size='lg'>
-          <Link href='/dashboard/organization/create'>
+          <Link href='/dashboard/setup'>
             <Plus className='mr-2 size-4' />
             Create your first organization
           </Link>
@@ -92,7 +92,7 @@ export function SelectOrganizationView({ organizations }: { organizations: Organ
         <p className='text-xs text-muted-foreground text-center'>You can change this at any time in your sidebar.</p>
         <Separator />
         <Button asChild variant='outline' className='w-full bg-transparent'>
-          <Link href='/dashboard/organization/create'>
+          <Link href='/dashboard/setup'>
             <Plus className='mr-2 size-4' />
             Create New Organization
           </Link>

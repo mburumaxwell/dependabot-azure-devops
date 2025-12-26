@@ -4,7 +4,7 @@ import { CreateOrganizationPage } from './page.client';
 export const metadata: Metadata = {
   title: 'Create Organization',
   description: 'Set up your organization to start managing projects',
-  openGraph: { url: `/dashboard/organization/create` },
+  openGraph: { url: `/dashboard/setup` },
 };
 
 export default function OrgCreatePage() {
