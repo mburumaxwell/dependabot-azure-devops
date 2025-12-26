@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { AzureRestError, logsContainer } from '@/lib/azure';
+import { AzureRestError, BLOB_CONTAINER_NAME_LOGS, getClients } from '@/lib/azure';
 import { prisma } from '@/lib/prisma';
 
 export const revalidate = 0; // always revalidate to get the latest
@@ -20,6 +20,8 @@ export async function GET(_req: Request, params: RouteContext<'/dashboard/[org]/
   });
   if (!updateJob) return notFound();
 
+  const { blobs: client } = getClients(updateJob.region);
+  const logsContainer = client.getContainerClient(BLOB_CONTAINER_NAME_LOGS);
   const blobClient = logsContainer.getBlockBlobClient(`${id}.txt`);
 
   try {

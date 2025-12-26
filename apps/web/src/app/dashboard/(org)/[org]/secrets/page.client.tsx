@@ -44,7 +44,7 @@ import type { Organization } from '@/lib/prisma';
 import { validateSecretNameFormat } from '@/lib/secrets';
 
 interface SecretsViewProps {
-  organization: Pick<Organization, 'id' | 'slug'>;
+  organization: Pick<Organization, 'id' | 'slug' | 'region'>;
   secrets: OrganizationSecretSafe[];
 }
 
@@ -118,6 +118,7 @@ export function SecretsView({ organization, secrets: initialSecrets }: SecretsVi
     } else {
       const secret = await createSecret({
         organizationId: organization.id,
+        region: organization.region,
         name: name,
         value: secretValue,
         description: secretDescription?.trim() || undefined,

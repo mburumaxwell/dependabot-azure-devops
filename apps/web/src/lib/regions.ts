@@ -97,3 +97,7 @@ export function fromExternalRegion(value: string | undefined): RegionCode | unde
 export function getRegionInfo(code: RegionCode) {
   return REGIONS.find((r) => r.code === code);
 }
+
+export function isRegionAvailable(code: RegionCode): boolean {
+  return getRegionInfo(code)?.available ?? false;
+}

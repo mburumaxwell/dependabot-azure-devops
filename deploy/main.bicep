@@ -2,13 +2,19 @@
 param location string = resourceGroup().location
 
 @minLength(5)
-@maxLength(24)
+@maxLength(15)
 @description('Name of the resources.')
 param name string = 'paklo'
 
 var vercelEnvironments = ['production', 'preview']
 var administratorLoginPasswordMongo = '${skip(uniqueString(resourceGroup().id), 5)}^${uniqueString('mongo-password', resourceGroup().id)}' // e.g. abcde%zecnx476et7xm (19 characters)
-var blobContainers = ['dependabot-job-logs']
+
+var regions = [
+  { name: 'dub', location: 'northeurope' }
+  { name: 'lhr', location: 'uksouth' }
+  // { name: 'sfo', location: 'westus' }
+  // { name: 'syd', location: 'australiaeast' }
+]
 
 /* Managed Identity */
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' = {
@@ -51,50 +57,6 @@ resource keyVault 'Microsoft.KeyVault/vaults@2025-05-01' = {
   }
 }
 
-/* Storage Account */
-resource storageAccount 'Microsoft.Storage/storageAccounts@2025-06-01' = {
-  name: name
-  location: location
-  kind: 'StorageV2'
-  sku: { name: 'Standard_LRS' }
-  properties: {
-    accessTier: 'Hot'
-    supportsHttpsTrafficOnly: true
-    allowBlobPublicAccess: false
-    networkAcls: {
-      bypass: 'AzureServices'
-      defaultAction: 'Allow'
-    }
-    minimumTlsVersion: 'TLS1_2'
-  }
-
-  resource blobServices 'blobServices' existing = {
-    name: 'default'
-
-    resource containers 'containers' = [
-      for bc in blobContainers: {
-        name: bc
-        properties: {
-          publicAccess: 'None'
-          defaultEncryptionScope: '$account-encryption-key'
-          denyEncryptionScopeOverride: false
-        }
-      }
-    ]
-  }
-}
-
-/* LogAnalytics */
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-07-01' = {
-  name: name
-  location: location
-  properties: {
-    sku: { name: 'PerGB2018' }
-    workspaceCapping: { dailyQuotaGb: json('0.167') } // low so as not to pass the 5GB limit per subscription
-    retentionInDays: 30
-  }
-}
-
 /* MongoDB Cluster */
 resource mongoCluster 'Microsoft.DocumentDB/mongoClusters@2025-09-01' = {
   name: name
@@ -125,107 +87,23 @@ resource mongoCluster 'Microsoft.DocumentDB/mongoClusters@2025-09-01' = {
   }
 }
 
-/* AppConfiguration */
-resource appConfiguration 'Microsoft.AppConfiguration/configurationStores@2024-06-01' = {
-  name: name
-  location: location
-  properties: {
-    dataPlaneProxy: { authenticationMode: 'Local', privateLinkDelegation: 'Disabled' }
-    softDeleteRetentionInDays: 0 /* Free does not support this */
-    defaultKeyValueRevisionRetentionPeriodInSeconds: 604800 /* 7 days */
-    publicNetworkAccess: 'Enabled'
-  }
-  sku: { name: 'free' }
-  identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: { '${managedIdentity.id}': {} }
-  }
-}
-
-/* Container App Environment */
-resource appEnvironment 'Microsoft.App/managedEnvironments@2025-07-01' = {
-  name: name
-  location: location
-  properties: {
-    peerAuthentication: { mtls: { enabled: false } }
-    peerTrafficConfiguration: { encryption: { enabled: false } }
-    publicNetworkAccess: 'Enabled'
-    workloadProfiles: [{ name: 'Consumption', workloadProfileType: 'Consumption' }]
-    appLogsConfiguration: { destination: 'azure-monitor' }
-  }
-  identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: { '${managedIdentity.id}': {} }
-  }
-}
-resource appEnvironmentDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: 'console-logs'
-  scope: appEnvironment
-  properties: {
-    // this could be changed to EventHubs if streaming logs is needed in the future
-    storageAccountId: storageAccount.id
-    logs: [
-      { category: 'ContainerAppConsoleLogs', enabled: true, retentionPolicy: { days: 0, enabled: false } }
-      // disabled but added here for reference and easier to detect changed on deploy
-      { category: 'ContainerAppSystemLogs', enabled: false, retentionPolicy: { days: 0, enabled: false } }
-      { category: 'AppEnvSpringAppConsoleLogs', enabled: false, retentionPolicy: { days: 0, enabled: false } }
-      { category: 'AppEnvSessionConsoleLogs', enabled: false, retentionPolicy: { days: 0, enabled: false } }
-      { category: 'AppEnvSessionPoolEventLogs', enabled: false, retentionPolicy: { days: 0, enabled: false } }
-      { category: 'AppEnvSessionLifeCycleLogs', enabled: false, retentionPolicy: { days: 0, enabled: false } }
-    ]
-    metrics: [
-      { category: 'AllMetrics', enabled: false, retentionPolicy: { days: 0, enabled: false } }
-    ]
-  }
-}
-resource appEnvironmentLogsRetention 'Microsoft.Storage/storageAccounts/managementPolicies@2025-06-01' = {
-  parent: storageAccount
-  name: 'default'
-  properties: {
-    policy: {
-      rules: [
-        {
-          name: 'delete-old-console-logs'
-          enabled: true
-          type: 'Lifecycle'
-          definition: {
-            actions: { baseBlob: { delete: { daysAfterModificationGreaterThan: 14 } } }
-            filters: {
-              blobTypes: ['blockBlob', 'appendBlob']
-              prefixMatch: ['insights-logs-containerappconsolelogs/ResourceId=${toUpper(appEnvironment.id)}/']
-            }
-          }
-        }
-      ]
+/* Region-specific resources */
+module jobsRegion 'jobs-region.bicep' = [
+  for region in regions: {
+    name: 'region-${region.name}'
+    scope: resourceGroup('${resourceGroup().name}-JOBS')
+    params: {
+      location: region.location
+      name: name
+      // storage account must use numbers and lower-case letters only
+      // hence no hyphen is used here
+      suffix: region.name
     }
   }
-}
-
-/* Idler app (Used to prevent the environment from being shutdown) */
-resource app 'Microsoft.App/containerApps@2025-07-01' = {
-  name: 'idler'
-  location: location
-  properties: {
-    managedEnvironmentId: appEnvironment.id
-    workloadProfileName: 'Consumption'
-    template: {
-      containers: [
-        {
-          name: 'idler'
-          image: 'mcr.microsoft.com/k8se/quickstart'
-          // these are the least resources we can provision
-          resources: { cpu: json('0.25'), memory: '0.5Gi' }
-        }
-      ]
-      scale: { minReplicas: 0, maxReplicas: 1, cooldownPeriod: 300, pollingInterval: 30 }
-    }
-  }
-}
+]
 
 /* Role Assignments */
 var roles = [
-  { name: 'App Configuration Data Reader', id: '516239f1-63e1-4d78-a4de-a74fb236a071' } // Allow read access to App Configuration
-  // { name: 'Log Analytics Reader', id: '73c42c96-874c-492b-b04d-ab87d138a893' } // Allow read access to Log Analytics
   { name: 'Key Vault Administrator', id: '00482a5a-887f-4fb3-b363-3b7fe8e74483' } // Perform all data plane operations on a key vault
   { name: 'Storage Blob Data Contributor', id: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe' } // Read, write, and delete Azure Storage containers and blobs
 ]
@@ -241,8 +119,9 @@ resource roleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = 
   }
 ]
 
-module jobs 'jobs.bicep' = {
-  name: 'deploy-jobs'
+/* RBAC in JOBS RG */
+module jobsRbac 'jobs-rbac.bicep' = {
+  name: 'rbac'
   scope: resourceGroup('${resourceGroup().name}-JOBS')
   params: { name: name, mainRGName: resourceGroup().name }
 }

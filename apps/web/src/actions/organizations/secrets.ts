@@ -3,6 +3,7 @@
 import { deleteKeyVaultSecret, getKeyVaultSecret, setKeyVaultSecret } from '@/lib/azure';
 import { PakloId } from '@/lib/ids';
 import { type OrganizationSecret, prisma } from '@/lib/prisma';
+import type { RegionCode } from '@/lib/regions';
 import { type SecretValidationResult, validateSecretNameFormat } from '@/lib/secrets';
 
 /** Validates if a secret name and its uniqueness within an organization */
@@ -47,11 +48,13 @@ function makeSecretResult(secret: OrganizationSecret): OrganizationSecretSafe {
 /** Creates a new organization secret */
 export async function createSecret({
   organizationId,
+  region,
   name,
   value,
   description,
 }: {
   organizationId: string;
+  region: RegionCode;
   name: string;
   value: string;
   description?: string;
@@ -60,12 +63,13 @@ export async function createSecret({
     data: {
       id: PakloId.generate('organization_secret'),
       organizationId,
+      region,
       name,
     },
   });
 
   // create the secret in Azure Key Vault
-  const url = await setKeyVaultSecret({ name: secret.id, value });
+  const url = await setKeyVaultSecret({ region, name: secret.id, value });
 
   // update the secret with the URL
   secret = await prisma.organizationSecret.update({
@@ -94,9 +98,9 @@ export async function updateSecret({
   });
 
   // update the secret in Azure Key Vault
-  let { secretUrl: url } = secret;
+  let { region, secretUrl: url } = secret;
   if (url) {
-    await setKeyVaultSecret({ url, value });
+    await setKeyVaultSecret({ region, url, value });
     // update the secret in the database
     secret = await prisma.organizationSecret.update({
       // organizationId just to make sure it matches the organization
@@ -105,7 +109,7 @@ export async function updateSecret({
     });
   } else {
     // if no URL is set, create a new secret
-    url = await setKeyVaultSecret({ name: secret.id, value });
+    url = await setKeyVaultSecret({ region, name: secret.id, value });
     // update the secret with the new URL
     secret = await prisma.organizationSecret.update({
       // organizationId just to make sure it matches the organization
@@ -125,9 +129,9 @@ export async function deleteSecret({ organizationId, id }: { organizationId: str
   });
 
   // delete the secret from Azure Key Vault
-  const { secretUrl: url } = secret;
+  const { region, secretUrl: url } = secret;
   if (url) {
-    await deleteKeyVaultSecret({ url });
+    await deleteKeyVaultSecret({ region, url });
   }
 
   // delete the secret from the database
@@ -153,5 +157,5 @@ export async function getSecretValue({
   });
   if (!secret || !secret.secretUrl) return undefined;
 
-  return getKeyVaultSecret({ url: secret.secretUrl });
+  return getKeyVaultSecret({ region: secret.region, url: secret.secretUrl });
 }

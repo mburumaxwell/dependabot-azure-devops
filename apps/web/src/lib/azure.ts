@@ -1,11 +1,11 @@
 import { type Job as ContainerAppJob, ContainerAppsAPIClient, type ContainerResources } from '@azure/arm-appcontainers';
-import { ComputeManagementClient } from '@azure/arm-compute';
 import { RestError } from '@azure/core-rest-pipeline';
 import { ClientAssertionCredential, DefaultAzureCredential, type TokenCredential } from '@azure/identity';
 import { parseKeyVaultSecretIdentifier, SecretClient } from '@azure/keyvault-secrets';
 import { BlobServiceClient } from '@azure/storage-blob';
 import { getVercelOidcToken } from '@vercel/oidc';
 import { environment } from '@/lib/environment';
+import { isRegionAvailable, type RegionCode } from '@/lib/regions';
 
 /**
  * There are only 3 possible places we run the application:
@@ -30,28 +30,72 @@ export const credential: TokenCredential =
         tenantId: process.env.AZURE_TENANT_ID,
       });
 
+export const BLOB_CONTAINER_NAME_LOGS = 'dependabot-job-logs';
+export const BLOB_CONTAINER_NAME_CONSOLE_LOGS = 'insights-logs-containerappconsolelogs';
+
 export const subscriptionId = process.env.AZURE_SUBSCRIPTION_ID!;
-
-export const secretClient = new SecretClient(process.env.AZURE_KEY_VAULT_URL!, credential);
-export const blobServiceClient = new BlobServiceClient(process.env.AZURE_BLOB_STORAGE_URL!, credential);
-export const consoleLogsContainer = blobServiceClient.getContainerClient('insights-logs-containerappconsolelogs');
-export const logsContainer = blobServiceClient.getContainerClient('dependabot-job-logs');
-
-export const computeClient = new ComputeManagementClient(credential, subscriptionId);
-export const containerAppsClient = new ContainerAppsAPIClient(credential, subscriptionId);
-
-export const resourceGroupName = process.env.AZURE_RESOURCE_GROUP!;
 export const resourceGroupNameJobs = process.env.AZURE_RESOURCE_GROUP_JOBS!;
-export const managedAppEnvironmentId = process.env.AZURE_MANAGED_ENVIRONMENT_ID!;
 
 export { RestError as AzureRestError };
 export type { ContainerAppJob, ContainerResources };
+
+type Clients = {
+  /** Azure Key Vault client for secrets */
+  secrets: SecretClient;
+  /** Azure Blob Storage client */
+  blobs: BlobServiceClient;
+  /** Azure Container Apps client */
+  containerApps: ContainerAppsAPIClient;
+  /** Managed Environment ID for Azure Container Apps */
+  environmentId: string;
+};
+// list of clients per region
+const clientsMap: Partial<Record<RegionCode, Clients>> = {};
+
+/**
+ * Get clients for a specific region.
+ * @param region The region code
+ * @returns The clients for the region
+ * @throws If the region is not available/provisioned
+ */
+export function getClients(region: RegionCode): Clients {
+  if (!isRegionAvailable(region)) {
+    throw new Error(`Region ${region} is not yet available/provisioned`);
+  }
+
+  let clients = clientsMap[region];
+  if (!clients) {
+    const resourceName = `paklo${region}`;
+    // for now, we use the same client (only one region at the moment)
+    clients = {
+      secrets: new SecretClient(`https://${resourceName}.vault.azure.net`, credential),
+      blobs: new BlobServiceClient(`https://${resourceName}.blob.core.windows.net`, credential),
+      containerApps: new ContainerAppsAPIClient(credential, subscriptionId),
+      // format: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/managedEnvironments/{environmentName}
+      environmentId: [
+        `/subscriptions/${subscriptionId}`,
+        `resourceGroups/${resourceGroupNameJobs}`,
+        `providers`,
+        `Microsoft.App/managedEnvironments`,
+        resourceName,
+      ].join('/'),
+    };
+    clientsMap[region] = clients;
+  }
+  return clients;
+}
 
 /**
  * Get a secret from Azure Key Vault
  * @returns The value of the secret or undefined if not found
  */
-export async function getKeyVaultSecret({ url }: { url: string }): Promise<string | undefined> {
+export async function getKeyVaultSecret({
+  region,
+  url,
+}: {
+  region: RegionCode;
+  url: string;
+}): Promise<string | undefined> {
   if (!url) return undefined;
 
   // parse the URL
@@ -62,9 +106,11 @@ export async function getKeyVaultSecret({ url }: { url: string }): Promise<strin
     return undefined;
   }
 
+  const { secrets: client } = getClients(region);
+
   // fetch the secret
   try {
-    const secret = await secretClient.getSecret(name);
+    const secret = await client.getSecret(name);
     return secret.value;
   } catch (error) {
     if (error instanceof RestError && error.statusCode === 404) {
@@ -79,9 +125,10 @@ export async function getKeyVaultSecret({ url }: { url: string }): Promise<strin
  * @returns The URL of the stored secret
  */
 export async function setKeyVaultSecret({
+  region,
   value,
   ...options
-}: ({ name: string } | { url: string }) & { value: string }): Promise<string> {
+}: ({ name: string } | { url: string }) & { region: RegionCode; value: string }): Promise<string> {
   let name: string;
   if ('name' in options) {
     name = options.name;
@@ -96,8 +143,10 @@ export async function setKeyVaultSecret({
     }
   }
 
+  const { secrets: client } = getClients(region);
+
   // set the secret
-  const secret = await secretClient.setSecret(name, value, {
+  const secret = await client.setSecret(name, value, {
     contentType: 'text/plain',
     enabled: true,
     tags: { managedBy: 'paklo-web' },
@@ -109,7 +158,7 @@ export async function setKeyVaultSecret({
 /**
  * Delete a secret from the vault
  */
-export async function deleteKeyVaultSecret({ url }: { url: string }) {
+export async function deleteKeyVaultSecret({ region, url }: { region: RegionCode; url: string }) {
   if (!url) return;
 
   // parse the URL
@@ -120,10 +169,12 @@ export async function deleteKeyVaultSecret({ url }: { url: string }) {
     return;
   }
 
+  const { secrets: client } = getClients(region);
+
   // delete and purge the secret
   try {
-    await secretClient.beginDeleteSecret(name);
-    await secretClient.purgeDeletedSecret(name);
+    await client.beginDeleteSecret(name);
+    await client.purgeDeletedSecret(name);
   } catch (error) {
     if (error instanceof RestError && error.statusCode === 404) {
       return;

@@ -3,8 +3,9 @@
 import { ANONYMOUS_USER_ID, type AzureDevOpsOrganizationUrl, extractOrganizationUrl } from '@paklo/core/azure';
 import { createGitHubClient } from '@paklo/core/github';
 import { RequestError } from 'octokit';
-import { getKeyVaultSecret, setKeyVaultSecret } from '@/lib/azure';
-import { type OrganizationType, prisma } from '@/lib/prisma';
+import { deleteKeyVaultSecret, getKeyVaultSecret, setKeyVaultSecret } from '@/lib/azure';
+import { type Organization, type OrganizationType, prisma } from '@/lib/prisma';
+import type { RegionCode } from '@/lib/regions';
 import { createAzdoClient } from './client';
 
 export async function validateOrganizationCredentials({
@@ -151,18 +152,22 @@ export async function updateGithubToken({
   token: string;
 }): Promise<{ success: boolean; error?: { message: string } }> {
   try {
+    // fetch organization
+    const organization = await prisma.organization.findUniqueOrThrow({ where: { id } });
+
     // fetch credential
     const credential = await prisma.organizationCredential.findUniqueOrThrow({
       where: { id },
     });
 
     // update the token in Azure Key Vault
+    const { region } = organization;
     let { githubTokenSecretUrl: url } = credential;
     if (url) {
-      await setKeyVaultSecret({ url, value: token });
+      await setKeyVaultSecret({ region, url, value: token });
     } else {
       // create a new secret in Azure Key Vault
-      url = await setKeyVaultSecret({ name: `github-${credential.id}`, value: token });
+      url = await setKeyVaultSecret({ region, name: `github-${credential.id}`, value: token });
 
       // update the credential with the URL
       await prisma.organizationCredential.update({
@@ -177,12 +182,18 @@ export async function updateGithubToken({
   }
 }
 
-export async function getGithubToken({
-  id,
-}: {
-  /** The ID of the organization for which to get the token */
-  id: string;
-}): Promise<string | undefined> {
+type GetGithubTokenOptions =
+  | {
+      /** The ID of the organization for which to get the token */
+      id: string;
+    }
+  | {
+      /** The organization for which to get the token */
+      organization: Pick<Organization, 'id' | 'region'>;
+    };
+export async function getGithubToken(options: GetGithubTokenOptions): Promise<string | undefined> {
+  const { id, region } = await getOrganizationIdAndRegion(options);
+
   // fetch credential
   const credential = await prisma.organizationCredential.findUnique({
     where: { id },
@@ -190,5 +201,38 @@ export async function getGithubToken({
   if (!credential || !credential.githubTokenSecretUrl) return undefined;
 
   // fetch the secret from Azure Key Vault
-  return await getKeyVaultSecret({ url: credential.githubTokenSecretUrl });
+  return await getKeyVaultSecret({ region, url: credential.githubTokenSecretUrl });
+}
+
+export async function deleteGithubToken(options: GetGithubTokenOptions): Promise<void> {
+  const { id, region } = await getOrganizationIdAndRegion(options);
+
+  // fetch credential
+  const credential = await prisma.organizationCredential.findUnique({
+    where: { id },
+  });
+  if (!credential) return;
+
+  // if there is a secret URL, delete the secret from Azure Key Vault
+  if (credential.githubTokenSecretUrl) {
+    await deleteKeyVaultSecret({ region, url: credential.githubTokenSecretUrl });
+  }
+
+  // update the credential to remove the secret URL
+  await prisma.organizationCredential.update({
+    where: { id },
+    data: { githubTokenSecretUrl: null },
+  });
+}
+
+async function getOrganizationIdAndRegion(options: GetGithubTokenOptions): Promise<{ id: string; region: RegionCode }> {
+  const id = 'id' in options ? options.id : options.organization.id;
+  let region: RegionCode | undefined;
+  if ('organization' in options) {
+    region = options.organization.region;
+  } else {
+    const organization = await prisma.organization.findUniqueOrThrow({ where: { id } });
+    region = organization.region;
+  }
+  return { id, region };
 }

@@ -30,7 +30,6 @@ env:
 
   GITHUB_SHA: ${{ github.sha }} # not discovered by default
   GITHUB_REF_NAME: ${{ github.ref_name }} # not discovered by default
-  RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
 
 jobs:
   Web:

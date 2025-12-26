@@ -39,6 +39,6 @@ export default async function SecretsPage(props: PageProps<'/dashboard/[org]/sec
 function getOrganization(slug: string) {
   return prisma.organization.findUnique({
     where: { slug },
-    select: { id: true, slug: true },
+    select: { id: true, slug: true, region: true },
   });
 }

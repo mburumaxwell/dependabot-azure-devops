@@ -5,6 +5,7 @@ import { auth } from '@/lib/auth';
 import { deleteKeyVaultSecret } from '@/lib/azure';
 import { prisma } from '@/lib/prisma';
 import { stripe } from '@/lib/stripe';
+import { deleteGithubToken } from './credentials';
 
 export async function deleteOrganization({
   organizationId,
@@ -43,7 +44,10 @@ export async function deleteOrganization({
   const secrets = await prisma.organizationSecret.findMany({
     where: { organizationId: organization.id, secretUrl: { not: null } },
   });
-  await Promise.all(secrets.map(({ secretUrl }) => deleteKeyVaultSecret({ url: secretUrl! })));
+  await Promise.all(secrets.map(({ region, secretUrl }) => deleteKeyVaultSecret({ region, url: secretUrl! })));
+
+  // delete credentials from key vault
+  await deleteGithubToken({ organization });
 
   // finally delete the organization
   const headers = await requestHeaders();

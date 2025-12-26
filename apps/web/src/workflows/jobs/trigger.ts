@@ -34,12 +34,11 @@ import { z } from 'zod';
 import { getGithubToken, getSecretValue } from '@/actions/organizations';
 import {
   AzureRestError,
+  BLOB_CONTAINER_NAME_CONSOLE_LOGS,
+  BLOB_CONTAINER_NAME_LOGS,
   type ContainerAppJob,
   type ContainerResources,
-  consoleLogsContainer,
-  containerAppsClient,
-  logsContainer,
-  managedAppEnvironmentId,
+  getClients,
   resourceGroupNameJobs,
 } from '@/lib/azure';
 import { environment } from '@/lib/environment';
@@ -91,14 +90,14 @@ export async function triggerUpdateJobs(options: TriggerUpdateJobsWorkflowOption
   'use workflow';
 
   const { workflowRunId } = getWorkflowMetadata();
-  const { ids } = await getOrCreateUpdateJobs({ workflowRunId, ...options });
+  const { ids, region } = await getOrCreateUpdateJobs({ workflowRunId, ...options });
   if (!environment.production) {
     console.info('Skipping scheduling update jobs in non-production environment.');
   } else {
-    await Promise.all(ids.map((id) => runUpdateJob({ id })));
+    await Promise.all(ids.map((id) => runUpdateJob({ id, region })));
   }
 
-  return { ids };
+  return { ids, region };
 }
 
 type GetOrCreateUpdateJobOptions = TriggerUpdateJobsWorkflowOptions & Pick<WorkflowMetadata, 'workflowRunId'>;
@@ -117,6 +116,7 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
   if (!organization || !organizationCredential || !project || !repository) {
     throw new FatalError('Organization, Project, or Repository not found');
   }
+  const region = organization.region;
 
   // if no specific repository updates are provided, fetch all updates for the repository
   const repositoryUpdateIds = (() => {
@@ -136,7 +136,7 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
   });
 
   let config: DependabotConfig | undefined;
-  const githubToken = await getGithubToken({ id: organization.id });
+  const githubToken = await getGithubToken({ organization });
 
   // work on each update
   const existingUpdateJobs: UpdateJob[] = [];
@@ -295,7 +295,7 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
         config,
         jobConfig: job,
         credentials,
-        region: organization.region,
+        region,
 
         startedAt: null,
         finishedAt: null,
@@ -311,6 +311,7 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
     ids: [...existingUpdateJobs, ...createdUpdateJobs].map((job) => job.id),
     existing: existingUpdateJobs.length,
     created: createdUpdateJobs.length,
+    region,
   };
 }
 
@@ -327,7 +328,7 @@ export function makeResourceName({ id }: { id: string }) {
   return `job-${id}`;
 }
 
-async function runUpdateJob({ id }: { id: string }) {
+async function runUpdateJob({ id, region }: { id: string; region: RegionCode }) {
   // this must not be a step as hooks can only be created in workflows
 
   // create and start the job resource
@@ -349,10 +350,10 @@ async function runUpdateJob({ id }: { id: string }) {
   }
 
   // fetch execution and stop the job resource
-  let execution = await getJobResourceExecution({ resourceName });
+  let execution = await getJobResourceExecution({ region, resourceName });
   if (execution?.name && execution.status === 'Running') {
-    await stopJobResource({ resourceName, executionName: execution.name! });
-    execution = await getJobResourceExecution({ resourceName });
+    await stopJobResource({ region, resourceName, executionName: execution.name! });
+    execution = await getJobResourceExecution({ region, resourceName });
   }
 
   // we must have an execution here
@@ -366,13 +367,13 @@ async function runUpdateJob({ id }: { id: string }) {
   await saveUpdateJobStatus({ id, executionStatus, startedAt, finishedAt });
 
   // remove job resources
-  await removeJobResources({ resourceName });
+  await removeJobResources({ region, resourceName });
 
   // wait 5 minutes to ensure logs are available in Azure Monitor
   await sleep('5m');
 
   // collect logs
-  await collectJobResourceLogs({ id, resourceName, startedAt, finishedAt });
+  await collectJobResourceLogs({ id, region, resourceName, startedAt, finishedAt });
 
   // report for billing
   await reportUsageBilling({ id });
@@ -406,8 +407,10 @@ export async function createAndStartJobResources({
   const jobCredentials = job.credentials;
 
   const { region } = job;
+  const { containerApps: client, environmentId } = getClients(region);
+
   try {
-    const response = await containerAppsClient.jobs.get(resourceGroupNameJobs, resourceName);
+    const response = await client.jobs.get(resourceGroupNameJobs, resourceName);
     if (response) return { hookToken: secret.hookToken }; // already exists
   } catch (error) {
     // do nothing when it is an azure error and the code is not found
@@ -430,7 +433,7 @@ export async function createAndStartJobResources({
   const cachedMode = Object.hasOwn(jobConfig.job.experiments, 'proxy-cached') === true;
   const app: ContainerAppJob = {
     location: toAzureLocation(region as RegionCode)!,
-    environmentId: managedAppEnvironmentId,
+    environmentId,
     configuration: {
       triggerType: 'Manual',
       manualTriggerConfig: { parallelism: 1, replicaCompletionCount: 1 },
@@ -537,11 +540,11 @@ export async function createAndStartJobResources({
       ],
     },
   };
-  const response = await containerAppsClient.jobs.beginCreateOrUpdateAndWait(resourceGroupNameJobs, resourceName, app);
+  const response = await client.jobs.beginCreateOrUpdateAndWait(resourceGroupNameJobs, resourceName, app);
   logger.debug(`Created ACA job: ${response.id}`);
 
   // start the job
-  await containerAppsClient.jobs.beginStartAndWait(resourceGroupNameJobs, resourceName);
+  await client.jobs.beginStartAndWait(resourceGroupNameJobs, resourceName);
   logger.debug(`Started ACA job: ${resourceName}`);
 
   // update job status to running
@@ -585,14 +588,17 @@ async function saveUpdateJobStatus({
 
 export type JobResourceExecution = { name: string; start: Date; status: string };
 export async function getJobResourceExecution({
+  region,
   resourceName,
 }: {
+  region: RegionCode;
   resourceName: string;
 }): Promise<JobResourceExecution | undefined> {
   'use step';
 
+  const { containerApps: client } = getClients(region);
   try {
-    for await (const execution of containerAppsClient.jobsExecutions.list(resourceGroupNameJobs, resourceName)) {
+    for await (const execution of client.jobsExecutions.list(resourceGroupNameJobs, resourceName)) {
       // there is only one execution
       return {
         name: execution.name!,
@@ -611,16 +617,19 @@ export async function getJobResourceExecution({
 }
 
 export async function stopJobResource({
+  region,
   resourceName,
   executionName,
 }: {
+  region: RegionCode;
   resourceName: string;
   executionName: string;
 }) {
   'use step';
 
+  const { containerApps: client } = getClients(region);
   try {
-    await containerAppsClient.jobs.beginStopExecutionAndWait(resourceGroupNameJobs, resourceName, executionName);
+    await client.jobs.beginStopExecutionAndWait(resourceGroupNameJobs, resourceName, executionName);
     logger.debug(`Stopped ACA job: ${resourceName}`);
   } catch (error) {
     // do nothing when it is an azure error and the code is not found
@@ -631,11 +640,12 @@ export async function stopJobResource({
   }
 }
 
-export async function removeJobResources({ resourceName }: { resourceName: string }) {
+export async function removeJobResources({ region, resourceName }: { region: RegionCode; resourceName: string }) {
   'use step';
 
+  const { containerApps: client } = getClients(region);
   try {
-    await containerAppsClient.jobs.beginDeleteAndWait(resourceGroupNameJobs, resourceName);
+    await client.jobs.beginDeleteAndWait(resourceGroupNameJobs, resourceName);
     logger.debug(`Deleted ACA job: ${resourceName}`);
   } catch (error) {
     // do nothing when it is an azure error and the code is not found
@@ -659,16 +669,20 @@ type AzureMonitorLogLine = z.infer<typeof AzureMonitorLogLineSchema>;
 
 export async function collectJobResourceLogs({
   id,
+  region,
   resourceName,
   startedAt,
   finishedAt,
 }: {
   id: string;
+  region: RegionCode;
   resourceName: string;
   startedAt: Date;
   finishedAt: Date;
 }) {
   'use step';
+
+  const { blobs: client, environmentId } = getClients(region);
 
   /**
    * azure monitor stores the logs in blob storage in a container named 'insights-logs-containerappconsolelogs'
@@ -700,12 +714,13 @@ export async function collectJobResourceLogs({
   for (const day of enumerateDays()) {
     // build the prefix for the day
     const prefix = [
-      `resourceId=${managedAppEnvironmentId.toUpperCase()}`,
+      `resourceId=${environmentId.toUpperCase()}`,
       `y=${day.getUTCFullYear()}`,
       `m=${String(day.getUTCMonth() + 1).padStart(2, '0')}`,
       `d=${String(day.getUTCDate()).padStart(2, '0')}`,
     ].join('/');
 
+    const consoleLogsContainer = client.getContainerClient(BLOB_CONTAINER_NAME_CONSOLE_LOGS);
     for await (const blob of consoleLogsContainer.listBlobsFlat({ prefix })) {
       const blobClient = consoleLogsContainer.getBlobClient(blob.name);
       const download = await blobClient.download();
@@ -754,6 +769,7 @@ export async function collectJobResourceLogs({
 
   // upload (overwrites) the merged log to the destination blob
   const mergedLogLength = Buffer.byteLength(mergedLog, 'utf-8');
+  const logsContainer = client.getContainerClient(BLOB_CONTAINER_NAME_LOGS);
   const blobClient = logsContainer.getBlockBlobClient(`${id}.txt`);
   await blobClient.upload(mergedLog, mergedLogLength, {
     blobHTTPHeaders: { blobContentType: 'text/plain; charset=utf-8' },
