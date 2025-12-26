@@ -10,6 +10,7 @@ import type {
   DependabotJobError as ImportedDependabotJobError,
   DependabotRecordUpdateJobWarning as ImportedDependabotRecordUpdateJobWarning,
 } from '@paklo/core/dependabot';
+import type { RegionCode as ImportedRegionCode } from '@/lib/regions';
 
 declare global {
   namespace PrismaJson {
@@ -23,5 +24,6 @@ declare global {
     type DependabotCredential = ImportedDependabotCredential;
     type DependabotJobError = ImportedDependabotJobError;
     type DependabotRecordUpdateJobWarning = ImportedDependabotRecordUpdateJobWarning;
+    type RegionCode = ImportedRegionCode;
   }
 }

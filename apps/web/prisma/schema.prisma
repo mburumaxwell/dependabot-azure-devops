@@ -117,6 +117,7 @@ model Organization {
   metadata            String?
   type                OrganizationType
   url                 String
+  /// [RegionCode]
   region              String
   providerHostname    String
   providerApiEndpoint String
@@ -404,6 +405,7 @@ model UpdateJob {
   /// [DependabotCredential]
   credentials    Json[]
   secret         UpdateJobSecret?
+  /// [RegionCode]
   region         String
   startedAt      DateTime?
   finishedAt     DateTime?
