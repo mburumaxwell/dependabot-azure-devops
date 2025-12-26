@@ -2,6 +2,7 @@
 
 import { headers as requestHeaders } from 'next/headers';
 import { auth } from '@/lib/auth';
+import { deleteKeyVaultSecret } from '@/lib/azure';
 import { prisma } from '@/lib/prisma';
 import { stripe } from '@/lib/stripe';
 
@@ -38,6 +39,13 @@ export async function deleteOrganization({
     await prisma.organization.update({ where: { id: organizationId }, data: { customerId: null } });
   }
 
+  // delete secrets from key vault
+  const secrets = await prisma.organizationSecret.findMany({
+    where: { organizationId: organization.id, secretUrl: { not: null } },
+  });
+  await Promise.all(secrets.map(({ secretUrl }) => deleteKeyVaultSecret({ url: secretUrl! })));
+
+  // finally delete the organization
   const headers = await requestHeaders();
   await auth.api.deleteOrganization({ headers, body: { organizationId: organizationId } });
   return { success: true };
