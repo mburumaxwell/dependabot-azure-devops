@@ -35,6 +35,12 @@ jobs:
   Web:
     runs-on: ubuntu-latest
 
+    services:
+      # for static generation during build and for tests
+      mongo:
+        image: mongo:latest
+        ports: ['27017:27017']
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -69,9 +75,6 @@ jobs:
       - name: Build
         run: pnpm turbo build
         working-directory: '${{ github.workspace }}/apps/web'
-        env:
-          # for static generation during build
-          MONGO_DATABASE_URL: ${{ secrets.MONGO_DATABASE_URL_DEV }}
 
       - name: Lint
         run: pnpm turbo lint
