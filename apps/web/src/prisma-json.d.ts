@@ -11,6 +11,7 @@ import type {
   DependabotRecordUpdateJobWarning as ImportedDependabotRecordUpdateJobWarning,
 } from '@paklo/core/dependabot';
 import type { RegionCode as ImportedRegionCode } from '@/lib/regions';
+import type { Period as ImportedPeriod } from '@/lib/period';
 
 declare global {
   namespace PrismaJson {
@@ -25,5 +26,6 @@ declare global {
     type DependabotJobError = ImportedDependabotJobError;
     type DependabotRecordUpdateJobWarning = ImportedDependabotRecordUpdateJobWarning;
     type RegionCode = ImportedRegionCode;
+    type Period = ImportedPeriod;
   }
 }

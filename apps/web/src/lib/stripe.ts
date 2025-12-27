@@ -1,4 +1,5 @@
 import { Stripe } from 'stripe';
+import type { Period } from '@/lib/period';
 import type { SubscriptionStatus } from '@/lib/prisma';
 
 export const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -22,8 +23,17 @@ export async function getPrices() {
   return fetchedPrices;
 }
 
-export type StripeSubscriptionStatus = Stripe.Subscription.Status;
+export type StripeSubscription = Stripe.Subscription;
+export function getBillingPeriod(subscription: StripeSubscription): Period {
+  const item = subscription.items.data.find((item) => item.price.lookup_key === PRICE_LOOKUP_KEY_MANAGEMENT)!;
+  if (!item) {
+    throw new Error('Management price not found in subscription items');
+  }
+  const { current_period_start, current_period_end } = item;
+  return { start: new Date(current_period_start * 1000), end: new Date(current_period_end * 1000) };
+}
 
+export type StripeSubscriptionStatus = Stripe.Subscription.Status;
 export function stripeSubscriptionStatusToSubscriptionStatus(
   status: StripeSubscriptionStatus,
 ): SubscriptionStatus | undefined {

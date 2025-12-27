@@ -21,13 +21,17 @@ export default async function BillingPage(props: PageProps<'/dashboard/[org]/set
   const organization = await getOrganization(organizationSlug);
   if (!organization) return notFound();
 
-  const aggregate = await prisma.updateJob.aggregate({
-    where: {
-      organizationId: organization.id,
-      duration: { not: null },
-    },
-    _sum: { duration: true },
-  });
+  const period = organization.billingPeriod;
+  const aggregate = period
+    ? await prisma.updateJob.aggregate({
+        where: {
+          organizationId: organization.id,
+          createdAt: { gte: period.start, lte: period.end },
+          duration: { not: null },
+        },
+        _sum: { duration: true },
+      })
+    : { _sum: { duration: 0 } };
   const consumed = (aggregate._sum.duration || 0) / 60_000; // convert from milliseconds to minutes
   const usage = { consumed, included: INCLUDED_USAGE_MINUTES };
 

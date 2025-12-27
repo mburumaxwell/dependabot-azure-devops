@@ -124,6 +124,8 @@ model Organization {
   customerId          String?
   subscriptionId      String?
   subscriptionStatus  SubscriptionStatus?
+  /// [Period]
+  billingPeriod       Json?
   members             Member[]
   invitations         Invitation[]
   credential          OrganizationCredential?
