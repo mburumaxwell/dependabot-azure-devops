@@ -24,6 +24,23 @@ export const defaultMetadata: Metadata = {
   },
 };
 
+const docsTitleTemplate: TemplateString = {
+  default: config.docs.title,
+  template: `%s | ${config.docs.title}`,
+};
+
+export const docsMetadata: Metadata = {
+  title: docsTitleTemplate,
+  description: config.docs.description,
+  metadataBase: new URL(config.siteUrl),
+  openGraph: {
+    type: 'website',
+    title: docsTitleTemplate,
+    description: config.docs.description,
+    url: config.siteUrl,
+  },
+};
+
 const dashboardTitleTemplate: TemplateString = {
   default: config.dashboard.title,
   template: `%s | ${config.dashboard.title}`,

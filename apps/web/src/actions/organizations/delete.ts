@@ -3,8 +3,8 @@
 import { headers as requestHeaders } from 'next/headers';
 import { auth } from '@/lib/auth';
 import { deleteKeyVaultSecret } from '@/lib/azure';
+import { stripe } from '@/lib/billing';
 import { prisma } from '@/lib/prisma';
-import { stripe } from '@/lib/stripe';
 import { deleteGithubToken } from './credentials';
 
 export async function deleteOrganization({

@@ -99,7 +99,7 @@ export function ConnectProjectsView({ organization, projects }: ProjectViewProps
                 />
                 <Label htmlFor={project.providerId} className='flex items-center gap-3 flex-1 cursor-pointer'>
                   <div className='flex size-10 items-center justify-center rounded-lg bg-muted'>
-                    <FolderGit2 className='h-5 w-5' />
+                    <FolderGit2 className='size-5' />
                   </div>
                   <div>
                     <p className='font-medium'>{project.name}</p>
@@ -117,9 +117,9 @@ export function ConnectProjectsView({ organization, projects }: ProjectViewProps
         </div>
 
         <div className='flex justify-end gap-3 pt-4'>
-          <Button variant='outline' asChild>
-            <Link href={`/dashboard/${organization.slug}/projects`}>Cancel</Link>
-          </Button>
+          <Link href={`/dashboard/${organization.slug}/projects`}>
+            <Button variant='outline'>Cancel</Button>
+          </Link>
           <Button onClick={handleConnect} disabled={selectedProjects.size === 0 || connecting}>
             {connecting ? (
               <>

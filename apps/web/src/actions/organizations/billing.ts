@@ -1,10 +1,10 @@
 'use server';
 
 import { storeFeedback } from '@/actions/feedback';
+import { getPrices, PRICE_LOOKUP_KEY_MANAGEMENT, PRICE_LOOKUP_KEY_USAGE, stripe } from '@/lib/billing';
 import { environment } from '@/lib/environment';
 import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
-import { getPrices, PRICE_LOOKUP_KEY_MANAGEMENT, PRICE_LOOKUP_KEY_USAGE, stripe } from '@/lib/stripe';
 import { config } from '@/site-config';
 
 export async function createStripeCheckoutSession({

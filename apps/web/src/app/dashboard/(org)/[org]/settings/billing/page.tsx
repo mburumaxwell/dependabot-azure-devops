@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { INCLUDED_USAGE_MINUTES } from '@/lib/billing';
 import { prisma } from '@/lib/prisma';
-import { INCLUDED_USAGE_MINUTES } from '@/lib/stripe';
 import { ManageSection, RegionSection, UsageSection } from './page.client';
 
 export async function generateMetadata(props: PageProps<'/dashboard/[org]/settings/billing'>): Promise<Metadata> {

@@ -9,7 +9,7 @@ const config: NextConfig = {
   logging: { fetches: { fullUrl: true } }, // allows us to see cache behavior for fetches
   images: {
     formats: ['image/avif', 'image/webp'],
-    unoptimized: true, // hoping this improves site performance
+    unoptimized: true, // do not need image optimization yet
   },
   experimental: {
     authInterrupts: true, // needed to use forbidden() and unauthorized()

@@ -4,7 +4,7 @@ dotenvFlow.config();
 
 async function run() {
   const { prisma } = await import('@/lib/prisma');
-  const { stripe, METER_EVENT_NAME_USAGE } = await import('@/lib/stripe');
+  const { stripe, METER_EVENT_NAME_USAGE } = await import('@/lib/billing');
 
   const jobs = await prisma.updateJob.findMany({
     where: { NOT: { status: { in: ['running', 'scheduled'] } } },

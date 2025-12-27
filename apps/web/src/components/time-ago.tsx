@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useMemo } from 'react';
 import { default as BaseTimeAgo, type Formatter, type Suffix, type Unit } from 'react-timeago';
 import { makeIntlFormatter } from 'react-timeago/defaultFormatter';

@@ -44,11 +44,11 @@ export function ProjectsView({
                 <Button onClick={handleConnectProjects}>Connect Projects</Button>
               </div>
             </EmptyContent>
-            <Button variant='link' asChild className='text-muted-foreground' size='sm'>
-              <a href='/docs/getting-started/projects' target='_blank' rel='noreferrer'>
+            <a href='/docs/getting-started/projects' target='_blank' rel='noreferrer'>
+              <Button variant='link' className='text-muted-foreground' size='sm'>
                 Learn More <ArrowUpRightIcon />
-              </a>
-            </Button>
+              </Button>
+            </a>
           </Empty>
         </div>
       ) : (

@@ -21,7 +21,7 @@ export const viewport: Viewport = {
 
 export default function Layout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang='en' className={geist.className} suppressHydrationWarning>
+    <html lang='en' className={`font-sans antialiased ${geist.className}`} suppressHydrationWarning>
       <body>
         <ThemeProvider>
           <TooltipProvider>{children}</TooltipProvider>

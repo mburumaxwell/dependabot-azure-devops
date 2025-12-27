@@ -16,16 +16,16 @@ export function BillingNotConfiguredView({ slug }: { slug: string }) {
         </EmptyHeader>
         <EmptyContent>
           <div className='flex gap-2'>
-            <Button asChild>
-              <Link href={`/dashboard/${slug}/settings/billing`}>Configure Billing</Link>
-            </Button>
+            <Link href={`/dashboard/${slug}/settings/billing`}>
+              <Button>Configure Billing</Button>
+            </Link>
           </div>
         </EmptyContent>
-        <Button variant='link' asChild className='text-muted-foreground' size='sm'>
-          <a href='/#pricing' target='_blank' rel='noreferrer'>
+        <a href='/#pricing' target='_blank' rel='noreferrer'>
+          <Button variant='link' className='text-muted-foreground' size='sm'>
             Learn More <ArrowUpRightIcon />
-          </a>
-        </Button>
+          </Button>
+        </a>
       </Empty>
     </div>
   );

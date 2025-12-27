@@ -22,7 +22,7 @@ export const legal = defineCollections({
     description: z.string().optional(),
     icon: z.string().optional(),
     full: z.boolean().optional(),
-    updated: z.coerce.date(),
+    published: z.coerce.date(),
   }),
 });
 

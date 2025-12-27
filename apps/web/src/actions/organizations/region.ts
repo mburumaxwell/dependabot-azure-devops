@@ -16,6 +16,10 @@ export async function updateOrganizationRegion(options: {
     return { success: false, error: { message: 'Selected region is not available' } };
   }
 
+  // update all secrets in the organization to the new region
+  // TODO: implement secret migration between regions
+
+  // update organization region
   await prisma.organization.updateMany({
     where: { id: options.organizationId },
     data: { region: options.region },

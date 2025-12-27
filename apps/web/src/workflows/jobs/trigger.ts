@@ -41,13 +41,13 @@ import {
   getClients,
   resourceGroupNameJobs,
 } from '@/lib/azure';
+import { METER_EVENT_NAME_USAGE, stripe } from '@/lib/billing';
 import { environment } from '@/lib/environment';
 import { enableDependabotConnectivityCheck } from '@/lib/flags';
 import { SequenceNumber } from '@/lib/ids';
 import { logger } from '@/lib/logger';
 import { prisma, type UpdateJob, type UpdateJobTrigger } from '@/lib/prisma';
 import { type RegionCode, toAzureLocation } from '@/lib/regions';
-import { METER_EVENT_NAME_USAGE, stripe } from '@/lib/stripe';
 import { streamToString } from '@/lib/utils';
 import { config } from '@/site-config';
 

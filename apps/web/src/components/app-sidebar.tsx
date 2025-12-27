@@ -14,6 +14,7 @@ import {
   LogOut,
   type LucideIcon,
   Plus,
+  ShieldAlert,
   Users,
 } from 'lucide-react';
 import type { Route } from 'next';
@@ -73,7 +74,7 @@ export function AppSidebar({ session, organizations, pakloAdmin, ...props }: App
               { label: 'Dashboard', href: `/dashboard/${current.slug}`, icon: CircleGauge },
               { label: 'Projects', href: `/dashboard/${current.slug}/projects`, icon: Folder },
               { label: 'Runs', href: `/dashboard/${current.slug}/runs`, icon: Activity },
-              // { label: 'Advisories', href: `/dashboard/${current.slug}/advisories`, icon: ShieldAlert },
+              { label: 'Advisories', href: `/dashboard/${current.slug}/advisories`, icon: ShieldAlert },
               { label: 'Secrets', href: `/dashboard/${current.slug}/secrets`, icon: Key },
             ],
           },

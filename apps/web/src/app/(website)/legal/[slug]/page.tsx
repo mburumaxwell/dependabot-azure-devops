@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { legal } from '@/lib/source';
-import { formatDate } from '@/lib/utils';
+import { Markdown } from '@/components/markdown';
+import { TimeAgo } from '@/components/time-ago';
+import { getPageImage, legal } from '@/lib/source';
 
 export async function generateMetadata(props: PageProps<'/legal/[slug]'>): Promise<Metadata> {
   const { slug } = await props.params;
@@ -10,7 +11,11 @@ export async function generateMetadata(props: PageProps<'/legal/[slug]'>): Promi
 
   return {
     title: doc.data.title,
-    openGraph: { url: doc.url },
+    description: doc.data.description,
+    openGraph: {
+      url: doc.url,
+      images: getPageImage(doc).url,
+    },
   };
 }
 
@@ -19,22 +24,26 @@ export default async function LegalDocPage(props: PageProps<'/legal/[slug]'>) {
   const doc = legal.getPage([slug]);
   if (!doc) return notFound();
 
-  const MDX = doc.data.body;
+  const body = doc.data.body;
 
   return (
     <article>
-      <div className='py-16 sm:py-32'>
-        <h1 className='font-display mt-5 text-center text-3xl leading-[1.15] font-bold sm:text-5xl sm:leading-[1.15]'>
+      <div className='py-4 sm:py-8'>
+        <h1 className='font-display mt-5 text-center text-2xl leading-[1.15] font-bold sm:text-4xl sm:leading-[1.15]'>
           {doc.data.title}
         </h1>
-        {doc.data.updated && (
-          <div className='mt-5 w-full text-center'>
-            <p>Last updated on {formatDate(doc.data.updated)}</p>
-          </div>
-        )}
+        <div className='mt-5 w-full md:flex gap-2 justify-center items-center text-center'>
+          <p>
+            Published <TimeAgo value={doc.data.published} />
+          </p>
+          <span className='hidden md:block'>&nbsp;•&nbsp;</span>
+          <p>
+            Last updated <TimeAgo value={doc.data.lastModified ?? doc.data.published} />
+          </p>
+        </div>
       </div>
-      <div className='mx-auto flex w-full max-w-(--breakpoint-lg) flex-col items-center p-10 px-2.5 sm:pt-20 lg:px-20'>
-        <MDX />
+      <div className='mx-auto max-w-(--breakpoint-lg) p-4 sm:py-8 lg:px-20'>
+        <Markdown body={body} source={legal} page={doc} />
       </div>
     </article>
   );
