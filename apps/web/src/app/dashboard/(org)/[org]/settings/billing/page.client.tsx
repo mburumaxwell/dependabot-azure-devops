@@ -1,7 +1,7 @@
 'use client';
 
 import { loadStripe } from '@stripe/stripe-js';
-import { AlertTriangle, CreditCard, Gauge, Globe, Server } from 'lucide-react';
+import { AlertTriangle, CreditCard, Gauge, Server } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -12,6 +12,7 @@ import {
   createStripeCheckoutSession,
   updateOrganizationRegion,
 } from '@/actions/organizations';
+import { RegionsSelect } from '@/components/regions-select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   AlertDialog,
@@ -29,12 +30,9 @@ import { Button } from '@/components/ui/button';
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import type { Organization } from '@/lib/prisma';
-import { REGIONS, type RegionCode } from '@/lib/regions';
-import { cn } from '@/lib/utils';
 
 type SimpleOrganization = Pick<Organization, 'id' | 'region' | 'subscriptionId' | 'subscriptionStatus'>;
 export function ManageSection({ organization, projects }: { organization: SimpleOrganization; projects: number }) {
@@ -227,7 +225,7 @@ export function UsageSection({ usage: { consumed, included } }: { usage: { consu
 
 export function RegionSection({ organization: initialOrganization }: { organization: SimpleOrganization }) {
   const [organization, setOrganization] = useState(initialOrganization);
-  const [selectedRegion, setSelectedRegion] = useState(organization.region as RegionCode);
+  const [selectedRegion, setSelectedRegion] = useState(organization.region);
   const [isSavingRegion, setIsSavingRegion] = useState(false);
 
   async function handleSaveRegion() {
@@ -245,11 +243,6 @@ export function RegionSection({ organization: initialOrganization }: { organizat
     toast.success('Region updated', { description: 'Your data region has been updated successfully.' });
   }
 
-  // filter regions allowed to be shown, sort by available the label
-  const regions = REGIONS.filter((region) => region.visible).sort(
-    (a, b) => Number(b.available) - Number(a.available) || a.label.localeCompare(b.label),
-  );
-
   return (
     <Item variant='outline'>
       <ItemMedia variant='icon'>
@@ -258,61 +251,17 @@ export function RegionSection({ organization: initialOrganization }: { organizat
       <ItemContent>
         <ItemTitle>Data Residency</ItemTitle>
         <ItemDescription>Choose where your organization's jobs will be run</ItemDescription>
-        <RadioGroup
-          value={selectedRegion}
-          onValueChange={(value) => setSelectedRegion(value as RegionCode)}
-          className='grid grid-cols-3 gap-2 mt-2'
+        <RegionsSelect
+          selected={selectedRegion}
+          onValueChange={(value) => setSelectedRegion(value)}
+          className='my-2'
           disabled={isSavingRegion}
-        >
-          {regions.map((region) => (
-            <div key={region.code} className='relative'>
-              <label
-                htmlFor={region.code}
-                className={cn(
-                  'flex items-center gap-2 rounded-lg border-2 p-4 transition-all cursor-pointer',
-                  !region.available && 'opacity-50 cursor-not-allowed',
-                  region.available && selectedRegion === region.code
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border bg-card hover:border-primary/50',
-                )}
-              >
-                <RadioGroupItem
-                  value={region.code}
-                  id={region.code}
-                  disabled={!region.available}
-                  className='shrink-0'
-                />
-                <div className='flex items-center gap-2 flex-1'>
-                  <div className='size-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0'>
-                    <Globe className='size-5' />
-                  </div>
-                  <div>
-                    <p className='font-semibold'>{region.label}</p>
-                    {organization.region === region.code && region.available && (
-                      <p className='text-sm text-muted-foreground'>Current region</p>
-                    )}
-                  </div>
-                </div>
-                {!region.available && (
-                  <div className='absolute inset-0 backdrop-blur-[2px] rounded-lg flex items-center justify-center'>
-                    <span className='bg-background/90 px-4 py-2 rounded-full text-sm font-medium border'>
-                      Coming Soon
-                    </span>
-                  </div>
-                )}
-              </label>
-            </div>
-          ))}
-        </RadioGroup>
+        />
         <div className='flex justify-end'>
           <Button
             onClick={handleSaveRegion}
             size='sm'
-            disabled={
-              isSavingRegion ||
-              selectedRegion === organization.region ||
-              !regions.find((r) => r.code === selectedRegion)?.available
-            }
+            disabled={isSavingRegion || selectedRegion === organization.region}
           >
             {isSavingRegion ? (
               <>

@@ -2,8 +2,6 @@ import { notFound } from 'next/navigation';
 import { AzureRestError, BLOB_CONTAINER_NAME_LOGS, getClients } from '@/lib/azure';
 import { prisma } from '@/lib/prisma';
 
-export const revalidate = 0; // always revalidate to get the latest
-
 export async function GET(_req: Request, params: RouteContext<'/dashboard/[org]/runs/[id]/logs'>) {
   const { org: organizationId, id } = await params.params;
 

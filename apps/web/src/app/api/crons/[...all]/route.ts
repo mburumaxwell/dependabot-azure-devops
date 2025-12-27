@@ -10,8 +10,6 @@ import { prisma } from '@/lib/prisma';
 import { cleanupDatabase } from '@/workflows/cleanup-database';
 import { scanVulnerabilities } from '@/workflows/scan-vulnerabilities';
 
-export const dynamic = 'force-dynamic';
-
 const app = new Hono().basePath('/api/crons');
 
 // crons are secured via a middleware at a higher level using a secret token

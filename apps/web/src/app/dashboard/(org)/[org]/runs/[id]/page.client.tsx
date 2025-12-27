@@ -29,8 +29,8 @@ type SlimUpdateJob = Pick<
   | 'duration'
 >;
 export function InfoSection({ job }: { job: SlimUpdateJob }) {
-  function RegionLabel({ code }: { code: string | RegionCode }) {
-    return <span title={code}>{getRegionInfo(code as RegionCode)?.label ?? code}</span>;
+  function RegionLabel({ code }: { code: RegionCode }) {
+    return <span title={code}>{getRegionInfo(code)?.label ?? code}</span>;
   }
 
   const parts: {

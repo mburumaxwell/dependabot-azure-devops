@@ -10,8 +10,6 @@ import {
 import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
-export const dynamic = 'force-dynamic';
-
 const app = new Hono().basePath('/api/webhooks/stripe');
 
 app.post('/', async (context) => {

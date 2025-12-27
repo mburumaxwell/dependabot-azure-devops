@@ -108,7 +108,7 @@ export function ChartsSection({ data }: { data: ChartData }) {
             variant='outline'
             size='sm'
             onValueChange={(value) => updateFilters({ timeRange: value })}
-            className='invisible lg:visible'
+            className='hidden lg:block'
           >
             {statsTimeRangeOptions.map((option) => (
               <ToggleGroupItem key={option.value} value={option.value}>
@@ -117,7 +117,7 @@ export function ChartsSection({ data }: { data: ChartData }) {
             ))}
           </ToggleGroup>
           <Select value={timeRange} onValueChange={(value) => updateFilters({ timeRange: value })}>
-            <SelectTrigger className='flex w-40 lg:invisible' size='sm' aria-label='Select a value'>
+            <SelectTrigger className='flex w-40 lg:hidden' size='sm' aria-label='Select a value'>
               <SelectValue placeholder={defaultStatsTimeRangeOption.label} />
             </SelectTrigger>
             <SelectContent className='rounded-xl'>

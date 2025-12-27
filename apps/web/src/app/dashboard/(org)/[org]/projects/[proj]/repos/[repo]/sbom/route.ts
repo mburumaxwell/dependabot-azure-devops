@@ -7,8 +7,6 @@ import { notFound } from 'next/navigation';
 import { getSpdxDocumentName } from '@/lib/organizations';
 import { prisma } from '@/lib/prisma';
 
-export const revalidate = 0; // always revalidate to get the latest SBOM
-
 export async function GET(_req: Request, params: RouteContext<'/dashboard/[org]/projects/[proj]/repos/[repo]/sbom'>) {
   const { org: organizationSlug, proj: projectId, repo: repositoryId } = await params.params;
 

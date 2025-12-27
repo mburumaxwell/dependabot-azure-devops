@@ -29,8 +29,6 @@ import {
 } from '@/lib/prisma';
 import type { UpdateJobHookResult } from '@/workflows/jobs';
 
-export const dynamic = 'force-dynamic';
-
 const app = createApiServerApp({
   basePath: '/api/update_jobs',
   authenticate,

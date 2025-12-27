@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import { REGIONS, type RegionCode } from '@/lib/regions';
+import { getRegionInfo, type RegionCode } from '@/lib/regions';
 
 /**
  * Update an organization's region.
@@ -11,7 +11,7 @@ export async function updateOrganizationRegion(options: {
   organizationId: string;
   region: RegionCode;
 }): Promise<{ success: boolean; error?: { message: string } }> {
-  const targetRegion = REGIONS.find((r) => r.code === options.region);
+  const targetRegion = getRegionInfo(options.region);
   if (!targetRegion || !targetRegion.available) {
     return { success: false, error: { message: 'Selected region is not available' } };
   }
@@ -22,7 +22,7 @@ export async function updateOrganizationRegion(options: {
   // update organization region
   await prisma.organization.updateMany({
     where: { id: options.organizationId },
-    data: { region: options.region },
+    data: { region: targetRegion.code },
   });
 
   return { success: true };

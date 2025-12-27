@@ -9,6 +9,7 @@ import {
   type OrganizationCreateOptions,
   validateOrganizationCredentials,
 } from '@/actions/organizations';
+import { RegionsSelect } from '@/components/regions-select';
 import { Stepper } from '@/components/stepper';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -22,11 +23,9 @@ import {
   InputGroupInput,
   InputGroupText,
 } from '@/components/ui/input-group';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Spinner } from '@/components/ui/spinner';
 import { authClient } from '@/lib/auth-client';
 import { ORGANIZATION_TYPES_INFO } from '@/lib/organizations';
-import { REGIONS, type RegionCode } from '@/lib/regions';
 import { cn } from '@/lib/utils';
 
 export function CreateOrganizationPage() {
@@ -192,11 +191,6 @@ export function CreateOrganizationPage() {
 
   const canProceedStep1 = data.name && data.slug && slugVerified;
   const canProceedStep2 = data.url && !urlError && data.token && credentialsVerified;
-
-  // filter regions allowed to be shown, sort by available the label
-  const regions = REGIONS.filter((region) => region.visible).sort(
-    (a, b) => Number(b.available) - Number(a.available) || a.label.localeCompare(b.label),
-  );
 
   return (
     <>
@@ -448,51 +442,10 @@ export function CreateOrganizationPage() {
                 <Field>
                   <FieldLabel>Select Execution Region</FieldLabel>
                   <FieldDescription>Choose where your organization's jobs will be run.</FieldDescription>
-                  <RadioGroup
-                    value={data.region}
-                    onValueChange={(value) => setData((prev) => ({ ...prev, region: value as RegionCode }))}
-                    className='grid grid-cols-2 gap-4'
-                  >
-                    {regions.map((region) => (
-                      <div key={region.code} className='relative'>
-                        <label
-                          htmlFor={region.code}
-                          className={cn(
-                            'flex items-center gap-4 rounded-lg border-2 p-4 transition-all cursor-pointer',
-                            !region.available && 'opacity-50 cursor-not-allowed',
-                            region.available && data.region === region.code
-                              ? 'border-primary bg-primary/5'
-                              : 'border-border bg-card hover:border-primary/50',
-                          )}
-                        >
-                          <RadioGroupItem
-                            value={region.code}
-                            id={region.code}
-                            disabled={!region.available}
-                            className='shrink-0'
-                          />
-                          <div className='flex items-center gap-4 flex-1'>
-                            <div className='size-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0'>
-                              <Globe className='size-6' />
-                            </div>
-                            <div className='flex-1'>
-                              <div className='font-semibold'>{region.label}</div>
-                              <div className='text-sm text-muted-foreground'>
-                                {region.available ? 'Available now' : 'Coming soon'}
-                              </div>
-                            </div>
-                          </div>
-                          {!region.available && (
-                            <div className='absolute inset-0 backdrop-blur-[2px] rounded-lg flex items-center justify-center'>
-                              <span className='bg-background/90 px-4 py-2 rounded-full text-sm font-medium border'>
-                                Coming Soon
-                              </span>
-                            </div>
-                          )}
-                        </label>
-                      </div>
-                    ))}
-                  </RadioGroup>
+                  <RegionsSelect
+                    selected={data.region}
+                    onValueChange={(value) => setData((prev) => ({ ...prev, region: value }))}
+                  />
                 </Field>
 
                 {creatingError && (

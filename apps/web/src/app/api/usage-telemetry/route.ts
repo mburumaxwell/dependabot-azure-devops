@@ -7,8 +7,6 @@ import { z } from 'zod';
 import { getMongoCollection, type UsageTelemetry } from '@/lib/mongodb';
 import { fromExternalRegion } from '@/lib/regions';
 
-export const dynamic = 'force-dynamic';
-
 const app = new Hono().basePath('/api/usage-telemetry');
 
 const RequestDataSchema = UsageTelemetryRequestDataSchema.omit({ id: true }).extend({

@@ -57,7 +57,6 @@ async function getAzureExtensionInstallations(id: string): Promise<number> {
       ],
       flags: 256, // includes statistics
     }),
-    next: { revalidate: 86400 }, // cache for 1 day
   });
   const data = await response.json();
   const stats = data.results[0]!.extensions[0]!.statistics as { statisticName: string; value: number }[];

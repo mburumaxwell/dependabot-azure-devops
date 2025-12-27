@@ -4,6 +4,7 @@ import { GitHubLogo, LinkedInLogo, PakloLogo, TwitterLogo } from '@/components/l
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { socials } from '@/site-config';
+import { type HeaderLink, MobileMenuSheet } from './layout.client';
 
 export default function Layout({ children }: LayoutProps<'/'>) {
   return (
@@ -16,7 +17,6 @@ export default function Layout({ children }: LayoutProps<'/'>) {
 }
 
 function Header() {
-  type HeaderLink = { name: string; href: Route | Route<'/docs'> };
   const links: HeaderLink[] = [
     { name: 'Features', href: '#features' },
     { name: 'Pricing', href: '#pricing' },
@@ -44,7 +44,8 @@ function Header() {
               ))}
             </div>
           </div>
-          <div className='flex items-center gap-4'>
+          <MobileMenuSheet links={links} />
+          <div className='hidden md:flex items-center gap-4'>
             <Link href='/login'>
               <Button variant='ghost' size='sm'>
                 Log in
@@ -62,7 +63,7 @@ function Header() {
   );
 }
 
-function Footer() {
+async function Footer() {
   type FooterColumn = {
     name: string;
     links: { name: string; href: Route | Route<'/docs'> | Route<`/legal/${string}`> }[];
@@ -91,6 +92,10 @@ function Footer() {
     { name: 'LinkedIn', href: socials.linkedin.url, icon: LinkedInLogo },
   ];
 
+  async function getCurrentYear() {
+    return new Date().getFullYear();
+  }
+
   return (
     <footer className='border-t border-border/40 py-8 bg-muted/10'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -115,9 +120,7 @@ function Footer() {
               ))}
             </div>
             <Separator className='mt-2' />
-            <p className='text-sm text-muted-foreground'>
-              &copy; {new Date().getFullYear()} Paklo. All rights reserved.
-            </p>
+            <p className='text-sm text-muted-foreground'>&copy; {await getCurrentYear()} Paklo. All rights reserved.</p>
           </div>
           <div className='grid grid-cols-2 gap-8 md:col-span-2 order-first md:order-last'>
             {columns.map((column) => (

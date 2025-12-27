@@ -3,8 +3,6 @@ import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { config } from '@/site-config';
 
-export const revalidate = 0; // always revalidate to get the latest SBOM
-
 // in this route (not a page), we will pull the details about the checkout, update the organization accordingly, and then redirect to the main billing page with a success message
 
 export async function GET(_req: Request, params: RouteContext<'/dashboard/[org]/settings/billing/success/[id]'>) {
