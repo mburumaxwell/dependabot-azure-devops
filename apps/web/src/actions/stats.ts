@@ -1,6 +1,7 @@
 'use server';
 
 import { getDateFromTimeRange, type TimeRange } from '@/lib/aggregation';
+import { environment } from '@/lib/environment';
 import { getMongoCollection } from '@/lib/mongodb';
 import { extensions } from '@/site-config';
 
@@ -9,21 +10,24 @@ export async function getHomePageStats(timeRange: TimeRange) {
   const installations = await getAzureExtensionInstallations(extensions.azure.id);
 
   const { start, end } = getDateFromTimeRange(timeRange);
-  const collection = await getMongoCollection('usage_telemetry', process.env.MONGO_DB_NAME_LOCAL);
   type AggResult = { totalDuration: number; totalJobs: number };
-  const usages = await collection
-    .aggregate<AggResult>([
-      { $match: { started: { $gte: start, $lte: end } } },
-      {
-        $group: {
-          _id: null,
-          totalDuration: { $sum: '$duration' },
-          totalJobs: { $sum: 1 },
+  let usage: AggResult | undefined;
+  if (environment.platform === 'vercel' || environment.development) {
+    const collection = await getMongoCollection('usage_telemetry', process.env.MONGO_DB_NAME_LOCAL);
+    const usages = await collection
+      .aggregate<AggResult>([
+        { $match: { started: { $gte: start, $lte: end } } },
+        {
+          $group: {
+            _id: null,
+            totalDuration: { $sum: '$duration' },
+            totalJobs: { $sum: 1 },
+          },
         },
-      },
-    ])
-    .toArray();
-  const usage = usages[0];
+      ])
+      .toArray();
+    usage = usages[0];
+  }
 
   return {
     installations,
