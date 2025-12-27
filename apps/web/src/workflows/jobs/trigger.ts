@@ -101,7 +101,8 @@ export async function triggerUpdateJobs(options: TriggerUpdateJobsWorkflowOption
 }
 
 type GetOrCreateUpdateJobOptions = TriggerUpdateJobsWorkflowOptions & Pick<WorkflowMetadata, 'workflowRunId'>;
-async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
+type GetOrCreateUpdateJobResult = { ids: string[]; existing: number; created: number; region: RegionCode };
+async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions): Promise<GetOrCreateUpdateJobResult> {
   'use step';
 
   const { organizationId, projectId, repositoryId, trigger, workflowRunId, command } = options;
@@ -116,7 +117,13 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions) {
   if (!organization || !organizationCredential || !project || !repository) {
     throw new FatalError('Organization, Project, or Repository not found');
   }
+
+  // check if the organization billing is active
   const region = organization.region;
+  if (organization.subscriptionStatus !== 'active') {
+    logger.info(`Organization ${organizationId} subscription is not active. Skipping job creation.`);
+    return { ids: [], existing: 0, created: 0, region };
+  }
 
   // if no specific repository updates are provided, fetch all updates for the repository
   const repositoryUpdateIds = (() => {
@@ -432,7 +439,7 @@ export async function createAndStartJobResources({
   // create the job resource
   const cachedMode = Object.hasOwn(jobConfig.job.experiments, 'proxy-cached') === true;
   const app: ContainerAppJob = {
-    location: toAzureLocation(region as RegionCode)!,
+    location: toAzureLocation(region)!,
     environmentId,
     configuration: {
       triggerType: 'Manual',
