@@ -1,4 +1,5 @@
 import { passkey } from '@better-auth/passkey';
+import { waitUntil } from '@vercel/functions';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { APIError } from 'better-auth/api';
 import { betterAuth } from 'better-auth/minimal';
@@ -32,6 +33,7 @@ export const auth = betterAuth({
     },
     // since we have not set baseURL, we need to trust proxy headers on ACA
     trustedProxyHeaders: environment.platform === 'azure_container_apps',
+    backgroundTasks: { handler: waitUntil },
   },
   user: {
     deleteUser: {
