@@ -6,6 +6,7 @@ const config: NextConfig = {
   reactStrictMode: true,
   reactCompiler: true,
   typedRoutes: true,
+  cacheComponents: true,
   logging: { fetches: { fullUrl: true } }, // allows us to see cache behavior for fetches
   images: {
     formats: ['image/avif', 'image/webp'],

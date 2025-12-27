@@ -1,5 +1,6 @@
 'use server';
 
+import { cacheLife } from 'next/cache';
 import { getDateFromTimeRange, type TimeRange } from '@/lib/aggregation';
 import { environment } from '@/lib/environment';
 import { getMongoCollection } from '@/lib/mongodb';
@@ -7,6 +8,9 @@ import { extensions } from '@/site-config';
 
 /** Get statistics for the website home page */
 export async function getHomePageStats(timeRange: TimeRange) {
+  'use cache';
+  cacheLife('days');
+
   const installations = await getAzureExtensionInstallations(extensions.azure.id);
 
   const { start, end } = getDateFromTimeRange(timeRange);
