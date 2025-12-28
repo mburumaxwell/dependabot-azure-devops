@@ -1,18 +1,35 @@
 'use server';
 
 import { getDateFromTimeRange, type TimeRange } from '@/lib/aggregation';
-import { environment } from '@/lib/environment';
 import { getMongoCollection } from '@/lib/mongodb';
 import { extensions } from '@/site-config';
 
+type HomePageStats = {
+  installations: number;
+  /**
+   * Statistics about runs in the selected time range.
+   * Undefined if data is not available (e.g., on platforms without a database)
+   */
+  runs?: {
+    /**
+     * Total duration of all runs in the selected time range (in seconds)
+     */
+    duration: number; // in seconds
+    count: number;
+  };
+};
+
 /** Get statistics for the website home page */
-export async function getHomePageStats(timeRange: TimeRange) {
+export async function getHomePageStats(timeRange: TimeRange): Promise<HomePageStats> {
+  // const fromDb = environment.platform === 'vercel' || environment.development;
+  const fromDb = false; // till we figure out a better way
+
   const installations = await getAzureExtensionInstallations(extensions.azure.id);
 
   const { start, end } = getDateFromTimeRange(timeRange);
   type AggResult = { totalDuration: number; totalJobs: number };
   let usage: AggResult | undefined;
-  if (environment.platform === 'vercel' || environment.development) {
+  if (fromDb) {
     const collection = await getMongoCollection('usage_telemetry', process.env.MONGO_DB_NAME_LOCAL);
     const usages = await collection
       .aggregate<AggResult>([
@@ -31,10 +48,12 @@ export async function getHomePageStats(timeRange: TimeRange) {
 
   return {
     installations,
-    runs: {
-      duration: (usage?.totalDuration ?? 0) / 1000, // convert to seconds
-      count: usage?.totalJobs ?? 0,
-    },
+    runs: fromDb
+      ? {
+          duration: (usage?.totalDuration ?? 0) / 1000, // convert to seconds
+          count: usage?.totalJobs ?? 0,
+        }
+      : undefined,
   };
 }
 
