@@ -9,6 +9,7 @@ type OpenGraphImageProps = {
   description?: string | React.ReactNode;
   icon?: React.ReactNode;
   site?: string | React.ReactNode;
+  size?: { width: number; height: number };
 };
 export function OpenGraphImage(props: OpenGraphImageProps) {
   // oklch doesn't seem to work here
@@ -17,9 +18,6 @@ export function OpenGraphImage(props: OpenGraphImageProps) {
   return <DefaultImage primaryColor={primaryColor} primaryTextColor={primaryTextColor} {...props} />;
 }
 
-export function generateOpenGraphImage(props: OpenGraphImageProps) {
-  return new ImageResponse(<OpenGraphImage {...props} />, {
-    width: 1200,
-    height: 630,
-  });
+export function generateOpenGraphImage({ size = { width: 1200, height: 630 }, ...props }: OpenGraphImageProps) {
+  return new ImageResponse(<OpenGraphImage {...props} />, { ...size });
 }

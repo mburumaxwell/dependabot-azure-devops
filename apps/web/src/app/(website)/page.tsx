@@ -1,7 +1,6 @@
 import { ArrowRight, Check, Globe, Layers, Lock, Shield, Users, Zap } from 'lucide-react';
 import { unstable_cache } from 'next/cache';
 import Link from 'next/link';
-import { connection } from 'next/server';
 import { numify } from 'numify';
 import { getHomePageStats } from '@/actions/stats';
 import type { Icon } from '@/components/icons';
@@ -75,8 +74,6 @@ const pricing = {
 };
 
 export default async function HomePage() {
-  await connection(); // ensure connection hence ensure no PPR
-
   const { installations, runs } = await getCachedStats();
   const installationsTruncated = Math.floor(installations / 100) * 100; // 4458 -> 4400
 

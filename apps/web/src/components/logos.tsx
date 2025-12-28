@@ -98,13 +98,6 @@ export function LinkedInLogo(props: IconProps) {
   );
 }
 
-// // this is only temporary until I can convert the logo into a proper svg component
-// // if it proves to hard, this can be turned into the next/image component
-// import { GalleryVerticalEnd } from 'lucide-react';
-// export function PakloLogo(props: IconProps) {
-//   return <GalleryVerticalEnd aria-label='Logo' {...props} />;
-// }
-
 export function PakloLogo({ fill = 'currentColor', ...props }: IconProps) {
   return (
     <svg viewBox='0 0 500 500' aria-label='Logo' aria-hidden='true' {...props}>

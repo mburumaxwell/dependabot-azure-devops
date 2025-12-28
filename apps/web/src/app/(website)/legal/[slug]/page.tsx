@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Markdown } from '@/components/markdown';
 import { TimeAgo } from '@/components/time-ago';
-import { getPageImage, legal } from '@/lib/source';
+import { legal } from '@/lib/source';
 
 export async function generateMetadata(props: PageProps<'/legal/[slug]'>): Promise<Metadata> {
   const { slug } = await props.params;
@@ -14,7 +14,7 @@ export async function generateMetadata(props: PageProps<'/legal/[slug]'>): Promi
     description: doc.data.description,
     openGraph: {
       url: doc.url,
-      images: getPageImage(doc).url,
+      images: `${doc.url}/og.png`,
     },
   };
 }
@@ -50,6 +50,5 @@ export default async function LegalDocPage(props: PageProps<'/legal/[slug]'>) {
 }
 
 export function generateStaticParams() {
-  // return legal.generateParams();
   return legal.getPages().map((doc) => ({ slug: doc.slugs[0] }));
 }
