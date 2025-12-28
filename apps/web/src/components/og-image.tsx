@@ -11,11 +11,9 @@ type OpenGraphImageProps = {
   site?: string | React.ReactNode;
 };
 export function OpenGraphImage(props: OpenGraphImageProps) {
-  // TODO: update these colors to match brand
-  // defaults to primaryColor = 'rgba(255,150,255,0.3)',
-  //         primaryTextColor = 'rgb(255,150,255)',
-  const primaryColor: string | undefined = undefined;
-  const primaryTextColor: string | undefined = undefined;
+  // oklch doesn't seem to work here
+  const primaryColor = 'rgba(70, 150, 30, 0.5)'; // default is 'rgba(255,150,255,0.3)'
+  const primaryTextColor = 'rgb(70, 150, 30)'; // default is 'rgb(255,150,255)'
   return <DefaultImage primaryColor={primaryColor} primaryTextColor={primaryTextColor} {...props} />;
 }
 

@@ -258,20 +258,35 @@ export function RegionSection({ organization: initialOrganization }: { organizat
           disabled={isSavingRegion}
         />
         <div className='flex justify-end'>
-          <Button
-            onClick={handleSaveRegion}
-            size='sm'
-            disabled={isSavingRegion || selectedRegion === organization.region}
-          >
-            {isSavingRegion ? (
-              <>
-                <Spinner className='mr-2' />
-                Saving...
-              </>
-            ) : (
-              'Save changes'
-            )}
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild disabled={isSavingRegion || selectedRegion === organization.region}>
+              <Button size='sm'>
+                {isSavingRegion ? (
+                  <>
+                    <Spinner className='mr-2' />
+                    Saving...
+                  </>
+                ) : (
+                  'Save changes'
+                )}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Changing your data region may take some time as we migrate your existing data. New jobs will be run in
+                  the selected region immediately, whereas secrets and other data may be migrated in the background.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isSavingRegion}>Cancel</AlertDialogCancel>
+                <AlertDialogAction className='bg-destructive' onClick={handleSaveRegion} disabled={isSavingRegion}>
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </ItemContent>
     </Item>

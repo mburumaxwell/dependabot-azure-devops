@@ -144,7 +144,7 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
         <MetricCard
           title='Success Rate'
           value={`${metrics.successRate.toFixed(1)}%`}
-          trend={metrics.successRate > 90 ? 'Excellent' : metrics.successRate > 75 ? 'Good' : 'Needs attention'}
+          trend={metrics.successRate > 90 ? '+23%' : undefined}
           direction={metrics.successRate > 90 ? 'up' : 'down'}
         />
         <MetricCard

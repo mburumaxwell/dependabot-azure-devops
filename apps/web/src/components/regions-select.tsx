@@ -8,7 +8,6 @@ type RegionsSelectProps = {
   onValueChange(value: RegionCode): void;
 } & Omit<React.ComponentProps<typeof RadioGroup>, 'value' | 'onValueChange'>;
 
-// perhaps will be better as a searchable select dropdown (or combobox) in the future
 export function RegionsSelect({ selected, className, onValueChange, ...props }: RegionsSelectProps) {
   // filter regions allowed to be shown, sort by available the label
   const regions = REGIONS.filter((region) => region.visible).sort(

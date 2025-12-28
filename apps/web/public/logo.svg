@@ -1,10 +1,10 @@
 <?xml version="1.0" standalone="no"?>
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="500.000000pt" height="500.000000pt" viewBox="0 0 500.000000 500.000000"
+ width="500" height="500" viewBox="0 0 500 500"
  preserveAspectRatio="xMidYMid meet">
 
-<g transform="translate(0.000000,500.000000) scale(0.100000,-0.100000)"
-fill="#000000" stroke="none">
+<g transform="translate(0,500) scale(0.100000,-0.100000)"
+fill="#2E6417" stroke="none">
 <path d="M2505 4888 c-4 -9 -5 -37 -3 -64 l3 -49 150 -12 c177 -14 293 -32
 405 -62 19 -6 51 -14 70 -19 174 -46 428 -162 603 -275 196 -127 399 -310 546
 -492 278 -346 445 -758 492 -1210 14 -146 7 -429 -16 -565 -14 -84 -68 -320

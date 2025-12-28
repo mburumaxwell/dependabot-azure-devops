@@ -1,5 +1,4 @@
-import type { IconProps, IconPropsWithOpenGraph } from '@/components/icons';
-import { themeColor } from '@/site-config';
+import type { IconProps } from '@/components/icons';
 
 export function AppleLogo(props: IconProps) {
   return (
@@ -106,13 +105,13 @@ export function LinkedInLogo(props: IconProps) {
 //   return <GalleryVerticalEnd aria-label='Logo' {...props} />;
 // }
 
-export function PakloLogo({ og, dark, ...props }: IconPropsWithOpenGraph) {
+export function PakloLogo({ fill = 'currentColor', ...props }: IconProps) {
   return (
     <svg viewBox='0 0 500 500' aria-label='Logo' aria-hidden='true' {...props}>
       <g
         transform='translate(0,500) scale(0.100000,-0.100000)'
-        className={og ? undefined : 'fill-brand dark:fill-white'}
-        fill={og ? (dark ? '#fff' : themeColor) : undefined}
+        className={'fill-brand dark:fill-white'}
+        fill={fill}
         stroke='none'
       >
         <path

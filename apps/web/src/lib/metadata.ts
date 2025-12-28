@@ -30,14 +30,13 @@ const docsTitleTemplate: TemplateString = {
 };
 
 export const docsMetadata: Metadata = {
+  ...defaultMetadata,
   title: docsTitleTemplate,
   description: config.docs.description,
-  metadataBase: new URL(config.siteUrl),
   openGraph: {
-    type: 'website',
+    ...defaultMetadata.openGraph,
     title: docsTitleTemplate,
     description: config.docs.description,
-    url: config.siteUrl,
   },
 };
 
@@ -47,13 +46,10 @@ const dashboardTitleTemplate: TemplateString = {
 };
 
 export const dashboardMetadata: Metadata = {
+  ...defaultMetadata,
   title: dashboardTitleTemplate,
-  description: config.description,
-  metadataBase: new URL(config.siteUrl),
   openGraph: {
-    type: 'website',
+    ...defaultMetadata.openGraph,
     title: dashboardTitleTemplate,
-    description: config.description,
-    url: config.siteUrl,
   },
 };

@@ -1,13 +1,12 @@
 import { environment, getSiteUrl } from '@/lib/environment';
 
-export const themeColor = 'oklch(0.4494 0.1221 138.11)'; // '#2E6417'
-
 const { development, main } = environment;
 const siteUrl = getSiteUrl({ defaultValue: 'https://www.paklo.app' });
 
 export const config = {
   siteUrl,
-  themeColor,
+  domain: 'paklo.app',
+  themeColor: 'oklch(0.4494 0.1221 138.11)', // '#2E6417',
   title: 'Paklo',
   description: 'Dependabot-like automation on Azure DevOps',
 
