@@ -77,13 +77,11 @@ export default async function HomePage() {
   const { installations, runs } = await getCachedStats();
   const installationsTruncated = Math.floor(installations / 100) * 100; // 4458 -> 4400
 
-  const stats = runs
-    ? [
-        { name: 'Installations', value: numify(installations) },
-        { name: 'Total run time (90d)', value: numify(Math.round(runs.duration / 60)), unit: 'mins' },
-        { name: 'Number of jobs (90d)', value: numify(runs.count) },
-      ]
-    : [];
+  const stats = [
+    { name: 'Installations', value: numify(installations) },
+    { name: 'Total run time (90d)', value: numify(Math.round(runs.duration / 60)), unit: 'mins' },
+    { name: 'Number of jobs (90d)', value: numify(runs.count) },
+  ];
 
   return (
     <>
@@ -147,24 +145,21 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Stats */}
-      {stats.length > 0 && (
-        <section className='py-12 lg:py-20'>
-          <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-              {stats.map((stat) => (
-                <div key={stat.name} className='text-center'>
-                  <p className='mb-2'>
-                    <span className='text-3xl font-semibold tracking-tight'>{stat.value}+</span>
-                    {stat.unit ? <span className='text-sm ml-2'>{stat.unit}</span> : null}
-                  </p>
-                  <p className='text-lg text-muted-foreground'>{stat.name}</p>
-                </div>
-              ))}
-            </div>
+      <section className='py-12 lg:py-20'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+            {stats.map((stat) => (
+              <div key={stat.name} className='text-center'>
+                <p className='mb-2'>
+                  <span className='text-3xl font-semibold tracking-tight'>{stat.value}+</span>
+                  {stat.unit ? <span className='text-sm ml-2'>{stat.unit}</span> : null}
+                </p>
+                <p className='text-lg text-muted-foreground'>{stat.name}</p>
+              </div>
+            ))}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* Features */}
       <section id='features' className='py-12 lg:py-20 bg-muted/30'>
