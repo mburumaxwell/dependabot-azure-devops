@@ -11,6 +11,7 @@ export const defaultMetadata: Metadata = {
   title: rootTitleTemplate,
   description: config.description,
   metadataBase: new URL(config.siteUrl),
+  keywords: config.keywords,
   openGraph: {
     type: 'website',
     title: rootTitleTemplate,

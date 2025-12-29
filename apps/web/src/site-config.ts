@@ -9,6 +9,20 @@ export const config = {
   themeColor: 'oklch(0.4494 0.1221 138.11)', // '#2E6417',
   title: 'Paklo',
   description: 'Dependabot-like automation on Azure DevOps',
+  keywords: [
+    'paklo',
+    'dependabot',
+    'azure devops',
+    'automation',
+    'devops',
+    'software development',
+    'code security',
+    'package management',
+    'devops tools',
+    'dependency updates',
+    'vulnerability management',
+    'devops automation',
+  ],
 
   // either in development or not on main branch
   showDrafts: development || !main,

@@ -37,7 +37,7 @@ export const docs = defineDocs({
       description: z.string().optional(),
       icon: z.string().optional(),
       full: z.boolean().optional(),
-      keywords: z.string().array().default([]),
+      keywords: z.string().array().optional(),
       draft: z.boolean().default(false),
     }),
   },

@@ -12,6 +12,7 @@ export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): P
   return {
     title: doc.data.title,
     description: doc.data.description,
+    keywords: doc.data.keywords,
     openGraph: {
       url: doc.url,
       images: getPageImage(doc).url,
