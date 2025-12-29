@@ -34,23 +34,17 @@ export function getBillingPeriod(subscription: StripeSubscription): Period {
 }
 
 export type StripeSubscriptionStatus = Stripe.Subscription.Status;
-export function stripeSubscriptionStatusToSubscriptionStatus(
-  status: StripeSubscriptionStatus,
-): SubscriptionStatus | undefined {
-  // TODO: investigate all the possible values and meanings
+export function mapSubscriptionStatus(status: StripeSubscriptionStatus): SubscriptionStatus | undefined {
   switch (status) {
     case 'active':
       return 'active';
     case 'canceled':
       return 'canceled';
-    // case 'incomplete':
-    //   return 'incomplete';
-    // case 'incomplete_expired':
-    //   return 'incomplete_expired';
     case 'past_due':
       return 'past_due';
+    // case 'incomplete':
+    // case 'incomplete_expired':
     // case 'unpaid':
-    //   return 'unpaid';
     default:
       return undefined;
   }

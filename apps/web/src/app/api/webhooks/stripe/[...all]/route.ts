@@ -1,12 +1,6 @@
 import { toNextJsHandler } from '@paklo/core/hono';
 import { Hono } from 'hono';
-import {
-  getBillingPeriod,
-  type StripeSubscription,
-  stripe,
-  stripeSubscriptionStatusToSubscriptionStatus,
-  webhookSecret,
-} from '@/lib/billing';
+import { getBillingPeriod, mapSubscriptionStatus, type StripeSubscription, stripe, webhookSecret } from '@/lib/billing';
 import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 
@@ -77,7 +71,7 @@ async function handleSubscriptionCancelled(sub: StripeSubscription) {
 
 async function handleSubscriptionUpdated(sub: StripeSubscription) {
   const status = sub.status;
-  const subscriptionStatus = stripeSubscriptionStatusToSubscriptionStatus(status);
+  const subscriptionStatus = mapSubscriptionStatus(status);
   if (!subscriptionStatus) {
     logger.warn(`Could not map stripe subscription status from ${status} to internal subscription status`);
     return;

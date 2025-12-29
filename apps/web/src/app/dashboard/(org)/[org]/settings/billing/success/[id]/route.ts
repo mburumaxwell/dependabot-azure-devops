@@ -1,4 +1,4 @@
-import { getBillingPeriod, stripe, stripeSubscriptionStatusToSubscriptionStatus } from '@/lib/billing';
+import { getBillingPeriod, mapSubscriptionStatus, stripe } from '@/lib/billing';
 import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { config } from '@/site-config';
@@ -38,7 +38,7 @@ export async function GET(_req: Request, params: RouteContext<'/dashboard/[org]/
   }
 
   // ensure the status is valid
-  const subscriptionStatus = stripeSubscriptionStatusToSubscriptionStatus(subscription.status);
+  const subscriptionStatus = mapSubscriptionStatus(subscription.status);
   if (!subscriptionStatus) {
     return new Response('Invalid subscription status', { status: 400 });
   }
