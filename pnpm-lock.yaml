@@ -68,7 +68,7 @@ importers:
         version: 1.4.9(14793ce1de2e801ce4d5e86214eca0a7)
       '@hono/zod-validator':
         specifier: 0.7.6
-        version: 0.7.6(hono@4.11.1)(zod@4.2.1)
+        version: 0.7.6(hono@4.11.3)(zod@4.2.1)
       '@opentelemetry/api':
         specifier: 1.9.0
         version: 1.9.0
@@ -235,8 +235,8 @@ importers:
         specifier: 16.4.1
         version: 16.4.1(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(lucide-react@0.562.0(react@19.2.3))(next@16.1.1(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)(zod@4.2.1)
       hono:
-        specifier: 4.11.1
-        version: 4.11.1
+        specifier: 4.11.3
+        version: 4.11.3
       lucide-react:
         specifier: 0.562.0
         version: 0.562.0(react@19.2.3)
@@ -348,7 +348,7 @@ importers:
         version: 5.0.2
       shadcn:
         specifier: 3.6.2
-        version: 3.6.2(@types/node@25.0.3)(hono@4.11.1)(typescript@5.9.3)
+        version: 3.6.2(@types/node@25.0.3)(hono@4.11.3)(typescript@5.9.3)
       tailwindcss:
         specifier: 4.1.18
         version: 4.1.18
@@ -410,10 +410,10 @@ importers:
     dependencies:
       '@hono/zod-validator':
         specifier: 0.7.6
-        version: 0.7.6(hono@4.11.1)(zod@4.2.1)
+        version: 0.7.6(hono@4.11.3)(zod@4.2.1)
       hono:
-        specifier: 4.11.1
-        version: 4.11.1
+        specifier: 4.11.3
+        version: 4.11.3
       js-yaml:
         specifier: 4.1.1
         version: 4.1.1
@@ -453,7 +453,7 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: 1.19.7
-        version: 1.19.7(hono@4.11.1)
+        version: 1.19.7(hono@4.11.3)
       '@paklo/core':
         specifier: workspace:*
         version: link:../core
@@ -5801,8 +5801,8 @@ packages:
   help-me@5.0.0:
     resolution: {integrity: sha512-7xgomUX6ADmcYzFik0HzAxh/73YlKR9bmFzf51CZwR+b6YtzU2m0u49hQCqV6SvlqIqsaxovfwdvbnsw3b/zpg==}
 
-  hono@4.11.1:
-    resolution: {integrity: sha512-KsFcH0xxHes0J4zaQgWbYwmz3UPOOskdqZmItstUG93+Wk1ePBLkLGwbP9zlmh1BFUiL8Qp+Xfu9P7feJWpGNg==}
+  hono@4.11.3:
+    resolution: {integrity: sha512-PmQi306+M/ct/m5s66Hrg+adPnkD5jiO6IjA7WhWw0gSBSo1EcRegwuI1deZ+wd5pzCGynCcn2DprnE4/yEV4w==}
     engines: {node: '>=16.9.0'}
 
   hookable@6.0.1:
@@ -10292,13 +10292,13 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/node-server@1.19.7(hono@4.11.1)':
+  '@hono/node-server@1.19.7(hono@4.11.3)':
     dependencies:
-      hono: 4.11.1
+      hono: 4.11.3
 
-  '@hono/zod-validator@0.7.6(hono@4.11.1)(zod@4.2.1)':
+  '@hono/zod-validator@0.7.6(hono@4.11.3)(zod@4.2.1)':
     dependencies:
-      hono: 4.11.1
+      hono: 4.11.3
       zod: 4.2.1
 
   '@iconify/types@2.0.0': {}
@@ -10529,9 +10529,9 @@ snapshots:
     dependencies:
       langium: 3.3.1
 
-  '@modelcontextprotocol/sdk@1.25.1(hono@4.11.1)(zod@3.25.76)':
+  '@modelcontextprotocol/sdk@1.25.1(hono@4.11.3)(zod@3.25.76)':
     dependencies:
-      '@hono/node-server': 1.19.7(hono@4.11.1)
+      '@hono/node-server': 1.19.7(hono@4.11.3)
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
@@ -15038,7 +15038,7 @@ snapshots:
 
   help-me@5.0.0: {}
 
-  hono@4.11.1: {}
+  hono@4.11.3: {}
 
   hookable@6.0.1: {}
 
@@ -17383,7 +17383,7 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shadcn@3.6.2(@types/node@25.0.3)(hono@4.11.1)(typescript@5.9.3):
+  shadcn@3.6.2(@types/node@25.0.3)(hono@4.11.3)(typescript@5.9.3):
     dependencies:
       '@antfu/ni': 25.0.0
       '@babel/core': 7.28.5
@@ -17391,7 +17391,7 @@ snapshots:
       '@babel/plugin-transform-typescript': 7.28.5(@babel/core@7.28.5)
       '@babel/preset-typescript': 7.28.5(@babel/core@7.28.5)
       '@dotenvx/dotenvx': 1.51.2
-      '@modelcontextprotocol/sdk': 1.25.1(hono@4.11.1)(zod@3.25.76)
+      '@modelcontextprotocol/sdk': 1.25.1(hono@4.11.3)(zod@3.25.76)
       browserslist: 4.28.1
       commander: 14.0.2
       cosmiconfig: 9.0.0(typescript@5.9.3)
