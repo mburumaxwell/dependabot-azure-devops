@@ -28,7 +28,7 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
   const searchParams = useSearchParams();
 
   const timeRange = (searchParams.get('timeRange') as TimeRange) ?? '24h';
-  const selectedPackageManager = (searchParams.get('package-manager') as WithAll<DependabotPackageManager>) ?? 'all';
+  const selectedPackageManager = (searchParams.get('packageManager') as WithAll<DependabotPackageManager>) ?? 'all';
   const successFilter = (searchParams.get('success') as WithAll<'false' | 'true'>) ?? 'all';
 
   const updateFilters = (updates: Record<string, string>, clear: boolean = false) =>
