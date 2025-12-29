@@ -17,7 +17,7 @@ import { formatDuration, updateFiltersInSearchParams } from '@/lib/utils';
 
 export type SlimTelemetry = Pick<
   UsageTelemetry,
-  '_id' | 'packageManager' | 'started' | 'success' | 'duration' | 'version'
+  '_id' | 'package-manager' | 'started' | 'success' | 'duration' | 'version'
 >;
 type TelemetryDashboardProps = {
   telemetries: SlimTelemetry[];
@@ -28,7 +28,7 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
   const searchParams = useSearchParams();
 
   const timeRange = (searchParams.get('timeRange') as TimeRange) ?? '24h';
-  const selectedPackageManager = (searchParams.get('packageManager') as WithAll<DependabotPackageManager>) ?? 'all';
+  const selectedPackageManager = (searchParams.get('package-manager') as WithAll<DependabotPackageManager>) ?? 'all';
   const successFilter = (searchParams.get('success') as WithAll<'false' | 'true'>) ?? 'all';
 
   const updateFilters = (updates: Record<string, string>, clear: boolean = false) =>
@@ -267,7 +267,7 @@ function RunsChart({ telemetries, timeRange }: RunsChartProps) {
 }
 
 interface PackageManagerChartProps {
-  telemetries: Pick<UsageTelemetry, 'packageManager' | 'success'>[];
+  telemetries: Pick<UsageTelemetry, 'package-manager' | 'success'>[];
 }
 
 function PackageManagerChart({ telemetries }: PackageManagerChartProps) {
@@ -279,13 +279,13 @@ function PackageManagerChart({ telemetries }: PackageManagerChartProps) {
   const chartData = Object.values(
     telemetries.reduce(
       (acc, item) => {
-        if (!acc[item.packageManager]) {
-          acc[item.packageManager] = { name: item.packageManager, success: 0, failure: 0 };
+        if (!acc[item['package-manager']]) {
+          acc[item['package-manager']] = { name: item['package-manager'], success: 0, failure: 0 };
         }
         if (item.success) {
-          acc[item.packageManager]!.success++;
+          acc[item['package-manager']]!.success++;
         } else {
-          acc[item.packageManager]!.failure++;
+          acc[item['package-manager']]!.failure++;
         }
         return acc;
       },

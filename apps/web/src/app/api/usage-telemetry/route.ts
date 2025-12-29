@@ -15,12 +15,6 @@ app.post('/', zValidator('json', UsageTelemetryRequestDataSchema), async (contex
   const values: Omit<UsageTelemetry, '_id'> = {
     country: geo?.country ?? undefined,
     region: fromExternalRegion(geo?.region),
-    hostPlatform: payload.host.platform,
-    hostRelease: payload.host.release,
-    hostArch: payload.host.arch,
-    hostMachineHash: payload.host['machine-hash'],
-    hostDockerContainer: payload.host['docker-container'] ?? false,
-    packageManager: payload['package-manager'],
     ...payload,
   };
 

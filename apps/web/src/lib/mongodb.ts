@@ -46,14 +46,6 @@ export const UsageTelemetrySchema = z.object({
   _id: z.string(),
   country: z.string().nullish(),
   region: RegionCodeSchema.nullish(),
-  // TODO: remove in favour of host object after records are migrated
-  hostPlatform: z.string(),
-  hostRelease: z.string(),
-  hostArch: z.string(),
-  hostMachineHash: z.string(),
-  hostDockerContainer: z.boolean().nullish(),
-  // TODO: remove in favour of "package-manager" property after records are migrated
-  packageManager: z.string(),
   ...UsageTelemetryRequestDataSchema.omit({ id: true }).shape,
 });
 export type UsageTelemetry = z.infer<typeof UsageTelemetrySchema>;
