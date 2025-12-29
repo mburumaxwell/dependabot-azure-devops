@@ -16,7 +16,7 @@ out
 .vercel
 .next
 .source
-.prisma
+.generated
 next-env.d.ts
 .env*.local
 .react-email

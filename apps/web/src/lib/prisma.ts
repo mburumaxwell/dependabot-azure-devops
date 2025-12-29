@@ -1,4 +1,4 @@
-import { PrismaClient } from '@/../.prisma/client';
+import { PrismaClient } from '@/../.generated/prisma/client';
 
 const globalForPrisma = global as unknown as {
   prisma: PrismaClient;
@@ -25,9 +25,9 @@ export type {
   UpdateJobStatus,
   UpdateJobTrigger,
   Verification,
-} from '@/../.prisma/client';
+} from '@/../.generated/prisma/client';
 
-export { Prisma, PrismaClient } from '@/../.prisma/client';
+export { Prisma, PrismaClient } from '@/../.generated/prisma/client';
 
 export type {
   InputJsonArray,
@@ -36,7 +36,7 @@ export type {
   JsonArray,
   JsonObject,
   JsonValue,
-} from '@/../.prisma/runtime/library';
+} from '@/../.generated/prisma/runtime/library';
 
 export type DependabotPersistedDep = PrismaJson.DependabotPersistedDep;
 

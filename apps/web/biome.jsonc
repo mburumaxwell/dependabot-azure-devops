@@ -10,7 +10,7 @@
       "!build",
       "!.vercel",
       "!.source",
-      "!.prisma",
+      "!.generated",
       "!.react-email",
       "!public",
       "!static",
