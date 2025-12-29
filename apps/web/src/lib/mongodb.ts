@@ -37,7 +37,7 @@ export async function getMongoCollection<K extends keyof Collections>(name: K, d
 // const collection = await getCollection();
 // await collection.createIndex({ trigger: 1 }, {})
 // await collection.createIndex({ owner: 1 }, {})
-// await collection.createIndex({ packageManager: 1 }, {})
+// await collection.createIndex({ 'package-manager': 1 }, {})
 // await collection.createIndex({ started: -1 }, {})
 // await collection.createIndex({ duration: 1 }, {})
 // await collection.createIndex({ success: 1 }, {})
