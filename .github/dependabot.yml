@@ -9,24 +9,28 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
+      day: 'monday'
       time: '02:00'
 
   - package-ecosystem: 'devcontainers'
     directory: '/'
     schedule:
       interval: 'weekly'
+      day: 'monday'
       time: '02:00'
 
   - package-ecosystem: 'gitsubmodule'
     directory: '/'
     schedule:
       interval: 'weekly'
+      day: 'monday'
       time: '02:00'
 
   - package-ecosystem: 'docker'
     directories: ['/packages/runner/docker']
     schedule:
       interval: 'weekly'
+      day: 'monday'
       time: '02:00'
     # For some reason, cooldown is not working as expected with these many docker updates.
     # It times out and fails to create PRs. Uncomment if/when fixed.
@@ -41,6 +45,7 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
+      day: 'monday'
       time: '02:00'
     open-pull-requests-limit: 20
     groups:
