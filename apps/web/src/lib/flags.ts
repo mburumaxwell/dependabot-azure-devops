@@ -10,12 +10,12 @@ import {
 } from '@/../.generated/hypertune';
 import { auth } from '@/lib/auth';
 
+const ANONYMOUS_USER = { id: 'anonymous', name: 'Anonymous', email: '' };
 const identify: Identify<Context> = dedupe(async ({ headers, cookies }) => {
   const user = (await auth.api.getSession({ headers }))?.user;
-  if (!user) return undefined;
   return {
     environment: process.env.NODE_ENV,
-    user: { id: user.id, name: user.name!, email: user.email },
+    user: user ? { id: user.id, name: user.name!, email: user.email } : ANONYMOUS_USER,
   };
 });
 
