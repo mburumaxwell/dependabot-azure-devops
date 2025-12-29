@@ -1,5 +1,4 @@
 import { ArrowRight, Check, Globe, Layers, Lock, Shield, Users, Zap } from 'lucide-react';
-import { unstable_cache } from 'next/cache';
 import Link from 'next/link';
 import { numify } from 'numify';
 import { getHomePageStats } from '@/actions/stats';
@@ -10,9 +9,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { INCLUDED_USAGE_MINUTES } from '@/lib/billing';
 import { extensions } from '@/site-config';
-
-// move this to 'use cache' function in stats.ts when other issues have been resolved
-const getCachedStats = unstable_cache(() => getHomePageStats('90d'), [], { revalidate: 4 * 3600 });
 
 type FeatureEntry = { title: string; description: string; icon: Icon };
 const features: FeatureEntry[] = [
@@ -74,7 +70,7 @@ const pricing = {
 };
 
 export default async function HomePage() {
-  const { installations, runs } = await getCachedStats();
+  const { installations, runs } = await getHomePageStats('90d');
   const installationsTruncated = Math.floor(installations / 100) * 100; // 4458 -> 4400
 
   const stats = runs

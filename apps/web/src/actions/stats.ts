@@ -1,7 +1,8 @@
 'use server';
 
+import { unstable_cache } from 'next/cache';
 import { getDateFromTimeRange, type TimeRange } from '@/lib/aggregation';
-import { environment } from '@/lib/environment';
+import { enableHomePageStats } from '@/lib/flags';
 import { getMongoCollection } from '@/lib/mongodb';
 import { extensions } from '@/site-config';
 
@@ -24,28 +25,8 @@ type HomePageStats = {
 export async function getHomePageStats(timeRange: TimeRange): Promise<HomePageStats> {
   const installations = await getAzureExtensionInstallations(extensions.azure.id);
 
-  // // this flag does not because this function is called inside unstable_cache
-  // const queryDb = await enableHomePageStats();
-  const queryDb = environment.platform === 'vercel' || environment.development;
-  type AggResult = { totalDuration: number; totalJobs: number };
-  let usage: AggResult | undefined;
-  if (queryDb) {
-    const { start, end } = getDateFromTimeRange(timeRange);
-    const collection = await getMongoCollection('usage_telemetry', process.env.MONGO_DB_NAME_LOCAL);
-    const usages = await collection
-      .aggregate<AggResult>([
-        { $match: { started: { $gte: start, $lte: end } } },
-        {
-          $group: {
-            _id: null,
-            totalDuration: { $sum: '$duration' },
-            totalJobs: { $sum: 1 },
-          },
-        },
-      ])
-      .toArray();
-    usage = usages[0];
-  }
+  const queryDb = await enableHomePageStats();
+  const usage = queryDb ? await getCachedUsageStats() : undefined;
 
   return {
     installations,
@@ -56,6 +37,28 @@ export async function getHomePageStats(timeRange: TimeRange): Promise<HomePageSt
         }
       : undefined,
   };
+}
+
+// move this to 'use cache' function in getHomePageStats() when other issues have been resolved
+const getCachedUsageStats = unstable_cache(() => getUsageStats('90d'), [], { revalidate: 4 * 3600 });
+
+async function getUsageStats(timeRange: TimeRange) {
+  type AggResult = { totalDuration: number; totalJobs: number };
+  const { start, end } = getDateFromTimeRange(timeRange);
+  const collection = await getMongoCollection('usage_telemetry', process.env.MONGO_DB_NAME_LOCAL);
+  const usages = await collection
+    .aggregate<AggResult>([
+      { $match: { started: { $gte: start, $lte: end } } },
+      {
+        $group: {
+          _id: null,
+          totalDuration: { $sum: '$duration' },
+          totalJobs: { $sum: 1 },
+        },
+      },
+    ])
+    .toArray();
+  return usages[0];
 }
 
 /**
