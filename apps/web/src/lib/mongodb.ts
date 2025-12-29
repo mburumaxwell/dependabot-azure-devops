@@ -1,5 +1,7 @@
+import { UsageTelemetryRequestDataSchema } from '@paklo/core/usage';
 import { type Document, MongoClient } from 'mongodb';
 import { z } from 'zod';
+import { RegionCodeSchema } from './regions';
 
 const url = process.env.MONGO_DATABASE_URL!;
 const client = new MongoClient(url);
@@ -43,30 +45,16 @@ export async function getMongoCollection<K extends keyof Collections>(name: K, d
 export const UsageTelemetrySchema = z.object({
   _id: z.string(),
   country: z.string().nullish(),
-  region: z.string().nullish(),
-  // TODO: remove in favour of host object after older records are migrated
+  region: RegionCodeSchema.nullish(),
+  // TODO: remove in favour of host object after records are migrated
   hostPlatform: z.string(),
   hostRelease: z.string(),
   hostArch: z.string(),
   hostMachineHash: z.string(),
   hostDockerContainer: z.boolean().nullish(),
-  host: {
-    platform: z.string(),
-    release: z.string(),
-    arch: z.string(),
-    'machine-hash': z.string(),
-    'docker-container': z.boolean().nullish(),
-  },
-  version: z.string(),
-  trigger: z.string(),
-  provider: z.string(),
-  owner: z.string(),
-  project: z.string().nullish(), // TODO: remove nullable after older records are cleared (90 days after 2025-Oct-21 i.e. 2026-Jan-19)
+  // TODO: remove in favour of "package-manager" property after records are migrated
   packageManager: z.string(),
-  started: z.coerce.date(),
-  duration: z.coerce.number(),
-  success: z.coerce.boolean(),
-  error: z.object({ message: z.string() }).nullish(),
+  ...UsageTelemetryRequestDataSchema.omit({ id: true }).shape,
 });
 export type UsageTelemetry = z.infer<typeof UsageTelemetrySchema>;
 

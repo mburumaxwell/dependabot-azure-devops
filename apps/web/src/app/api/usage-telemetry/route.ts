@@ -3,41 +3,25 @@ import { toNextJsHandler } from '@paklo/core/hono';
 import { UsageTelemetryRequestDataSchema } from '@paklo/core/usage';
 import { geolocation } from '@vercel/functions';
 import { Hono } from 'hono';
-import { z } from 'zod';
 import { getMongoCollection, type UsageTelemetry } from '@/lib/mongodb';
 import { fromExternalRegion } from '@/lib/regions';
 
 const app = new Hono().basePath('/api/usage-telemetry');
 
-const RequestDataSchema = UsageTelemetryRequestDataSchema.omit({ id: true }).extend({
-  // this supports older versions that send numeric ids
-  // changed from number to string on 2025-11-16
-  id: z.string().or(z.number()),
-});
-app.post('/', zValidator('json', RequestDataSchema), async (context) => {
+app.post('/', zValidator('json', UsageTelemetryRequestDataSchema), async (context) => {
   const geo = geolocation(context.req.raw);
-  const payload = context.req.valid('json');
-  const _id = String(payload.id);
+  const { id: _id, ...payload } = context.req.valid('json');
 
   const values: Omit<UsageTelemetry, '_id'> = {
-    country: geo?.country ?? null,
-    region: fromExternalRegion(geo?.region) ?? geo.region ?? null, // may be undefined for non-Vercel providers
+    country: geo?.country ?? undefined,
+    region: fromExternalRegion(geo?.region),
     hostPlatform: payload.host.platform,
     hostRelease: payload.host.release,
     hostArch: payload.host.arch,
     hostMachineHash: payload.host['machine-hash'],
     hostDockerContainer: payload.host['docker-container'] ?? false,
-    host: payload.host,
-    trigger: payload.trigger,
-    version: payload.version,
-    provider: payload.provider,
-    owner: payload.owner,
-    project: payload.project ?? null,
     packageManager: payload['package-manager'],
-    started: payload.started,
-    duration: payload.duration,
-    success: payload.success,
-    error: payload.error,
+    ...payload,
   };
 
   const collection = await getMongoCollection('usage_telemetry');

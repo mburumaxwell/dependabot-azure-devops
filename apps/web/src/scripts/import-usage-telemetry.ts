@@ -9,7 +9,7 @@ dotenvFlow.config();
 
 async function run(signal: AbortSignal) {
   const { getMongoCollection, UsageTelemetrySchema } = await import('@/lib/mongodb'); // ensure mongodb connection is setup
-  const refinedSchema = z.object({ id: z.string() }).and(UsageTelemetrySchema.omit({ _id: true }));
+  const refinedSchema = z.object({ id: z.string(), ...UsageTelemetrySchema.omit({ _id: true }).shape });
   const { create } = await import('@paklo/core/logger');
   const logger = create({ timestamp: true, pretty: { includeLevel: true } });
   const collection = await getMongoCollection('usage_telemetry');
