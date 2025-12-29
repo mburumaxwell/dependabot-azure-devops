@@ -1075,8 +1075,8 @@ packages:
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
 
-  '@dotenvx/dotenvx@1.51.2':
-    resolution: {integrity: sha512-+693mNflujDZxudSEqSNGpn92QgFhJlBn9q2mDQ9yGWyHuz3hZ8B5g3EXCwdAz4DMJAI+OFCIbfEFZS+YRdrEA==}
+  '@dotenvx/dotenvx@1.51.4':
+    resolution: {integrity: sha512-AoziS8lRQ3ew/lY5J4JSlzYSN9Fo0oiyMBY37L3Bwq4mOQJT5GSrdZYLFPt6pH1LApDI3ZJceNyx+rHRACZSeQ==}
     hasBin: true
 
   '@ecies/ciphers@0.2.5':
@@ -10114,7 +10114,7 @@ snapshots:
 
   '@colors/colors@1.5.0': {}
 
-  '@dotenvx/dotenvx@1.51.2':
+  '@dotenvx/dotenvx@1.51.4':
     dependencies:
       commander: 11.1.0
       dotenv: 17.2.3
@@ -17558,7 +17558,7 @@ snapshots:
       '@babel/parser': 7.28.5
       '@babel/plugin-transform-typescript': 7.28.5(@babel/core@7.28.5)
       '@babel/preset-typescript': 7.28.5(@babel/core@7.28.5)
-      '@dotenvx/dotenvx': 1.51.2
+      '@dotenvx/dotenvx': 1.51.4
       '@modelcontextprotocol/sdk': 1.25.1(hono@4.11.3)(zod@3.25.76)
       browserslist: 4.28.1
       commander: 14.0.2
