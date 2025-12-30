@@ -1,3 +1,0 @@
-biome format --staged
-biome lint --staged
-codespell

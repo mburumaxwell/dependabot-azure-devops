@@ -21,12 +21,6 @@ pnpm test
 pnpm format:check
 ```
 
-Optional Git hooks can be enabled to run these checks automatically:
-
-```bash
-pnpm dlx husky
-```
-
 ## Submitting Changes
 
 1. Fork the repository and create your branch from `main`.
