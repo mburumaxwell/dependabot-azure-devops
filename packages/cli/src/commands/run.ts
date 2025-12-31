@@ -86,7 +86,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
   }
 
   function secretMasker(secret: string) {
-    // TODO: implement this (basically hide from logs)
+    // hide from logs, (clueless how to do this with pino without being global)
   }
 
   // extract url parts
