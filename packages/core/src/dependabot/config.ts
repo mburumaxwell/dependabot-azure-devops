@@ -260,6 +260,9 @@ export const DependabotMultiEcosystemGroupSchema = z.object({
 });
 export type DependabotMultiEcosystemGroup = z.infer<typeof DependabotMultiEcosystemGroupSchema>;
 
+/* Ecosystems that are currently in beta */
+export const BETA_ECOSYSTEMS: PackageEcosystem[] = ['bazel', 'opentofu'];
+
 /**
  * Represents the dependabot.yaml configuration file options.
  * See: https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates#configuration-options-for-dependabotyml
@@ -327,10 +330,9 @@ export const DependabotConfigSchema = z
     }
 
     // ensure that the ecosystems in beta are only used when 'enable-beta-ecosystems' is true
-    const betaEcosystems: PackageEcosystem[] = ['bazel', 'opentofu'];
     if (!value['enable-beta-ecosystems']) {
       for (const update of value.updates) {
-        if (betaEcosystems.includes(update['package-ecosystem'])) {
+        if (BETA_ECOSYSTEMS.includes(update['package-ecosystem'])) {
           addIssue(
             `The package ecosystem '${update['package-ecosystem']}' is currently in beta. To use it, set 'enable-beta-ecosystems' to true in the dependabot configuration.`,
           );

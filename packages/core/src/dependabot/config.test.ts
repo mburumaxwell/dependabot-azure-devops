@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { ZodError } from 'zod';
 
 import {
+  BETA_ECOSYSTEMS,
   DependabotConfigSchema,
   type DependabotRegistry,
   DependabotScheduleSchema,
@@ -639,7 +640,7 @@ describe('Duplicate update configuration detection', () => {
 });
 
 describe('Beta ecosystems validation', () => {
-  it.each(['bazel', 'opentofu'])('Should reject %s when enable-beta-ecosystems is not set', async (ecosystem) => {
+  it.each(BETA_ECOSYSTEMS)('Should reject %s when enable-beta-ecosystems is not set', async (ecosystem) => {
     const config = {
       version: 2,
       updates: [
@@ -656,7 +657,14 @@ describe('Beta ecosystems validation', () => {
     );
   });
 
-  it.each(['bazel', 'opentofu'])('Should allow %s when enable-beta-ecosystems is true', async (ecosystem) => {
+  it.each([
+    ...BETA_ECOSYSTEMS,
+    // these were never in beta or have graduated
+    // when an ecosystem graduates out of beta, it should continue to work even if 'enable-beta-ecosystems' is still true
+    // hence the user does not need to change anything in their config when that happens
+    'nuget',
+    'conda',
+  ])('Should allow %s when enable-beta-ecosystems is true', async (ecosystem) => {
     const config = {
       version: 2,
       'enable-beta-ecosystems': true,
