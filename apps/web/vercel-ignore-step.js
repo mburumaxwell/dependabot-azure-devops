@@ -2,15 +2,15 @@
 
 const branch = process.env.VERCEL_GIT_COMMIT_REF;
 
-// ignore builds for dependabot branches
-if (branch.startsWith('dependabot/')) {
-  console.log('🛑 - Ignoring build for dependabot branch:', branch);
-  process.exit(0);
-}
-
 // ignore builds for changeset release branches
 if (branch.startsWith('changeset-release/')) {
   console.log('🛑 - Ignoring build for changeset branch:', branch);
+  process.exit(0);
+}
+
+// ignore builds for dependabot branches, except for workflow
+if (branch.startsWith('dependabot/') && !branch.includes('workflow')) {
+  console.log('🛑 - Ignoring build for dependabot branch:', branch);
   process.exit(0);
 }
 
