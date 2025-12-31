@@ -33,7 +33,20 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "tasks/**/dist/**", ".next/**", "!.next/cache/**", "out/**"]
+      "outputs": [
+        // bundled output (from packages)
+        "dist/**",
+        // bundled output (from extensions)
+        "tasks/**/dist/**",
+        // next.js build output
+        ".next/**",
+        "!.next/cache/**",
+        "out/**",
+        // fumadocs static site generation output
+        ".source/**",
+        // generated files from other tools like prisma, hypertune, etc.
+        ".generated/**"
+      ]
     },
     "lint": {},
     "test": {},
