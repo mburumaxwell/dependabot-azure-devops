@@ -7,11 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item';
+import { enableHomePageStats } from '@/lib/flags';
 import { extensions } from '@/site-config';
 import { faqs, features, pricing } from './page.data';
 
 export default async function HomePage() {
-  const { installations, runs } = await getHomePageStats('90d');
+  const query = await enableHomePageStats();
+  const { installations, runs } = await getHomePageStats('90d', query);
   const installationsTruncated = Math.floor(installations / 100) * 100; // 4458 -> 4400
 
   const stats = runs
