@@ -2,7 +2,24 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["tsconfig.json"],
   "globalEnv": ["NODE_ENV"],
-  "globalPassThroughEnv": ["DEPENDABOT_ENABLE_CONNECTIVITY_CHECK", "GITHUB_TOKEN"],
+  "globalPassThroughEnv": [
+    "DEPENDABOT_ENABLE_CONNECTIVITY_CHECK",
+    "GITHUB_TOKEN",
+    // the entries below are only used in apps/web but Vercel outputs a warning during
+    // build as "turbo run build" in apps/web triggers build in other packages too
+    "AZURE_TENANT_ID",
+    "AZURE_CLIENT_ID",
+    "AZURE_SUBSCRIPTION_ID",
+    "AZURE_RESOURCE_GROUP_JOBS",
+    "AXIOM_API_KEY",
+    "BETTER_AUTH_SECRET",
+    "CRON_SECRET",
+    "EXPERIMENTATION_CONFIG_ITEM_KEY",
+    "MONGO_DATABASE_URL",
+    "RESEND_API_KEY",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
