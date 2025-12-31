@@ -1,0 +1,49 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": ["$TURBO_EXTENDS$", "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", "NEXT_RUNTIME"],
+      "passThroughEnv": [
+        "$TURBO_EXTENDS$",
+        "APPLICATIONINSIGHTS_CONNECTION_STRING",
+        "AUTH_ADMIN_USER_IDS",
+        "AUTH_ADMIN_EMAILS",
+        "AZURE_TENANT_ID",
+        "AZURE_CLIENT_ID",
+        "AZURE_SUBSCRIPTION_ID",
+        "AZURE_RESOURCE_GROUP_JOBS",
+        "AXIOM_API_KEY",
+        "BETTER_AUTH_SECRET",
+        "CONTAINER_APP_ENV_DNS_SUFFIX",
+        "CONTAINER_APP_NAME",
+        "CRON_SECRET",
+        "DEPLOY_GIT_COMMIT_REF",
+        "DEPLOY_GIT_COMMIT_SHA",
+        "EXPERIMENTATION_CONFIG_ITEM_KEY",
+        "MONGO_DATABASE_URL",
+        "MONGO_DB_NAME_LOCAL",
+        "PORT",
+        "RESEND_API_KEY",
+        "STRIPE_SECRET_KEY",
+        "STRIPE_WEBHOOK_SECRET",
+        "VERCEL_BRANCH_URL",
+        "VERCEL_GIT_COMMIT_REF",
+        "VERCEL_GIT_COMMIT_SHA"
+      ],
+
+      "outputs": [
+        // inherits from root
+        "$TURBO_EXTENDS$",
+        // next.js build output
+        ".next/**",
+        "!.next/cache/**",
+        "out/**",
+        // fumadocs static site generation output
+        ".source/**",
+        // generated files from other tools like prisma, hypertune, etc.
+        ".generated/**"
+      ]
+    }
+  }
+}
