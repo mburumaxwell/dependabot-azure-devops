@@ -178,7 +178,7 @@ export const PackageEcosystemSchema = z.enum([
   'maven',
   'npm',
   'nuget',
-  'opentofu', // in beta as of 2025-Nov-17
+  'opentofu',
   'pip',
   'pip-compile', // alias mapped to 'pip'
   'pipenv', // alias mapped to 'pip'
@@ -261,7 +261,7 @@ export const DependabotMultiEcosystemGroupSchema = z.object({
 export type DependabotMultiEcosystemGroup = z.infer<typeof DependabotMultiEcosystemGroupSchema>;
 
 /* Ecosystems that are currently in beta */
-export const BETA_ECOSYSTEMS: PackageEcosystem[] = ['opentofu'];
+export const BETA_ECOSYSTEMS: PackageEcosystem[] = [];
 
 /**
  * Represents the dependabot.yaml configuration file options.
