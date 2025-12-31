@@ -20,6 +20,10 @@ permissions:
   contents: read
   id-token: write # needed for azure/login@v2
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   Remove:
     if: ${{ !contains(github.actor, '[bot]') && !contains(github.head_ref, 'dependabot/') }}
