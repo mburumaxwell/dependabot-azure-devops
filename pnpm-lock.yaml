@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  tfx-cli>validator: '>=13.15.20'
-
 importers:
 
   .:

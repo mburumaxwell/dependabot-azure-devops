@@ -43,10 +43,5 @@
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "pnpm@10.24.0",
-  "pnpm": {
-    "overrides": {
-      "tfx-cli>validator": ">=13.15.20"
-    }
-  }
+  "packageManager": "pnpm@10.24.0"
 }
