@@ -2,66 +2,53 @@
 
 import { cacheLife } from 'next/cache';
 import { getDateFromTimeRange, type TimeRange } from '@/lib/aggregation';
+import { logger } from '@/lib/logger';
 import { getMongoCollection } from '@/lib/mongodb';
-import { extensions } from '@/site-config';
 
+/**
+ * Statistics about runs in the selected time range.
+ * Undefined if data is not available (e.g., on platforms without a database)
+ */
 type HomePageStats = {
-  installations: number;
   /**
-   * Statistics about runs in the selected time range.
-   * Undefined if data is not available (e.g., on platforms without a database)
+   * Total duration of all runs in the selected time range (in seconds)
    */
-  runs?: {
-    /**
-     * Total duration of all runs in the selected time range (in seconds)
-     */
-    duration: number; // in seconds
-    count: number;
-  };
+  duration: number; // in seconds
+  count: number;
 };
 
 /**
  * Get statistics for the website home page
  * @param timeRange - The time range for usage statistics
- * @param query - Whether to query the database for usage statistics
  * @returns The home page statistics
  */
-export async function getHomePageStats(timeRange: TimeRange, query: boolean): Promise<HomePageStats> {
+export async function getHomePageStats(timeRange: TimeRange): Promise<HomePageStats> {
   'use cache';
   // 4 hours to revalidate, 1 day expire
   cacheLife({ stale: 4 * 3600, revalidate: 4 * 3600, expire: 86400 });
 
-  const installations = await getAzureExtensionInstallations(extensions.azure.id);
-
+  logger.info(`Fetching home page stats for time range: ${timeRange}`);
   type AggResult = { totalDuration: number; totalJobs: number };
-  let usage: AggResult | undefined;
-
-  if (query) {
-    const { start, end } = getDateFromTimeRange(timeRange);
-    const collection = await getMongoCollection('usage_telemetry', process.env.MONGO_DB_NAME_LOCAL);
-    const usages = await collection
-      .aggregate<AggResult>([
-        { $match: { started: { $gte: start, $lte: end } } },
-        {
-          $group: {
-            _id: null,
-            totalDuration: { $sum: '$duration' },
-            totalJobs: { $sum: 1 },
-          },
+  const { start, end } = getDateFromTimeRange(timeRange);
+  const collection = await getMongoCollection('usage_telemetry', process.env.MONGO_DB_NAME_LOCAL);
+  const usages = await collection
+    .aggregate<AggResult>([
+      { $match: { started: { $gte: start, $lte: end } } },
+      {
+        $group: {
+          _id: null,
+          totalDuration: { $sum: '$duration' },
+          totalJobs: { $sum: 1 },
         },
-      ])
-      .toArray();
-    usage = usages[0];
-  }
+      },
+    ])
+    .toArray();
+  const usage = usages[0];
+  logger.info('Home page stats fetched');
 
   return {
-    installations,
-    runs: query
-      ? {
-          duration: (usage?.totalDuration ?? 0) / 1000, // convert to seconds
-          count: usage?.totalJobs ?? 0,
-        }
-      : undefined,
+    duration: (usage?.totalDuration ?? 0) / 1000, // convert to seconds
+    count: usage?.totalJobs ?? 0,
   };
 }
 
@@ -70,7 +57,12 @@ export async function getHomePageStats(timeRange: TimeRange, query: boolean): Pr
  * @param id - The extension ID (e.g., 'publisher.extensionName')
  * @returns The total installation count (including on-premises downloads)
  */
-async function getAzureExtensionInstallations(id: string): Promise<number> {
+export async function getInstallations(id: string): Promise<number> {
+  'use cache';
+  // 1 day to revalidate and/or expire
+  cacheLife({ stale: 86400, revalidate: 86400, expire: 86400 });
+
+  logger.info(`Fetching installation count for extension ID: ${id}`);
   const response = await fetch('https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery', {
     method: 'POST',
     headers: {
@@ -90,6 +82,7 @@ async function getAzureExtensionInstallations(id: string): Promise<number> {
     }),
   });
   const data = await response.json();
+  logger.info(`Installation count fetched for extension ID: ${id}`);
   const stats = data.results[0]!.extensions[0]!.statistics as { statisticName: string; value: number }[];
   return stats
     .filter((stat) => ['install', 'onpremDownloads'].includes(stat.statisticName))

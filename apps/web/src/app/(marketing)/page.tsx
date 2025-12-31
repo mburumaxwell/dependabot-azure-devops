@@ -1,28 +1,20 @@
 import { ArrowRight, Check, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { numify } from 'numify';
-import { getHomePageStats } from '@/actions/stats';
+import * as React from 'react';
+import { getHomePageStats, getInstallations } from '@/actions/stats';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item';
-import { enableHomePageStats } from '@/lib/flags';
+import { Skeleton } from '@/components/ui/skeleton';
 import { extensions } from '@/site-config';
 import { faqs, features, pricing } from './page.data';
 
 export default async function HomePage() {
-  const query = await enableHomePageStats();
-  const { installations, runs } = await getHomePageStats('90d', query);
-  const installationsTruncated = Math.floor(installations / 100) * 100; // 4458 -> 4400
-
-  const stats = runs
-    ? [
-        { name: 'Installations', value: numify(installations) },
-        { name: 'Total run time (90d)', value: numify(Math.round(runs.duration / 60)), unit: 'mins' },
-        { name: 'Number of jobs (90d)', value: numify(runs.count) },
-      ]
-    : [];
+  const truncate = (num: number, places: number) => Math.floor(num / 10 ** places) * 10 ** places;
+  const installations = truncate(await getInstallations(extensions.azure.id), 2); // 4458 -> 4400
 
   return (
     <>
@@ -33,7 +25,7 @@ export default async function HomePage() {
           <div className='text-center max-w-4xl mx-auto'>
             <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm mb-6'>
               <Shield className='size-4' />
-              Trusted by {numify(installationsTruncated)}+ engineering teams
+              Trusted by {numify(installations)}+ engineering teams
             </div>
             <h1 className='text-4xl lg:text-6xl font-bold mb-6 text-balance'>
               Secure your dependencies, <span className='text-primary'>ship with confidence</span>
@@ -91,23 +83,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {stats.length > 0 && (
-        <section className='py-12 lg:py-20'>
-          <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-              {stats.map((stat) => (
-                <div key={stat.name} className='text-center'>
-                  <p className='mb-2'>
-                    <span className='text-3xl font-semibold tracking-tight'>{stat.value}+</span>
-                    {stat.unit ? <span className='text-sm ml-2'>{stat.unit}</span> : null}
-                  </p>
-                  <p className='text-lg text-muted-foreground'>{stat.name}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      <section className='py-12 lg:py-20'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <React.Suspense fallback={<StatsSectionSkeleton />}>
+            <StatsSection installations={installations} />
+          </React.Suspense>
+        </div>
+      </section>
 
       {/* Features */}
       <section id='features' className='py-12 lg:py-20 bg-muted/30'>
@@ -224,5 +206,43 @@ export default async function HomePage() {
         </div>
       </section>
     </>
+  );
+}
+
+async function StatsSection({ installations }: { installations: number }) {
+  const runs = await getHomePageStats('90d');
+  const stats = [
+    { name: 'Installations', value: numify(installations) },
+    { name: 'Total run time (90d)', value: numify(Math.round(runs.duration / 60)), unit: 'mins' },
+    { name: 'Number of jobs (90d)', value: numify(runs.count) },
+  ];
+
+  return (
+    <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+      {stats.map((stat) => (
+        <div key={stat.name} className='text-center'>
+          <p className='mb-2'>
+            <span className='text-3xl font-semibold tracking-tight'>{stat.value}</span>
+            {stat.unit ? <span className='text-sm ml-2'>{stat.unit}</span> : null}
+          </p>
+          <p className='text-lg text-muted-foreground'>{stat.name}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+async function StatsSectionSkeleton() {
+  return (
+    <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+      {[1, 2, 3].map((stat) => (
+        <div key={stat} className='text-center'>
+          {/* <div className='mb-2 h-8 w-24 mx-auto bg-muted animate-pulse rounded' /> */}
+          <Skeleton className='mb-2 h-8 w-24 mx-auto' />
+          {/* <div className='h-5 w-32 mx-auto bg-muted animate-pulse rounded' /> */}
+          <Skeleton className='h-5 w-32 mx-auto' />
+        </div>
+      ))}
+    </div>
   );
 }
