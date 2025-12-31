@@ -17,6 +17,7 @@ export const defaultMetadata: Metadata = {
     title: rootTitleTemplate,
     description: config.description,
     url: config.siteUrl,
+    siteName: config.name,
   },
   twitter: {
     card: 'summary_large_image',

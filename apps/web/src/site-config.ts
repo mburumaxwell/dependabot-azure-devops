@@ -5,6 +5,7 @@ const siteUrl = getSiteUrl({ defaultValue: 'https://www.paklo.app' });
 
 export const config = {
   siteUrl,
+  name: 'Paklo',
   domain: 'paklo.app',
   themeColor: 'oklch(0.4494 0.1221 138.11)', // '#2E6417',
   title: 'Paklo',
@@ -13,6 +14,7 @@ export const config = {
     'paklo',
     'dependabot',
     'azure devops',
+    'security',
     'automation',
     'devops',
     'software development',
