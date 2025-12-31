@@ -94,7 +94,9 @@ async function Footer() {
     { name: 'LinkedIn', href: socials.linkedin.url, icon: LinkedInLogo },
   ];
 
+  // https://nextjs.org/docs/messages/next-prerender-current-time-client#cache-the-time-in-a-server-component
   async function getCurrentYear() {
+    'use cache';
     return new Date().getFullYear();
   }
 
