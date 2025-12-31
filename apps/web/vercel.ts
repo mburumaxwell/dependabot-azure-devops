@@ -19,7 +19,7 @@ export const config: VercelConfig = {
     //   schedule: '0 12 * * *',
     // },
   ],
-  ignoreCommand: '[ "$VERCEL_GIT_COMMIT_AUTHOR_LOGIN" == "dependabot[bot]" ]',
+  ignoreCommand: 'node vercel-ignore-step.js',
   git: {
     deploymentEnabled: {
       'dependabot/*': false,
