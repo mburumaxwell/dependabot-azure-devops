@@ -1,5 +1,18 @@
 # @paklo/core
 
+## 0.11.1
+
+### Patch Changes
+
+- [#2365](https://github.com/mburumaxwell/dependabot-azure-devops/pull/2365) [`f172ddf`](https://github.com/mburumaxwell/dependabot-azure-devops/commit/f172ddffb28a8ebc4ad058f5bd411009eae3eb04) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - `conda` ecosystem graduated to stable
+  Official changelog: https://github.blog/changelog/2025-12-16-conda-ecosystem-support-for-dependabot-now-generally-available/
+
+- [#2368](https://github.com/mburumaxwell/dependabot-azure-devops/pull/2368) [`32705f9`](https://github.com/mburumaxwell/dependabot-azure-devops/commit/32705f958be5e00f08028977967645e0f9370572) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - `opentofu` ecosystem graduated to stable
+  Official changelog: https://github.blog/changelog/2025-12-16-dependabot-version-updates-now-support-opentofu
+
+- [#2366](https://github.com/mburumaxwell/dependabot-azure-devops/pull/2366) [`26bcf23`](https://github.com/mburumaxwell/dependabot-azure-devops/commit/26bcf23a6a7195c3ae9f5477222deb460a70091e) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - `bazel` ecosystem graduated to stable
+  Official changelog: https://github.blog/changelog/2025-12-16-dependabot-version-updates-now-support-bazel
+
 ## 0.11.0
 
 ### Minor Changes

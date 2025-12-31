@@ -1,5 +1,13 @@
 # paklo
 
+## 0.16.2
+
+### Patch Changes
+
+- Updated dependencies [[`f172ddf`](https://github.com/mburumaxwell/dependabot-azure-devops/commit/f172ddffb28a8ebc4ad058f5bd411009eae3eb04), [`32705f9`](https://github.com/mburumaxwell/dependabot-azure-devops/commit/32705f958be5e00f08028977967645e0f9370572), [`045c3fb`](https://github.com/mburumaxwell/dependabot-azure-devops/commit/045c3fb1ece48904e4193b760ceb8e22a57609c7), [`26bcf23`](https://github.com/mburumaxwell/dependabot-azure-devops/commit/26bcf23a6a7195c3ae9f5477222deb460a70091e), [`9ebdafd`](https://github.com/mburumaxwell/dependabot-azure-devops/commit/9ebdafd43b5e87d04a06c4a16b6c4750455dace5)]:
+  - @paklo/core@0.11.1
+  - @paklo/runner@0.8.2
+
 ## 0.16.1
 
 ### Patch Changes
