@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+    paths:
+      - '.changeset/**'
+      - 'packages/**'
+      - 'extensions/**'
   pull_request:
     branches: [main]
     paths:
