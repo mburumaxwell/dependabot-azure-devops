@@ -157,7 +157,7 @@ export const PackageEcosystemSchema = z.enum([
   // order matches
   // https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#package-ecosystem-
 
-  'bazel', // still in beta as of 2025-Nov-17
+  'bazel',
   'bun',
   'bundler',
   'cargo',
@@ -261,7 +261,7 @@ export const DependabotMultiEcosystemGroupSchema = z.object({
 export type DependabotMultiEcosystemGroup = z.infer<typeof DependabotMultiEcosystemGroupSchema>;
 
 /* Ecosystems that are currently in beta */
-export const BETA_ECOSYSTEMS: PackageEcosystem[] = ['bazel', 'opentofu'];
+export const BETA_ECOSYSTEMS: PackageEcosystem[] = ['opentofu'];
 
 /**
  * Represents the dependabot.yaml configuration file options.
