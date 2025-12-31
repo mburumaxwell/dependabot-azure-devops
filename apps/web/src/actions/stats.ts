@@ -28,7 +28,8 @@ type HomePageStats = {
  */
 export async function getHomePageStats(timeRange: TimeRange, query: boolean): Promise<HomePageStats> {
   'use cache';
-  cacheLife('days');
+  // 4 hours to revalidate, 1 day expire
+  cacheLife({ stale: 4 * 3600, revalidate: 4 * 3600, expire: 86400 });
 
   const installations = await getAzureExtensionInstallations(extensions.azure.id);
 
