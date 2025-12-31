@@ -35,6 +35,12 @@ jobs:
   Web:
     runs-on: ubuntu-latest
 
+    services:
+      # for static generation during build and for tests
+      mongo:
+        image: mongo:latest
+        ports: [27017:27017]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
