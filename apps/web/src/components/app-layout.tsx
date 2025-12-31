@@ -1,6 +1,6 @@
 import { AppBreadcrumb } from '@/components/app-breadcrumb';
 import { AppSidebar } from '@/components/app-sidebar';
-import { ThemeToggle } from '@/components/theme';
+import { ThemeSelect } from '@/components/theme';
 import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import type { Organization, Session } from '@/lib/auth';
@@ -33,7 +33,7 @@ export async function AppLayout({
           <Separator orientation='vertical' className='mr-2 data-[orientation=vertical]:h-4' />
           {breadcrumb && <AppBreadcrumb omit={slugs} />}
           <div className='ml-auto'>
-            <ThemeToggle />
+            <ThemeSelect />
           </div>
         </header>
         {children}

@@ -7,6 +7,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const routesMap = [
     '', // root without trailing slash
+    '/compare',
     // '/about',
   ].map(
     (route): Route => ({

@@ -1,6 +1,7 @@
 import type { Route } from 'next';
 import Link from 'next/link';
 import { GitHubLogo, LinkedInLogo, PakloLogo, TwitterLogo } from '@/components/logos';
+import { ThemeToggle } from '@/components/theme';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { socials } from '@/site-config';
@@ -18,8 +19,8 @@ export default function Layout({ children }: LayoutProps<'/'>) {
 
 function Header() {
   const links: HeaderLink[] = [
-    { name: 'Features', href: '#features' },
-    { name: 'Pricing', href: '#pricing' },
+    { name: 'Features', href: '/#features' },
+    { name: 'Pricing', href: '/#pricing' },
     { name: 'Docs', href: '/docs' },
   ];
 
@@ -72,8 +73,9 @@ async function Footer() {
     {
       name: 'Product',
       links: [
-        { name: 'Features', href: '#features' },
-        { name: 'Pricing', href: '#pricing' },
+        { name: 'Features', href: '/#features' },
+        { name: 'Pricing', href: '/#pricing' },
+        { name: 'Compare', href: '/compare' },
         { name: 'Documentation', href: '/docs' },
       ],
     },
@@ -119,6 +121,7 @@ async function Footer() {
                 </a>
               ))}
             </div>
+            <ThemeToggle />
             <Separator className='mt-2' />
             <p className='text-sm text-muted-foreground'>&copy; {await getCurrentYear()} Paklo. All rights reserved.</p>
           </div>

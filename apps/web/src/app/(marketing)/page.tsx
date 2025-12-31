@@ -1,73 +1,14 @@
-import { ArrowRight, Check, Globe, Layers, Lock, Shield, Users, Zap } from 'lucide-react';
+import { ArrowRight, Check, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { numify } from 'numify';
 import { getHomePageStats } from '@/actions/stats';
-import type { Icon } from '@/components/icons';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item';
-import { INCLUDED_USAGE_MINUTES } from '@/lib/billing';
 import { extensions } from '@/site-config';
-
-type FeatureEntry = { title: string; description: string; icon: Icon };
-const features: FeatureEntry[] = [
-  {
-    title: 'Real-time Scanning',
-    description: 'Continuous monitoring of your dependencies for known vulnerabilities across all ecosystems',
-    icon: Shield,
-  },
-  {
-    title: 'Automated Updates',
-    description: 'Smart PRs that keep your dependencies up-to-date while respecting your version constraints',
-    icon: Zap,
-  },
-  {
-    title: 'Private Advisories',
-    description: 'Create and manage internal security advisories for proprietary code and dependencies',
-    icon: Lock,
-  },
-  {
-    title: 'Team Collaboration',
-    description: 'Add team members to your organization to collaborate on security',
-    icon: Users,
-  },
-  {
-    title: 'Multi-Platform Support',
-    description: 'Works seamlessly with Azure DevOps repositories with more platforms coming soon',
-    icon: Layers,
-  },
-  {
-    title: 'Global Infrastructure',
-    // description: 'Deploy in UK, US, EU, or Australia with more regions coming soon',
-    description: 'Deploy in UK or EU with more regions coming soon',
-    icon: Globe,
-  },
-];
-const pricing = {
-  free: {
-    features: [
-      'Full feature access',
-      'Unlimited projects (private & public)',
-      'Self-hosted infrastructure',
-      'Community support',
-      'Open source',
-    ],
-  },
-  paid: {
-    monthly: '$20',
-    features: [
-      'Everything in Self-Managed',
-      `${INCLUDED_USAGE_MINUTES.toLocaleString()} minutes/month included ($0.06/min after)`,
-      'Fully managed infrastructure',
-      'PR comments',
-      'Managed Private advisories',
-      'Multi-ecosystem pull requests',
-      'Weekly vulnerabilities email',
-      'Team collaboration',
-    ],
-  },
-};
+import { faqs, features, pricing } from './page.data';
 
 export default async function HomePage() {
   const { installations, runs } = await getHomePageStats('90d');
@@ -100,6 +41,11 @@ export default async function HomePage() {
               secure without slowing down.
             </p>
             <div className='flex flex-col sm:flex-row items-center justify-center gap-4'>
+              <Link href='/compare'>
+                <Button size='lg' variant='outline' className='w-full sm:w-auto'>
+                  Compare
+                </Button>
+              </Link>
               <Link href='/signup'>
                 <Button size='lg' variant='brand' className='w-full sm:w-auto'>
                   Get Started
@@ -250,6 +196,29 @@ export default async function HomePage() {
               </CardContent>
             </Card>
           </div>
+        </div>
+      </section>
+
+      {/* FAQs */}
+      <section id='faqs' className='py-12 lg:py-20 bg-muted/30'>
+        <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='text-center mb-16'>
+            <h2 className='text-3xl lg:text-4xl font-bold mb-4'>Frequently Asked Questions</h2>
+            <p className='text-xl text-muted-foreground'>Everything you need to know about Paklo</p>
+          </div>
+
+          <Accordion type='single' collapsible className='space-y-2'>
+            {faqs.map((faq) => (
+              <AccordionItem
+                key={faq.question}
+                value={faq.question}
+                className='bg-background rounded-lg border px-6 last:border-b'
+              >
+                <AccordionTrigger className='text-left underline-offset-4'>{faq.question}</AccordionTrigger>
+                <AccordionContent>{faq.answer}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </section>
     </>

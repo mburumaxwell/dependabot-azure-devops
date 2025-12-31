@@ -1,4 +1,5 @@
 import { Stripe } from 'stripe';
+import type { Money } from '@/lib/money';
 import type { Period } from '@/lib/period';
 import type { SubscriptionStatus } from '@/lib/prisma';
 
@@ -52,3 +53,6 @@ export function mapSubscriptionStatus(status: StripeSubscriptionStatus): Subscri
 
 export const INCLUDED_USAGE_MINUTES = 1000;
 export const METER_EVENT_NAME_USAGE = 'job_execution_minutes';
+
+export const PRICE_AMOUNT_MONTHLY_MANAGEMENT: Money = { amount: 2000, currency: 'USD' }; // $20.00
+export const PRICE_AMOUNT_PER_MINUTE_USAGE: Money = { amount: 6, currency: 'USD' }; // $0.06

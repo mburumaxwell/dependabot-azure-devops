@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -38,7 +39,8 @@ export function useTheme() {
   };
 }
 
-export function ThemeToggle() {
+/** Theme selection component using a dropdown select. */
+export function ThemeSelect() {
   const { theme, setTheme, mounted } = useTheme();
 
   if (!mounted) {
@@ -59,19 +61,19 @@ export function ThemeToggle() {
         </SelectValue>
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value='light'>
+        <SelectItem value='light' aria-label='Light'>
           <div className='flex items-center gap-2'>
             <Sun className='size-4' />
             Light
           </div>
         </SelectItem>
-        <SelectItem value='dark'>
+        <SelectItem value='dark' aria-label='Dark'>
           <div className='flex items-center gap-2'>
             <Moon className='size-4' />
             Dark
           </div>
         </SelectItem>
-        <SelectItem value='system'>
+        <SelectItem value='system' aria-label='System'>
           <div className='flex items-center gap-2'>
             <Monitor className='size-4' />
             System
@@ -82,8 +84,8 @@ export function ThemeToggle() {
   );
 }
 
-// Alternative simpler button version
-export function ThemeToggleButton() {
+/** Theme toggle component using a button that cycles through themes. */
+export function ThemeButton() {
   const { theme, setTheme, mounted } = useTheme();
 
   if (!mounted) {
@@ -94,11 +96,11 @@ export function ThemeToggleButton() {
     );
   }
 
-  const cycleTheme = () => {
+  function cycleTheme() {
     if (theme === 'light') setTheme('dark');
     else if (theme === 'dark') setTheme('system');
     else setTheme('light');
-  };
+  }
 
   return (
     <Button variant='outline' size='sm' onClick={cycleTheme}>
@@ -106,5 +108,32 @@ export function ThemeToggleButton() {
       {theme === 'dark' && <Moon className='size-4' />}
       {theme === 'system' && <Monitor className='size-4' />}
     </Button>
+  );
+}
+
+/** Theme toggle component using a toggle group. */
+export function ThemeToggle() {
+  const { setTheme, theme, mounted } = useTheme();
+
+  if (!mounted) {
+    return (
+      <Button variant='outline' size='sm'>
+        <Sun className='size-4' />
+      </Button>
+    );
+  }
+
+  return (
+    <ToggleGroup type='single' variant='outline' size='sm' value={theme} onValueChange={setTheme}>
+      <ToggleGroupItem value='light' aria-label='Light'>
+        <Sun />
+      </ToggleGroupItem>
+      <ToggleGroupItem value='dark' aria-label='Dark'>
+        <Moon />
+      </ToggleGroupItem>
+      <ToggleGroupItem value='system' aria-label='System'>
+        <Monitor />
+      </ToggleGroupItem>
+    </ToggleGroup>
   );
 }
