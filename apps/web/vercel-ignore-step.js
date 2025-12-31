@@ -15,5 +15,5 @@ if (branch.startsWith('dependabot/') && !branch.includes('workflow')) {
 }
 
 // proceed with the build
-console.log('✅ - Build can proceed', branch);
+console.log('✅ - Build can proceed:', branch);
 process.exit(1);
