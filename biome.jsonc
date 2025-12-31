@@ -21,6 +21,7 @@
       "!extensions/azure/tasks/*/task.json",
       "!extensions/azure/vss-extension.json",
       "!packages/runner/docker/containers.json",
+      "!.changeset/config.json",
       "!.github/ISSUE_TEMPLATE",
       "!.vscode/settings.json",
       "!README.md",
