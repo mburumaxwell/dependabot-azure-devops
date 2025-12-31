@@ -46,7 +46,6 @@
   "packageManager": "pnpm@10.24.0",
   "pnpm": {
     "overrides": {
-      "@workflow/world-local>undici": "~6.21.2",
       "tfx-cli>validator": ">=13.15.20"
     }
   }
