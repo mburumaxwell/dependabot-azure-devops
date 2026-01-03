@@ -25,7 +25,7 @@
     "start": "next start",
     "lint": "biome check",
     "test": "vitest",
-    "clean": "rimraf .turbo .next .source .generated .react-email out"
+    "clean": "rimraf .turbo .next .source .react-email .generated src/app/.well-known/workflow out"
   },
   "dependencies": {
     "@azure/arm-appcontainers": "3.0.0",
