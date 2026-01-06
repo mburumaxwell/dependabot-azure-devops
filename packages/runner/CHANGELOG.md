@@ -1,5 +1,11 @@
 # @paklo/runner
 
+## 0.8.3
+
+### Patch Changes
+
+- [#2380](https://github.com/mburumaxwell/dependabot-azure-devops/pull/2380) [`d2aa368`](https://github.com/mburumaxwell/dependabot-azure-devops/commit/d2aa368588b40f7b774b7d3da9d054396455280b) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump the dependabot-core-images (29 updates) to from various versions to `v2.0.20260101165450`
+
 ## 0.8.2
 
 ### Patch Changes
