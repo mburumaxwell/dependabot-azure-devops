@@ -12,6 +12,7 @@ export const DEFAULT_EXPERIMENTS: DependabotExperiments = {
   'npm-fallback-version-above-v6': true,
   'enable-record-ecosystem-meta': true,
   'enable-corepack-for-npm-and-yarn': true,
+  'enable-private-registry-for-corepack': true,
   'enable-shared-helpers-command-timeout': true,
   'enable-dependabot-setting-up-cronjob': true,
   'enable-engine-version-detection': true,
