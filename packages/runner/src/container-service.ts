@@ -47,7 +47,7 @@ export const ContainerService = {
         // Then run the dependabot commands as dependabot user
         const dependabotCommands = [
           'mkdir -p /home/dependabot/dependabot-updater/output',
-          '$DEPENDABOT_HOME/dependabot-updater/bin/run fetch_files',
+          // 'fetch_files' command removed as it is now a no-op
         ];
 
         if (command === 'graph') {
