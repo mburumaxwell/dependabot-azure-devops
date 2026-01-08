@@ -175,8 +175,8 @@ model Passkey {
 }
 
 model Feedback {
-  id        String         @id
-  createdAt DateTime       @default(now())
+  id        String   @id
+  createdAt DateTime @default(now())
   // [FeedbackAction]
   action    String
   message   String
@@ -221,17 +221,17 @@ model OrganizationSecret {
 }
 
 model Project {
-  id                    String                @id
+  id                    String       @id
   organizationId        String
-  organization          Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   providerId            String
   name                  String
   url                   String
   /// The link that never changes even if the name changes (only for some providers).
   /// This tends to be the API url for the project.
   permalink             String
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @updatedAt
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
   /// [SynchronizationStatus]
   synchronizationStatus String
   synchronizedAt        DateTime?
@@ -301,10 +301,10 @@ model RepositoryUpdate {
 }
 
 model RepositoryPullRequest {
-  id             String                      @id
-  createdAt      DateTime                    @default(now())
-  updatedAt      DateTime                    @updatedAt
-  repository     Repository                  @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  id             String     @id
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  repository     Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   repositoryId   String
   providerId     Int
   /// [DependabotPackageManager]
@@ -322,9 +322,9 @@ model RepositoryPullRequest {
 }
 
 model UpdateJob {
-  id        String           @id
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   /// [UpdateJobStatus]
   status    String
   /// [UpdateJobTrigger]
