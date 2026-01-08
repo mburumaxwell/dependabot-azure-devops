@@ -322,9 +322,6 @@ model RepositoryUpdate {
   nextUpdateJobAt DateTime
   files           String[]
 
-  /// [DependabotPersistedDep]
-  deps Json[]
-
   @@unique([repositoryId, ecosystem, directoryKey])
   @@index([repositoryId])
   @@map("repository_update")

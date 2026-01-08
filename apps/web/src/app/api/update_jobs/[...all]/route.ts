@@ -12,12 +12,14 @@ import {
   getPullRequestDependencies,
   getPullRequestDescription,
   makeDirectoryKey,
+  type PackageEcosystem,
 } from '@paklo/core/dependabot';
 import { toNextJsHandler } from '@paklo/core/hono';
 import { resumeHook } from 'workflow/api';
 import { createAzdoClient } from '@/actions/organizations';
 import { author } from '@/lib/author';
 import { logger } from '@/lib/logger';
+import { getMongoCollection } from '@/lib/mongodb';
 import {
   type Organization,
   type Project,
@@ -66,7 +68,6 @@ async function handleRequest(id: string, request: DependabotRequest): Promise<bo
   const [repositoryUpdate, repository, project, organization] = await Promise.all([
     prisma.repositoryUpdate.findUnique({
       where: { id: job.repositoryUpdateId },
-      omit: { deps: true },
     }),
     prisma.repository.findUnique({ where: { id: job.repositoryId } }),
     prisma.project.findUnique({ where: { id: job.projectId } }),
@@ -85,12 +86,21 @@ async function handleRequest(id: string, request: DependabotRequest): Promise<bo
 
     case 'update_dependency_list': {
       const { dependency_files, dependencies } = data;
+      const collection = await getMongoCollection('repository_update_dependencies');
+      await collection.updateOne(
+        { _id: repositoryUpdate.id },
+        {
+          $set: {
+            // TODO: remove cast once prisma has the enum set
+            ecosystem: repositoryUpdate.ecosystem as PackageEcosystem,
+            deps: dependencies?.map((d) => ({ name: d.name, version: d.version ?? undefined })) ?? [],
+          },
+        },
+        { upsert: true },
+      );
       await prisma.repositoryUpdate.update({
         where: { id: repositoryUpdate.id },
-        data: {
-          files: dependency_files ?? [],
-          deps: dependencies?.map((d) => ({ name: d.name, version: d.version ?? undefined })) ?? [],
-        },
+        data: { files: dependency_files ?? [] },
       });
 
       return true;
