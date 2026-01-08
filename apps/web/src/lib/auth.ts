@@ -20,8 +20,8 @@ import { RegionCodeSchema } from '@/lib/regions';
 import { config } from '@/site-config';
 import app from '../../package.json';
 
-const adminUserIds = process.env.AUTH_ADMIN_USER_IDS?.split(',') ?? [];
-const adminEmails = process.env.AUTH_ADMIN_EMAILS?.split(',') ?? [];
+const adminUserIds = process.env.BETTER_AUTH_ADMIN_USER_IDS?.split(',') ?? [];
+const adminEmails = process.env.BETTER_AUTH_ADMIN_EMAILS?.split(',') ?? [];
 
 export const auth = betterAuth({
   database: prismaAdapter(prismaClient, { provider: 'postgresql' }),
