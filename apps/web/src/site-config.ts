@@ -48,7 +48,7 @@ export const socials = {
   github: {
     username: 'mburumaxwell',
     url: 'https://github.com/mburumaxwell',
-    repo: 'https://github.com/mburumaxwell/dependabot-azure-devops',
+    repo: 'https://github.com/mburumaxwell/paklo',
   },
   linkedin: {
     username: 'maxwellweru',

@@ -172,7 +172,7 @@ describe('notification types', () => {
     expect(event.resource.comment.content).toBe('Deployment to your Review App succeeded.');
     expect(event.resource.comment.commentType).toBe('text');
     expect(event.resource.comment.author.id).toBe('961314fa-c312-68ab-8dce-cbb71e30c268');
-    expect(event.resource.comment.author.uniqueName).toBe('dependabot@tingle.software');
+    expect(event.resource.comment.author.uniqueName).toBe('dependabot@paklo.app');
     expect(event.resource.comment.author.displayName).toBe('dependabot');
     expect(event.resource.pullRequest.pullRequestId).toBe(22568);
     expect(event.resource.pullRequest.status).toBe('completed');

@@ -265,4 +265,4 @@ CMD ["paklo", "--help"]
 
 For contributing guidelines, license information, bug reports, and support:
 
-👉 **Visit the main project repository:** [dependabot-azure-devops](https://github.com/mburumaxwell/dependabot-azure-devops)
+👉 **Visit the main project repository:** [paklo](https://github.com/mburumaxwell/paklo)

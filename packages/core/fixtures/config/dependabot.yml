@@ -64,4 +64,4 @@ registries:
   reg2:
     type: npm-registry
     url: "https://pkgs.dev.azure.com/dependabot/_packaging/dependabot-npm/npm/registry/"
-    token: "tingle-npm:${{ DEFAULT_TOKEN }}"
+    token: "custom-npm:${{ DEFAULT_TOKEN }}"

@@ -5,7 +5,7 @@ description: Complete guide for using, troubleshooting, and developing the Depen
 
 ## Using the extension
 
-Refer to the extension [README.md](https://github.com/mburumaxwell/dependabot-azure-devops/blob/main/extensions/azure/README.md).
+Refer to the extension [README.md](https://github.com/mburumaxwell/paklo/blob/main/extensions/azure/README.md).
 
 ## Troubleshooting issues
 

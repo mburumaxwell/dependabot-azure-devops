@@ -30,4 +30,4 @@ steps:
       mergeStrategy: 'squash'
 ```
 
-The task accepts many inputs such as `dryRun`, `setAutoComplete`, and `mergeStrategy`. See the [task parameters](https://github.com/mburumaxwell/dependabot-azure-devops/blob/main/extensions/azure/README.md#task-parameters) for the full list.
+The task accepts many inputs such as `dryRun`, `setAutoComplete`, and `mergeStrategy`. See the [task parameters](https://github.com/mburumaxwell/paklo/blob/main/extensions/azure/README.md#task-parameters) for the full list.

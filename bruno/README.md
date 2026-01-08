@@ -1,6 +1,6 @@
 # Bruno API Collection
 
-This directory contains Bruno API testing files for the dependabot-azure-devops project.
+This directory contains Bruno API testing files for the paklo project.
 
 ## Getting Started
 
