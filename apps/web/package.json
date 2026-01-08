@@ -76,7 +76,7 @@
     "@react-email/render": "2.0.1",
     "@sapphire/snowflake": "3.5.5",
     "@spdx/tools": "0.1.0",
-    "@stripe/stripe-js": "8.6.0",
+    "@stripe/stripe-js": "8.6.1",
     "@vercel/analytics": "1.6.1",
     "@vercel/functions": "3.3.4",
     "@vercel/oidc": "3.0.5",
