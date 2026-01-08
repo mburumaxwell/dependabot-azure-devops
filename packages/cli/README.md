@@ -144,6 +144,40 @@ updates:
       interval: "weekly"
 ```
 
+### Custom CA Certificates
+
+If you need to access private registries or feeds that use self-signed certificates or internal certificate authorities, you can provide a custom CA certificate using environment variables:
+
+```bash
+# Using CUSTOM_CA_PATH
+export CUSTOM_CA_PATH=/path/to/your/certificate.crt
+paklo run --organisation-url https://dev.azure.com/my-org ...
+
+# Or using NODE_EXTRA_CA_CERTS
+export NODE_EXTRA_CA_CERTS=/path/to/your/certificate.crt
+paklo run --organisation-url https://dev.azure.com/my-org ...
+```
+
+The certificate file should be in PEM format. This is particularly useful when:
+- Accessing internal Artifactory, Nexus, or other private package repositories
+- Using corporate proxy servers with SSL inspection
+- Working with self-signed certificates in development environments
+
+**Example with JFrog Artifactory:**
+
+```bash
+# Export your internal CA certificate
+export CUSTOM_CA_PATH=/etc/ssl/certs/company-ca.crt
+
+# Run Paklo with the custom certificate
+paklo run \
+  --organisation-url https://dev.azure.com/my-org \
+  --project my-project \
+  --repository my-repo \
+  --git-token $GIT_TOKEN \
+  --debug
+```
+
 ## Advanced Usage
 
 ### Custom Experiments
