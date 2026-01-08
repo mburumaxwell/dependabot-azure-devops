@@ -38,7 +38,7 @@
         }
       },
       "id": "961314fa-c312-68ab-8dce-cbb71e30c268",
-      "uniqueName": "dependabot@tingle.software",
+      "uniqueName": "dependabot@paklo.app",
       "imageUrl": "https://dev.azure.com/dependabot/_api/_common/identityImage?id=961314fa-c312-68ab-8dce-cbb71e30c268",
       "descriptor": "aad.OTYxMzE0ZmEtYzMxMi03OGFiLThkY2UtY2JiNzFlMzBjMjY4"
     },
@@ -63,12 +63,12 @@
       "commitId": "74f9ceb316ef52762eea289d63fbac6c8f2a224d",
       "author": {
         "name": "dependabot",
-        "email": "dependabot@tingle.software",
+        "email": "dependabot@paklo.app",
         "date": "2023-01-18T04:03:20Z"
       },
       "committer": {
         "name": "dependabot",
-        "email": "dependabot@tingle.software",
+        "email": "dependabot@paklo.app",
         "date": "2023-01-18T04:03:20Z"
       },
       "comment": "Merge pull request 22568 from dependabot/nuget/Tingle.EventBus.Transports.InMemory-0.18.0 into main",
@@ -89,7 +89,7 @@
           }
         },
         "id": "ddc45be0-f1fe-6042-87ac-e6dbbdbc3b45",
-        "uniqueName": "mburumaxwell@tingle.software",
+        "uniqueName": "mburumaxwell@paklo.app",
         "imageUrl": "https://dev.azure.com/dependabot/_api/_common/identityImage?id=ddc45be0-f1fe-6042-87ac-e6dbbdbc3b45"
       }
     ],
@@ -120,7 +120,7 @@
         }
       },
       "id": "961314fa-c312-68ab-8dce-cbb71e30c268",
-      "uniqueName": "dependabot@tingle.software",
+      "uniqueName": "dependabot@paklo.app",
       "imageUrl": "https://dev.azure.com/dependabot/_api/_common/identityImage?id=961314fa-c312-68ab-8dce-cbb71e30c268",
       "descriptor": "aad.OTYxMzE0ZmEtYzMxMi03OGFiLThkY2UtY2JiNzFlMzBjMjY4"
     },

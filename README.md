@@ -2,10 +2,10 @@
 
 This repository contains tools for updating dependencies in Azure DevOps repositories using [Dependabot](https://dependabot.com).
 
-![Extension - Azure](https://img.shields.io/github/actions/workflow/status/mburumaxwell/dependabot-azure-devops/extension-azure.yml?branch=main&label=Extension%20-%20Azure&style=flat-square)
-![Web](https://img.shields.io/github/actions/workflow/status/mburumaxwell/dependabot-azure-devops/web.yml?branch=main&label=Web&style=flat-square)
-![CLI](https://img.shields.io/github/actions/workflow/status/mburumaxwell/dependabot-azure-devops/cli.yml?branch=main&label=CLI&style=flat-square)
-[![license](https://img.shields.io/github/license/mburumaxwell/dependabot-azure-devops.svg?style=flat-square)](LICENSE)
+![Extension - Azure](https://img.shields.io/github/actions/workflow/status/mburumaxwell/paklo/extension-azure.yml?branch=main&label=Extension%20-%20Azure&style=flat-square)
+![Web](https://img.shields.io/github/actions/workflow/status/mburumaxwell/paklo/web.yml?branch=main&label=Web&style=flat-square)
+![CLI](https://img.shields.io/github/actions/workflow/status/mburumaxwell/paklo/cli.yml?branch=main&label=CLI&style=flat-square)
+[![license](https://img.shields.io/github/license/mburumaxwell/paklo.svg?style=flat-square)](LICENSE)
 
 In this repository you'll find:
 
@@ -192,7 +192,7 @@ No longer functional.
 - [`directories`](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#directories-or-directory--) are not supported.
 - [`groups`](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#groups--) are not supported.
 - [`assignees`](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#assignees--) must be a list of user GUIDs; email addresses and group/team names are not supported.
-- Private feed/registry authentication may not work with all package ecosystems. See [problems with authentication](https://github.com/mburumaxwell/dependabot-azure-devops/discussions/1317) for more.
+- Private feed/registry authentication may not work with all package ecosystems. See [problems with authentication](https://github.com/mburumaxwell/paklo/discussions/1317) for more.
 
 ## Contributing
 
@@ -200,8 +200,8 @@ No longer functional.
 
 ### Reporting issues and feature requests
 
-Please leave all issues, bugs, and feature requests on the [issues page](https://github.com/mburumaxwell/dependabot-azure-devops/issues). We'll respond ASAP!
-Use the [discussions page](https://github.com/mburumaxwell/dependabot-azure-devops/discussions) for all other questions and comments.
+Please leave all issues, bugs, and feature requests on the [issues page](https://github.com/mburumaxwell/paklo/issues). We'll respond ASAP!
+Use the [discussions page](https://github.com/mburumaxwell/paklo/discussions) for all other questions and comments.
 
 ### Submitting pull requests
 

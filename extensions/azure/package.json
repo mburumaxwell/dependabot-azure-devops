@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mburumaxwell/dependabot-azure-devops.git",
+    "url": "git+https://github.com/mburumaxwell/paklo.git",
     "directory": "extensions/azure"
   },
   "keywords": [
@@ -32,9 +32,9 @@
     "devops"
   ],
   "bugs": {
-    "url": "https://github.com/mburumaxwell/dependabot-azure-devops/issues"
+    "url": "https://github.com/mburumaxwell/paklo/issues"
   },
-  "homepage": "https://github.com/mburumaxwell/dependabot-azure-devops#readme",
+  "homepage": "https://github.com/mburumaxwell/paklo#readme",
   "dependencies": {
     "@paklo/core": "workspace:*",
     "@paklo/runner": "workspace:*",

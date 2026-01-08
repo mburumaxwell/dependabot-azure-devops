@@ -79,7 +79,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
     // TODO: If and when Dependabot supports a better way to do security-only updates, remove this.
     if (config.updates?.some((u) => u['open-pull-requests-limit'] === 0)) {
       logger.warn(
-        'Security-only updates incur a slight performance overhead due to limitations in Dependabot CLI. For more info, see: https://github.com/mburumaxwell/dependabot-azure-devops/blob/main/README.md#configuring-security-advisories-and-known-vulnerabilities',
+        'Security-only updates incur a slight performance overhead due to limitations in Dependabot CLI. For more info, see: https://github.com/mburumaxwell/paklo/blob/main/README.md#configuring-security-advisories-and-known-vulnerabilities',
       );
     }
 

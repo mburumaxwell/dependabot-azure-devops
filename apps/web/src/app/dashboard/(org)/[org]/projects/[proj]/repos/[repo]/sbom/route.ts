@@ -74,7 +74,7 @@ export async function GET(_req: Request, params: RouteContext<'/dashboard/[org]/
 
   // add each dep to the SBOM
   for (const dep of deps) {
-    // ref: https://github.com/mburumaxwell/dependabot-azure-devops/dependency-graph/sbom
+    // ref: https://github.com/mburumaxwell/paklo/dependency-graph/sbom
     // Use PURL (Package URL) format to uniquely identify packages across ecosystems
     // e.g., pkg:npm/react@18.0.0 or pkg:pypi/django@4.2.0
     const purlType = dep.ecosystem.toLowerCase(); // npm, pypi, maven, etc.

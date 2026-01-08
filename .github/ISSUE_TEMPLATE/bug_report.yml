@@ -11,7 +11,7 @@ body:
       label: Categorization
       description: Please confirm these points before submitting
       options:
-        - label: This is not a permissions issue (Seek help at https://github.com/mburumaxwell/dependabot-azure-devops/discussions/1245)
+        - label: This is not a permissions issue (Seek help at https://github.com/mburumaxwell/paklo/discussions/1245)
           required: true
         - label: |
             This is an issue specific to Azure DevOps or this repository and does not belong in [dependabot-core](https://github.com/dependabot/dependabot-core).
@@ -28,7 +28,7 @@ body:
     attributes:
       label: Repository
       description: URL of the repository where the bug occurs
-      placeholder: e.g. https://dev.azure.com/tingle/dependabot/_git/repro-684
+      placeholder: e.g. https://dev.azure.com/paklo/dependabot/_git/repro-684
     validations:
       required: false
 
