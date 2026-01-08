@@ -4,6 +4,7 @@ import { generateCron } from '@/lib/cron';
 import { environment } from '@/lib/environment';
 import { PakloId } from '@/lib/ids';
 import { logger } from '@/lib/logger';
+import { getMongoCollection } from '@/lib/mongodb';
 import { type Organization, type OrganizationCredential, type Project, prisma, type Repository } from '@/lib/prisma';
 import { type ISyncProvider, type SynchronizerConfigurationItem, toSynchronizerProject } from './provider';
 
@@ -295,12 +296,14 @@ export class Synchronizer {
     const updatesMap = Object.fromEntries(updates.map((u) => [makeDirectoryKey(u), u]));
     const repositoryUpdates = await prisma.repositoryUpdate.findMany({
       where: { repositoryId: repository.id },
-      omit: { deps: true },
     });
     const updatesToDelete = repositoryUpdates.filter((u) => !updatesMap[makeDirectoryKey(u)]);
+    const updatesToDeleteIds = updatesToDelete.map((u) => u.id);
     const { count: deleted } = await prisma.repositoryUpdate.deleteMany({
-      where: { id: { in: updatesToDelete.map((u) => u.id) } },
+      where: { id: { in: updatesToDeleteIds } },
     });
+    const collection = await getMongoCollection('repository_update_dependencies');
+    await collection.deleteMany({ _id: { $in: updatesToDeleteIds } });
     logger.debug(`Deleted ${deleted} updates in repository ${repository.id} that have been removed.`);
     const updatesToUpsert = updates;
     for (const update of updatesToUpsert) {

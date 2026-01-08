@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import * as spdx from '@spdx/tools';
 import { notFound } from 'next/navigation';
 
+import { getMongoCollection } from '@/lib/mongodb';
 import { getSpdxDocumentName } from '@/lib/organizations';
 import { prisma } from '@/lib/prisma';
 
@@ -39,21 +40,47 @@ export async function GET(_req: Request, params: RouteContext<'/dashboard/[org]/
     ],
   );
 
-  // get all deps from repository updates
-  const deps = (
+  // get ids of all repository updates for this repository
+  const ids = (
     await prisma.repositoryUpdate.findMany({
       where: { repositoryId },
-      select: { deps: true },
+      select: { id: true },
     })
-  )
-    .flatMap((u) => u.deps)
-    .filter(Boolean)
-    .map((d) => d!);
+  ).map((u) => u.id);
+
+  // get all deps from repository updates using aggregate in one go
+  const collection = await getMongoCollection('repository_update_dependencies');
+  const deps = await collection
+    .aggregate<{ name: string; version: string | null | undefined; ecosystem: string }>([
+      { $match: { _id: { $in: ids } } },
+      { $unwind: '$deps' },
+      {
+        $project: {
+          name: '$deps.name',
+          version: '$deps.version',
+          ecosystem: '$ecosystem',
+        },
+      },
+      {
+        $group: {
+          _id: { name: '$name', version: '$version', ecosystem: '$ecosystem' },
+          name: { $first: '$name' },
+          version: { $first: '$version' },
+          ecosystem: { $first: '$ecosystem' },
+        },
+      },
+    ])
+    .toArray();
 
   // add each dep to the SBOM
   for (const dep of deps) {
     // ref: https://github.com/mburumaxwell/dependabot-azure-devops/dependency-graph/sbom
-    const pkg = document.addPackage(dep.name, {
+    // Use PURL (Package URL) format to uniquely identify packages across ecosystems
+    // e.g., pkg:npm/react@18.0.0 or pkg:pypi/django@4.2.0
+    const purlType = dep.ecosystem.toLowerCase(); // npm, pypi, maven, etc.
+    const packageName = `pkg:${purlType}/${dep.name}`;
+
+    const pkg = document.addPackage(packageName, {
       version: dep.version ?? 'NOASSERTION',
       downloadLocation: 'NOASSERTION',
     });

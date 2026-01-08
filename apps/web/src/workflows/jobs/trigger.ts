@@ -139,7 +139,6 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions): Prom
       id: hasRequestedSpecificUpdates ? { in: repositoryUpdateIds } : undefined,
       repositoryId: hasRequestedSpecificUpdates ? undefined : repositoryId,
     },
-    omit: { deps: true },
   });
 
   let config: DependabotConfig | undefined;

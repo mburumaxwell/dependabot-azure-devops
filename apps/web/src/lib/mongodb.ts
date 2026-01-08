@@ -1,3 +1,4 @@
+import { PackageEcosystemSchema } from '@paklo/core/dependabot';
 import { UsageTelemetryRequestDataSchema } from '@paklo/core/usage';
 import { type Document, MongoClient } from 'mongodb';
 import { z } from 'zod';
@@ -25,6 +26,7 @@ export async function closeMongoClient() {
 type EnsureDocumentMap<T extends Record<string, Document>> = T;
 type Collections = EnsureDocumentMap<{
   usage_telemetry: UsageTelemetry;
+  repository_update_dependencies: RepositoryUpdateDependencies;
   // add future collections here
 }>;
 
@@ -49,5 +51,17 @@ export const UsageTelemetrySchema = z.object({
   ...UsageTelemetryRequestDataSchema.omit({ id: true }).shape,
 });
 export type UsageTelemetry = z.infer<typeof UsageTelemetrySchema>;
+
+export const RepositoryUpdateDependenciesSchema = z.object({
+  _id: z.string(),
+  ecosystem: PackageEcosystemSchema,
+  deps: z
+    .object({
+      name: z.string(),
+      version: z.string().nullish(),
+    })
+    .array(),
+});
+export type RepositoryUpdateDependencies = z.infer<typeof RepositoryUpdateDependenciesSchema>;
 
 export type { AnyBulkWriteOperation, Filter } from 'mongodb';

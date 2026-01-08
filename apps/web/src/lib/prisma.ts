@@ -38,6 +38,4 @@ export type {
   JsonValue,
 } from '@/../.generated/prisma/runtime/library';
 
-export type DependabotPersistedDep = PrismaJson.DependabotPersistedDep;
-
 if (process.env.NODE_ENV === 'development') globalForPrisma.prisma = prisma;

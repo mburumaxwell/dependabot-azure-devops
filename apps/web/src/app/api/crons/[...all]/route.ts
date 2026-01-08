@@ -53,7 +53,6 @@ app.get('/trigger-update-jobs', async (context) => {
   const dueRepositoryUpdates = await prisma.repositoryUpdate.findMany({
     where: { enabled: true, nextUpdateJobAt: { lte: new Date() } },
     orderBy: { nextUpdateJobAt: 'asc' },
-    omit: { deps: true },
     take: 500,
   });
 

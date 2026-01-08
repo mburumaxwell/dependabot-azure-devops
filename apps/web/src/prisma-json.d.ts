@@ -15,10 +15,6 @@ import type { Period as ImportedPeriod } from '@/lib/period';
 
 declare global {
   namespace PrismaJson {
-    type DependabotPersistedDep = {
-      name: string;
-      version?: string;
-    };
     type DependabotPersistedPr = ImportedDependabotPersistedPr;
     type DependabotConfig = ImportedDependabotConfig;
     type DependabotJobConfig = ImportedDependabotJobConfig;
