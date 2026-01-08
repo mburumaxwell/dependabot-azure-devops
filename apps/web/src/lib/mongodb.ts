@@ -4,7 +4,7 @@ import { type Document, MongoClient } from 'mongodb';
 import { z } from 'zod';
 import { RegionCodeSchema } from '@/lib/regions';
 
-const url = process.env.MONGO_DATABASE_URL!;
+const url = process.env.MONGO_URL!;
 const client = new MongoClient(url);
 
 let connected = false;
