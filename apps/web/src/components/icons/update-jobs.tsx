@@ -1,7 +1,7 @@
 import { Calendar, CheckCircle2, CircleCheckBig, CircleX, Command, RefreshCw, Timer } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
-import type { UpdateJobStatus, UpdateJobTrigger } from '@/lib/prisma';
+import type { UpdateJobStatus, UpdateJobTrigger } from '@/lib/enums';
 import { cn } from '@/lib/utils';
 import type { IconProps } from './types';
 

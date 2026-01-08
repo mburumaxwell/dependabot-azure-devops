@@ -91,23 +91,6 @@ model Verification {
   @@map("verification")
 }
 
-enum OrganizationType {
-  azure
-  bitbucket
-  gitlab
-
-  @@map("organization_type")
-}
-
-enum SubscriptionStatus {
-  active
-  inactive
-  past_due
-  canceled
-
-  @@map("subscription_status")
-}
-
 model Organization {
   id                  String                  @id @map("_id")
   name                String
@@ -115,7 +98,8 @@ model Organization {
   logo                String?
   createdAt           DateTime
   metadata            String?
-  type                OrganizationType
+  /// [OrganizationType]
+  type                String
   url                 String
   /// [RegionCode]
   region              String
@@ -123,7 +107,8 @@ model Organization {
   providerApiEndpoint String
   customerId          String?
   subscriptionId      String?
-  subscriptionStatus  SubscriptionStatus?
+  /// [SubscriptionStatus]
+  subscriptionStatus  String?
   /// [Period]
   billingPeriod       Json?
   members             Member[]
@@ -189,18 +174,11 @@ model Passkey {
   @@map("passkey")
 }
 
-enum FeedbackAction {
-  organization_leave @map("organization.leave")
-  user_delete        @map("user.delete")
-  billing_cancel     @map("billing.cancel")
-
-  @@map("feedback_action")
-}
-
 model Feedback {
   id        String         @id @map("_id")
   createdAt DateTime       @default(now())
-  action    FeedbackAction
+  // [FeedbackAction]
+  action    String
   message   String
   metadata  String?
 
@@ -242,14 +220,6 @@ model OrganizationSecret {
   @@map("organization_secret")
 }
 
-enum SynchronizationStatus {
-  pending
-  success
-  failed
-
-  @@map("synchronization_status")
-}
-
 model Project {
   id                    String                @id @map("_id")
   organizationId        String
@@ -262,7 +232,8 @@ model Project {
   permalink             String
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
-  synchronizationStatus SynchronizationStatus
+  /// [SynchronizationStatus]
+  synchronizationStatus String
   synchronizedAt        DateTime?
   repositories          Repository[]
 
@@ -292,7 +263,8 @@ model Repository {
   configPath            String?
   /// Error that encountered, if any, when parsing the configuration file.
   synchronizationError  String?
-  synchronizationStatus SynchronizationStatus
+  /// [SynchronizationStatus]
+  synchronizationStatus String
   synchronizedAt        DateTime?
   updates               RepositoryUpdate[]
   pullRequests          RepositoryPullRequest[]
@@ -311,6 +283,7 @@ model RepositoryUpdate {
   repository      Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   repositoryId    String
   enabled         Boolean
+  /// [PackageEcosystem]
   ecosystem       String
   directory       String?
   directories     String[]
@@ -327,14 +300,6 @@ model RepositoryUpdate {
   @@map("repository_update")
 }
 
-enum RepositoryPullRequestStatus {
-  open
-  closed
-  merged
-
-  @@map("repository_pull_request_status")
-}
-
 model RepositoryPullRequest {
   id             String                      @id @map("_id")
   createdAt      DateTime                    @default(now())
@@ -342,8 +307,10 @@ model RepositoryPullRequest {
   repository     Repository                  @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   repositoryId   String
   providerId     Int
+  /// [DependabotPackageManager]
   packageManager String
-  status         RepositoryPullRequestStatus
+  /// [RepositoryPullRequestStatus]
+  status         String
 
   /// [DependabotPersistedPr]
   data Json
@@ -354,31 +321,14 @@ model RepositoryPullRequest {
   @@map("repository_pull_request")
 }
 
-enum UpdateJobTrigger {
-  synchronization
-  scheduled
-  conflicts
-  comment
-  manual
-
-  @@map("update_job_trigger")
-}
-
-enum UpdateJobStatus {
-  scheduled
-  running
-  succeeded
-  failed
-
-  @@map("update_job_status")
-}
-
 model UpdateJob {
   id        String           @id @map("_id")
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
-  status    UpdateJobStatus
-  trigger   UpdateJobTrigger
+  /// [UpdateJobStatus]
+  status    String
+  /// [UpdateJobTrigger]
+  trigger   String
 
   // no related objects to allow delete to not cascade, records retained for billing and analytics
   organizationId     String
@@ -390,9 +340,9 @@ model UpdateJob {
 
   /// Commit SHA of the configuration file used for the update.
   commit         String
-  /// Ecosystem for the update (e.g., npm, dotnet-sdk, etc.)
+  /// [PackageEcosystem]
   ecosystem      String
-  /// Package manager for the update (e.g., npm_and_yarn, dotnet_sdk, etc.)
+  /// [DependabotPackageManager]
   packageManager String
   directory      String?
   directories    String[]

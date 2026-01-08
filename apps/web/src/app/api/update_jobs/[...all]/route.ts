@@ -12,7 +12,6 @@ import {
   getPullRequestDependencies,
   getPullRequestDescription,
   makeDirectoryKey,
-  type PackageEcosystem,
 } from '@paklo/core/dependabot';
 import { toNextJsHandler } from '@paklo/core/hono';
 import { resumeHook } from 'workflow/api';
@@ -91,8 +90,7 @@ async function handleRequest(id: string, request: DependabotRequest): Promise<bo
         { _id: repositoryUpdate.id },
         {
           $set: {
-            // TODO: remove cast once prisma has the enum set
-            ecosystem: repositoryUpdate.ecosystem as PackageEcosystem,
+            ecosystem: repositoryUpdate.ecosystem,
             deps: dependencies?.map((d) => ({ name: d.name, version: d.version ?? undefined })) ?? [],
           },
         },

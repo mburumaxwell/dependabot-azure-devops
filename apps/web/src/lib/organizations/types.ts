@@ -1,8 +1,5 @@
-import { z } from 'zod';
 import { AzureDevOpsLogo, BitbucketLogo, GitlabLogo } from '@/components/logos';
-import type { OrganizationType } from '@/lib/prisma';
-
-export const OrganizationTypeSchema = z.enum(['azure', 'bitbucket', 'gitlab']);
+import type { OrganizationType } from '@/lib/enums';
 
 export type OrganizationTypeInfo = {
   type: OrganizationType;

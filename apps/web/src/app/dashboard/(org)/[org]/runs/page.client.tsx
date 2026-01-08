@@ -10,8 +10,15 @@ import { Item, ItemActions, ItemContent, ItemMedia } from '@/components/ui/item'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { type TimeRange, timeRangeOptions } from '@/lib/aggregation';
-import { packageManagerOptions, updateJobStatusOptions, updateJobTriggerOptions, type WithAll } from '@/lib/enums';
-import type { Organization, Project, UpdateJob, UpdateJobStatus, UpdateJobTrigger } from '@/lib/prisma';
+import {
+  packageManagerOptions,
+  type UpdateJobStatus,
+  type UpdateJobTrigger,
+  updateJobStatusOptions,
+  updateJobTriggerOptions,
+  type WithAll,
+} from '@/lib/enums';
+import type { Organization, Project, UpdateJob } from '@/lib/prisma';
 import { formatDuration, updateFiltersInSearchParams } from '@/lib/utils';
 
 type SimpleOrganization = Pick<Organization, 'id' | 'slug'>;

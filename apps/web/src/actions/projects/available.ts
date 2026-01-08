@@ -1,7 +1,8 @@
 'use server';
 
 import { createAzdoClient } from '@/actions/organizations';
-import { type OrganizationType, prisma } from '@/lib/prisma';
+import type { OrganizationType } from '@/lib/enums';
+import { prisma } from '@/lib/prisma';
 
 export type AvailableProject = {
   name: string;

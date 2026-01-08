@@ -8,22 +8,15 @@ export const prisma = globalForPrisma.prisma || new PrismaClient({});
 
 export type {
   Feedback,
-  FeedbackAction,
   Organization,
   OrganizationCredential,
   OrganizationSecret,
-  OrganizationType,
   Project,
   Repository,
   RepositoryPullRequest,
-  RepositoryPullRequestStatus,
   RepositoryUpdate,
-  SubscriptionStatus,
-  SynchronizationStatus,
   UpdateJob,
   UpdateJobSecret,
-  UpdateJobStatus,
-  UpdateJobTrigger,
   Verification,
 } from '@/../.generated/prisma/client';
 

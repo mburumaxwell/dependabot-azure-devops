@@ -1,4 +1,4 @@
-import type { SynchronizationStatus } from '@/lib/prisma';
+import type { SynchronizationStatus } from '@/lib/enums';
 
 type ObjectCanBeSynchronized = {
   synchronizationStatus: SynchronizationStatus;

@@ -4,7 +4,8 @@ import { extractOrganizationUrl } from '@paklo/core/azure';
 import { Keygen } from '@paklo/core/keygen';
 import { headers as requestHeaders } from 'next/headers';
 import { auth, type Organization } from '@/lib/auth';
-import { type OrganizationType, prisma } from '@/lib/prisma';
+import type { OrganizationType } from '@/lib/enums';
+import { prisma } from '@/lib/prisma';
 import type { RegionCode } from '@/lib/regions';
 
 export type OrganizationCreateOptions = {

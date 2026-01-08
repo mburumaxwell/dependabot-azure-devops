@@ -4,7 +4,8 @@ import { ANONYMOUS_USER_ID, type AzureDevOpsOrganizationUrl, extractOrganization
 import { createGitHubClient } from '@paklo/core/github';
 import { RequestError } from 'octokit';
 import { deleteKeyVaultSecret, getKeyVaultSecret, setKeyVaultSecret } from '@/lib/azure';
-import { type Organization, type OrganizationType, prisma } from '@/lib/prisma';
+import type { OrganizationType } from '@/lib/enums';
+import { type Organization, prisma } from '@/lib/prisma';
 import type { RegionCode } from '@/lib/regions';
 import { createAzdoClient } from './client';
 

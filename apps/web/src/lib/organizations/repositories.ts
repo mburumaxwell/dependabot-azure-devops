@@ -1,4 +1,4 @@
-import type { OrganizationType } from '@/lib/prisma';
+import type { OrganizationType } from '@/lib/enums';
 import { trimTrailingSlash } from '@/lib/utils';
 
 export function getRepositoryFileUrl({ type, url, file }: { type: OrganizationType; url: string; file: string }) {

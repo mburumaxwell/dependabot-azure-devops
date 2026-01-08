@@ -2,8 +2,9 @@ import type { DependabotPackageManager } from '@paklo/core/dependabot';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getDateFromTimeRange, type TimeRange } from '@/lib/aggregation';
+import type { UpdateJobStatus, UpdateJobTrigger } from '@/lib/enums';
 import { unwrapWithAll, type WithAll } from '@/lib/enums';
-import { prisma, type UpdateJobStatus, type UpdateJobTrigger } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import RunsView from './page.client';
 
 export async function generateMetadata(props: PageProps<'/dashboard/[org]/runs'>): Promise<Metadata> {

@@ -1,4 +1,4 @@
-import type { OrganizationType } from '@/lib/prisma';
+import type { OrganizationType } from '@/lib/enums';
 
 export const HEADER_NAME_ORGANIZATION = 'X-Paklo-Organization';
 export const HEADER_NAME_PROJECT = 'X-Paklo-Project';

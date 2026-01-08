@@ -9,7 +9,6 @@ import {
   type FileUpdaterInput,
   makeDirectoryKey,
   mapPackageEcosystemToPackageManager,
-  type PackageEcosystem,
   parseDependabotConfig,
 } from '@paklo/core/dependabot';
 import type { SecurityVulnerability } from '@paklo/core/github';
@@ -42,11 +41,12 @@ import {
   resourceGroupNameJobs,
 } from '@/lib/azure';
 import { METER_EVENT_NAME_USAGE, stripe } from '@/lib/billing';
+import type { UpdateJobTrigger } from '@/lib/enums';
 import { environment } from '@/lib/environment';
 import { enableDependabotConnectivityCheck } from '@/lib/flags';
 import { SequenceNumber } from '@/lib/ids';
 import { logger } from '@/lib/logger';
-import { prisma, type UpdateJob, type UpdateJobTrigger } from '@/lib/prisma';
+import { prisma, type UpdateJob } from '@/lib/prisma';
 import { type RegionCode, toAzureLocation } from '@/lib/regions';
 import { streamToString } from '@/lib/utils';
 import { config } from '@/site-config';
@@ -148,7 +148,7 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions): Prom
   const existingUpdateJobs: UpdateJob[] = [];
   const createdUpdateJobs: UpdateJob[] = [];
   for (const repoUpdate of repositoryUpdates) {
-    const ecosystem = repoUpdate.ecosystem as PackageEcosystem;
+    const { ecosystem } = repoUpdate;
     const packageManager = mapPackageEcosystemToPackageManager(ecosystem);
 
     // a job is already existing for this run if it matches: packageManager, directoryKey, workflowRunId
