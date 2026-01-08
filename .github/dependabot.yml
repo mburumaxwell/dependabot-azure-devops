@@ -70,6 +70,7 @@ updates:
       prisma: { patterns: ['prisma*', '@prisma/*'] }
       radix-ui: { patterns: ['@radix-ui*', 'radix-*'] }
       react-email: { patterns: ['@react-email/*', 'react-email'] }
+      stripe: { patterns: ['stripe*', '@stripe/*'] }
       validator: { patterns: ['@types/validator', 'validator'] }
       vercel:
         patterns: ['@vercel/*', 'vercel']
