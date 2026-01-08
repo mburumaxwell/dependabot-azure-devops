@@ -39,7 +39,7 @@ export default async function Page(props: PageProps<'/dashboard/usage'>) {
   const collection = await getMongoCollection('usage_telemetry');
   const query: Filter<UsageTelemetry> = {
     started: { $gte: start, $lte: end },
-    ...(packageManager ? { packageManager } : {}),
+    ...(packageManager ? { 'package-manager': packageManager } : {}),
     ...(success !== undefined ? { success: success } : {}),
   };
   const telemetries = await collection
@@ -47,7 +47,7 @@ export default async function Page(props: PageProps<'/dashboard/usage'>) {
     .sort({ started: -1 })
     .project<SlimTelemetry>({
       _id: 1,
-      packageManager: 1,
+      'package-manager': 1,
       started: 1,
       success: 1,
       duration: 1,
