@@ -1,5 +1,12 @@
 # extension-azure-devops
 
+## 2.63.3
+
+### Patch Changes
+
+- Updated dependencies [[`d2aa368`](https://github.com/mburumaxwell/dependabot-azure-devops/commit/d2aa368588b40f7b774b7d3da9d054396455280b)]:
+  - @paklo/runner@0.8.3
+
 ## 2.63.2
 
 ### Patch Changes
