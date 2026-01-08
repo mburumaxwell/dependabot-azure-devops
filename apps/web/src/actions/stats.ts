@@ -30,7 +30,7 @@ export async function getHomePageStats(timeRange: TimeRange): Promise<HomePageSt
   logger.info(`Fetching home page stats for time range: ${timeRange}`);
   type AggResult = { totalDuration: number; totalJobs: number };
   const { start, end } = getDateFromTimeRange(timeRange);
-  const collection = await getMongoCollection('usage_telemetry', process.env.MONGO_DB_NAME_LOCAL);
+  const collection = await getMongoCollection('usage_telemetry');
   const usages = await collection
     .aggregate<AggResult>([
       { $match: { started: { $gte: start, $lte: end } } },

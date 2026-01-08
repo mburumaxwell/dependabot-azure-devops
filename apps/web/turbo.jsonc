@@ -22,7 +22,6 @@
         "DEPLOY_GIT_COMMIT_SHA",
         "EXPERIMENTATION_CONFIG_ITEM_KEY",
         "MONGO_DATABASE_URL",
-        "MONGO_DB_NAME_LOCAL",
         "PORT",
         "RESEND_API_KEY",
         "STRIPE_SECRET_KEY",

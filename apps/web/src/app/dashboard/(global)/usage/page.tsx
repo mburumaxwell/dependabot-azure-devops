@@ -36,7 +36,7 @@ export default async function Page(props: PageProps<'/dashboard/usage'>) {
   const packageManager = unwrapWithAll(selectedPackageManager);
   const success = successFilter === 'true' ? true : successFilter === 'false' ? false : undefined;
 
-  const collection = await getMongoCollection('usage_telemetry', process.env.MONGO_DB_NAME_LOCAL);
+  const collection = await getMongoCollection('usage_telemetry');
   const query: Filter<UsageTelemetry> = {
     started: { $gte: start, $lte: end },
     ...(packageManager ? { packageManager } : {}),
