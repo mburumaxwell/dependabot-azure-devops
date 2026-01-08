@@ -95,7 +95,7 @@ app.get('/trigger-update-jobs', async (context) => {
 });
 
 // CRON: 0 12 * * *
-app.get('/scan-vulnerabilities', async (context) => {
+app.get('/trigger-scan-vulnerabilities', async (context) => {
   await start(scanVulnerabilities, []);
   return context.body(null, 204);
 });

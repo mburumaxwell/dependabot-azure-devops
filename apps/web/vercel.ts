@@ -15,7 +15,7 @@ export const config: VercelConfig = {
     //   schedule: '23 */6 * * *',
     // },
     // {
-    //   path: '/api/crons/scan-vulnerabilities',
+    //   path: '/api/crons/trigger-scan-vulnerabilities',
     //   schedule: '0 12 * * *',
     // },
   ],
