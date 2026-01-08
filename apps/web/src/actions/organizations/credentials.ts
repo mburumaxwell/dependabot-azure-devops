@@ -24,7 +24,7 @@ export async function validateOrganizationCredentials({
   // ensure the URL can be parsed
   let url: AzureDevOpsOrganizationUrl;
   try {
-    url = extractOrganizationUrl({ organisationUrl: inputUrl });
+    url = extractOrganizationUrl({ organizationUrl: inputUrl });
   } catch (_error) {
     return {
       valid: false,

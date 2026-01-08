@@ -5,7 +5,7 @@ import { extractRepositoryUrl } from './url-parts';
 describe('extractRepositoryUrl', () => {
   it('works for old style devops url', () => {
     const url = extractRepositoryUrl({
-      organisationUrl: 'https://contoso.visualstudio.com/',
+      organizationUrl: 'https://contoso.visualstudio.com/',
       project: 'prj1',
       repository: 'repo1',
     });
@@ -19,7 +19,7 @@ describe('extractRepositoryUrl', () => {
 
   it('works for azure devops domain', () => {
     const url = extractRepositoryUrl({
-      organisationUrl: 'https://dev.azure.com/contoso/',
+      organizationUrl: 'https://dev.azure.com/contoso/',
       project: 'prj1',
       repository: 'repo1',
     });
@@ -33,7 +33,7 @@ describe('extractRepositoryUrl', () => {
 
   it('works for on-premise domain', () => {
     const url = extractRepositoryUrl({
-      organisationUrl: 'https://server.domain.com/tfs/contoso/',
+      organizationUrl: 'https://server.domain.com/tfs/contoso/',
       project: 'prj1',
       repository: 'repo1',
     });
@@ -47,7 +47,7 @@ describe('extractRepositoryUrl', () => {
 
   it('works for on-premise domain with port', () => {
     const url = extractRepositoryUrl({
-      organisationUrl: 'https://server.domain.com:8081/tfs/contoso/',
+      organizationUrl: 'https://server.domain.com:8081/tfs/contoso/',
       project: 'prj1',
       repository: 'repo1',
     });
@@ -60,7 +60,7 @@ describe('extractRepositoryUrl', () => {
 
   it('works for localhost', () => {
     const url = extractRepositoryUrl({
-      organisationUrl: 'http://localhost:8080/contoso/',
+      organizationUrl: 'http://localhost:8080/contoso/',
       project: 'prj1',
       repository: 'repo1',
     });
@@ -73,7 +73,7 @@ describe('extractRepositoryUrl', () => {
 
   it('works for project Uri', () => {
     const url = extractRepositoryUrl({
-      organisationUrl: 'https://dev.azure.com/contoso/Core',
+      organizationUrl: 'https://dev.azure.com/contoso/Core',
       project: 'prj1',
       repository: 'repo1',
     });
@@ -86,7 +86,7 @@ describe('extractRepositoryUrl', () => {
 
   it('works for project or repository with spaces', () => {
     const url = extractRepositoryUrl({
-      organisationUrl: 'https://dev.azure.com/contoso/',
+      organizationUrl: 'https://dev.azure.com/contoso/',
       project: 'prj 1',
       repository: 'repo 1',
     });
@@ -99,13 +99,13 @@ describe('extractRepositoryUrl', () => {
 
   it('works for azure devops domain without trailing slash', () => {
     const url = extractRepositoryUrl({
-      organisationUrl: 'https://dev.azure.com/contoso',
+      organizationUrl: 'https://dev.azure.com/contoso',
       project: 'prj1',
       repository: 'repo1',
     });
     expect(url.hostname).toBe('dev.azure.com');
     expect(url['api-endpoint']).toBe('https://dev.azure.com/');
-    expect(url.organisation).toBe('contoso');
+    expect(url.organization).toBe('contoso');
     expect(url.project).toBe('prj1');
     expect(url.repository).toBe('repo1');
     expect(url['repository-slug']).toBe('contoso/prj1/_git/repo1');
@@ -113,7 +113,7 @@ describe('extractRepositoryUrl', () => {
 
   it('handles already-encoded project and repository names to prevent double-encoding', () => {
     const url = extractRepositoryUrl({
-      organisationUrl: 'https://dev.azure.com/contoso/',
+      organizationUrl: 'https://dev.azure.com/contoso/',
       project: 'Markt%20-%20Project', // already encoded input
       repository: 'repo%201', // already encoded input
     });

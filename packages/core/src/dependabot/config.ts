@@ -34,7 +34,7 @@ export const DependabotRegistrySchema = z
     'replaces-base': z.boolean().optional(),
     host: z.string().optional(), // for terraform and composer only
     registry: z.string().optional(), // for npm only
-    organization: z.string().optional(), // for hex-organisation only
+    organization: z.string().optional(), // for hex-organization only
     repo: z.string().optional(), // for hex-repository only
     'public-key-fingerprint': z.string().optional(), // for hex-repository only
     'index-url': z.string().optional(), // for python-index only

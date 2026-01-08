@@ -31,7 +31,7 @@ Privacy Policy.
 
 We collect information in three main ways:
 
-- **Information you provide**: name, email address, organisation details,
+- **Information you provide**: name, email address, organization details,
 support requests, and any information you send us directly.
 - **Account, billing, and usage information**: subscription status and billing
 details handled by our payment provider, plus Service usage data (for example,

@@ -1,15 +1,15 @@
 export type AzureDevOpsOrganizationUrl = {
-  /** URL of the organisation. This may lack the project name */
+  /** URL of the organization. This may lack the project name */
   value: URL;
 
-  /** Organisation URL hostname */
+  /** Organization URL hostname */
   hostname: string;
 
-  /** Organisation API endpoint URL */
+  /** Organization API endpoint URL */
   'api-endpoint': string;
 
-  /** Organisation name/slug */
-  organisation: string;
+  /** Organization name/slug */
+  organization: string;
 
   /** Virtual directory if present (on-premises only) */
   'virtual-directory'?: string;
@@ -40,15 +40,15 @@ export type AzureDevOpsRepositoryUrl = AzureDevOpsProjectUrl & {
   'repository-slug': string;
 };
 
-export function extractOrganizationUrl({ organisationUrl }: { organisationUrl: string }): AzureDevOpsOrganizationUrl {
+export function extractOrganizationUrl({ organizationUrl }: { organizationUrl: string }): AzureDevOpsOrganizationUrl {
   // convert url string into a valid JS URL object
-  const value = new URL(organisationUrl);
+  const value = new URL(organizationUrl);
   const protocol = value.protocol.slice(0, -1);
   let { hostname } = value;
   const visualStudioUrlRegex = /^(?<prefix>\S+)\.visualstudio\.com$/iu;
   if (visualStudioUrlRegex.test(hostname)) hostname = 'dev.azure.com';
 
-  const organisation: string = extractOrganisation(organisationUrl);
+  const organization: string = extractOrganization(organizationUrl);
 
   const virtualDirectory = extractVirtualDirectory(value);
   const apiEndpoint = `${protocol}://${hostname}${value.port ? `:${value.port}` : ''}/${virtualDirectory ? `${virtualDirectory}/` : ''}`;
@@ -58,27 +58,27 @@ export function extractOrganizationUrl({ organisationUrl }: { organisationUrl: s
   const identityApiUrl =
     hostname === 'dev.azure.com' || hostname.endsWith('.visualstudio.com')
       ? // https://learn.microsoft.com/en-us/rest/api/azure/devops/ims/identities/read-identities
-        new URL(`https://vssps.dev.azure.com/${organisation}/`)
+        new URL(`https://vssps.dev.azure.com/${organization}/`)
       : value;
 
   return {
     value,
     hostname,
     'api-endpoint': apiEndpoint,
-    organisation,
+    organization,
     'virtual-directory': virtualDirectory,
     'identity-api-url': identityApiUrl,
   };
 }
 
 export function extractProjectUrl({
-  organisationUrl,
+  organizationUrl,
   project,
 }: {
-  organisationUrl: string;
+  organizationUrl: string;
   project: string;
 }): AzureDevOpsProjectUrl {
-  const extracted = extractOrganizationUrl({ organisationUrl });
+  const extracted = extractOrganizationUrl({ organizationUrl });
   // Decode to handle already-encoded inputs, store raw for client methods to encode
   const decodedProject = decodeURIComponent(project);
 
@@ -89,21 +89,21 @@ export function extractProjectUrl({
 }
 
 export function extractRepositoryUrl({
-  organisationUrl,
+  organizationUrl,
   project,
   repository,
 }: {
-  organisationUrl: string;
+  organizationUrl: string;
   project: string;
   repository: string;
 }): AzureDevOpsRepositoryUrl {
-  const extracted = extractProjectUrl({ organisationUrl, project });
-  const { organisation, 'virtual-directory': virtualDirectory, project: decodedProject } = extracted;
+  const extracted = extractProjectUrl({ organizationUrl, project });
+  const { organization, 'virtual-directory': virtualDirectory, project: decodedProject } = extracted;
 
   // Decode to handle already-encoded inputs, store raw for client methods to encode
   const decodedRepository = decodeURIComponent(repository);
   // For the slug, encode since it's used in display/logging contexts
-  const repoSlug = `${virtualDirectory ? `${virtualDirectory}/` : ''}${organisation}/${encodeURI(decodedProject)}/_git/${encodeURI(decodedRepository)}`;
+  const repoSlug = `${virtualDirectory ? `${virtualDirectory}/` : ''}${organization}/${encodeURI(decodedProject)}/_git/${encodeURI(decodedRepository)}`;
 
   return {
     ...extracted,
@@ -113,14 +113,14 @@ export function extractRepositoryUrl({
 }
 
 /**
- * Extract organisation name from organisation URL
+ * Extract organization name from organization URL
  *
- * @param organisationUrl
+ * @param organizationUrl
  *
- * @returns organisation name
+ * @returns organization name
  */
-function extractOrganisation(organisationUrl: string): string {
-  const url = new URL(organisationUrl);
+function extractOrganization(organizationUrl: string): string {
+  const url = new URL(organizationUrl);
   const { hostname, pathname } = url;
 
   // Check for old style: https://x.visualstudio.com/
@@ -142,23 +142,23 @@ function extractOrganisation(organisationUrl: string): string {
     return pathSegments[0]!; // Always return the first path segment for dev.azure.com
   }
 
-  throw new Error(`Error parsing organisation from organisation url: '${organisationUrl}'.`);
+  throw new Error(`Error parsing organization from organization url: '${organizationUrl}'.`);
 }
 
 /**
- * Extract virtual directory from organisation URL
+ * Extract virtual directory from organization URL
  *
  * Virtual Directories are sometimes used in on-premises
- * @param organisationUrl
+ * @param organizationUrl
  *
  * @returns virtual directory
  *
  * @example URLs typically are like this:`https://server.domain.com/tfs/x/` and `tfs` is the virtual directory
  */
-function extractVirtualDirectory(organisationUrl: URL) {
+function extractVirtualDirectory(organizationUrl: URL) {
   // extract the pathname from the url then split
   // pathname takes the shape '/tfs/x/'
-  const path = organisationUrl.pathname.split('/');
+  const path = organizationUrl.pathname.split('/');
 
   // Virtual Directories are sometimes used in on-premises
   // URLs typically are like this: https://server.domain.com/tfs/x/

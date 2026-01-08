@@ -34,7 +34,7 @@ In this repository you'll find:
 > [!WARNING]
 > It is strongly recommended that you complete (or abandon) all active pull requests created by the same user that were created manually or using earlier versions of the task.
 
-Dependabot for Azure DevOps must be explicitly configured to run in your organisation; creating a `dependabot.yml` file alone is **not** enough to enable updates. There are two ways to enable Dependabot, using:
+Dependabot for Azure DevOps must be explicitly configured to run in your organization; creating a `dependabot.yml` file alone is **not** enough to enable updates. There are two ways to enable Dependabot, using:
 
 - [Azure DevOps Extension](https://marketplace.visualstudio.com/items?itemName=tingle-software.dependabot) - Ideal if you want to get Dependabot running with minimal administrative effort. The extension can run directly inside your existing pipeline agents and doesn't require hosting of any additional services. Because the extension runs in pipelines, this option does **not** scale well if you have a large number of projects and repositories.
 

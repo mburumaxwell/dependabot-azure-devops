@@ -89,7 +89,7 @@ describe('AzureLocalJobsRunner', () => {
 
     options = {
       url: extractRepositoryUrl({
-        organisationUrl: 'https://dev.azure.com/test-org/',
+        organizationUrl: 'https://dev.azure.com/test-org/',
         project: 'test-project',
         repository: 'test-repo',
       }),

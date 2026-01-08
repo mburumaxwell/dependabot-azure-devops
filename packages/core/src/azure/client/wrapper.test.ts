@@ -9,7 +9,7 @@ vi.mock('ky');
 
 describe('AzureDevOpsClientWrapper', () => {
   const url = extractRepositoryUrl({
-    organisationUrl: 'https://dev.azure.com/mock-organization',
+    organizationUrl: 'https://dev.azure.com/mock-organization',
     project: 'project',
     repository: 'repository',
   });

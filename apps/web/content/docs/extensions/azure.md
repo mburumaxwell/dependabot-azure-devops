@@ -13,7 +13,7 @@ Dependabot will log more diagnostic information when [verbose logs are enabled](
 
 :::warning
 
-When sharing pipeline logs, please be aware that the **task log contains potentially sensitive information** such as your DevOps organisation name, project names, repository names, private package feeds URLs, list of used dependency names/versions, and the contents of any dependency files that are updated (e.g. `package.json`, `*.csproj`, etc). The Flame Graph report does **not** contain any sensitive information about your DevOps environment.
+When sharing pipeline logs, please be aware that the **task log contains potentially sensitive information** such as your DevOps organization name, project names, repository names, private package feeds URLs, list of used dependency names/versions, and the contents of any dependency files that are updated (e.g. `package.json`, `*.csproj`, etc). The Flame Graph report does **not** contain any sensitive information about your DevOps environment.
 
 :::
 
@@ -49,11 +49,11 @@ pnpm package -- --rev-version --publisher your-publisher-id-here
 
 ## Installing the extension
 
-To test the extension in a Azure DevOps organisation:
+To test the extension in a Azure DevOps organization:
 
 1. [Build the extension `.vsix` package](#building-the-extension)
 2. [Publish the extension to your publisher account](https://learn.microsoft.com/en-us/azure/devops/extend/publish/overview?view=azure-devops#publish-your-extension)
-3. [Share the extension with the organisation](https://learn.microsoft.com/en-us/azure/devops/extend/publish/overview?view=azure-devops#share-your-extension).
+3. [Share the extension with the organization](https://learn.microsoft.com/en-us/azure/devops/extend/publish/overview?view=azure-devops#share-your-extension).
 
 ## Running the task locally
 

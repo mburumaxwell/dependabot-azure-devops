@@ -49,7 +49,7 @@ export async function createAzdoClient<W extends boolean = false>(
         credential = credentialRecord;
       }
     }
-    url = extractOrganizationUrl({ organisationUrl: organization.url });
+    url = extractOrganizationUrl({ organizationUrl: organization.url });
     token = credential.token;
   } else {
     url = options.url;

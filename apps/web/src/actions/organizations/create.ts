@@ -50,13 +50,13 @@ export async function createOrganizationWithCredential(
 }
 
 type GetProviderStuffResult = Pick<Organization, 'providerHostname' | 'providerApiEndpoint'>;
-function getProviderStuff({ type, url: organisationUrl }: OrganizationCreateOptions): GetProviderStuffResult {
+function getProviderStuff({ type, url: organizationUrl }: OrganizationCreateOptions): GetProviderStuffResult {
   let hostname: string;
   let apiEndpoint: string;
 
   switch (type) {
     case 'azure': {
-      const url = extractOrganizationUrl({ organisationUrl });
+      const url = extractOrganizationUrl({ organizationUrl });
       hostname = url.hostname;
       apiEndpoint = url['api-endpoint'];
       break;

@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { type HandlerOptions, handlerOptions } from './base';
 
 const schema = z.object({
-  organisationUrl: z.string(),
+  organizationUrl: z.string(),
   project: z.string(),
   repository: z.string(),
   gitToken: z.string(),
@@ -14,12 +14,12 @@ const schema = z.object({
 type Options = z.infer<typeof schema>;
 
 async function handler({ options, error }: HandlerOptions<Options>) {
-  let { organisationUrl } = options;
+  let { organizationUrl } = options;
   const { gitToken, project, repository } = options;
 
   // extract url parts
-  if (!organisationUrl.endsWith('/')) organisationUrl = `${organisationUrl}/`; // without trailing slash the extraction fails
-  const url = extractRepositoryUrl({ organisationUrl, project, repository });
+  if (!organizationUrl.endsWith('/')) organizationUrl = `${organizationUrl}/`; // without trailing slash the extraction fails
+  const url = extractRepositoryUrl({ organizationUrl, project, repository });
 
   // prepare to find variables by asking user for input
   const variables = new Set<string>();
@@ -54,8 +54,8 @@ async function handler({ options, error }: HandlerOptions<Options>) {
 export const command = new Command('validate')
   .description('Validate a dependabot configuration file.')
   .requiredOption(
-    '--organisation-url <ORGANISATION-URL>',
-    'URL of the organisation e.g. https://dev.azure.com/my-org or https://my-org.visualstudio.com or http://my-org.com:8443/tfs',
+    '--organization-url <ORGANIZATION-URL>',
+    'URL of the organization e.g. https://dev.azure.com/my-org or https://my-org.visualstudio.com or http://my-org.com:8443/tfs',
   )
   .requiredOption('--project <PROJECT>', 'Name or ID of the project')
   .requiredOption('--repository <REPOSITORY>', 'Name or ID of the repository')

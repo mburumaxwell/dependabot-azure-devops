@@ -42,7 +42,7 @@ describe('AzureLocalDependabotServer', () => {
 
     options = {
       url: extractRepositoryUrl({
-        organisationUrl: 'http://localhost:8081/contoso/',
+        organizationUrl: 'http://localhost:8081/contoso/',
         project: 'testproject',
         repository: 'test-repo',
       }),

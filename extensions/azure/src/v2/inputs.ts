@@ -81,8 +81,8 @@ export function getTaskInputs(): TaskInputs {
     tl.debug(`Custom repository provided; Running update for remote repository.`);
   }
 
-  const organisationUrl = tl.getVariable('System.TeamFoundationCollectionUri')!;
-  const urlParts = extractRepositoryUrl({ organisationUrl, project, repository });
+  const organizationUrl = tl.getVariable('System.TeamFoundationCollectionUri')!;
+  const urlParts = extractRepositoryUrl({ organizationUrl, project, repository });
 
   // Prepare the access credentials
   const githubAccessToken = getGithubAccessToken();
@@ -166,8 +166,8 @@ export function getTaskInputs(): TaskInputs {
     dependabotUpdaterImage,
   };
 
-  // Mask environment, organisation, and project specific variables from the logs.
-  // Most user's environments are private and they're less likely to share diagnostic info when it exposes information about their environment or organisation.
+  // Mask environment, organization, and project specific variables from the logs.
+  // Most user's environments are private and they're less likely to share diagnostic info when it exposes information about their environment or organization.
   // Although not exhaustive, this will mask the most common information that could be used to identify the user's environment.
   if (inputs.secrets) {
     setSecrets(

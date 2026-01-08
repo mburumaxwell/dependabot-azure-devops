@@ -28,10 +28,10 @@ npx @paklo/cli --help
 
 ```bash
 # Validate your dependabot.yml configuration
-paklo validate --organisation-url https://dev.azure.com/my-org --project my-project --repository my-repo --git-token <TOKEN>
+paklo validate --organization-url https://dev.azure.com/my-org --project my-project --repository my-repo --git-token <TOKEN>
 
 # Run dependency updates locally
-paklo run --organisation-url https://dev.azure.com/my-org --project my-project --repository my-repo --git-token <TOKEN>
+paklo run --organization-url https://dev.azure.com/my-org --project my-project --repository my-repo --git-token <TOKEN>
 
 # Clean up Docker resources
 paklo cleanup
@@ -44,12 +44,12 @@ paklo cleanup
 Validates your Dependabot configuration file against a repository.
 
 ```bash
-paklo validate --organisation-url <ORGANISATION-URL> --project <PROJECT> --repository <REPOSITORY> --git-token <TOKEN>
+paklo validate --organization-url <ORGANIZATION-URL> --project <PROJECT> --repository <REPOSITORY> --git-token <TOKEN>
 ```
 
 **Options:**
 
-- `--organisation-url <ORGANISATION-URL>` - Azure DevOps organization URL (e.g., `https://dev.azure.com/my-org`) (required)
+- `--organization-url <ORGANIZATION-URL>` - Azure DevOps organization URL (e.g., `https://dev.azure.com/my-org`) (required)
 - `--project <PROJECT>` - Project name or ID (required)
 - `--repository <REPOSITORY>` - Repository name or ID (required)
 - `--git-token <TOKEN>` - Git access token (required)
@@ -59,12 +59,12 @@ paklo validate --organisation-url <ORGANISATION-URL> --project <PROJECT> --repos
 Executes Dependabot updates locally with full control over the process.
 
 ```bash
-paklo run --organisation-url <ORGANISATION-URL> --project <PROJECT> --repository <REPOSITORY> [options]
+paklo run --organization-url <ORGANIZATION-URL> --project <PROJECT> --repository <REPOSITORY> [options]
 ```
 
 **Key Options:**
 
-- `--organisation-url <ORGANISATION-URL>` - Azure DevOps organization URL (e.g., `https://dev.azure.com/my-org`) (required)
+- `--organization-url <ORGANIZATION-URL>` - Azure DevOps organization URL (e.g., `https://dev.azure.com/my-org`) (required)
 - `--project <PROJECT>` - Project name or ID (required)
 - `--repository <REPOSITORY>` - Repository name or ID (required)
 - `--git-token <TOKEN>` - Git access token (required)
@@ -84,7 +84,7 @@ paklo run --organisation-url <ORGANISATION-URL> --project <PROJECT> --repository
 **Example:**
 
 ```bash
-paklo run --organisation-url https://dev.azure.com/contoso \
+paklo run --organization-url https://dev.azure.com/contoso \
   --project contoso-project \
   --repository web-app \
   --git-token $GIT_TOKEN \
@@ -151,11 +151,11 @@ If you need to access private registries or feeds that use self-signed certifica
 ```bash
 # Using CUSTOM_CA_PATH
 export CUSTOM_CA_PATH=/path/to/your/certificate.crt
-paklo run --organisation-url https://dev.azure.com/my-org ...
+paklo run --organization-url https://dev.azure.com/my-org ...
 
 # Or using NODE_EXTRA_CA_CERTS
 export NODE_EXTRA_CA_CERTS=/path/to/your/certificate.crt
-paklo run --organisation-url https://dev.azure.com/my-org ...
+paklo run --organization-url https://dev.azure.com/my-org ...
 ```
 
 The certificate file should be in PEM format. This is particularly useful when:
@@ -171,7 +171,7 @@ export CUSTOM_CA_PATH=/etc/ssl/certs/company-ca.crt
 
 # Run Paklo with the custom certificate
 paklo run \
-  --organisation-url https://dev.azure.com/my-org \
+  --organization-url https://dev.azure.com/my-org \
   --project my-project \
   --repository my-repo \
   --git-token $GIT_TOKEN \
@@ -246,7 +246,7 @@ Paklo can be integrated into CI/CD pipelines for testing dependency updates:
 # Azure Pipelines example
 - script: |
     npm install -g @paklo/cli
-    paklo validate --organisation-url $(System.TeamFoundationCollectionUri) --project $(System.TeamProject) --repository $(Build.Repository.Name) --git-token $(System.AccessToken)
+    paklo validate --organization-url $(System.TeamFoundationCollectionUri) --project $(System.TeamProject) --repository $(Build.Repository.Name) --git-token $(System.AccessToken)
   displayName: 'Validate Dependabot Config'
 ```
 

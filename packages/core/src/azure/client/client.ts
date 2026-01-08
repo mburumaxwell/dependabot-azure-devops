@@ -21,7 +21,7 @@ export class AzureDevOpsClient {
   public readonly subscriptions: HookSubscriptionsClient;
 
   constructor(url: AzureDevOpsOrganizationUrl, accessToken: string, debug: boolean = false) {
-    this.organizationSlug = url.organisation;
+    this.organizationSlug = url.organization;
     const organizationUrl = url.value.toString().replace(/\/$/, ''); // trim trailing slash
     this.organizationUrl = organizationUrl;
     const mainClientOptions = AzureDevOpsClient.createClientOptions(accessToken, debug, {
