@@ -9,11 +9,12 @@ export const config = {
   domain: 'paklo.app',
   themeColor: 'oklch(0.4494 0.1221 138.11)', // '#2E6417',
   title: 'Paklo',
-  description: 'Dependabot-like automation on Azure DevOps',
+  description: 'Dependabot-like dependency updates for Azure DevOps — automated PRs and scheduling',
   keywords: [
     'paklo',
     'dependabot',
     'azure devops',
+    'dependabot azure devops',
     'security',
     'automation',
     'devops',
