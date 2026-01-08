@@ -2,7 +2,7 @@
 // https://www.prisma.io/docs/orm/prisma-schema/overview
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -20,7 +20,7 @@ generator json {
 }
 
 model User {
-  id            String       @id @map("_id")
+  id            String       @id
   name          String
   email         String
   emailVerified Boolean      @default(false)
@@ -42,7 +42,7 @@ model User {
 }
 
 model Session {
-  id                   String   @id @map("_id")
+  id                   String   @id
   expiresAt            DateTime
   token                String
   createdAt            DateTime @default(now())
@@ -60,7 +60,7 @@ model Session {
 }
 
 model Account {
-  id                    String    @id @map("_id")
+  id                    String    @id
   accountId             String
   providerId            String
   userId                String
@@ -80,7 +80,7 @@ model Account {
 }
 
 model Verification {
-  id         String   @id @map("_id")
+  id         String   @id
   identifier String
   value      String
   expiresAt  DateTime
@@ -92,7 +92,7 @@ model Verification {
 }
 
 model Organization {
-  id                  String                  @id @map("_id")
+  id                  String                  @id
   name                String
   slug                String
   logo                String?
@@ -125,7 +125,7 @@ model Organization {
 }
 
 model Member {
-  id             String       @id @map("_id")
+  id             String       @id
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   userId         String
@@ -139,7 +139,7 @@ model Member {
 }
 
 model Invitation {
-  id             String       @id @map("_id")
+  id             String       @id
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   email          String
@@ -156,7 +156,7 @@ model Invitation {
 }
 
 model Passkey {
-  id           String    @id @map("_id")
+  id           String    @id
   name         String?
   publicKey    String
   userId       String
@@ -175,7 +175,7 @@ model Passkey {
 }
 
 model Feedback {
-  id        String         @id @map("_id")
+  id        String         @id
   createdAt DateTime       @default(now())
   // [FeedbackAction]
   action    String
@@ -190,7 +190,7 @@ model Feedback {
 // organization data.
 
 model OrganizationCredential {
-  id                   String       @id @map("_id")
+  id                   String       @id
   organization         Organization @relation(fields: [id], references: [id], onDelete: Cascade)
   token                String
   tokenSecretUrl       String? // Hopefully won't need secret store with federated identity
@@ -203,7 +203,7 @@ model OrganizationCredential {
 }
 
 model OrganizationSecret {
-  id             String       @id @map("_id")
+  id             String       @id
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   name           String
@@ -221,7 +221,7 @@ model OrganizationSecret {
 }
 
 model Project {
-  id                    String                @id @map("_id")
+  id                    String                @id
   organizationId        String
   organization          Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   providerId            String
@@ -244,7 +244,7 @@ model Project {
 }
 
 model Repository {
-  id                    String                  @id @map("_id")
+  id                    String                  @id
   createdAt             DateTime                @default(now())
   updatedAt             DateTime                @updatedAt
   projectId             String
@@ -277,7 +277,7 @@ model Repository {
 }
 
 model RepositoryUpdate {
-  id              String     @id @map("_id")
+  id              String     @id
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
   repository      Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
@@ -301,7 +301,7 @@ model RepositoryUpdate {
 }
 
 model RepositoryPullRequest {
-  id             String                      @id @map("_id")
+  id             String                      @id
   createdAt      DateTime                    @default(now())
   updatedAt      DateTime                    @updatedAt
   repository     Repository                  @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
@@ -322,7 +322,7 @@ model RepositoryPullRequest {
 }
 
 model UpdateJob {
-  id        String           @id @map("_id")
+  id        String           @id
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
   /// [UpdateJobStatus]
@@ -381,7 +381,7 @@ model UpdateJob {
 /// This is stored separately to avoid accidental exposure.
 
 model UpdateJobSecret {
-  id               String    @id @map("_id")
+  id               String    @id
   job              UpdateJob @relation(fields: [id], references: [id], onDelete: Cascade)
   jobToken         String
   credentialsToken String

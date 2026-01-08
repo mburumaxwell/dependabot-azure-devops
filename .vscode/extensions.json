@@ -11,6 +11,7 @@
     "mongodb.mongodb-vscode",
     "ms-azuretools.vscode-bicep",
     "ms-azuretools.vscode-containers",
+    "ms-ossdata.vscode-pgsql",
     "Prisma.prisma",
     "redhat.vscode-yaml",
     "shardulm94.trailing-spaces",

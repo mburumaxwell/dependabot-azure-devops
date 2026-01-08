@@ -8,6 +8,7 @@ import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { MongoDBInstrumentation } from '@opentelemetry/instrumentation-mongodb';
+import { PgInstrumentation } from '@opentelemetry/instrumentation-pg';
 import { PinoInstrumentation } from '@opentelemetry/instrumentation-pino';
 import type { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { BatchLogRecordProcessor, type LogRecordExporter } from '@opentelemetry/sdk-logs';
@@ -23,6 +24,7 @@ export async function register() {
   const instrumentations: Configuration['instrumentations'] = [
     new PrismaInstrumentation(),
     new MongoDBInstrumentation(),
+    new PgInstrumentation(),
     new PinoInstrumentation(),
   ];
   const spanProcessors: Configuration['spanProcessors'] = [];

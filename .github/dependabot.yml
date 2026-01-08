@@ -90,5 +90,3 @@ updates:
         update-types: [version-update:semver-major] # shadcn still doesn't support (https://github.com/shadcn-ui/ui/issues/7669)
       - dependency-name: 'vite*'
         update-types: [version-update:semver-patch] # too many changes
-      - dependency-name: '*prisma*'
-        update-types: [version-update:semver-major] # wait until mongo is supported

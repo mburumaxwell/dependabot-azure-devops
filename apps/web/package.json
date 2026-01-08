@@ -44,6 +44,7 @@
     "@opentelemetry/exporter-trace-otlp-http": "0.208.0",
     "@opentelemetry/instrumentation": "0.208.0",
     "@opentelemetry/instrumentation-mongodb": "0.62.0",
+    "@opentelemetry/instrumentation-pg": "0.61.2",
     "@opentelemetry/instrumentation-pino": "0.55.1",
     "@opentelemetry/otlp-exporter-base": "0.208.0",
     "@opentelemetry/sdk-logs": "0.208.0",
