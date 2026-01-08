@@ -207,7 +207,7 @@ type AvatarSnippetProps = {
 function AvatarSnippet(props: AvatarSnippetProps) {
   return (
     <>
-      <AvatarSnippetHeader size={8} {...props} />
+      <AvatarSnippetHeader {...props} />
       <AvatarSnippetFooter {...props} />
     </>
   );
@@ -217,18 +217,15 @@ function AvatarSnippetHeader({
   title,
   subtitle,
   image,
-  size,
-  className,
   initialsType = 'all',
   ...props
-}: AvatarSnippetProps & { size: 4 | 8 } & React.ComponentProps<typeof Avatar>) {
+}: AvatarSnippetProps & React.ComponentProps<typeof Avatar>) {
   const initials = getInitials(title || subtitle || 'Paklo', initialsType);
 
   return (
-    // we override anything present because of size
-    <Avatar className={cn(className, `size-${size} rounded-lg`)} {...props}>
-      <AvatarImage src={image!} alt={title} />
-      <AvatarFallback className={`rounded-lg size-${size}`}>{initials}</AvatarFallback>
+    <Avatar {...props}>
+      {image && <AvatarImage src={image} alt={title} />}
+      <AvatarFallback>{initials}</AvatarFallback>
     </Avatar>
   );
 }
@@ -264,14 +261,11 @@ function OrganizationSwitcher({
               size='lg'
               className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
             >
-              <div className='flex aspect-square size-8 items-center justify-center rounded-lg'>
-                <AvatarSnippetHeader
-                  title={current.name || 'Organization'}
-                  subtitle={currentOrgTypeInfo?.name}
-                  image={current.logo}
-                  size={8}
-                />
-              </div>
+              <AvatarSnippetHeader
+                title={current.name || 'Organization'}
+                subtitle={currentOrgTypeInfo?.name}
+                image={current.logo}
+              />
               <AvatarSnippetFooter title={current.name || 'Organization'} subtitle={currentOrgTypeInfo?.name} />
               <ChevronsUpDown className='ml-auto' />
             </SidebarMenuButton>
@@ -289,16 +283,14 @@ function OrganizationSwitcher({
                 onClick={() => handleOrgChange(organization)}
                 className='gap-2 p-2'
               >
-                <div className='flex size-6 items-center justify-center rounded-md border'>
-                  <AvatarSnippetHeader
-                    title={organization.name}
-                    subtitle={getOrganizationTypeInfo(organization.type).name}
-                    image={organization.logo}
-                    size={4}
-                    className='shrink-0'
-                    initialsType='first'
-                  />
-                </div>
+                <AvatarSnippetHeader
+                  title={organization.name}
+                  subtitle={getOrganizationTypeInfo(organization.type).name}
+                  image={organization.logo}
+                  size='sm'
+                  className='shrink-0'
+                  initialsType='first'
+                />
                 {organization.name}
               </DropdownMenuItem>
             ))}

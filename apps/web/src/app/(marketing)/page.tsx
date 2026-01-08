@@ -151,8 +151,8 @@ export default async function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className='border-brand border-2 relative'>
-              <Badge variant='brand' className='absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1'>
+            <Card className='border-brand border-2 relative overflow-visible'>
+              <Badge variant='brand' className='absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-3'>
                 Recommended
               </Badge>
               <CardContent className='p-8'>
