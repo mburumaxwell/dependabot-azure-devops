@@ -159,6 +159,7 @@ paklo run --organization-url https://dev.azure.com/my-org ...
 ```
 
 The certificate file should be in PEM format. This is particularly useful when:
+
 - Accessing internal Artifactory, Nexus, or other private package repositories
 - Using corporate proxy servers with SSL inspection
 - Working with self-signed certificates in development environments
