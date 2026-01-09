@@ -1,16 +1,9 @@
 # Paklo Runner
 
-Mirrors the official dependabot-action runtime while adding the hooks we need to execute Dependabot jobs locally (via the CLI, Azure DevOps extension, or hosted service). It wires primitives into Docker orchestration, updater lifecycle management, and the lightweight local Azure runner/server.
+> **⚠️ Internal Package - Not for Direct Use**
 
-## Usage Expectations
+This package contains the Dependabot job execution runtime used internally by Paklo. It is not a public API and may change without notice.
 
-- Treated as an internal package; the public consumption surface is the CLI. Breaking changes can land without notice.
-- For behavior details, refer to the `dependabot-action` documentation—the runner intentionally stays aligned with it. This README only highlights the local execution differences.
-- Requires Node.js 22+ and access to a Docker daemon when running the full workflow.
+**Do not use this package directly.** Use `@paklo/cli` or the Azure DevOps extension instead.
 
-## Development
-
-- `pnpm dev` — watch mode for rapid iteration
-- `pnpm test` — run Vitest (includes local runner/server tests)
-- `pnpm lint` — Biome checks
-- `pnpm build` — produce compiled artifacts
+For contribution guidelines, see [Contributing](https://www.paklo.app/docs/contributing).

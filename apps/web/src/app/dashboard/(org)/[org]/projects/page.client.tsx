@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowUpRightIcon, Calendar, ChevronRightIcon, Folder, FolderGit2 } from 'lucide-react';
+import { Calendar, ChevronRightIcon, Folder, FolderGit2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SynchronizationStatusBadge } from '@/components/icons';
@@ -44,11 +44,6 @@ export function ProjectsView({
                 <Button onClick={handleConnectProjects}>Connect Projects</Button>
               </div>
             </EmptyContent>
-            <a href='/docs/getting-started/projects' target='_blank' rel='noreferrer'>
-              <Button variant='link' className='text-muted-foreground' size='sm'>
-                Learn More <ArrowUpRightIcon />
-              </Button>
-            </a>
           </Empty>
         </div>
       ) : (

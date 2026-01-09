@@ -1,4 +1,4 @@
-# Dependabot Azure DevOps Extension
+# Dependabot Azure DevOps (Paklo) Extension
 
 This is the unofficial [dependabot](https://github.com/Dependabot/dependabot-core) extension for [Azure DevOps](https://azure.microsoft.com/en-gb/services/devops/). It will allow you to run Dependabot inside a build pipeline.
 
@@ -46,7 +46,7 @@ steps:
 
 ## Task Requirements
 
-The task uses [dependabot-cli](https://github.com/dependabot/cli), which requires [Go](https://go.dev/doc/install) (1.22+) and [Docker](https://docs.docker.com/engine/install/) (with Linux containers) be installed on the pipeline agent.
+The task requires [Docker](https://docs.docker.com/engine/install/) (with Linux containers) be installed on the pipeline agent.
 If you use [Microsoft-hosted agents](https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops&tabs=yaml#software), we recommend using the [ubuntu-latest](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md) image, which meets all task requirements.
 
 Dependabot uses Docker containers, which may take time to install if not already cached. Subsequent dependabot tasks in the same job will be faster after initially pulling the images. An alternative way to run your pipelines faster is by leveraging Docker caching in Azure Pipelines (See [#113](https://github.com/mburumaxwell/paklo/issues/113#issuecomment-894771611)).
@@ -76,8 +76,12 @@ Dependabot uses Docker containers, which may take time to install if not already
 
 ## Advanced
 
-- [Configuring private feeds and registries](https://github.com/mburumaxwell/paklo/#configuring-private-feeds-and-registries)
-- [Configuring security advisories and known vulnerabilities](https://github.com/mburumaxwell/paklo/#configuring-security-advisories-and-known-vulnerabilities)
-- [Configuring experiments](https://github.com/mburumaxwell/paklo/#configuring-experiments)
-- [Configuring assignees](https://github.com/mburumaxwell/paklo/#configuring-assignees)
-- [Unsupported features and configurations](https://github.com/mburumaxwell/paklo/#unsupported-features-and-configurations)
+For advanced configuration and detailed documentation, see the [Azure DevOps Extension Documentation](https://www.paklo.app/docs/extensions/azure).
+
+- [Complete Task Parameters Reference](https://www.paklo.app/docs/extensions/azure#task-parameters)
+- [Private Registries Configuration](https://www.paklo.app/docs/private-registries)
+- [Custom CA Certificates](https://www.paklo.app/docs/custom-ca-certificates)
+- [Security Advisories](https://www.paklo.app/docs/security-advisories)
+- [Experiments Configuration](https://www.paklo.app/docs/experiments)
+- [Limitations and Unsupported Features](https://www.paklo.app/docs/limitations)
+- [Troubleshooting Guide](https://www.paklo.app/docs/troubleshooting)

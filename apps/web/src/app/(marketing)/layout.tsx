@@ -89,7 +89,7 @@ async function Footer() {
   ];
 
   const socialLinks = [
-    { name: 'GitHub', href: socials.github.repo, icon: GitHubLogo },
+    { name: 'GitHub', href: socials.github.url, icon: GitHubLogo },
     { name: 'Twitter', href: socials.twitter.url, icon: TwitterLogo },
     { name: 'LinkedIn', href: socials.linkedin.url, icon: LinkedInLogo },
   ];

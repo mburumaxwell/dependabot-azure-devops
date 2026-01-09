@@ -1,16 +1,9 @@
 # Paklo Core
 
-The shared toolkit for Paklo, ensuring consistent integrations with Azure DevOps, GitHub, Dependabot primitives, logging, HTTP helpers, and shared utilities.
+> **⚠️ Internal Package - Not for Direct Use**
 
-## Internal Surface Area
+This package contains shared utilities used internally by Paklo components. It is not a public API and may change without notice.
 
-- This package is not a public API. Names, exports, and behaviors may change at any time as we evolve the architecture.
-- Use it only from within this monorepo. External consumers should rely on higher-level packages such as `@paklo/cli`.
-- When contributing, prefer adding well-tested, isolated helpers so they can be reused by downstream packages.
+**Do not use this package directly.** Use `@paklo/cli` or the Azure DevOps extension instead.
 
-## Development
-
-- `pnpm dev` — watch mode via `tsdown`
-- `pnpm test` — run the Vitest suite (fixtures live under `packages/core/fixtures`)
-- `pnpm lint` — run Biome checks
-- `pnpm build` — build distributable artifacts
+For contribution guidelines, see [Contributing](https://www.paklo.app/docs/contributing).
