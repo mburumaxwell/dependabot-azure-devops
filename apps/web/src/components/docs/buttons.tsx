@@ -1,12 +1,11 @@
 'use client';
 
-import { buttonVariants } from 'fumadocs-ui/components/ui/button';
-import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
-import { Check, Copy } from 'lucide-react';
+import { Check, Copy, Edit } from 'lucide-react';
 import * as React from 'react';
+import { Button } from '@/components/ui/button';
+import { useCopyButton } from '@/hooks/use-copy-button';
 import { cn } from '@/lib/utils';
 
-// https://github.com/fuma-nama/fumadocs/blob/e2fbe21c8aca4485ee189f3bf2a83ceb1edc336e/apps/docs/components/ai/page-actions.tsx
 const cache = new Map<string, string>();
 
 type CopyMarkdownButtonProps = {
@@ -37,21 +36,27 @@ export function CopyMarkdownButton({ url, className, ...props }: CopyMarkdownBut
   });
 
   return (
-    <button
+    <Button
       disabled={isLoading}
-      className={cn(
-        buttonVariants({
-          color: 'secondary',
-          size: 'sm',
-          className: 'gap-2 [&_svg]:size-3.5 [&_svg]:text-fd-muted-foreground',
-        }),
-        className,
-      )}
+      size='sm'
+      variant='outline'
+      className={cn('text-xs gap-2', className)}
       onClick={onClick}
       {...props}
     >
       {checked ? <Check /> : <Copy />}
       Copy Markdown
-    </button>
+    </Button>
+  );
+}
+
+export function EditOnGitHub({className, ...props}: React.ComponentPropsWithoutRef<'a'>) {
+  return (
+    <a target='_blank' rel='noreferrer noopener' {...props}>
+      <Button size='sm' variant='outline' className={cn('text-xs gap-2 not-prose', className)}>
+        <Edit />
+        Edit on GitHub
+      </Button>
+    </a>
   );
 }
