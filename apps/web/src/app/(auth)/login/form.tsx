@@ -30,14 +30,27 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
 
   useEffect(() => setIsMounted(true), []);
 
+  // Preload passkey authentication for conditional UI
+  useEffect(() => {
+    if (!isMounted) return;
+
+    if (
+      !PublicKeyCredential.isConditionalMediationAvailable ||
+      !PublicKeyCredential.isConditionalMediationAvailable()
+    ) {
+      return;
+    }
+
+    const abortController = new AbortController();
+    void authClient.signIn.passkey({ autoFill: true, fetchOptions: { signal: abortController.signal } });
+    return () => abortController.abort();
+  }, [isMounted]);
+
   async function handlePasskeyLogin() {
     setIsLoading(true);
     let error: { code?: string; message?: string } | null = null;
     try {
-      ({ error } = await authClient.signIn.passkey({
-        // autoFill enables conditional UI but lots more needs to be done
-        // autoFill: true,
-      }));
+      ({ error } = await authClient.signIn.passkey({ autoFill: true }));
     } catch (err) {
       error = { message: (err as Error).message };
     }
@@ -146,7 +159,7 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
                 type='email'
                 placeholder='chris.johnson@contoso.com'
                 autoCapitalize='none'
-                autoComplete='email'
+                autoComplete='email webauthn'
                 autoCorrect='off'
                 required
                 value={email}
