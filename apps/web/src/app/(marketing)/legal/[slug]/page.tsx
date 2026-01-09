@@ -37,9 +37,11 @@ export default async function LegalDocPage(props: PageProps<'/legal/[slug]'>) {
             Published <TimeAgo value={doc.data.published} />
           </p>
           <span className='hidden md:block'>&nbsp;•&nbsp;</span>
-          <p>
-            Last updated <TimeAgo value={doc.data.lastModified ?? doc.data.published} />
-          </p>
+          {doc.data.lastModified && (
+            <p>
+              Last updated <TimeAgo value={doc.data.lastModified} />
+            </p>
+          )}
         </div>
       </div>
       <div className='mx-auto max-w-(--breakpoint-lg) p-4 sm:py-8 lg:px-20'>

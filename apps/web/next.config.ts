@@ -56,6 +56,11 @@ const config: NextConfig = {
         destination: `https://www.paklo.app/:path*`,
         permanent: true,
       },
+      {
+        source: '/legal',
+        destination: '/legal/terms',
+        permanent: false,
+      },
     ];
   },
 };

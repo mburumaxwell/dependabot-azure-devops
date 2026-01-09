@@ -1,7 +1,8 @@
-import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/page';
+import { DocsBody, DocsPage, PageLastUpdate } from 'fumadocs-ui/page';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Markdown } from '@/components/markdown';
+import { Separator } from '@/components/ui/separator';
 import { docs, getPageImage } from '@/lib/source';
 
 export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): Promise<Metadata> {
@@ -28,11 +29,14 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const body = doc.data.body;
 
   return (
-    <DocsPage toc={doc.data.toc} full={doc.data.full}>
-      <DocsTitle>{doc.data.title}</DocsTitle>
-      <DocsDescription>{doc.data.description}</DocsDescription>
+    <DocsPage toc={doc.data.toc} full={doc.data.full} tableOfContent={{ style: 'clerk' }}>
+      <h1 className='text-3xl font-semibold'>{doc.data.title}</h1>
+      <p className='text-lg text-fd-muted-foreground mb-2'>{doc.data.description}</p>
+      <Separator />
       <DocsBody>
         <Markdown body={body} source={docs} page={doc} />
+        <Separator />
+        {doc.data.lastModified && <PageLastUpdate date={doc.data.lastModified} />}
       </DocsBody>
     </DocsPage>
   );
