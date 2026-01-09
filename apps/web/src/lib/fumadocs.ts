@@ -3,6 +3,9 @@ import { type InferPageType, loader } from 'fumadocs-core/source';
 import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
 import { toFumadocsSource } from 'fumadocs-mdx/runtime/server';
 
+export { createFromSource } from 'fumadocs-core/search/server';
+export type { LoaderConfig, LoaderOutput, Page } from 'fumadocs-core/source';
+
 export const legal = loader(toFumadocsSource(allLegal, []), {
   baseUrl: '/legal',
 });

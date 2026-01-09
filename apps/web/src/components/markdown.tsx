@@ -1,8 +1,8 @@
-import type { LoaderConfig, LoaderOutput, Page } from 'fumadocs-core/source';
-import defaultMdxComponents, { createRelativeLink } from 'fumadocs-ui/mdx';
 import type { MDXComponents, MDXProps } from 'mdx/types';
 import type * as React from 'react';
+import { createRelativeLink, defaultMdxComponents } from '@/components/docs';
 import { Mermaid } from '@/components/mdx/mermaid';
+import type { LoaderConfig, LoaderOutput, Page } from '@/lib/fumadocs';
 
 import { cn } from '@/lib/utils';
 

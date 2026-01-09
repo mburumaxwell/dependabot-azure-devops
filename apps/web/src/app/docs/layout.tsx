@@ -1,7 +1,6 @@
-import { DocsLayout } from 'fumadocs-ui/layouts/docs';
-import { RootProvider } from 'fumadocs-ui/provider/next';
+import { DocsLayout, RootProvider } from '@/components/docs';
 import { PakloLogo } from '@/components/logos';
-import { docs } from '@/lib/source';
+import { docs } from '@/lib/fumadocs';
 import { config, socials } from '@/site-config';
 
 export { docsMetadata as metadata } from '@/lib/metadata';

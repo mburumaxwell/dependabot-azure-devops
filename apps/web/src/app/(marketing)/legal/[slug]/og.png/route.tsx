@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { generateOpenGraphImage } from '@/components/og-image';
-import { legal } from '@/lib/source';
+import { legal } from '@/lib/fumadocs';
 import { config } from '@/site-config';
 
 export async function GET(_req: Request, props: RouteContext<'/legal/[slug]/og.png'>) {

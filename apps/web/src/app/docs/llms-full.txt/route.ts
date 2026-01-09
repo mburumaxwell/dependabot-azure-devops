@@ -1,4 +1,4 @@
-import { docs, getLLMFullText } from '@/lib/source';
+import { docs, getLLMFullText } from '@/lib/fumadocs';
 
 export async function GET() {
   const scan = docs.getPages().map(getLLMFullText);

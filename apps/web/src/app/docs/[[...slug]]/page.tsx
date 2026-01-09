@@ -1,9 +1,9 @@
-import { DocsBody, DocsPage, PageLastUpdate } from 'fumadocs-ui/page';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { DocsBody, DocsPage, PageLastUpdate } from '@/components/docs';
 import { Markdown } from '@/components/markdown';
 import { Separator } from '@/components/ui/separator';
-import { docs, getPageImage } from '@/lib/source';
+import { docs, getPageImage } from '@/lib/fumadocs';
 
 export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): Promise<Metadata> {
   const { slug } = await props.params;

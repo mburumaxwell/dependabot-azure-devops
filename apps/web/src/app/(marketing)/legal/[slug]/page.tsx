@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Markdown } from '@/components/markdown';
 import { TimeAgo } from '@/components/time-ago';
-import { legal } from '@/lib/source';
+import { legal } from '@/lib/fumadocs';
 
 export async function generateMetadata(props: PageProps<'/legal/[slug]'>): Promise<Metadata> {
   const { slug } = await props.params;

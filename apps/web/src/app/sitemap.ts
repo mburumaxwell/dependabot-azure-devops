@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { docs, legal } from '@/lib/source';
+import { docs, legal } from '@/lib/fumadocs';
 import { config } from '@/site-config';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
