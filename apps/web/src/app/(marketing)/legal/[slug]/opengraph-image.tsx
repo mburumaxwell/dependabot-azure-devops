@@ -3,7 +3,10 @@ import { generateOpenGraphImage } from '@/components/og-image';
 import { legal } from '@/lib/fumadocs';
 import { config } from '@/site-config';
 
-export async function GET(_req: Request, props: RouteContext<'/legal/[slug]/og.png'>) {
+export const contentType = 'image/png';
+export const size = { width: 1200, height: 630 };
+
+export default async function Image(props: PageProps<'/legal/[slug]'>) {
   const { slug } = await props.params;
   const doc = legal.getPage([slug]);
   if (!doc) return notFound();

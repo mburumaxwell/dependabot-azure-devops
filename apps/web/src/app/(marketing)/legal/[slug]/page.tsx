@@ -12,10 +12,7 @@ export async function generateMetadata(props: PageProps<'/legal/[slug]'>): Promi
   return {
     title: doc.data.title,
     description: doc.data.description,
-    openGraph: {
-      url: doc.url,
-      images: `${doc.url}/og.png`,
-    },
+    openGraph: { url: doc.url },
   };
 }
 
