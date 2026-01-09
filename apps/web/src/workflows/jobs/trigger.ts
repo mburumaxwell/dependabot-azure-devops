@@ -20,8 +20,6 @@ import {
   extractUpdaterSha,
   JOB_INPUT_FILENAME,
   JOB_INPUT_PATH,
-  JOB_OUTPUT_FILENAME,
-  JOB_OUTPUT_PATH,
   PROXY_IMAGE_NAME,
   ProxyBuilder,
   REPO_CONTENTS_PATH,
@@ -478,8 +476,6 @@ export async function createAndStartJobResources({
             { name: 'DEPENDABOT_JOB_TOKEN', value: '' },
             { name: 'DEPENDABOT_JOB_PATH', value: `${JOB_INPUT_PATH}/${JOB_INPUT_FILENAME}` },
             { name: 'DEPENDABOT_OPEN_TIMEOUT_IN_SECONDS', value: '15' },
-            // not using the file share because we are not consuming the output yet
-            { name: 'DEPENDABOT_OUTPUT_PATH', value: `${JOB_OUTPUT_PATH}/${JOB_OUTPUT_FILENAME}` },
             // not using the file share because we do not need to clone repos there
             { name: 'DEPENDABOT_REPO_CONTENTS_PATH', value: REPO_CONTENTS_PATH },
             { name: 'DEPENDABOT_API_URL', value: apiUrl },
@@ -488,7 +484,6 @@ export async function createAndStartJobResources({
             { name: 'HTTP_PROXY', value: proxyUrl },
             { name: 'https_proxy', value: proxyUrl },
             { name: 'HTTPS_PROXY', value: proxyUrl },
-            { name: 'UPDATER_ONE_CONTAINER', value: '1' },
 
             // enable or disable connectivity check based on feature flag
             ...((await enableDependabotConnectivityCheck())

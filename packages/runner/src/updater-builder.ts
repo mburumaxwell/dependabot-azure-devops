@@ -9,8 +9,6 @@ import type { JobParameters } from './params';
 import type { Proxy } from './proxy';
 import { extractUpdaterSha } from './utils';
 
-export const JOB_OUTPUT_FILENAME = 'output.json';
-export const JOB_OUTPUT_PATH = '/home/dependabot/dependabot-updater/output';
 export const JOB_INPUT_FILENAME = 'job.json';
 export const JOB_INPUT_PATH = `/home/dependabot/dependabot-updater`;
 export const REPO_CONTENTS_PATH = '/home/dependabot/dependabot-updater/repo';
@@ -40,7 +38,6 @@ export class UpdaterBuilder {
       `DEPENDABOT_JOB_TOKEN=`,
       `DEPENDABOT_JOB_PATH=${JOB_INPUT_PATH}/${JOB_INPUT_FILENAME}`,
       `DEPENDABOT_OPEN_TIMEOUT_IN_SECONDS=15`,
-      `DEPENDABOT_OUTPUT_PATH=${JOB_OUTPUT_PATH}/${JOB_OUTPUT_FILENAME}`,
       `DEPENDABOT_REPO_CONTENTS_PATH=${REPO_CONTENTS_PATH}`,
       `DEPENDABOT_API_URL=${this.jobParams.dependabotApiDockerUrl}`,
       `SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt`,
@@ -48,7 +45,6 @@ export class UpdaterBuilder {
       `HTTP_PROXY=${proxyUrl}`,
       `https_proxy=${proxyUrl}`,
       `HTTPS_PROXY=${proxyUrl}`,
-      `UPDATER_ONE_CONTAINER=1`,
       `ENABLE_CONNECTIVITY_CHECK=${process.env.DEPENDABOT_ENABLE_CONNECTIVITY_CHECK || '1'}`,
 
       // for updates relying on .NET (e.g. NuGet) and running on macOS (e.g. dev laptop or local MacMini),
