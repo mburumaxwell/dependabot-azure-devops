@@ -12,7 +12,6 @@ import {
 
 // This file exists to allow usage without renaming other files to tsx e.g. auth.ts
 
-const FROM_NO_REPLY = 'Paklo (No Reply) <noreply@paklo.app>';
 const SUPPORT_EMAIL = 'Paklo Support <support@paklo.app>';
 
 type SimpleOptions = Omit<EmailRequest, 'from' | 'body' | 'subject' | 'replyTo' | 'to'> & {
@@ -25,8 +24,7 @@ export function sendMagicLinkEmail({
   ...remaining
 }: SimpleOptions & Omit<MagicLinkProps, 'recipient'>) {
   return send({
-    from: FROM_NO_REPLY,
-    replyTo: SUPPORT_EMAIL,
+    from: SUPPORT_EMAIL,
     subject: 'Your login link',
     body: <MagicLink recipient={recipient} url={url} />,
     to: recipient,
@@ -40,8 +38,7 @@ export function sendUserDeleteVerificationEmail({
   ...remaining
 }: SimpleOptions & Omit<UserDeleteVerificationProps, 'recipient'>) {
   return send({
-    from: FROM_NO_REPLY,
-    replyTo: SUPPORT_EMAIL,
+    from: SUPPORT_EMAIL,
     subject: 'Confirm your account deletion',
     body: <UserDeleteVerification recipient={recipient} url={url} />,
     to: recipient,
@@ -59,8 +56,7 @@ export function sendOrganizationInviteEmail({
   ...remaining
 }: SimpleOptions & Omit<OrganizationInviteProps, 'recipient'>) {
   return send({
-    from: FROM_NO_REPLY,
-    replyTo: SUPPORT_EMAIL,
+    from: SUPPORT_EMAIL,
     subject: `Invitation to join the ${organization} organization`,
     body: (
       <OrganizationInvite
@@ -84,8 +80,7 @@ export function sendOrganizationInviteDeclinedEmail({
   ...remaining
 }: SimpleOptions & Omit<OrganizationInviteDeclinedProps, 'recipient'>) {
   return send({
-    from: FROM_NO_REPLY,
-    replyTo: SUPPORT_EMAIL,
+    from: SUPPORT_EMAIL,
     subject: `Invitation to join the ${organization} organization declined`,
     body: <OrganizationInviteDeclined organization={organization} invitee={invitee} recipient={recipient} />,
     to: recipient,
