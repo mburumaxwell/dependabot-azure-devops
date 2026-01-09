@@ -32,6 +32,13 @@
         "VERCEL_GIT_COMMIT_SHA"
       ],
 
+      "inputs": [
+        // inherits from root
+        "$TURBO_EXTENDS$",
+        // include environment variables from devcontainer
+        "../../.devcontainer/devcontainer.env"
+      ],
+
       "outputs": [
         // inherits from root
         "$TURBO_EXTENDS$",
