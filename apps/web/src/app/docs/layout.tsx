@@ -1,14 +1,14 @@
 import { DocsLayout, RootProvider } from '@/components/docs';
 import { PakloLogo } from '@/components/logos';
 import { docs } from '@/lib/fumadocs';
-import { config, socials } from '@/site-config';
+import { config } from '@/site-config';
 
 export { docsMetadata as metadata } from '@/lib/metadata';
 
 export default function Layout({ children }: LayoutProps<'/docs'>) {
   return (
     <div className='flex flex-col min-h-screen'>
-      <RootProvider>
+      <RootProvider search={{ options: { api: '/api/docs/search' } }}>
         <DocsLayout
           tree={docs.pageTree}
           nav={{
@@ -19,7 +19,7 @@ export default function Layout({ children }: LayoutProps<'/docs'>) {
               </div>
             ),
           }}
-          githubUrl={socials.github.repo}
+          githubUrl={config.github.repo_url}
         >
           {children}
         </DocsLayout>

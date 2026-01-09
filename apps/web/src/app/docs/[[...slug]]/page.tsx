@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { DocsBody, DocsPage, PageLastUpdate } from '@/components/docs';
+import { CopyMarkdownButton, DocsBody, DocsPage, EditOnGitHub, PageLastUpdate } from '@/components/docs';
 import { Markdown } from '@/components/markdown';
 import { Separator } from '@/components/ui/separator';
 import { docs, getPageImage } from '@/lib/fumadocs';
+import { config } from '@/site-config';
 
 export async function generateMetadata(props: PageProps<'/docs/[[...slug]]'>): Promise<Metadata> {
   const { slug } = await props.params;
@@ -27,11 +28,16 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   if (!doc) return notFound();
 
   const body = doc.data.body;
+  const rawUrl = ['/docs/raw', ...doc.slugs].filter(Boolean).join('/');
 
   return (
     <DocsPage toc={doc.data.toc} full={doc.data.full} tableOfContent={{ style: 'clerk' }}>
       <h1 className='text-3xl font-semibold'>{doc.data.title}</h1>
       <p className='text-lg text-fd-muted-foreground mb-2'>{doc.data.description}</p>
+      <div className='flex flex-row flex-wrap gap-2 items-center'>
+        <CopyMarkdownButton url={rawUrl} />
+        <EditOnGitHub href={`${config.github.repo_url}/blob/main/apps/web/content/docs/${doc.path}`} />
+      </div>
       <Separator />
       <DocsBody>
         <Markdown body={body} source={docs} page={doc} />

@@ -1,164 +1,217 @@
 ---
-title: Azure Extension Guide
-description: Complete guide for using, troubleshooting, and developing the Dependabot Azure DevOps extension.
+title: Azure DevOps Extension
+description: Complete guide for using, troubleshooting, and developing the Azure DevOps extension.
 ---
 
-## Using the extension
+The Azure DevOps extension allows you to run Dependabot updates directly in your Azure Pipelines. This runs Dependabot in your pipeline agents using Docker containers.
 
-Refer to the extension [README.md](https://github.com/mburumaxwell/paklo/blob/main/extensions/azure/README.md).
+## Installation
+
+Install the extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=tingle-software.dependabot).
+
+## Quick Start
+
+Create a pipeline with the `dependabot@2` task:
+
+```yaml
+trigger: none # Disable CI trigger
+
+schedules:
+  - cron: '0 0 * * 0' # Weekly on Sunday at midnight UTC
+    always: true # Run even when there are no code changes
+    branches:
+      include:
+        - main
+    batch: true
+    displayName: Weekly Dependabot
+
+pool:
+  vmImage: 'ubuntu-latest' # Requires macOS or Ubuntu (Windows is not supported)
+
+steps:
+  - task: dependabot@2
+    inputs:
+      mergeStrategy: 'squash'
+```
+
+### Requirements
+
+The task requires:
+
+- [Docker](https://docs.docker.com/engine/install/) with Linux containers
+
+Microsoft-hosted agents like [`ubuntu-latest`](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md) include all requirements.
+
+### Configuration File
+
+Create a `dependabot.yml` file at `.github/dependabot.yml` or `.azuredevops/dependabot.yml`:
+
+```yaml
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+```
+
+See [Configuration](/docs/configuration) for all options.
+
+## Task Parameters
+
+### Basic Parameters
+
+| Input | Description | Default |
+| ----- | ----------- | ------- |
+| `dryRun` | Test logic without creating/updating PRs | `false` |
+| `setAutoComplete` | Enable auto-complete on created PRs | `false` |
+| `mergeStrategy` | Merge strategy: `squash`, `rebase`, `merge` | `squash` |
+| `autoApprove` | Automatically approve created PRs | `false` |
+
+### Authentication Parameters
+
+| Input | Description |
+| ----- | ----------- |
+| `azureDevOpsServiceConnection` | Service connection for Azure DevOps access |
+| `azureDevOpsAccessToken` | PAT for Azure DevOps (alternative to service connection) |
+| `gitHubConnection` | GitHub service connection for rate limiting/security advisories |
+| `gitHubAccessToken` | GitHub PAT (alternative to GitHub connection) |
+
+Required permissions for Azure DevOps PAT:
+
+- Code (Full)
+- Pull Requests Threads (Read & Write)
+
+### Customization Parameters
+
+| Input | Description | Default |
+| ----- | ----------- | ------- |
+| `authorEmail` | Email for commit author | `noreply@github.com` |
+| `authorName` | Name for commit author | `dependabot[bot]` |
+| `autoCompleteIgnoreConfigIds` | Policy IDs to ignore for auto-complete | - |
+| `autoApproveUserToken` | PAT for auto-approval (different user) | - |
+
+### Advanced Parameters
+
+| Input | Description |
+| ----- | ----------- |
+| `targetProjectName` | Target project (for multi-project pipelines) |
+| `targetRepositoryName` | Target repository (for multi-repo pipelines) |
+| `targetUpdateIds` | Semicolon-separated update IDs to run |
+| `experiments` | Comma-separated Dependabot experiments |
+| `dependabotUpdaterImage` | Custom updater Docker image |
+| `dependabotCliApiListeningPort` | Fixed port for Dependabot CLI API |
+
+### Examples
+
+#### Auto-Complete with Squash Merge
+
+```yaml
+- task: dependabot@2
+  inputs:
+    setAutoComplete: true
+    mergeStrategy: 'squash'
+    autoCompleteIgnoreConfigIds: '1,2'  # Ignore optional policies
+```
+
+#### Auto-Approve with Different User
+
+```yaml
+variables:
+  APPROVER_PAT: $(ApproverPersonalAccessToken)
+
+steps:
+  - task: dependabot@2
+    inputs:
+      autoApprove: true
+      autoApproveUserToken: $(APPROVER_PAT)
+```
+
+#### Using Service Connection
+
+```yaml
+- task: dependabot@2
+  inputs:
+    azureDevOpsServiceConnection: 'my-service-connection'
+    gitHubConnection: 'github-connection'
+```
+
+#### Security-Only Updates
+
+```yaml
+# dependabot.yml
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 0  # Security-only
+
+# Pipeline
+- task: dependabot@2
+  inputs:
+    gitHubAccessToken: $(GITHUB_TOKEN)  # Required for security advisories
+```
+
+#### Multi-Repository Pipeline
+
+```yaml
+steps:
+  - task: dependabot@2
+    displayName: 'Update repo-1'
+    inputs:
+      targetProjectName: 'my-project'
+      targetRepositoryName: 'repo-1'
+  
+  - task: dependabot@2
+    displayName: 'Update repo-2'
+    inputs:
+      targetProjectName: 'my-project'
+      targetRepositoryName: 'repo-2'
+```
+
+#### Custom Experiments
+
+```yaml
+- task: dependabot@2
+  inputs:
+    experiments: 'tidy=true,vendor=true,goprivate=*'
+```
+
+See [Experiments](/docs/experiments) for usage patterns.
+
+## Scheduling
+
+Since the `schedule` in `dependabot.yml` is not used (required for schema conformity only), use [Azure Pipelines scheduled triggers](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/scheduled-triggers):
+
+```yaml
+schedules:
+  # Daily at 2 AM UTC
+  - cron: '0 2 * * *'
+    displayName: Daily Dependabot
+    branches:
+      include:
+        - main
+    always: true
+
+  # Weekly on Monday at 8 AM UTC
+  - cron: '0 8 * * 1'
+    displayName: Weekly Dependabot
+    branches:
+      include:
+        - develop
+    always: true
+```
 
 ## Troubleshooting issues
 
 Dependabot will log more diagnostic information when [verbose logs are enabled](https://learn.microsoft.com/en-us/azure/devops/pipelines/troubleshooting/review-logs?view=azure-devops&tabs=windows-agent#configure-verbose-logs); i.e. `System.Debug` variable is set to `true`.
 
 :::warning
-
 When sharing pipeline logs, please be aware that the **task log contains potentially sensitive information** such as your DevOps organization name, project names, repository names, private package feeds URLs, list of used dependency names/versions, and the contents of any dependency files that are updated (e.g. `package.json`, `*.csproj`, etc). The Flame Graph report does **not** contain any sensitive information about your DevOps environment.
-
 :::
 
 :::info
-
 To mask environment secrets from the task log, set the `System.Secrets` variable to `true` in your pipeline.
-
 :::
-
-## Development guide
-
-## Getting the development environment ready
-
-Install [Node.js](https://docs.docker.com/engine/install/) (22+), [Go](https://go.dev/doc/install) (1.22+), and [Docker](https://docs.docker.com/engine/install/) (with Linux containers); Install project dependencies using PNPM:
-
-```bash
-cd extension
-pnpm install
-```
-
-## Building the extension
-
-```bash
-cd extension
-pnpm build
-```
-
-To then generate the a Azure DevOps `.vsix` extension package for testing, you'll first need to [create a publisher account](https://learn.microsoft.com/en-us/azure/devops/extend/publish/overview?view=azure-devops#create-a-publisher) for the [Visual Studio Marketplace Publishing Portal](https://marketplace.visualstudio.com/manage/createpublisher?managePageRedirect=true). After this, use `pnpm package` to build the package, with an override for your publisher ID:
-
-```bash
-pnpm package -- --rev-version --publisher your-publisher-id-here
-```
-
-## Installing the extension
-
-To test the extension in a Azure DevOps organization:
-
-1. [Build the extension `.vsix` package](#building-the-extension)
-2. [Publish the extension to your publisher account](https://learn.microsoft.com/en-us/azure/devops/extend/publish/overview?view=azure-devops#publish-your-extension)
-3. [Share the extension with the organization](https://learn.microsoft.com/en-us/azure/devops/extend/publish/overview?view=azure-devops#share-your-extension).
-
-## Running the task locally
-
-To run the latest task version:
-
-```bash
-pnpm start
-```
-
-To run a specific task version:
-
-```bash
-pnpm start:V1 # runs dependabot@1 task
-pnpm start:V2 # runs dependabot@2 task
-```
-
-## Running the unit tests
-
-```bash
-cd extension
-pnpm test
-```
-
-## Architecture
-
-## dependabot2 versioned update process diagram
-
-High-level sequence diagram illustrating how the `dependabot@2` task performs versioned updates using [dependabot-cli](https://github.com/dependabot/cli). For more technical details, see [how dependabot-cli works](https://github.com/dependabot/cli?tab=readme-ov-file#how-it-works).
-
-```mermaid
- sequenceDiagram
-    participant ext as Dependabot DevOps Extension
-    participant agent as DevOps Pipeline Agent
-    participant devops as DevOps API
-    participant cli as Dependabot CLI
-    participant core as Dependabot Updater
-    participant feed as Package Feed
-
-    ext->>ext: Read and parse `dependabot.yml`
-    ext->>ext: Write `job.yaml`
-    ext->>agent: Download dependabot-cli from github
-    ext->>+cli: Execute `dependabot update -f job.yaml -o update-scenario.yaml`
-    cli->>+core: Run update for `job.yaml` with proxy and dependabot-updater docker containers
-    core->>devops: Fetch source files from repository
-    core->>core: Discover dependencies
-    loop for each dependency
-        core->>feed: Fetch latest version
-        core->>core: Update dependency files
-    end
-    core-->>-cli: Report outputs
-    cli->>cli: Write outputs to `update-sceario.yaml`
-    cli-->>-ext: Update completed
-
-    ext->>ext: Read and parse `update-sceario.yaml`
-    loop for each output
-      alt when output is "create_pull_request"
-        ext->>devops: Create pull request source branch
-        ext->>devops: Push commit to source branch
-        ext->>devops: Create pull request
-        ext->>devops: Set auto-approve
-        ext->>devops: Set auto-complete
-      end
-      alt when output is "update_pull_request"
-        ext->>devops: Push commit to pull request
-        ext->>devops: Update pull request description
-        ext->>devops: Set auto-approve
-        ext->>devops: Set auto-complete
-      end
-      alt when output is "close_pull_request"
-        ext->>devops: Create comment thread on pull request with close reason
-        ext->>devops: Abandon pull request
-        ext->>devops: Delete source branch
-      end
-    end
-
-```
-
-## dependabot2 security-only update process diagram
-
-High-level sequence diagram illustrating how the `dependabot@2` task performs security-only updates using [dependabot-cli](https://github.com/dependabot/cli).
-
-```mermaid
- sequenceDiagram
-    participant ext as TaskV2
-    participant cli as Dependabot CLI
-    participant gha as GitHub Advisory Database
-
-    ext->>ext: Write `list-dependencies-job.yml`
-    Note right of ext: The job file contains `ignore: [ 'dependency-name': '*' ]`.<br>This will make Dependabot to discover all dependencies, but not update anything.<br>We can then extract the dependency list from the "depenedency_list" output.
-    ext->>+cli: Execute `dependabot update -f list-dependencies-job.yml -o output.yml`
-    cli->>cli: Run update job
-    cli->>cli: Write `output.yaml`
-    cli-->>-ext: Update completed
-
-    ext->>ext: Read and parse `output.yaml`, extract "dependency_list"
-    loop for each dependency
-      ext->>gha: Check security advisories for dependency
-    end
-    ext->>ext: Filter dependency list to only ones containing security advisories
-    ext->>ext: Write `security-only-update-job.yml`
-    Note right of ext: The job file contains the list of `dependency-names` and `security-advisories`.<br>This will make Dependanbot only update the dependencies named in the job file.
-    ext->>+cli: Execute `dependabot update -f security-only-update-job-job.yml -o output.yml`
-    cli->>cli: Run update job
-    cli->>cli: Write `output.yaml`
-    cli-->>-ext: Update completed
-    ext->>ext: Read and parse `output.yaml`
-    Note right of ext: Normal update logic resumes from this point.<br/>Outputs are parsed, pull requests are created/updated/closed based on the outputs
-```

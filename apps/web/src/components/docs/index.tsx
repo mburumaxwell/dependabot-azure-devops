@@ -5,5 +5,7 @@ export { DefaultImage };
 export { defaultMdxComponents, createRelativeLink };
 
 export { DocsLayout } from 'fumadocs-ui/layouts/docs';
-export { DocsBody, DocsPage, PageLastUpdate } from 'fumadocs-ui/page';
+export { DocsBody, DocsPage, EditOnGitHub, PageLastUpdate } from 'fumadocs-ui/page';
 export { RootProvider } from 'fumadocs-ui/provider/next';
+
+export * from './copy-markdown';

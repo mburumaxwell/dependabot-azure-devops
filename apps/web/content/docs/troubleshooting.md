@@ -1,11 +1,27 @@
 ---
 title: Troubleshooting
-description: Fix common problems when running Dependabot in Azure Pipelines.
+description: Fix common problems when running Dependabot with the extension, CLI, or hosted service.
 ---
 
-## Missing Docker
+## Deployment-Specific Issues
+
+### Extension: Missing Docker
 
 Dependabot runs inside Docker with Linux containers. Ensure your agents have Docker available. The Microsoft-hosted `ubuntu-latest` image already includes it.
+
+### CLI: Missing Docker
+
+Ensure Docker is installed and running:
+
+```bash
+docker ps
+```
+
+On macOS/Windows, start Docker Desktop. On Linux, ensure the Docker daemon is running.
+
+### Hosted: No Docker Required
+
+The hosted service manages all infrastructure. No Docker installation needed.
 
 ## Existing Pull Requests
 

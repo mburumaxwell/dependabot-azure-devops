@@ -1,7 +1,7 @@
 {
   "name": "extension-azure-devops",
   "version": "2.63.3",
-  "description": "Dependabot Azure DevOps task",
+  "description": "Dependabot Azure DevOps (Paklo) task",
   "license": "AGPL-3.0-later",
   "author": "mburumaxwell",
   "private": true,

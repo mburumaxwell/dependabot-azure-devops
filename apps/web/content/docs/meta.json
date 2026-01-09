@@ -1,0 +1,20 @@
+{
+  "pages": [
+    "---Introduction---",
+    "index",
+    "hosted",
+    "configuration",
+    "---Extensions---",
+    "...extensions",
+    "cli",
+    "---General---",
+    "private-registries",
+    "security-advisories",
+    "experiments",
+    "limitations",
+    "---Advanced---",
+    "custom-ca-certificates",
+    "troubleshooting",
+    "contributing"
+  ]
+}

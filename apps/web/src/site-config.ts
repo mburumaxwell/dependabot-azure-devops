@@ -38,6 +38,12 @@ export const config = {
   dashboard: {
     title: 'Paklo Dashboard',
   },
+
+  github: {
+    owner: 'mburumaxwell',
+    repo: 'paklo',
+    repo_url: 'https://github.com/mburumaxwell/paklo',
+  },
 };
 
 // just me, for now
@@ -48,8 +54,7 @@ export const socials = {
   },
   github: {
     username: 'mburumaxwell',
-    url: 'https://github.com/mburumaxwell',
-    repo: 'https://github.com/mburumaxwell/paklo',
+    url: 'https://github.com/mburumaxwell/paklo',
   },
   linkedin: {
     username: 'maxwellweru',

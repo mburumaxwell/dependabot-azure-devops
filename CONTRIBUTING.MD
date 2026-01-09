@@ -1,63 +1,21 @@
-Thank you for contributing to the Dependabot for Azure DevOps project.
+# Contributing
 
-# Table of Contents
+Thank you for contributing to Paklo!
 
-- [Contribution workflow](#contribution-workflow)
-- [Development environment](#development-environment)
-- [Submitting pull requests](#submitting-pull-requests)
-  - [Unit tests](#unit-tests)
-  - [Static code analyzers and linters](#static-code-analyzers-and-linters)
-  - [Formatters](#formatters)
-  - [Spelling](#spelling)
-  - [Automatically run quality checks on commit](#automatically-run-quality-checks-on-commit)
+**📚 Complete contribution guide: [www.paklo.app/docs/contributing](https://www.paklo.app/docs/contributing)**
 
-# Contribution workflow
+## Quick Start
 
-1. Fork the project.
-1. Get the [development environment running](#development-environment).
-1. Make your feature addition or bug fix.
-1. Make sure all [required quality checks](#required-workflow-tasks) have passed.
-1. Send a pull request.
+1. Fork the repository
+2. Run `pnpm install`
+3. Make your changes
+4. Run `pnpm build`
+5. Run quality checks:
 
-# Development environment
+   ```bash
+   pnpm lint
+   pnpm test
+   pnpm format:check
+   ```
 
-Before contributing, you'll need to configure your local development environment; View the corresponding development guide for the component you'd like to contribute to:
-
-- [Azure DevOps Extension](https://www.paklo.app/docs/extensions/azure#development-guide)
-- [Paklo CLI](https://www.paklo.app/docs/cli#development-guide)
-
-# Submitting pull requests
-
-If you plan on submitting a pull request, there are several quality checks that must pass; It is recommended that you run these before submitting the pull request. The checks are:
-
-## Unit tests
-
-All existing unit tests must pass.
-View the corresponding unit test instructions for the component you'd like to test:
-
-- [Azure DevOps Extension](https://www.paklo.app/docs/extensions/azure#running-the-unit-tests)
-- [Paklo CLI](https://www.paklo.app/docs/cli#running-the-unit-tests)
-
-## Static code analyzers and linters
-
-Some components use static code analyzers and linters.
-View the corresponding instructions for each component:
-
-- [Azure DevOps Extension](https://www.paklo.app/docs/extensions/azure#building-the-extension)
-- [Paklo CLI](https://www.paklo.app/docs/cli#development-guide)
-
-## Formatters
-
-```bash
-pnpm install
-pnpm format:check        # to check for formatting issues
-pnpm format              # to automatically fix formatting issues
-```
-
-## Spelling
-
-```bash
-pip install codespell
-codespell                   # to check for misspellings
-codespell --write-changes   # to automatically fix misspellings
-```
+6. Submit a pull request
