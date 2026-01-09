@@ -28,12 +28,21 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
 
+  // the URL to navigate to after successful login
+  const postLoginUrl = (redirectTo || '/dashboard') as Route;
+
   useEffect(() => setIsMounted(true), []);
 
   // Preload passkey authentication for conditional UI
   useEffect(() => {
     if (!isMounted) return;
 
+    // check if WebAuthn is supported
+    if (!window.PublicKeyCredential) {
+      return;
+    }
+
+    // check if browser supports conditional UI and preload passkeys
     if (
       !PublicKeyCredential.isConditionalMediationAvailable ||
       !PublicKeyCredential.isConditionalMediationAvailable()
@@ -41,16 +50,34 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
       return;
     }
 
+    // start autofill passkey with redirect handling
     const abortController = new AbortController();
-    void authClient.signIn.passkey({ autoFill: true, fetchOptions: { signal: abortController.signal } });
+    authClient.signIn
+      .passkey({
+        autoFill: true,
+        fetchOptions: {
+          signal: abortController.signal,
+          onSuccess(context) {
+            window.location.href = postLoginUrl;
+          },
+          onError(context) {
+            console.error('❌ [PASSKEY] Autofill sign-in error:', context.error);
+          },
+        },
+      })
+      .catch((error) => {
+        // Silent catch for autofill errors (user might cancel or no passkey available)
+        console.log('🔍 [DEBUG] Autofill passkey silent error:', error);
+      });
     return () => abortController.abort();
-  }, [isMounted]);
+  }, [isMounted, postLoginUrl]);
 
   async function handlePasskeyLogin() {
     setIsLoading(true);
     let error: { code?: string; message?: string } | null = null;
     try {
-      ({ error } = await authClient.signIn.passkey({ autoFill: true }));
+      // no autofill for manual trigger
+      ({ error } = await authClient.signIn.passkey({ autoFill: false }));
     } catch (err) {
       error = { message: (err as Error).message };
     }
@@ -65,7 +92,7 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
     }
 
     // Redirect to dashboard or specified redirect URL after successful login
-    router.push((redirectTo || '/dashboard') as Route);
+    router.push(postLoginUrl);
   }
 
   async function handleMagicLinkLogin(e: React.FormEvent) {
