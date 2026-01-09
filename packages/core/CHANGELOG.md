@@ -1,5 +1,20 @@
 # @paklo/core
 
+## 0.12.0
+
+### Minor Changes
+
+- [#2404](https://github.com/mburumaxwell/paklo/pull/2404) [`fb32322`](https://github.com/mburumaxwell/paklo/commit/fb32322f3f2fd61ccf5fee82323d497f28638b13) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Repository renamed to paklo
+
+- [#2406](https://github.com/mburumaxwell/paklo/pull/2406) [`4b8ad36`](https://github.com/mburumaxwell/paklo/commit/4b8ad363bae686633a733eeb41b10ae1eb107e14) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Updated documentation to catch up with months of changes
+
+- [`fd36772`](https://github.com/mburumaxwell/paklo/commit/fd36772d78b977403fef4ef983f22117ca9cd47c) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Standard spelling for orgs (organization)
+  Even though we should be using organisation, there are places we cannot change. Hence, we choose consistency.
+
+### Patch Changes
+
+- [#2405](https://github.com/mburumaxwell/paklo/pull/2405) [`79d860b`](https://github.com/mburumaxwell/paklo/commit/79d860bcc8a5d1cc3a8e4c0ffb9228be25986281) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Update default experiments as of 08 January 2026
+
 ## 0.11.1
 
 ### Patch Changes
