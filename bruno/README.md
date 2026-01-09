@@ -19,7 +19,6 @@ This directory contains Bruno API testing files for the paklo project.
 
 1. Copy `.env.sample` to `.env`
 2. Fill in the required environment variables:
-
    ```bash
    AZURE_DEVOPS_PAT="your-azure-devops-personal-access-token"
    ```

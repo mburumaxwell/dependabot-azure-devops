@@ -1,0 +1,5 @@
+{
+  // Disable the rule that enforces fenced code blocks to be surrounded by blank lines
+  // When enforce for lists, it can create unwanted blank lines within list items
+  "MD031": false
+}
