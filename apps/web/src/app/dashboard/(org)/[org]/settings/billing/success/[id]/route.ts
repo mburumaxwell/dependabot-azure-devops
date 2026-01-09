@@ -16,7 +16,7 @@ export async function GET(_req: Request, params: RouteContext<'/dashboard/[org]/
   });
 
   if (!session || !session.customer || !session.subscription || !session.client_reference_id) {
-    return new Response('Invalid checkout session', { status: 400 });
+    return Response.json({ error: 'Invalid checkout session' }, { status: 400 });
   }
 
   // the organization ID is stored in the client_reference_id field
@@ -34,13 +34,13 @@ export async function GET(_req: Request, params: RouteContext<'/dashboard/[org]/
   }
   const subscriptionId = subscription.id;
   if (!customerId || !subscriptionId) {
-    return new Response('Invalid customer or subscription in checkout session', { status: 400 });
+    return Response.json({ error: 'Invalid customer or subscription in checkout session' }, { status: 400 });
   }
 
   // ensure the status is valid
   const subscriptionStatus = mapSubscriptionStatus(subscription.status);
   if (!subscriptionStatus) {
-    return new Response('Invalid subscription status', { status: 400 });
+    return Response.json({ error: 'Invalid subscription status' }, { status: 400 });
   }
 
   const billingPeriod = getBillingPeriod(subscription);
