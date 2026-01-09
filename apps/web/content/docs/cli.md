@@ -156,10 +156,24 @@ paklo run \
 Pre-fetch Docker images used by Dependabot. Useful for testing image existence or package manager mapping.
 
 ```bash
-paklo fetch-images
+paklo fetch-images <packageManager>
 ```
 
-This downloads all necessary Docker images before running updates.
+**Required Arguments:**
+
+- `<packageManager>` - The package manager to fetch the updater image for (e.g., `npm_and_yarn`, `bundler`, `pip`, `cargo`, etc.)
+
+**Example:**
+
+```bash
+# Fetch images for npm_and_yarn
+paklo fetch-images npm_and_yarn
+
+# Fetch images for bundler
+paklo fetch-images bundler
+```
+
+This downloads the updater Docker image for the specified package manager and the proxy image.
 
 ### cleanup
 
