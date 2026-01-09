@@ -148,7 +148,7 @@ export async function cancelSubscription({
     // collect the feedback, if provided
     if (feedback) {
       await storeFeedback({
-        action: 'billing_cancel',
+        type: 'billing.cancel',
         message: feedback,
         metadata: { organizationId },
       });

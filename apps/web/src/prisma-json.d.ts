@@ -14,7 +14,7 @@ import type {
 } from '@paklo/core/dependabot';
 import type { RegionCode as ImportedRegionCode } from '@/lib/regions';
 import type { Period as ImportedPeriod } from '@/lib/period';
-import type { FeedbackAction as ImportedFeedbackAction } from '@/lib/enums';
+import type { FeedbackType as ImportedFeedbackType, FeedbackOpinion as ImportedFeedbackOpinion } from '@/lib/feedback';
 import type {
   UpdateJobStatus as ImportedUpdateJobStatus,
   UpdateJobTrigger as ImportedUpdateJobTrigger,
@@ -35,7 +35,8 @@ declare global {
     type DependabotRecordUpdateJobWarning = ImportedDependabotRecordUpdateJobWarning;
     type RegionCode = ImportedRegionCode;
     type Period = ImportedPeriod;
-    type FeedbackAction = ImportedFeedbackAction;
+    type FeedbackType = ImportedFeedbackType;
+    type FeedbackOpinion = ImportedFeedbackOpinion;
     type UpdateJobStatus = ImportedUpdateJobStatus;
     type UpdateJobTrigger = ImportedUpdateJobTrigger;
     type RepositoryPullRequestStatus = ImportedRepositoryPullRequestStatus;

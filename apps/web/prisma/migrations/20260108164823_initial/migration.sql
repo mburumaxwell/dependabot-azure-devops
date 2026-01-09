@@ -129,9 +129,11 @@ CREATE TABLE "passkey" (
 CREATE TABLE "feedback" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "action" TEXT NOT NULL,
-    "message" TEXT NOT NULL,
-    "metadata" TEXT,
+    "type" TEXT NOT NULL,
+    "opinion" TEXT,
+    "url" TEXT,
+    "message" TEXT,
+    "metadata" JSONB,
 
     CONSTRAINT "feedback_pkey" PRIMARY KEY ("id")
 );

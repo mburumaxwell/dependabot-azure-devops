@@ -34,7 +34,7 @@ export async function leaveOrganization(
   // collect the feedback, if provided
   if (feedback) {
     await storeFeedback({
-      action: 'organization_leave',
+      type: 'organization.leave',
       message: feedback,
       metadata: { organizationId },
     });

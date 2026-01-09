@@ -33,8 +33,8 @@ export async function deleteUser({ feedback }: DeleteUserOptions) {
   if (feedback) {
     await storeFeedback({
       // use the user ID to avoid duplicates because delete requires email confirmation (i.e. 2 step)
-      id: `delete_${user.id}`,
-      action: 'user_delete',
+      deduplicationId: `delete_${user.id}`,
+      type: 'user.delete',
       message: feedback,
       metadata: { userId: user.id },
     });

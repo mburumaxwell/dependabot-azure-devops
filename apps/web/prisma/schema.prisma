@@ -176,10 +176,13 @@ model Passkey {
 model Feedback {
   id        String   @id
   createdAt DateTime @default(now())
-  // [FeedbackAction]
-  action    String
-  message   String
-  metadata  String?
+  /// [FeedbackType]
+  type      String
+  /// [FeedbackOpinion]
+  opinion   String?
+  url       String?
+  message   String?
+  metadata  Json?
 
   @@map("feedback")
 }

@@ -9,3 +9,4 @@ export { DocsBody, DocsPage, EditOnGitHub, PageLastUpdate } from 'fumadocs-ui/pa
 export { RootProvider } from 'fumadocs-ui/provider/next';
 
 export * from './copy-markdown';
+export * from './feedback';

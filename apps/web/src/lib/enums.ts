@@ -10,9 +10,6 @@ export function unwrapWithAll<T>(value?: WithAll<T>): T | undefined {
 export const OrganizationTypeSchema = z.enum(['azure', 'bitbucket', 'gitlab']);
 export type OrganizationType = z.infer<typeof OrganizationTypeSchema>;
 
-export const FeedbackActionSchema = z.enum(['organization.leave', 'user.delete', 'billing.cancel']);
-export type FeedbackAction = z.infer<typeof FeedbackActionSchema>;
-
 export const RepositoryPullRequestStatusSchema = z.enum(['open', 'closed', 'merged']);
 export type RepositoryPullRequestStatus = z.infer<typeof RepositoryPullRequestStatusSchema>;
 

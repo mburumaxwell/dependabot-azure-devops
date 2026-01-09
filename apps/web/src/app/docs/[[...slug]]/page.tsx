@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { CopyMarkdownButton, DocsBody, DocsPage, EditOnGitHub, PageLastUpdate } from '@/components/docs';
+import { storeFeedback } from '@/actions/feedback';
+import { CopyMarkdownButton, DocsBody, DocsPage, EditOnGitHub, Feedback, PageLastUpdate } from '@/components/docs';
 import { Markdown } from '@/components/markdown';
 import { Separator } from '@/components/ui/separator';
+import type { SubmitFeedback } from '@/lib/feedback';
 import { docs, getPageImage } from '@/lib/fumadocs';
 import { config } from '@/site-config';
 
@@ -30,6 +32,12 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const body = doc.data.body;
   const rawUrl = ['/docs/raw', ...doc.slugs].filter(Boolean).join('/');
 
+  // can't simplify this function any further due to server/client boundaries
+  async function handleFeedback(feedback: SubmitFeedback) {
+    'use server';
+    return await storeFeedback({ type: 'docs.review', ...feedback });
+  }
+
   return (
     <DocsPage toc={doc.data.toc} full={doc.data.full} tableOfContent={{ style: 'clerk' }}>
       <h1 className='text-3xl font-semibold'>{doc.data.title}</h1>
@@ -41,7 +49,9 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
       <Separator />
       <DocsBody>
         <Markdown body={body} source={docs} page={doc} />
-        <Separator />
+        <Separator className='my-2' />
+        <Feedback onSendAction={handleFeedback} />
+        <Separator className='my-2' />
         {doc.data.lastModified && <PageLastUpdate date={doc.data.lastModified} />}
       </DocsBody>
     </DocsPage>
