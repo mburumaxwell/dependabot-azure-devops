@@ -13,12 +13,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { isHourlyRange, type TimeRange, timeRangeOptions } from '@/lib/aggregation';
 import { packageManagerOptions, type WithAll } from '@/lib/enums';
 import type { UsageTelemetry } from '@/lib/mongodb';
+import { REGIONS, type RegionCode } from '@/lib/regions';
 import { formatDuration, updateFiltersInSearchParams } from '@/lib/utils';
 
 export type SlimTelemetry = Pick<
   UsageTelemetry,
-  '_id' | 'package-manager' | 'started' | 'success' | 'duration' | 'version'
->;
+  '_id' | 'region' | 'package-manager' | 'started' | 'success' | 'duration'
+> & { region: RegionCode }; // TODO: remove this after data cleanup
 type TelemetryDashboardProps = {
   telemetries: SlimTelemetry[];
 };
@@ -28,6 +29,7 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
   const searchParams = useSearchParams();
 
   const timeRange = (searchParams.get('timeRange') as TimeRange) ?? '24h';
+  const selectedRegion = (searchParams.get('region') as WithAll<RegionCode>) ?? 'all';
   const selectedPackageManager = (searchParams.get('packageManager') as WithAll<DependabotPackageManager>) ?? 'all';
   const successFilter = (searchParams.get('success') as WithAll<'false' | 'true'>) ?? 'all';
 
@@ -90,6 +92,20 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
                 {timeRangeOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedRegion} onValueChange={(value) => updateFilters({ region: value })}>
+              <SelectTrigger className='w-50'>
+                <SelectValue placeholder='All Regions' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='all'>All Regions</SelectItem>
+                {REGIONS.map((region) => (
+                  <SelectItem key={region.code} value={region.code}>
+                    {region.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -163,6 +179,7 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
 
       <div className='grid grid-rows-1 gap-4'>
         <RunsChart telemetries={telemetries} timeRange={timeRange} />
+        <RegionChart telemetries={telemetries} />
         <PackageManagerChart telemetries={telemetries} />
       </div>
     </div>
@@ -170,7 +187,7 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
 }
 
 interface RunsChartProps {
-  telemetries: Pick<UsageTelemetry, 'started' | 'success'>[];
+  telemetries: Pick<SlimTelemetry, 'started' | 'success'>[];
   timeRange: TimeRange;
 }
 
@@ -241,7 +258,7 @@ function RunsChart({ telemetries, timeRange }: RunsChartProps) {
           <h3 className='text-lg font-semibold text-foreground'>Pipeline Runs</h3>
           <p className='text-sm text-muted-foreground'>Total executions over time</p>
         </div>
-        <ChartContainer config={chartConfig} className='h-75 w-full'>
+        <ChartContainer config={chartConfig} className='h-50 w-full'>
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray='3 3' vertical={false} />
             <XAxis
@@ -266,8 +283,59 @@ function RunsChart({ telemetries, timeRange }: RunsChartProps) {
   );
 }
 
+interface RegionChartProps {
+  telemetries: Pick<SlimTelemetry, 'region' | 'success'>[];
+}
+
+function RegionChart({ telemetries }: RegionChartProps) {
+  const chartConfig = {
+    count: { label: 'Count', color: 'var(--chart-1)' },
+  } satisfies ChartConfig;
+
+  const chartData = Object.values(
+    telemetries.reduce(
+      (acc, item) => {
+        if (!acc[item.region]) {
+          acc[item.region] = { name: item.region, count: 0 };
+        }
+        acc[item.region]!.count++;
+        return acc;
+      },
+      {} as Record<string, { name: string; count: number }>,
+    ),
+  ).sort((a, b) => b.count - a.count);
+
+  return (
+    <Card className='p-6'>
+      <div className='flex flex-col gap-4'>
+        <div>
+          <h3 className='text-lg font-semibold text-foreground'>Region Usage</h3>
+          <p className='text-sm text-muted-foreground'>Distribution by region</p>
+        </div>
+        <ChartContainer config={chartConfig} className='h-50 w-full'>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray='3 3' vertical={false} />
+            <XAxis dataKey='name' tickLine={false} axisLine={false} tickMargin={8} />
+            <ChartTooltip
+              cursor={false}
+              content={
+                <ChartTooltipContent
+                  indicator='line'
+                  labelFormatter={(value) => REGIONS.find((region) => region.code === value)?.label || value}
+                />
+              }
+            />
+            <Legend />
+            <Bar dataKey='count' fill='var(--color-count)' radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ChartContainer>
+      </div>
+    </Card>
+  );
+}
+
 interface PackageManagerChartProps {
-  telemetries: Pick<UsageTelemetry, 'package-manager' | 'success'>[];
+  telemetries: Pick<SlimTelemetry, 'package-manager' | 'success'>[];
 }
 
 function PackageManagerChart({ telemetries }: PackageManagerChartProps) {
@@ -291,9 +359,7 @@ function PackageManagerChart({ telemetries }: PackageManagerChartProps) {
       },
       {} as Record<string, { name: string; success: number; failure: number }>,
     ),
-  )
-    .sort((a, b) => b.success + b.failure - (a.success + a.failure))
-    .slice(0, 10);
+  ).sort((a, b) => b.success + b.failure - (a.success + a.failure));
 
   return (
     <Card className='p-6'>
@@ -302,20 +368,22 @@ function PackageManagerChart({ telemetries }: PackageManagerChartProps) {
           <h3 className='text-lg font-semibold text-foreground'>Package Manager Usage</h3>
           <p className='text-sm text-muted-foreground'>Distribution by package manager</p>
         </div>
-        <ChartContainer config={chartConfig} className='h-75 w-full'>
+        <ChartContainer config={chartConfig} className='h-50 w-full'>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray='3 3' vertical={false} />
-            <XAxis
-              dataKey='name'
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => packageManagerOptions.find((pm) => pm.value === value)?.label || value}
+            <XAxis dataKey='name' tickLine={false} axisLine={false} tickMargin={8} />
+            <ChartTooltip
+              cursor={false}
+              content={
+                <ChartTooltipContent
+                  indicator='line'
+                  labelFormatter={(value) => packageManagerOptions.find((pm) => pm.value === value)?.label || value}
+                />
+              }
             />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator='dashed' />} />
             <Legend />
-            <Bar dataKey='success' fill='var(--color-success)' radius={[4, 4, 0, 0]} />
-            <Bar dataKey='failure' fill='var(--color-failure)' radius={[4, 4, 0, 0]} />
+            <Bar dataKey='success' stackId='a' fill='var(--color-success)' />
+            <Bar dataKey='failure' stackId='a' fill='var(--color-failure)' />
           </BarChart>
         </ChartContainer>
       </div>

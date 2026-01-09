@@ -6,6 +6,7 @@ import { getDateFromTimeRange, type TimeRange } from '@/lib/aggregation';
 import { auth, isPakloAdmin } from '@/lib/auth';
 import { unwrapWithAll, type WithAll } from '@/lib/enums';
 import { type Filter, getMongoCollection, type UsageTelemetry } from '@/lib/mongodb';
+import type { RegionCode } from '@/lib/regions';
 import { type SlimTelemetry, TelemetryDashboard } from './page.client';
 
 export async function generateMetadata(props: PageProps<'/dashboard/usage'>): Promise<Metadata> {
@@ -27,18 +28,27 @@ export default async function Page(props: PageProps<'/dashboard/usage'>) {
 
   const searchParams = (await props.searchParams) as {
     timeRange?: TimeRange;
+    region?: WithAll<RegionCode>;
     packageManager?: WithAll<DependabotPackageManager>;
     success?: WithAll<'true' | 'false'>;
   };
-  const { timeRange = '24h', packageManager: selectedPackageManager, success: successFilter } = searchParams;
+  const {
+    timeRange = '24h',
+    region: selectedRegion,
+    packageManager: selectedPackageManager,
+    success: successFilter,
+  } = searchParams;
   const { start, end } = getDateFromTimeRange(timeRange);
 
+  const region = unwrapWithAll(selectedRegion);
   const packageManager = unwrapWithAll(selectedPackageManager);
   const success = successFilter === 'true' ? true : successFilter === 'false' ? false : undefined;
 
   const collection = await getMongoCollection('usage_telemetry');
   const query: Filter<UsageTelemetry> = {
     started: { $gte: start, $lte: end },
+    // ...(region ? { region: region } : { }),
+    ...(region ? { region: region } : { region: { $type: 'string' } }), // TODO: Remove $type filter after backfilling existing data
     ...(packageManager ? { 'package-manager': packageManager } : {}),
     ...(success !== undefined ? { success: success } : {}),
   };
@@ -47,11 +57,11 @@ export default async function Page(props: PageProps<'/dashboard/usage'>) {
     .sort({ started: -1 })
     .project<SlimTelemetry>({
       _id: 1,
+      region: 1,
       'package-manager': 1,
       started: 1,
       success: 1,
       duration: 1,
-      version: 1,
     })
     .toArray();
 
