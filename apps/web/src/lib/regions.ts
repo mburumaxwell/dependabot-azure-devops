@@ -1,29 +1,13 @@
 import { z } from 'zod';
 
-/**
- * usage as of 2025-Oct-29
- * | Region | Count  |
- * |--------|-------:|
- * | fra    | 9,642  |
- * | dub    | 8,446  |
- * | cdg    | 4,297  |
- * | cle    | 4,099  |
- * | iad    | 3,699  |
- * | sfo    | 2,097  |
- * | lhr    | 1,683  |
- * | syd    | 1,112  |
- * | pdx    |   635  |
- * | gru    |   102  |
- * | arn    |    71  |
- * | sin    |    21  |
- * | hkg    |    15  |
- */
-
-// Codes for organization regions using IATA airport codes, similar to Vercel
-// and can be translated to/from Azure regions as needed.
 // biome-ignore format: the array should not be formatted
+/**
+ * Codes for organization regions using IATA airport codes, similar to Vercel
+ * and can be translated to/from Azure regions as needed.
+ * Not all regions may be documented at https://vercel.com/docs/regions,
+ * especially when a new one is being added.
+ */
 export const RegionCodeSchema = z.enum([
-  // matching vercel regions, https://vercel.com/docs/regions, as of 2025-Oct-29,
   'arn', 'bom', 'cdg', 'cle', 'cpt',
   'dub', 'dxb', 'fra', 'gru', 'hkg',
   'hnd', 'iad', 'icn', 'kix', 'lhr',
@@ -41,6 +25,7 @@ export type RegionInfo = {
 };
 
 // biome-ignore format: the array should not be formatted
+/** List of supported regions with their mappings and availability */
 export const REGIONS: RegionInfo[] = [
   // Europe
   { code: 'arn', vercel: 'arn1', azure: 'swedencentral',      visible: false, available: false, label: 'Stockholm (SE)', }, // Azure city: Stockholm
