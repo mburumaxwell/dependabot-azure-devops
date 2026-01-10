@@ -1,4 +1,4 @@
-import { headers as requestHeaders } from 'next/headers';
+import { cookies as cookieStore, headers as requestHeaders } from 'next/headers';
 import { forbidden } from 'next/navigation';
 import { AppLayout } from '@/components/app-layout';
 import { auth, isPakloAdmin } from '@/lib/auth';
@@ -21,8 +21,10 @@ export default async function Layout({ children, params }: LayoutProps<'/dashboa
   // ensure user has access to the organization in the url
   if (!organizations.find((org) => org.active)) return forbidden();
 
+  const cookies = await cookieStore();
+
   return (
-    <AppLayout session={session} organizations={organizations} pakloAdmin={pakloAdmin}>
+    <AppLayout session={session} organizations={organizations} pakloAdmin={pakloAdmin} cookies={cookies}>
       {children}
     </AppLayout>
   );
