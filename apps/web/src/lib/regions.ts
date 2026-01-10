@@ -41,7 +41,7 @@ export const REGIONS: RegionInfo[] = [
   // Americas
   { code: 'gru', vercel: 'gru1', azure: 'brazilsouth',        visible: false, available: false, label: 'São Paulo (BR)' },
   { code: 'iad', vercel: 'iad1', azure: 'eastus',             visible: false, available: false, label: 'N. Virginia / DC (US)' },
-  { code: 'cle', vercel: 'cle1', azure: 'eastus2',            visible: false, available: false, label: 'Cleveland-adjacent (US)' },
+  { code: 'cle', vercel: 'cle1', azure: 'eastus2',            visible: true,  available: false, label: 'Cleveland (US)' },
   { code: 'sfo', vercel: 'sfo1', azure: 'westus',             visible: true,  available: false, label: 'San Francisco (US)' },
   { code: 'pdx', vercel: 'pdx1', azure: 'westus2',            visible: false, available: false, label: 'Oregon/Washington (US)' },
   { code: 'yul', vercel: 'yul1', azure: 'canadaeast',         visible: false, available: false, label: 'Montreal (CA)' },

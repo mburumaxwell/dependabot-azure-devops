@@ -14,6 +14,7 @@ type RegionInfo = { name: string, location: string }
 var regions RegionInfo[] = [
   { name: 'dub', location: 'northeurope' }
   { name: 'lhr', location: 'uksouth' }
+  // { name: 'cle', location: 'eastus2' }
   // { name: 'sfo', location: 'westus' }
   // { name: 'syd', location: 'australiaeast' }
 ]
