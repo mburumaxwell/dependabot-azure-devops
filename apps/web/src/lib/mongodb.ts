@@ -49,6 +49,7 @@ export const UsageTelemetrySchema = z.object({
   country: z.string().nullish(),
   region: RegionCodeSchema.nullish(),
   ...UsageTelemetryRequestDataSchema.omit({ id: true }).shape,
+  metadata: z.record(z.string(), z.string().nullish()).nullish(),
 });
 export type UsageTelemetry = z.infer<typeof UsageTelemetrySchema>;
 
