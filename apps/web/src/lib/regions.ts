@@ -27,7 +27,7 @@ export const RegionCodeSchema = z.enum([
   'arn', 'bom', 'cdg', 'cle', 'cpt',
   'dub', 'dxb', 'fra', 'gru', 'hkg',
   'hnd', 'iad', 'icn', 'kix', 'lhr',
-  'pdx', 'sfo', 'sin', 'syd'
+  'pdx', 'sfo', 'sin', 'syd', 'yul',
 ]);
 export type RegionCode = z.infer<typeof RegionCodeSchema>;
 
@@ -59,6 +59,7 @@ export const REGIONS: RegionInfo[] = [
   { code: 'cle', vercel: 'cle1', azure: 'eastus2',            visible: false, available: false, label: 'Cleveland-adjacent (US)' },
   { code: 'sfo', vercel: 'sfo1', azure: 'westus',             visible: true,  available: false, label: 'San Francisco (US)' },
   { code: 'pdx', vercel: 'pdx1', azure: 'westus2',            visible: false, available: false, label: 'Oregon/Washington (US)' },
+  { code: 'yul', vercel: 'yul1', azure: 'canadaeast',         visible: false, available: false, label: 'Montreal (CA)' },
 
   // Asia
   { code: 'hkg', vercel: 'hkg1', azure: 'eastasia',           visible: false, available: false, label: 'Hong Kong (HK)' },

@@ -15,7 +15,7 @@ const EXPECTED_CODES = [
   'arn', 'bom', 'cdg', 'cle', 'cpt',
   'dub', 'dxb', 'fra', 'gru', 'hkg',
   'hnd', 'iad', 'icn', 'kix', 'lhr',
-  'pdx', 'sfo', 'sin', 'syd'
+  'pdx', 'sfo', 'sin', 'syd', 'yul',
 ] as const;
 
 // these tests were generated using copilot!
