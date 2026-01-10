@@ -8,8 +8,10 @@ param name string = 'paklo'
 
 var vercelEnvironments = ['production', 'preview']
 var administratorLoginPasswordMongo = '${skip(uniqueString(resourceGroup().id), 5)}^${uniqueString('mongo-password', resourceGroup().id)}' // e.g. abcde%zecnx476et7xm (19 characters)
+var administratorLoginPasswordPostgres = '${skip(uniqueString(resourceGroup().id), 5)}%${uniqueString('postgres-password', resourceGroup().id)}' // e.g. abcde%zecnx476et7xm (19 characters)
 
-var regions = [
+type RegionInfo = { name: string, location: string }
+var regions RegionInfo[] = [
   { name: 'dub', location: 'northeurope' }
   { name: 'lhr', location: 'uksouth' }
   // { name: 'sfo', location: 'westus' }
@@ -55,6 +57,11 @@ resource keyVault 'Microsoft.KeyVault/vaults@2025-05-01' = {
     name: 'mongo-password'
     properties: { contentType: 'text/plain', value: administratorLoginPasswordMongo }
   }
+
+  resource postgresPasswordSecret 'secrets' = {
+    name: 'postgres-password'
+    properties: { contentType: 'text/plain', value: administratorLoginPasswordPostgres }
+  }
 }
 
 /* MongoDB Cluster */
@@ -84,6 +91,56 @@ resource mongoCluster 'Microsoft.DocumentDB/mongoClusters@2025-09-01' = {
   resource allowAll 'firewallRules' = {
     name: 'AllowAll_IPs'
     properties: { startIpAddress: '0.0.0.0', endIpAddress: '255.255.255.255' }
+  }
+}
+
+/* Postgres Server */
+resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2025-08-01' = if (false) {
+  name: name
+  location: location
+  properties: {
+    version: '18'
+    authConfig: {
+      activeDirectoryAuth: 'Enabled'
+      passwordAuth: 'Enabled'
+      tenantId: tenant().tenantId
+    }
+    availabilityZone: '1'
+    administratorLogin: 'chipmunk'
+    #disable-next-line use-secure-value-for-secure-inputs
+    administratorLoginPassword: administratorLoginPasswordPostgres
+    backup: { geoRedundantBackup: 'Enabled', backupRetentionDays: 35 } // max is 35 days
+    storage: {
+      storageSizeGB: 32
+      autoGrow: 'Disabled'
+      tier: 'P4'
+      iops: 120
+    }
+    replica: { role: 'Primary' }
+    replicationRole: 'Primary'
+    maintenanceWindow: { customWindow: 'Enabled', dayOfWeek: 0, startHour: 0, startMinute: 0 }
+    dataEncryption: { type: 'SystemManaged' }
+    network: { publicNetworkAccess: 'Enabled' }
+    highAvailability: { mode: 'Disabled' }
+  }
+  sku: { name: 'Standard_B1ms', tier: 'Burstable' }
+  identity: { type: 'UserAssigned', userAssignedIdentities: { '${managedIdentity.id}': {} } }
+
+  // resource firewallRuleForAzure 'firewallRules' = {
+  //   name: 'AllowAllAzureServicesAndResourcesWithinAzureIps'
+  //   properties: { endIpAddress: '0.0.0.0', startIpAddress: '0.0.0.0' }
+  // }
+
+  // allowing all IPs for now, because we deploy the web on Vercel and it needs to access the database
+  // no fixed IPs are provided by Vercel
+  resource allowAll 'firewallRules' = {
+    name: 'AllowAll_IPs'
+    properties: { startIpAddress: '0.0.0.0', endIpAddress: '255.255.255.255' }
+  }
+
+  resource databases 'databases' = {
+    name: 'paklodb'
+    properties: { charset: 'UTF8', collation: 'en_US.utf8' }
   }
 }
 
@@ -132,3 +189,4 @@ output mongoConnectionString string = replace(
   '<user>',
   mongoCluster.properties.administrator.userName
 )
+output postgresServerFqdn string = postgresServer.?properties.fullyQualifiedDomainName ?? ''
