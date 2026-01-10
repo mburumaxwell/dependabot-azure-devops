@@ -19,7 +19,7 @@ import { formatDuration, updateFiltersInSearchParams } from '@/lib/utils';
 export type SlimTelemetry = Pick<
   UsageTelemetry,
   '_id' | 'region' | 'package-manager' | 'started' | 'success' | 'duration'
-> & { region: RegionCode }; // TODO: remove this after data cleanup
+>;
 type TelemetryDashboardProps = {
   telemetries: SlimTelemetry[];
 };
@@ -295,10 +295,10 @@ function RegionChart({ telemetries }: RegionChartProps) {
   const chartData = Object.values(
     telemetries.reduce(
       (acc, item) => {
-        if (!acc[item.region]) {
-          acc[item.region] = { name: item.region, count: 0 };
+        if (!acc[item.region ?? 'unknown']) {
+          acc[item.region ?? 'unknown'] = { name: item.region ?? 'unknown', count: 0 };
         }
-        acc[item.region]!.count++;
+        acc[item.region ?? 'unknown']!.count++;
         return acc;
       },
       {} as Record<string, { name: string; count: number }>,

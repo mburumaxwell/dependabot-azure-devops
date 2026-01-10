@@ -47,8 +47,7 @@ export default async function Page(props: PageProps<'/dashboard/usage'>) {
   const collection = await getMongoCollection('usage_telemetry');
   const query: Filter<UsageTelemetry> = {
     started: { $gte: start, $lte: end },
-    // ...(region ? { region: region } : { }),
-    ...(region ? { region: region } : { region: { $type: 'string' } }), // TODO: Remove $type filter after backfilling existing data
+    ...(region ? { region: region } : {}),
     ...(packageManager ? { 'package-manager': packageManager } : {}),
     ...(success !== undefined ? { success: success } : {}),
   };
