@@ -50,7 +50,7 @@
   },
   "homepage": "https://github.com/mburumaxwell/paklo#readme",
   "dependencies": {
-    "@hono/node-server": "1.19.7",
+    "@hono/node-server": "1.19.8",
     "@paklo/core": "workspace:*",
     "dockerode": "4.0.9",
     "ky": "1.14.2",
