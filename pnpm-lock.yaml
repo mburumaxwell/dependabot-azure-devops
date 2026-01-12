@@ -298,8 +298,8 @@ importers:
         specifier: 7.2.0
         version: 7.2.0(@types/react@19.2.8)(better-sqlite3@12.5.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3)
       prisma-json-types-generator:
-        specifier: 4.0.1
-        version: 4.0.1(@prisma/client@7.2.0(prisma@7.2.0(@types/react@19.2.8)(better-sqlite3@12.5.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.2.0(@types/react@19.2.8)(better-sqlite3@12.5.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3)
+        specifier: 4.1.0
+        version: 4.1.0(@prisma/client@7.2.0(prisma@7.2.0(@types/react@19.2.8)(better-sqlite3@12.5.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.2.0(@types/react@19.2.8)(better-sqlite3@12.5.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3)
       react-email:
         specifier: 5.2.1
         version: 5.2.1
@@ -7609,13 +7609,13 @@ packages:
     resolution: {integrity: sha512-gjVS5hOP+M3wMm5nmNOucbIrqudzs9v/57bWRHQWLYklXqoXKrVfYW2W9+glfGsqtPgpiz5WwyEEB+ksXIx3gQ==}
     engines: {node: '>=18'}
 
-  prisma-json-types-generator@4.0.1:
-    resolution: {integrity: sha512-kSwVwVXalpe4Nix7+OdDBd5NNTIsle+daDa9PPdypKBGAml/HCWqSLPEEic4N677dHHxT/cDivmyeqZfA1bYtg==}
+  prisma-json-types-generator@4.1.0:
+    resolution: {integrity: sha512-iJ8swM4fz3yjgwjjww8vDek3wEAxhi310q349zPXvGljYL0WNtC2iP6EFVkSpRXFoTquymd3bG0zDA1zYDPuLw==}
     engines: {node: '>=14.0'}
     hasBin: true
     peerDependencies:
-      '@prisma/client': ^7.0.1
-      prisma: ^7.0.1
+      '@prisma/client': ^7.2.0
+      prisma: ^7.2.0
       typescript: ^5.9.3
 
   prisma@7.2.0:
@@ -17539,7 +17539,7 @@ snapshots:
     dependencies:
       parse-ms: 4.0.0
 
-  prisma-json-types-generator@4.0.1(@prisma/client@7.2.0(prisma@7.2.0(@types/react@19.2.8)(better-sqlite3@12.5.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.2.0(@types/react@19.2.8)(better-sqlite3@12.5.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3):
+  prisma-json-types-generator@4.1.0(@prisma/client@7.2.0(prisma@7.2.0(@types/react@19.2.8)(better-sqlite3@12.5.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3))(prisma@7.2.0(@types/react@19.2.8)(better-sqlite3@12.5.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3):
     dependencies:
       '@prisma/client': 7.2.0(prisma@7.2.0(@types/react@19.2.8)(better-sqlite3@12.5.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3)
       '@prisma/generator-helper': 7.2.0
