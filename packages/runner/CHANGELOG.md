@@ -1,5 +1,30 @@
 # @paklo/runner
 
+## 0.9.0
+
+### Minor Changes
+
+- [#2404](https://github.com/mburumaxwell/paklo/pull/2404) [`fb32322`](https://github.com/mburumaxwell/paklo/commit/fb32322f3f2fd61ccf5fee82323d497f28638b13) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Repository renamed to paklo
+
+- [#2406](https://github.com/mburumaxwell/paklo/pull/2406) [`4b8ad36`](https://github.com/mburumaxwell/paklo/commit/4b8ad363bae686633a733eeb41b10ae1eb107e14) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Updated documentation to catch up with months of changes
+
+- [#2401](https://github.com/mburumaxwell/paklo/pull/2401) [`e1302ef`](https://github.com/mburumaxwell/paklo/commit/e1302efc21a07b11aad2d8111bde051f15f9d4a7) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Remove `fetch_files` command.
+  In <https://github.com/dependabot/dependabot-core/pull/13275> the `fetch_files` command was made a no-op, and it does not need to be called.
+  Also cleaned up environment variables that are not used as a result.
+  Copied from: <https://github.com/github/dependabot-action/pull/1550>
+
+- [`fd36772`](https://github.com/mburumaxwell/paklo/commit/fd36772d78b977403fef4ef983f22117ca9cd47c) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Standard spelling for orgs (organization)
+  Even though we should be using organisation, there are places we cannot change. Hence, we choose consistency.
+
+### Patch Changes
+
+- [#2397](https://github.com/mburumaxwell/paklo/pull/2397) [`7c5ee09`](https://github.com/mburumaxwell/paklo/commit/7c5ee0967dc6c2759d860e5091f67fe9e95d0e17) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump the dependabot-core-images (29 updates) to from various versions to `v2.0.20260108161155`.
+
+- [#2398](https://github.com/mburumaxwell/paklo/pull/2398) [`d96b059`](https://github.com/mburumaxwell/paklo/commit/d96b05982e5d1024d823cc21b12f3e0ce3ed4abf) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bumps github/dependabot-update-job-proxy/dependabot-update-job-proxy from v2.0.20251219172147 to v2.0.20260106190418.
+
+- Updated dependencies [[`fb32322`](https://github.com/mburumaxwell/paklo/commit/fb32322f3f2fd61ccf5fee82323d497f28638b13), [`4b8ad36`](https://github.com/mburumaxwell/paklo/commit/4b8ad363bae686633a733eeb41b10ae1eb107e14), [`79d860b`](https://github.com/mburumaxwell/paklo/commit/79d860bcc8a5d1cc3a8e4c0ffb9228be25986281), [`fd36772`](https://github.com/mburumaxwell/paklo/commit/fd36772d78b977403fef4ef983f22117ca9cd47c)]:
+  - @paklo/core@0.12.0
+
 ## 0.8.3
 
 ### Patch Changes

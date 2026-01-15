@@ -1,5 +1,22 @@
 # paklo
 
+## 0.17.0
+
+### Minor Changes
+
+- [#2404](https://github.com/mburumaxwell/paklo/pull/2404) [`fb32322`](https://github.com/mburumaxwell/paklo/commit/fb32322f3f2fd61ccf5fee82323d497f28638b13) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Repository renamed to paklo
+
+- [#2406](https://github.com/mburumaxwell/paklo/pull/2406) [`4b8ad36`](https://github.com/mburumaxwell/paklo/commit/4b8ad363bae686633a733eeb41b10ae1eb107e14) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Updated documentation to catch up with months of changes
+
+- [`fd36772`](https://github.com/mburumaxwell/paklo/commit/fd36772d78b977403fef4ef983f22117ca9cd47c) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Standard spelling for orgs (organization)
+  Even though we should be using organisation, there are places we cannot change. Hence, we choose consistency.
+
+### Patch Changes
+
+- Updated dependencies [[`7c5ee09`](https://github.com/mburumaxwell/paklo/commit/7c5ee0967dc6c2759d860e5091f67fe9e95d0e17), [`fb32322`](https://github.com/mburumaxwell/paklo/commit/fb32322f3f2fd61ccf5fee82323d497f28638b13), [`4b8ad36`](https://github.com/mburumaxwell/paklo/commit/4b8ad363bae686633a733eeb41b10ae1eb107e14), [`e1302ef`](https://github.com/mburumaxwell/paklo/commit/e1302efc21a07b11aad2d8111bde051f15f9d4a7), [`79d860b`](https://github.com/mburumaxwell/paklo/commit/79d860bcc8a5d1cc3a8e4c0ffb9228be25986281), [`fd36772`](https://github.com/mburumaxwell/paklo/commit/fd36772d78b977403fef4ef983f22117ca9cd47c), [`d96b059`](https://github.com/mburumaxwell/paklo/commit/d96b05982e5d1024d823cc21b12f3e0ce3ed4abf)]:
+  - @paklo/runner@0.9.0
+  - @paklo/core@0.12.0
+
 ## 0.16.3
 
 ### Patch Changes
