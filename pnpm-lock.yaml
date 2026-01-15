@@ -67,7 +67,7 @@ importers:
         version: 0.3.2(@opentelemetry/api@1.9.0)(next@16.1.1(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))
       '@hono/zod-validator':
         specifier: 0.7.6
-        version: 0.7.6(hono@4.11.3)(zod@4.3.5)
+        version: 0.7.6(hono@4.11.4)(zod@4.3.5)
       '@opentelemetry/api':
         specifier: 1.9.0
         version: 1.9.0
@@ -192,8 +192,8 @@ importers:
         specifier: 16.4.6
         version: 16.4.6(@types/react-dom@19.2.3(@types/react@19.2.8))(@types/react@19.2.8)(fumadocs-core@16.4.6(@types/react@19.2.8)(lucide-react@0.562.0(react@19.2.3))(next@16.1.1(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.5))(next@16.1.1(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)
       hono:
-        specifier: 4.11.3
-        version: 4.11.3
+        specifier: 4.11.4
+        version: 4.11.4
       hypertune:
         specifier: 2.10.1
         version: 2.10.1
@@ -311,7 +311,7 @@ importers:
         version: 5.0.2
       shadcn:
         specifier: 3.6.3
-        version: 3.6.3(@types/node@25.0.3)(hono@4.11.3)(typescript@5.9.3)
+        version: 3.6.3(@types/node@25.0.3)(hono@4.11.4)(typescript@5.9.3)
       tailwindcss:
         specifier: 4.1.18
         version: 4.1.18
@@ -373,10 +373,10 @@ importers:
     dependencies:
       '@hono/zod-validator':
         specifier: 0.7.6
-        version: 0.7.6(hono@4.11.3)(zod@4.3.5)
+        version: 0.7.6(hono@4.11.4)(zod@4.3.5)
       hono:
-        specifier: 4.11.3
-        version: 4.11.3
+        specifier: 4.11.4
+        version: 4.11.4
       js-yaml:
         specifier: 4.1.1
         version: 4.1.1
@@ -415,8 +415,8 @@ importers:
   packages/runner:
     dependencies:
       '@hono/node-server':
-        specifier: 1.19.8
-        version: 1.19.8(hono@4.11.3)
+        specifier: 1.19.9
+        version: 1.19.9(hono@4.11.4)
       '@paklo/core':
         specifier: workspace:*
         version: link:../core
@@ -1454,8 +1454,8 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hono/node-server@1.19.8':
-    resolution: {integrity: sha512-0/g2lIOPzX8f3vzW1ggQgvG5mjtFBDBHFAzI5SFAi2DzSqS9luJwqg9T6O/gKYLi+inS7eNxBeIFkkghIPvrMA==}
+  '@hono/node-server@1.19.9':
+    resolution: {integrity: sha512-vHL6w3ecZsky+8P5MD+eFfaGTyCeOHUIFYMGpQGbrBTSmNNoxv0if69rEZ5giu36weC5saFuznL411gRX7bJDw==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
@@ -6074,8 +6074,8 @@ packages:
     resolution: {integrity: sha512-BIdolzGpDO9MQ4nu3AUuDwHZZ+KViNm+EZ75Ae55eMXMqLVhDFqEMXxtUe9Qh8hjL+pIna/frs2j6Y2yD5Ua/g==}
     engines: {node: '>=16.9.0'}
 
-  hono@4.11.3:
-    resolution: {integrity: sha512-PmQi306+M/ct/m5s66Hrg+adPnkD5jiO6IjA7WhWw0gSBSo1EcRegwuI1deZ+wd5pzCGynCcn2DprnE4/yEV4w==}
+  hono@4.11.4:
+    resolution: {integrity: sha512-U7tt8JsyrxSRKspfhtLET79pU8K+tInj5QZXs1jSugO1Vq5dFj3kmZsRldo29mTBfcjDRVRXrEZ6LS63Cog9ZA==}
     engines: {node: '>=16.9.0'}
 
   hookable@6.0.1:
@@ -10708,13 +10708,13 @@ snapshots:
     dependencies:
       hono: 4.10.6
 
-  '@hono/node-server@1.19.8(hono@4.11.3)':
+  '@hono/node-server@1.19.9(hono@4.11.4)':
     dependencies:
-      hono: 4.11.3
+      hono: 4.11.4
 
-  '@hono/zod-validator@0.7.6(hono@4.11.3)(zod@4.3.5)':
+  '@hono/zod-validator@0.7.6(hono@4.11.4)(zod@4.3.5)':
     dependencies:
-      hono: 4.11.3
+      hono: 4.11.4
       zod: 4.3.5
 
   '@iconify/types@2.0.0': {}
@@ -10945,9 +10945,9 @@ snapshots:
     dependencies:
       langium: 3.3.1
 
-  '@modelcontextprotocol/sdk@1.25.2(hono@4.11.3)(zod@3.25.76)':
+  '@modelcontextprotocol/sdk@1.25.2(hono@4.11.4)(zod@3.25.76)':
     dependencies:
-      '@hono/node-server': 1.19.8(hono@4.11.3)
+      '@hono/node-server': 1.19.9(hono@4.11.4)
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
@@ -15772,7 +15772,7 @@ snapshots:
 
   hono@4.10.6: {}
 
-  hono@4.11.3: {}
+  hono@4.11.4: {}
 
   hookable@6.0.1: {}
 
@@ -18281,7 +18281,7 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shadcn@3.6.3(@types/node@25.0.3)(hono@4.11.3)(typescript@5.9.3):
+  shadcn@3.6.3(@types/node@25.0.3)(hono@4.11.4)(typescript@5.9.3):
     dependencies:
       '@antfu/ni': 25.0.0
       '@babel/core': 7.28.5
@@ -18289,7 +18289,7 @@ snapshots:
       '@babel/plugin-transform-typescript': 7.28.5(@babel/core@7.28.5)
       '@babel/preset-typescript': 7.28.5(@babel/core@7.28.5)
       '@dotenvx/dotenvx': 1.51.4
-      '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.3)(zod@3.25.76)
+      '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.4)(zod@3.25.76)
       '@types/validate-npm-package-name': 4.0.2
       browserslist: 4.28.1
       commander: 14.0.2
