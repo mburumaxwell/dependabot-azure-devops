@@ -163,7 +163,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
 export const command = new Command('run')
   .description('Run dependabot updates for a given repository.')
   .requiredOption(
-    '--organization-url <ORGANIZATION-URL>',
+    '--organisation-url, --organization-url <ORGANIZATION-URL>',
     'URL of the organization e.g. https://dev.azure.com/my-org or https://my-org.visualstudio.com or http://my-org.com:8443/tfs',
   )
   .requiredOption('--project <PROJECT>', 'Name or ID of the project')
