@@ -43,7 +43,7 @@ updates:
     # cooldown:
     #   default-days: 14 # chill for 14 days so that they fix any sudden issues
     #   include: ['dependabot/*']
-    multi-ecosystem-group: 'upstream-release'
+    multi-ecosystem-group: 'dependabot-updater'
     patterns: ['dependabot/*']
 
   - package-ecosystem: 'bundler'
