@@ -19,7 +19,7 @@ export const comparison: FeatureComparison[] = [
   { name: 'Vulnerability Scanning', managed: true, selfManaged: true, github: true, azureDevOps: true },
   { name: 'Pull Request comments', managed: true, selfManaged: false, github: true, azureDevOps: false },
   { name: 'Private Advisories', managed: true, selfManaged: 'Manual setup', github: false, azureDevOps: false },
-  { name: 'Multi-ecosystem pull requests', managed: true, selfManaged: false, github: false, azureDevOps: false },
+  { name: 'Multi-ecosystem pull requests', managed: true, selfManaged: false, github: true, azureDevOps: false },
   { name: 'Weekly vulnerabilities email', managed: true, selfManaged: false, github: false, azureDevOps: false },
   { name: 'Team Collaboration', managed: true, selfManaged: 'Limited', github: true, azureDevOps: true },
   {
