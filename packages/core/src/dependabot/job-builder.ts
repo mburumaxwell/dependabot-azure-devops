@@ -172,6 +172,7 @@ export class DependabotJobBuilder {
     }
 
     // handle multi-ecosystem groups
+    let groups = this.update.groups;
     const multiEcosystemGroupName = this.update['multi-ecosystem-group'];
     const multiEcosystemUpdate = !!multiEcosystemGroupName;
     const multiEcosystemGroup = this.config['multi-ecosystem-groups']?.[multiEcosystemGroupName!];
@@ -181,6 +182,10 @@ export class DependabotJobBuilder {
       );
     }
 
+    if (multiEcosystemUpdate) {
+      
+    }
+
     return {
       job: {
         id: id,
@@ -188,7 +193,7 @@ export class DependabotJobBuilder {
         'package-manager': this.packageManager,
         'updating-a-pull-request': updatingPullRequest || false,
         'dependency-group-to-refresh': updateDependencyGroupName,
-        'dependency-groups': mapGroupsFromDependabotConfigToJobConfig(this.update.groups),
+        'dependency-groups': mapGroupsFromDependabotConfigToJobConfig(groups),
         dependencies: updateDependencyNames,
         'allowed-updates': mapAllowedUpdatesFromDependabotConfigToJobConfig(this.update.allow, securityOnlyUpdate),
         'ignore-conditions': mapIgnoreConditionsFromDependabotConfigToJobConfig(this.update.ignore),
