@@ -69,7 +69,7 @@
     "better-auth": "1.4.10",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
-    "cron-parser": "5.4.0",
+    "cron-parser": "5.5.0",
     "csv-parse": "6.1.0",
     "devicons-react": "1.5.0",
     "dotenv-flow": "4.1.0",
