@@ -9,8 +9,7 @@
     "paklo": "./dist/index.mjs"
   },
   "files": [
-    "dist",
-    "package.json"
+    "dist"
   ],
   "scripts": {
     "dev": "tsdown --watch",
