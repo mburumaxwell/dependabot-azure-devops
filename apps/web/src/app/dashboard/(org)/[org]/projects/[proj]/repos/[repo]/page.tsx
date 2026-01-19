@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { UpdateJobStatus } from '@/lib/enums';
-import { enableSbomDownload } from '@/lib/flags';
 import { prisma } from '@/lib/prisma';
 import { RepositoryView } from './page.client';
 
@@ -52,15 +51,8 @@ export default async function RepositoryPage(props: PageProps<'/dashboard/[org]/
     }),
   );
 
-  const sbomAllowed = updates.length > 0 && (await enableSbomDownload());
   return (
-    <RepositoryView
-      organization={organization}
-      project={project}
-      repository={repository}
-      updates={enrichedUpdates}
-      sbomAllowed={sbomAllowed}
-    />
+    <RepositoryView organization={organization} project={project} repository={repository} updates={enrichedUpdates} />
   );
 }
 

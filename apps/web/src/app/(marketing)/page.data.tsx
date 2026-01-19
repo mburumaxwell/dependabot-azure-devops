@@ -56,6 +56,7 @@ export const pricing = {
       'PR comments',
       'Managed Private advisories',
       'Multi-ecosystem pull requests',
+      'SBOM Export',
       'Weekly vulnerabilities email',
       'Team collaboration',
     ],

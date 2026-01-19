@@ -27,7 +27,6 @@ const hypertuneAdapter = createHypertuneAdapter<FlagValues, Context>({
 });
 
 export const enableHomePageStats = flag(hypertuneAdapter.declarations.enableHomePageStats);
-export const enableSbomDownload = flag(hypertuneAdapter.declarations.enableSbomDownload);
 
 export const enableDependabotDebug = flag({
   key: 'enable-dependabot-debug',

@@ -16,7 +16,7 @@ import { Item, ItemActions, ItemContent, ItemGroup, ItemMedia, ItemTitle } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getRepositoryFileUrl } from '@/lib/organizations';
 import type { Organization, Project, Repository, RepositoryUpdate, UpdateJob } from '@/lib/prisma';
-import { cn, trimLeadingSlash } from '@/lib/utils';
+import { trimLeadingSlash } from '@/lib/utils';
 
 type SimpleOrganization = Pick<Organization, 'id' | 'slug'>;
 type SimpleProject = Pick<Project, 'id' | 'name' | 'organizationId'> & {
@@ -35,13 +35,11 @@ export function RepositoryView({
   project,
   repository,
   updates,
-  sbomAllowed,
 }: {
   organization: SimpleOrganization;
   project: SimpleProject;
   repository: SimpleRepository;
   updates: SimpleRepositoryUpdate[];
-  sbomAllowed: boolean;
 }) {
   const organizationType = project.organization.type;
 
@@ -69,15 +67,8 @@ export function RepositoryView({
             </a>
           </p>
         </div>
-        <Button
-          className='mt-4 md:w-full lg:mt-0 lg:justify-self-end lg:w-auto'
-          disabled={!sbomAllowed}
-          asChild={sbomAllowed}
-        >
-          <Link
-            href={`/dashboard/${organization.slug}/projects/${project.id}/repos/${repository.id}/sbom`}
-            className={cn(!sbomAllowed && 'flex flex-row')}
-          >
+        <Button className='mt-4 md:w-full lg:mt-0 lg:justify-self-end lg:w-auto' asChild>
+          <Link href={`/dashboard/${organization.slug}/projects/${project.id}/repos/${repository.id}/sbom`}>
             <Download className='mr-2 size-4' />
             Export SBOM
           </Link>

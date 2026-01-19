@@ -13,14 +13,15 @@ export type FeatureComparison = {
 
 export const comparison: FeatureComparison[] = [
   { name: 'Azure DevOps Support', managed: true, selfManaged: true, github: false, azureDevOps: true },
-  // { name: 'GitLab Support', managed: true, selfManaged: true, github: false, azureDevOps: false },
   // { name: 'Bitbucket Support', managed: true, selfManaged: true, github: false, azureDevOps: false },
+  // { name: 'GitLab Support', managed: true, selfManaged: true, github: false, azureDevOps: false },
   { name: 'Automated Dependency Updates', managed: true, selfManaged: true, github: true, azureDevOps: false },
   { name: 'Vulnerability Scanning', managed: true, selfManaged: true, github: true, azureDevOps: true },
   { name: 'Pull Request comments', managed: true, selfManaged: false, github: true, azureDevOps: false },
   { name: 'Private Advisories', managed: true, selfManaged: 'Manual setup', github: false, azureDevOps: false },
   { name: 'Multi-ecosystem pull requests', managed: true, selfManaged: false, github: true, azureDevOps: false },
-  { name: 'Weekly vulnerabilities email', managed: true, selfManaged: false, github: false, azureDevOps: false },
+  { name: 'SBOM Export', managed: true, selfManaged: false, github: true, azureDevOps: false },
+  { name: 'Weekly vulnerabilities email', managed: true, selfManaged: false, github: true, azureDevOps: false },
   { name: 'Team Collaboration', managed: true, selfManaged: 'Limited', github: true, azureDevOps: true },
   {
     name: 'Infrastructure Management',
