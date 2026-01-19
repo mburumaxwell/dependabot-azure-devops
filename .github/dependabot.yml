@@ -4,6 +4,16 @@
 # https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
 
 version: 2
+multi-ecosystem-groups:
+  dependabot-updater:
+    # Aligning to the same schedule as the dependabot-core repo ('25 1 * * THU')
+    # but with a little delay just in case they need to fix something.
+    # https://github.com/dependabot/dependabot-core/blob/32a883c3e2471c1df1f483cc96a2b37f86ca125c/.github/workflows/gems-bump-version.yml#L4
+    schedule:
+      interval: 'weekly'
+      day: 'thursday'
+      time: '02:00'
+
 updates:
   - package-ecosystem: 'github-actions'
     directory: '/'
@@ -28,25 +38,18 @@ updates:
 
   - package-ecosystem: 'docker'
     directories: ['/packages/runner/docker']
-    schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '02:00'
     # For some reason, cooldown is not working as expected with these many docker updates.
     # It times out and fails to create PRs. Uncomment if/when fixed.
     # cooldown:
     #   default-days: 14 # chill for 14 days so that they fix any sudden issues
     #   include: ['dependabot/*']
-    groups:
-      dependabot-core-images:
-        patterns: ['dependabot/*']
+    multi-ecosystem-group: 'upstream-release'
+    patterns: ['dependabot/*']
 
   - package-ecosystem: 'bundler'
     directory: '/packages/runner/upstream'
-    schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '02:00'
+    multi-ecosystem-group: 'dependabot-updater'
+    patterns: ['*dependabot*']
 
   - package-ecosystem: 'npm'
     directory: '/'
