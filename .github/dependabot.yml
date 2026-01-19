@@ -41,6 +41,13 @@ updates:
       dependabot-core-images:
         patterns: ['dependabot/*']
 
+  - package-ecosystem: 'bundler'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '02:00'
+
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
