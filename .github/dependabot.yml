@@ -42,7 +42,7 @@ updates:
         patterns: ['dependabot/*']
 
   - package-ecosystem: 'bundler'
-    directory: '/'
+    directory: '/packages/runner/upstream'
     schedule:
       interval: 'weekly'
       day: 'monday'
