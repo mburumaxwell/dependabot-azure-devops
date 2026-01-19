@@ -7,4 +7,4 @@ source "https://rubygems.org"
 # A lock file is missing intentionally.
 # There is no lockfile because we are only interested in tracking gem version changes.
 
-gem "dependabot-omnibus", "~> 0.356.0"
+gem "dependabot-omnibus", "~> 0.357.0"
