@@ -6,4 +6,4 @@ source "https://rubygems.org"
 # the docker images we use in this repo. This helps react to changes appropriately.
 # A lock file is missing intentionally.
 
-gem "dependabot-omnibus", "~> 0.356.0"
+gem "dependabot-omnibus", "~> 0.357.0"
