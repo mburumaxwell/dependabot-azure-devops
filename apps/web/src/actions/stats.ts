@@ -23,7 +23,7 @@ type HomePageStats = {
  * @returns The home page statistics
  */
 export async function getHomePageStats(timeRange: TimeRange): Promise<HomePageStats> {
-  'use cache';
+  'use cache: remote';
   // 4 hours to revalidate, 1 day expire
   cacheLife({ stale: 4 * 3600, revalidate: 4 * 3600, expire: 86400 });
 
@@ -58,7 +58,7 @@ export async function getHomePageStats(timeRange: TimeRange): Promise<HomePageSt
  * @returns The total installation count (including on-premises downloads)
  */
 export async function getInstallations(id: string): Promise<number> {
-  'use cache';
+  'use cache: remote';
   // 1 day to revalidate and/or expire
   cacheLife({ stale: 86400, revalidate: 86400, expire: 86400 });
 
