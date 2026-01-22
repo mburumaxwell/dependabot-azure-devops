@@ -1,5 +1,16 @@
 # @paklo/runner
 
+## 0.9.1
+
+### Patch Changes
+
+- [#2421](https://github.com/mburumaxwell/paklo/pull/2421) [`8b8007d`](https://github.com/mburumaxwell/paklo/commit/8b8007d0f2ecb28c277432696df036ca064dd1e4) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump github/dependabot-update-job-proxy/dependabot-update-job-proxy from v2.0.20260106190418 to v2.0.20260116202120.
+
+- [#2431](https://github.com/mburumaxwell/paklo/pull/2431) [`7ca8a5b`](https://github.com/mburumaxwell/paklo/commit/7ca8a5b87aaa1a15e6fc73ebeaef82d6b37c8ff9) Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump the dependabot-core-images (29 updates) to from various versions to `v2.0.20260116233754`.
+
+- Updated dependencies [[`e957487`](https://github.com/mburumaxwell/paklo/commit/e957487c31d148a217465276eca1284dc2764d39)]:
+  - @paklo/core@0.12.1
+
 ## 0.9.0
 
 ### Minor Changes
