@@ -18,6 +18,8 @@
     "yaml.schemas": {
         "https://json.schemastore.org/github-issue-config.json": "file:///Users/maxwell/Documents/paklo/.github/ISSUE_TEMPLATE/config.yml"
     },
+    "chat.useNestedAgentsMdFiles": true,
+    "chat.useAgentSkills": true,
     "cSpell.language": "en-GB",
     "yaml.format.singleQuote": true
 }
