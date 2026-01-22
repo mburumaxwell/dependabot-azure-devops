@@ -6,14 +6,14 @@ export const config: VercelConfig = {
       path: '/api/crons/cleanup/database',
       schedule: '0 2 * * *',
     },
-    {
-      path: '/api/crons/trigger-update-jobs',
-      // schedule: '*/30 * * * *',
-      schedule: '12 */2 * * *',
-    },
+    // {
+    //  path: '/api/crons/trigger-update-jobs',
+    //  schedule: '*/30 * * * *',
+    // },
     {
       path: '/api/crons/trigger-sync-projects',
-      schedule: '23 */6 * * *',
+      // schedule: '23 */6 * * *',
+      schedule: '23 6 * * *',
     },
     {
       path: '/api/crons/trigger-scan-vulnerabilities',
