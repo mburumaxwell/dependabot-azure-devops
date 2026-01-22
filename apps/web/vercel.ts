@@ -8,7 +8,8 @@ export const config: VercelConfig = {
     },
     // {
     //  path: '/api/crons/trigger-update-jobs',
-    //  schedule: '*/30 * * * *',
+    //  // schedule: '*/30 * * * *',
+    //  schedule: '12 */2 * * *',
     // },
     {
       path: '/api/crons/trigger-sync-projects',
