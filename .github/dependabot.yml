@@ -4,16 +4,6 @@
 # https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
 
 version: 2
-multi-ecosystem-groups:
-  dependabot-updater:
-    # Aligning to the same schedule as the dependabot-core repo ('25 1 * * THU')
-    # but with a little delay just in case they need to fix something.
-    # https://github.com/dependabot/dependabot-core/blob/32a883c3e2471c1df1f483cc96a2b37f86ca125c/.github/workflows/gems-bump-version.yml#L4
-    schedule:
-      interval: 'weekly'
-      day: 'thursday'
-      time: '02:00'
-
 updates:
   - package-ecosystem: 'github-actions'
     directory: '/'
@@ -43,13 +33,20 @@ updates:
     # cooldown:
     #   default-days: 14 # chill for 14 days so that they fix any sudden issues
     #   include: ['dependabot/*']
-    multi-ecosystem-group: 'dependabot-updater'
-    patterns: ['dependabot/*']
+    groups:
+      dependabot-core-images:
+        patterns: ['dependabot/*']
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '02:00'
 
   - package-ecosystem: 'bundler'
     directory: '/packages/runner/upstream'
-    multi-ecosystem-group: 'dependabot-updater'
-    patterns: ['*dependabot*']
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '02:00'
 
   - package-ecosystem: 'npm'
     directory: '/'
