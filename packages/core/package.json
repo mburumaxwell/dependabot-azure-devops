@@ -1,6 +1,6 @@
 {
   "name": "@paklo/core",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "sideEffects": false,
   "type": "module",
   "author": "mburumaxwell",
