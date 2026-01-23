@@ -2,7 +2,11 @@
   "$schema": "https://turbo.build/schema.json",
   "extends": ["//"],
   "tasks": {
+    "codegen": {
+      "outputs": [".generated/**", "src/generated/**", "prisma/generated/**"]
+    },
     "build": {
+      "dependsOn": ["^build", "codegen"],
       "env": ["$TURBO_EXTENDS$", "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", "NEXT_RUNTIME"],
       "passThroughEnv": [
         "$TURBO_EXTENDS$",

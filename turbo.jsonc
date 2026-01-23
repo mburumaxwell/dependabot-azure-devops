@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
   "globalDependencies": ["tsconfig.json"],
   "globalEnv": ["NODE_ENV"],
   "globalPassThroughEnv": [
@@ -22,8 +23,12 @@
     "STRIPE_WEBHOOK_SECRET"
   ],
   "tasks": {
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "codegen": {},
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "typecheck", "codegen"],
       "outputs": ["dist/**"]
     },
     "lint": {
@@ -39,8 +44,10 @@
       "cache": false
     },
     "dev": {
+      "dependsOn": ["codegen"],
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "interruptible": true
     },
     "packages:version": {
       "cache": false

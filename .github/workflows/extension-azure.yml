@@ -58,15 +58,15 @@ jobs:
         working-directory: '${{ github.workspace }}/extensions/azure'
 
       - name: Build
-        run: pnpm turbo build
+        run: pnpm turbo run build
         working-directory: '${{ github.workspace }}/extensions/azure'
 
       - name: Lint
-        run: pnpm turbo lint
+        run: pnpm turbo run lint
         working-directory: '${{ github.workspace }}/extensions/azure'
 
       - name: Test
-        run: pnpm turbo test
+        run: pnpm turbo run test
         working-directory: '${{ github.workspace }}/extensions/azure'
 
       - name: Update Dev Version

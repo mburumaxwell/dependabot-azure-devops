@@ -22,6 +22,8 @@
     "extensions-azure:build": "turbo run build --filter=extension-azure-devops...",
     "extensions-azure:lint": "turbo run lint --filter=extension-azure-devops...",
 
+    "typecheck": "turbo run typecheck",
+    "codegen": "turbo run codegen",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
