@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "dev": "tsdown --watch",
-    "prebuild": "tsc",
+    "typecheck": "tsc",
     "build": "tsdown",
     "lint": "biome check",
     "test": "vitest",

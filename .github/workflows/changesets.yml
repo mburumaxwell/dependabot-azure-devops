@@ -49,7 +49,7 @@ jobs:
       # IMPORTANT: building CLI using turbo also builds its dependencies
       # hence where there are no additional build steps
       - name: Build
-        run: pnpm turbo build
+        run: pnpm turbo run build
         working-directory: '${{ github.workspace }}/packages/cli'
 
       - name: Generate token
