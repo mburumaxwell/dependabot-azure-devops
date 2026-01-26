@@ -18,6 +18,7 @@
       "!dist",
       "!.turbo",
       "!dependabot-action",
+      "!dependabot-cli",
       "!extensions/azure/tasks/*/task.json",
       "!extensions/azure/vss-extension.json",
       "!packages/runner/docker/containers.json",
