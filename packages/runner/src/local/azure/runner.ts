@@ -164,8 +164,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       options: { url, dryRun },
       authorClient,
     } = this;
-    for (const pullRequestIndex in existingPullRequests) {
-      const pullRequest = existingPullRequests[pullRequestIndex]!;
+    for (const pullRequest of existingPullRequests) {
       const pullRequestSourceRefName = normalizeBranchName(
         pullRequest.properties?.find((x) => x.name === PR_PROPERTY_MICROSOFT_GIT_SOURCE_REF_NAME)?.value,
       );
@@ -243,7 +242,6 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       // Parse the Dependabot metadata for the existing pull requests that are related to this update
       // Dependabot will use this to determine if we need to create new pull requests or update/close existing ones
       const existingPullRequestsForPackageManager = parsePullRequestProperties(existingPullRequests, packageManager);
-      const existingPullRequestDependenciesForPackageManager = Object.values(existingPullRequestsForPackageManager);
 
       const builder = new DependabotJobBuilder({
         source: { provider: 'azure', ...url },
@@ -345,7 +343,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       }
 
       // Run an update job for "all dependencies"; this will create new pull requests for dependencies that need updating
-      const openPullRequestsCount = Object.entries(existingPullRequestsForPackageManager).length;
+      const openPullRequestsCount = existingPullRequestsForPackageManager.length;
       const hasReachedOpenPullRequestLimit =
         openPullRequestsLimit > 0 && openPullRequestsCount >= openPullRequestsLimit;
       if (!hasReachedOpenPullRequestLimit) {
@@ -356,7 +354,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
             id,
             command,
             dependencyNamesToUpdate,
-            existingPullRequests: existingPullRequestDependenciesForPackageManager,
+            existingPullRequests: existingPullRequestsForPackageManager,
             securityVulnerabilities,
           }));
           ({ jobToken, credentialsToken } = this.makeTokens());
@@ -385,16 +383,16 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       }
 
       // If there are existing pull requests, run an update job for each one; this will resolve merge conflicts and close pull requests that are no longer needed
-      const numberOfPullRequestsToUpdate = Object.keys(existingPullRequestsForPackageManager).length;
+      const numberOfPullRequestsToUpdate = existingPullRequestsForPackageManager.length;
       if (numberOfPullRequestsToUpdate > 0) {
         if (!dryRun) {
-          for (const pullRequestId in existingPullRequestsForPackageManager) {
+          for (const pullRequestToUpdate of existingPullRequestsForPackageManager) {
             const id = makeRandomJobId();
             ({ job, credentials } = builder.forUpdate({
               id,
               command,
-              existingPullRequests: existingPullRequestDependenciesForPackageManager,
-              pullRequestToUpdate: existingPullRequestsForPackageManager[pullRequestId]!,
+              existingPullRequests: existingPullRequestsForPackageManager,
+              pullRequestToUpdate,
               securityVulnerabilities,
             }));
             ({ jobToken, credentialsToken } = this.makeTokens());

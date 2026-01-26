@@ -1,0 +1,20 @@
+meta {
+  name: azdo-repo-pr-props-get
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://dev.azure.com/tingle/dependabot/_apis/git/repositories/sample-python/pullrequests/31231/properties?api-version=5.0
+  body: none
+  auth: basic
+}
+
+params:query {
+  api-version: 5.0
+}
+
+auth:basic {
+  username: 
+  password: {{AZURE_DEVOPS_PAT}}
+}

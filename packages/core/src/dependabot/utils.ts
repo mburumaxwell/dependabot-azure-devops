@@ -1,4 +1,4 @@
-import type { DependabotDependency, DependabotExistingGroupPR, DependabotPersistedPr } from './job';
+import type { DependabotDependency, DependabotPersistedPr } from './job';
 import type { DependabotClosePullRequest, DependabotCreatePullRequest } from './update';
 
 export function normalizeFilePath(path: string): string {
@@ -16,9 +16,8 @@ export function normalizeBranchName(branch?: string): string | undefined {
   return branch?.replace(/^refs\/heads\//i, '');
 }
 
-export function getDependencyNames(dependencies: DependabotPersistedPr): string[] {
-  const deps = Array.isArray(dependencies) ? dependencies : dependencies.dependencies;
-  return deps.map((dep) => dep['dependency-name']?.toString());
+export function getDependencyNames(pr: DependabotPersistedPr): string[] {
+  return pr.dependencies.map((dep) => dep['dependency-name']?.toString());
 }
 
 export function areEqual(a: string[], b: string[]): boolean {
@@ -53,20 +52,15 @@ export function getPullRequestCloseReason(data: DependabotClosePullRequest): str
   return reason;
 }
 
-export function getPullRequestDependencies(data: DependabotCreatePullRequest): DependabotPersistedPr {
-  const dependencies = data.dependencies?.map((dep) => {
-    return {
+export function getPersistedPr(data: DependabotCreatePullRequest): DependabotPersistedPr {
+  return {
+    'dependency-group-name': data['dependency-group']?.name || null,
+    dependencies: data.dependencies.map((dep) => ({
       'dependency-name': dep.name,
       'dependency-version': dep.version,
       directory: dep.directory,
-    };
-  });
-  const dependencyGroupName = data['dependency-group']?.name;
-  if (!dependencyGroupName) return dependencies;
-  return {
-    'dependency-group-name': dependencyGroupName,
-    dependencies: dependencies,
-  } as DependabotExistingGroupPR;
+    })),
+  };
 }
 
 export function getPullRequestDescription({

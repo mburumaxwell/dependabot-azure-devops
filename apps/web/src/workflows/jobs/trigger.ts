@@ -2,8 +2,9 @@ import {
   DEFAULT_EXPERIMENTS,
   type DependabotCommand,
   type DependabotConfig,
+  type DependabotExistingGroupPr,
+  type DependabotExistingPr,
   DependabotJobBuilder,
-  type DependabotPersistedPr,
   type DependabotProxyConfig,
   type FileFetcherInput,
   type FileUpdaterInput,
@@ -216,8 +217,9 @@ async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions): Prom
         status: 'open',
       },
     });
-    const existingPullRequestsMap: Map<string, DependabotPersistedPr> = new Map(
-      existingPullRequestsRaw.map((pr) => [pr.id, pr.data]),
+    const existingPullRequestsMap: Map<string, DependabotExistingPr | DependabotExistingGroupPr> = new Map(
+      // Add 'pr-number' field back from the PR record
+      existingPullRequestsRaw.map((pr) => [pr.id, { 'pr-number': pr.providerId, ...pr.data }]),
     );
     const existingPullRequests = existingPullRequestsMap.values().toArray();
     const pullRequestToUpdate =
