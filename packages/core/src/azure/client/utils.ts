@@ -57,10 +57,22 @@ export function getPullRequestForDependencyNames(
   existingPullRequests: AzdoPrExtractedWithProperties[],
   packageManager: string,
   dependencyNames: string[],
+  dependencyGroupName?: string | null,
 ): AzdoPrExtractedWithProperties | undefined {
   return existingPullRequests
     .filter((pr) => filterPullRequestsByPackageManager(pr, packageManager))
-    .find((pr) => areEqual(getDependencyNames(parsePullRequestProps(pr)), dependencyNames));
+    .find((pr) => {
+      const parsedPr = parsePullRequestProps(pr);
+      const prGroupName = 'dependency-group-name' in parsedPr ? parsedPr['dependency-group-name'] : null;
+
+      // For grouped PRs: match by group name (dependencies can vary)
+      if (dependencyGroupName) {
+        return prGroupName === dependencyGroupName;
+      }
+
+      // For non-grouped PRs: match by exact dependency names
+      return !prGroupName && areEqual(getDependencyNames(parsedPr), dependencyNames);
+    });
 }
 
 export function getPullRequestChangedFiles(data: DependabotCreatePullRequest | DependabotUpdatePullRequest) {

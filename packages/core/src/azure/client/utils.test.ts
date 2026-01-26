@@ -262,7 +262,7 @@ describe('getPullRequestForDependencyNames', () => {
       },
     ];
 
-    const result = getPullRequestForDependencyNames(prs, 'npm_and_yarn', ['lodash', 'express']);
+    const result = getPullRequestForDependencyNames(prs, 'npm_and_yarn', ['lodash', 'express'], 'dev-dependencies');
 
     expect(result).toBeDefined();
     expect(result!.pullRequestId).toBe(1);
@@ -327,6 +327,99 @@ describe('getPullRequestForDependencyNames', () => {
 
     expect(result).toBeDefined();
     expect(result!.pullRequestId).toBe(1);
+  });
+
+  it('finds grouped PR by group name even with different dependency names', () => {
+    const prs: AzdoPrExtractedWithProperties[] = [
+      {
+        pullRequestId: 1,
+        properties: [
+          { name: PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER, value: 'nuget' },
+          {
+            name: PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
+            value: JSON.stringify({
+              'dependency-group-name': 'System-Commandline',
+              dependencies: [
+                { 'dependency-name': 'System.CommandLine.Hosting', 'dependency-version': '0.4.0-alpha.25320.106' },
+                { 'dependency-name': 'System.CommandLine.Rendering', 'dependency-version': '0.4.0-alpha.25320.106' },
+              ],
+            }),
+          },
+        ],
+      },
+    ];
+
+    // Looking for PR with just one dependency, but same group name
+    const result = getPullRequestForDependencyNames(prs, 'nuget', ['System.CommandLine.Hosting'], 'System-Commandline');
+
+    expect(result).toBeDefined();
+    expect(result!.pullRequestId).toBe(1);
+  });
+
+  it('does not find grouped PR when group name differs', () => {
+    const prs: AzdoPrExtractedWithProperties[] = [
+      {
+        pullRequestId: 1,
+        properties: [
+          { name: PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER, value: 'npm_and_yarn' },
+          {
+            name: PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
+            value: JSON.stringify({
+              'dependency-group-name': 'production',
+              dependencies: [{ 'dependency-name': 'lodash' }],
+            }),
+          },
+        ],
+      },
+    ];
+
+    const result = getPullRequestForDependencyNames(prs, 'npm_and_yarn', ['lodash'], 'development');
+
+    expect(result).toBeUndefined();
+  });
+
+  it('does not find non-grouped PR when searching with group name', () => {
+    const prs: AzdoPrExtractedWithProperties[] = [
+      {
+        pullRequestId: 1,
+        properties: [
+          { name: PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER, value: 'npm_and_yarn' },
+          {
+            name: PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
+            value: JSON.stringify({
+              dependencies: [{ 'dependency-name': 'lodash' }],
+            }),
+          },
+        ],
+      },
+    ];
+
+    const result = getPullRequestForDependencyNames(prs, 'npm_and_yarn', ['lodash'], 'production');
+
+    expect(result).toBeUndefined();
+  });
+
+  it('does not find grouped PR when searching without group name', () => {
+    const prs: AzdoPrExtractedWithProperties[] = [
+      {
+        pullRequestId: 1,
+        properties: [
+          { name: PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER, value: 'npm_and_yarn' },
+          {
+            name: PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
+            value: JSON.stringify({
+              'dependency-group-name': 'production',
+              dependencies: [{ 'dependency-name': 'lodash' }],
+            }),
+          },
+        ],
+      },
+    ];
+
+    // Searching for exact dependency match without group name should not find grouped PR
+    const result = getPullRequestForDependencyNames(prs, 'npm_and_yarn', ['lodash']);
+
+    expect(result).toBeUndefined();
   });
 });
 
