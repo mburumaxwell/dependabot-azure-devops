@@ -18,6 +18,7 @@ export const DEFAULT_EXPERIMENTS: DependabotExperiments = {
   'allow-refresh-group-with-all-dependencies': true,
   'enable-enhanced-error-details-for-updater': true,
   'gradle-lockfile-updater': true,
+  'gradle-wrapper-updater': true,
   'enable-exclude-paths-subdirectory-manifest-files': true,
   'group-membership-enforcement': true,
   'deprecate-close-command': true,
