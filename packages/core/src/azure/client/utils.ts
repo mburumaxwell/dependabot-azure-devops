@@ -1,8 +1,12 @@
 import * as path from 'node:path';
+import { z } from 'zod';
 
 import {
   areEqual,
   type DependabotCreatePullRequest,
+  type DependabotExistingGroupPr,
+  type DependabotExistingPr,
+  DependabotExistingPrDependencySchema,
   type DependabotPersistedPr,
   DependabotPersistedPrSchema,
   type DependabotUpdatePullRequest,
@@ -13,39 +17,40 @@ import type { AzdoFileChange, AzdoPrExtractedWithProperties, AzdoVersionControlC
 
 export function buildPullRequestProperties(packageManager: string, dependencies: DependabotPersistedPr) {
   return [
-    {
-      name: PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER,
-      value: packageManager,
-    },
-    {
-      name: PR_PROPERTY_DEPENDABOT_DEPENDENCIES,
-      value: JSON.stringify(dependencies),
-    },
+    { name: PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER, value: packageManager },
+    { name: PR_PROPERTY_DEPENDABOT_DEPENDENCIES, value: JSON.stringify(dependencies) },
   ];
+}
+
+export function parsePullRequestProps(
+  pr: AzdoPrExtractedWithProperties,
+): DependabotExistingPr | DependabotExistingGroupPr {
+  // TODO: remove legacy format support on or after 2026-03-26 (it would be 90 days later)
+  const WithLegacySchema = z.union([
+    DependabotPersistedPrSchema,
+    // legacy format to be removed in the future
+    DependabotExistingPrDependencySchema.array(),
+  ]);
+
+  const parsed = WithLegacySchema.parse(
+    JSON.parse(pr.properties!.find((p) => p.name === PR_PROPERTY_DEPENDABOT_DEPENDENCIES)!.value),
+  );
+  if (Array.isArray(parsed)) {
+    return { 'pr-number': pr.pullRequestId, dependencies: parsed };
+  } else {
+    return { 'pr-number': pr.pullRequestId, ...parsed };
+  }
+}
+
+function filterPullRequestsByPackageManager(pr: AzdoPrExtractedWithProperties, packageManager: string) {
+  return pr.properties?.find((p) => p.name === PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER && p.value === packageManager);
 }
 
 export function parsePullRequestProperties(
   pullRequests: AzdoPrExtractedWithProperties[],
-  packageManager: string | null,
-): Record<string, DependabotPersistedPr> {
-  return Object.fromEntries(
-    pullRequests
-      .filter((pr) => {
-        return pr.properties?.find(
-          (p) =>
-            p.name === PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER &&
-            (packageManager === null || p.value === packageManager),
-        );
-      })
-      .map((pr) => {
-        return [
-          pr.pullRequestId,
-          DependabotPersistedPrSchema.parse(
-            JSON.parse(pr.properties!.find((p) => p.name === PR_PROPERTY_DEPENDABOT_DEPENDENCIES)!.value),
-          ),
-        ];
-      }),
-  );
+  packageManager: string,
+): (DependabotExistingPr | DependabotExistingGroupPr)[] {
+  return pullRequests.filter((pr) => filterPullRequestsByPackageManager(pr, packageManager)).map(parsePullRequestProps);
 }
 
 export function getPullRequestForDependencyNames(
@@ -53,16 +58,9 @@ export function getPullRequestForDependencyNames(
   packageManager: string,
   dependencyNames: string[],
 ): AzdoPrExtractedWithProperties | undefined {
-  return existingPullRequests.find((pr) => {
-    return (
-      pr.properties?.find((p) => p.name === PR_PROPERTY_DEPENDABOT_PACKAGE_MANAGER && p.value === packageManager) &&
-      pr.properties?.find(
-        (p) =>
-          p.name === PR_PROPERTY_DEPENDABOT_DEPENDENCIES &&
-          areEqual(getDependencyNames(DependabotPersistedPrSchema.parse(JSON.parse(p.value))), dependencyNames),
-      )
-    );
-  });
+  return existingPullRequests
+    .filter((pr) => filterPullRequestsByPackageManager(pr, packageManager))
+    .find((pr) => areEqual(getDependencyNames(parsePullRequestProps(pr)), dependencyNames));
 }
 
 export function getPullRequestChangedFiles(data: DependabotCreatePullRequest | DependabotUpdatePullRequest) {

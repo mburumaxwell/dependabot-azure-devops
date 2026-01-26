@@ -8,8 +8,8 @@ import {
   type DependabotTokenType,
   getBranchNameForUpdate,
   getDependencyNames,
+  getPersistedPr,
   getPullRequestCloseReason,
-  getPullRequestDependencies,
   getPullRequestDescription,
   makeDirectoryKey,
 } from '@paklo/core/dependabot';
@@ -185,7 +185,7 @@ async function handlePrRequests(options: HandlePrRequestsOptions): Promise<boole
       }
 
       const changedFiles = getPullRequestChangedFiles(data);
-      const dependencies = getPullRequestDependencies(data);
+      const dependencies = getPersistedPr(data);
       const targetBranch =
         update['target-branch'] ||
         (await authorClient.getDefaultBranch({ project: project.name, repository: repository.name }));

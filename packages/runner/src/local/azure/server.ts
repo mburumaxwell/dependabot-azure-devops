@@ -14,8 +14,8 @@ import {
 import {
   type DependabotRequest,
   getBranchNameForUpdate,
+  getPersistedPr,
   getPullRequestCloseReason,
-  getPullRequestDependencies,
   getPullRequestDescription,
 } from '@paklo/core/dependabot';
 import { logger } from '@paklo/core/logger';
@@ -89,7 +89,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         // Parse the Dependabot metadata for the existing pull requests that are related to this update
         // Dependabot will use this to determine if we need to create new pull requests or update/close existing ones
         const existingPullRequestsForPackageManager = parsePullRequestProperties(existingPullRequests, packageManager);
-        const existingPullRequestsCount = Object.entries(existingPullRequestsForPackageManager).length;
+        const existingPullRequestsCount = existingPullRequestsForPackageManager.length;
         const openPullRequestsCount = affectedPullRequestIds.get(id)!.created.length + existingPullRequestsCount;
         const hasReachedOpenPullRequestLimit =
           openPullRequestsLimit > 0 && openPullRequestsCount >= openPullRequestsLimit;
@@ -102,14 +102,14 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         }
 
         const changedFiles = getPullRequestChangedFiles(data);
-        const dependencies = getPullRequestDependencies(data);
+        const dependencies = getPersistedPr(data);
         const targetBranch = update['target-branch'] || (await authorClient.getDefaultBranch({ project, repository }));
         const sourceBranch = getBranchNameForUpdate({
           packageEcosystem: update['package-ecosystem'],
           targetBranchName: targetBranch,
           directory: update.directory || update.directories?.find((dir) => changedFiles[0]?.path?.startsWith(dir)),
-          dependencyGroupName: !Array.isArray(dependencies) ? dependencies['dependency-group-name'] : undefined,
-          dependencies: !Array.isArray(dependencies) ? dependencies.dependencies : dependencies,
+          dependencyGroupName: dependencies['dependency-group-name'],
+          dependencies: dependencies.dependencies,
           separator: update['pull-request-branch-name']?.separator,
         });
 

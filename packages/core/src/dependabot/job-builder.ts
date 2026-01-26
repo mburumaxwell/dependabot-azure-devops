@@ -14,12 +14,12 @@ import type {
   DependabotAllowed,
   DependabotCondition,
   DependabotCredential,
-  DependabotExistingGroupPR,
+  DependabotExistingGroupPr,
+  DependabotExistingPr,
   DependabotExperiments,
   DependabotGroupJob,
   DependabotJobConfig,
   DependabotPackageManager,
-  DependabotPersistedPr,
   DependabotSecurityAdvisory,
   DependabotSource,
   DependabotSourceProvider,
@@ -142,8 +142,8 @@ export class DependabotJobBuilder {
     id: string;
     command: DependabotJobConfig['command'];
     dependencyNamesToUpdate?: string[];
-    existingPullRequests: DependabotPersistedPr[];
-    pullRequestToUpdate?: DependabotPersistedPr;
+    existingPullRequests: (DependabotExistingPr | DependabotExistingGroupPr)[];
+    pullRequestToUpdate?: DependabotExistingPr | DependabotExistingGroupPr;
     securityVulnerabilities?: SecurityVulnerability[];
   }): DependabotJobBuilderOutput {
     const securityOnlyUpdate = this.update['open-pull-requests-limit'] === 0;
@@ -155,12 +155,9 @@ export class DependabotJobBuilder {
 
     if (pullRequestToUpdate) {
       updatingPullRequest = true;
-      updateDependencyGroupName = Array.isArray(pullRequestToUpdate)
-        ? null
-        : pullRequestToUpdate['dependency-group-name'];
-      updateDependencyNames = (
-        Array.isArray(pullRequestToUpdate) ? pullRequestToUpdate : pullRequestToUpdate.dependencies
-      )?.map((d) => d['dependency-name']);
+      updateDependencyGroupName =
+        'dependency-group-name' in pullRequestToUpdate ? pullRequestToUpdate['dependency-group-name'] : null;
+      updateDependencyNames = pullRequestToUpdate.dependencies.map((d) => d['dependency-name']);
       vulnerabilities = securityVulnerabilities?.filter((v) => updateDependencyNames?.includes(v.package.name));
     } else {
       updatingPullRequest = false;
@@ -187,10 +184,8 @@ export class DependabotJobBuilder {
         'security-advisories': mapSecurityAdvisories(vulnerabilities),
         source: this.source,
         'update-subdependencies': false,
-        'existing-pull-requests': existingPullRequests.filter((pr) => Array.isArray(pr)),
-        'existing-group-pull-requests': existingPullRequests.filter(
-          (pr): pr is DependabotExistingGroupPR => !Array.isArray(pr),
-        ),
+        'existing-pull-requests': existingPullRequests.filter((pr) => !('dependency-group-name' in pr)),
+        'existing-group-pull-requests': existingPullRequests.filter((pr) => 'dependency-group-name' in pr),
         'commit-message-options': {
           prefix: this.update['commit-message']?.prefix ?? null,
           'prefix-development': this.update['commit-message']?.['prefix-development'] ?? null,

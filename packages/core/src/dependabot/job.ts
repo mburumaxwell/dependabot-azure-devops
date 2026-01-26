@@ -33,19 +33,25 @@ export const DependabotSourceSchema = z.object({
 });
 export type DependabotSource = z.infer<typeof DependabotSourceSchema>;
 
-export const DependabotExistingPRSchema = z.object({
+export const DependabotExistingPrDependencySchema = z.object({
   'dependency-name': z.string(),
   'dependency-version': z.string().nullish(),
   directory: z.string().nullish(),
   removed: z.boolean().nullish(),
 });
-export type DependabotExistingPR = z.infer<typeof DependabotExistingPRSchema>;
+export type DependabotExistingPrDependency = z.infer<typeof DependabotExistingPrDependencySchema>;
 
-export const DependabotExistingGroupPRSchema = z.object({
-  'dependency-group-name': z.string(),
-  dependencies: DependabotExistingPRSchema.array(),
+export const DependabotExistingPrSchema = z.object({
+  'pr-number': z.number(),
+  dependencies: DependabotExistingPrDependencySchema.array(),
 });
-export type DependabotExistingGroupPR = z.infer<typeof DependabotExistingGroupPRSchema>;
+export type DependabotExistingPr = z.infer<typeof DependabotExistingPrSchema>;
+
+export const DependabotExistingGroupPrSchema = DependabotExistingPrSchema.extend({
+  'dependency-group-name': z.string(),
+  dependencies: DependabotExistingPrDependencySchema.array(),
+});
+export type DependabotExistingGroupPr = z.infer<typeof DependabotExistingGroupPrSchema>;
 
 export const DependabotAllowedSchema = z.object({
   'dependency-name': z.string().nullish(),
@@ -169,8 +175,8 @@ export const DependabotJobConfigSchema = z.object({
   'dependency-groups': DependabotGroupJobSchema.array().nullish(),
   dependencies: z.string().array().nullable(),
   'dependency-group-to-refresh': z.string().nullish(),
-  'existing-pull-requests': DependabotExistingPRSchema.array().array(),
-  'existing-group-pull-requests': DependabotExistingGroupPRSchema.array(),
+  'existing-pull-requests': DependabotExistingPrSchema.array(),
+  'existing-group-pull-requests': DependabotExistingGroupPrSchema.array(),
   experiments: DependabotExperimentsSchema,
   'ignore-conditions': DependabotConditionSchema.array(),
   'lockfile-only': z.boolean(),
@@ -217,5 +223,7 @@ export type FileUpdaterInput = FetchedFiles & {
   job: DependabotJobConfig;
 };
 
-export const DependabotPersistedPrSchema = DependabotExistingPRSchema.array().or(DependabotExistingGroupPRSchema);
+export const DependabotPersistedPrSchema = DependabotExistingGroupPrSchema.omit({ 'pr-number': true }).extend({
+  'dependency-group-name': z.string().nullish(),
+});
 export type DependabotPersistedPr = z.infer<typeof DependabotPersistedPrSchema>;
