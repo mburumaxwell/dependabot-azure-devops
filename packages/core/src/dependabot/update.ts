@@ -67,6 +67,7 @@ export const DependabotDependencySubmissionSchema = z.object({
       })
       .nullish(),
   }),
+  metadata: z.record(z.string(), z.any()).nullish(),
 });
 export type DependabotDependencySubmission = z.infer<typeof DependabotDependencySubmissionSchema>;
 
