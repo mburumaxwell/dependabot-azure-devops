@@ -17,6 +17,7 @@ import {
   getPersistedPr,
   getPullRequestCloseReason,
   getPullRequestDescription,
+  shouldSupersede,
 } from '@paklo/core/dependabot';
 import { logger } from '@paklo/core/logger';
 import { LocalDependabotServer, type LocalDependabotServerOptions } from '../server';
@@ -101,15 +102,15 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           return true;
         }
 
+        const persisted = getPersistedPr(data);
         const changedFiles = getPullRequestChangedFiles(data);
-        const dependencies = getPersistedPr(data);
         const targetBranch = update['target-branch'] || (await authorClient.getDefaultBranch({ project, repository }));
         const sourceBranch = getBranchNameForUpdate({
           packageEcosystem: update['package-ecosystem'],
           targetBranchName: targetBranch,
           directory: update.directory || update.directories?.find((dir) => changedFiles[0]?.path?.startsWith(dir)),
-          dependencyGroupName: dependencies['dependency-group-name'],
-          dependencies: dependencies.dependencies,
+          dependencyGroupName: persisted['dependency-group-name'],
+          dependencies: persisted.dependencies,
           separator: update['pull-request-branch-name']?.separator,
         });
 
@@ -159,7 +160,7 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           labels: update.labels?.map((label) => label?.trim()) || [],
           workItems: update.milestone ? [update.milestone] : [],
           changes: changedFiles,
-          properties: buildPullRequestProperties(packageManager, dependencies),
+          properties: buildPullRequestProperties(packageManager, persisted),
         });
 
         // Auto-approve the pull request, if required
@@ -173,7 +174,29 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
 
         // Store the new pull request ID, so we can keep track of the total number of open pull requests
         if (newPullRequestId) {
-          affectedPullRequestIds.get(id)!.created.push(newPullRequestId);
+          affectedPullRequestIds.get(id)!.created.push({
+            'pr-number': newPullRequestId,
+            ...persisted,
+          });
+
+          // Check if any existing pull requests are now superseded by this new pull request
+          for (const existingPr of existingPullRequestsForPackageManager) {
+            if (shouldSupersede(persisted, existingPr)) {
+              logger.info(
+                `Detected that existing PR #${existingPr['pr-number']} is superseded by new PR #${newPullRequestId}`,
+              );
+
+              // The updater leaves the PR open for the backend to close with a comment that it has been superseded
+              authorClient.abandonPullRequest({
+                project: project,
+                repository: repository,
+                pullRequestId: existingPr['pr-number'],
+                comment: `Superseded by #${newPullRequestId}`,
+                deleteSourceBranch: true,
+              });
+            }
+          }
+
           return true;
         }
         return false;
@@ -243,9 +266,6 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
           return false;
         }
 
-        // TODO: GitHub Dependabot will close with reason "Superseded by ${new_pull_request_id}" when another PR supersedes it.
-        //       How do we detect this? Do we need to?
-
         // Close the pull request
         const success = await authorClient.abandonPullRequest({
           project: project,
@@ -268,7 +288,10 @@ export class AzureLocalDependabotServer extends LocalDependabotServer {
         }
 
         // add comment to each create/updated pull request
-        const ids = affectedPullRequestIds.get(id)!.created.concat(affectedPullRequestIds.get(id)!.updated);
+        const ids = affectedPullRequestIds
+          .get(id)!
+          .created.map((pr) => pr['pr-number'])
+          .concat(affectedPullRequestIds.get(id)!.updated);
         for (const pullRequestId of ids) {
           await authorClient.addCommentThread({
             project: project,

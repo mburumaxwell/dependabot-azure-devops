@@ -101,3 +101,100 @@ export function getPullRequestDescription({
   }
   return `${header}${description}${footer}`;
 }
+
+/**
+ * Determines if a new pull request should supersede an existing pull request.
+ *
+ * Follows GitHub Dependabot's superseding logic:
+ * - **Grouped PRs**: Supersede if same group name AND any dependency version changed
+ * - **Single dependency PRs**: Supersede if updating the exact same dependency with a different version
+ * - **Different scopes**: PRs with different dependency sets don't supersede each other
+ *
+ * A new PR supersedes an old PR when:
+ * 1. Both are for the same group (same `dependency-group-name`), OR
+ *    Both update the exact same set of dependencies (same dependency names)
+ * 2. AND at least one dependency has a different version
+ *
+ * This prevents incorrect superseding when PRs update overlapping but different dependency sets.
+ *
+ * @param oldPr - The existing pull request's dependency data
+ * @param newPr - The new pull request's dependency data
+ * @returns `true` if the new PR should supersede the old PR, `false` otherwise
+ *
+ * @example
+ * ```ts
+ * // Single dependency - same dependency, different version: SUPERSEDE
+ * const oldPr = {
+ *   'dependency-group-name': null,
+ *   dependencies: [{ 'dependency-name': 'lodash', 'dependency-version': '4.17.20' }]
+ * };
+ * const newPr = {
+ *   'dependency-group-name': null,
+ *   dependencies: [{ 'dependency-name': 'lodash', 'dependency-version': '4.17.21' }]
+ * };
+ * shouldSupersede(oldPr, newPr); // returns true
+ * ```
+ *
+ * @example
+ * ```ts
+ * // Different dependency sets - overlap but different scope: DON'T SUPERSEDE
+ * const oldPr = {
+ *   'dependency-group-name': null,
+ *   dependencies: [
+ *     { 'dependency-name': 'lodash', 'dependency-version': '4.17.20' },
+ *     { 'dependency-name': 'express', 'dependency-version': '4.18.0' }
+ *   ]
+ * };
+ * const newPr = {
+ *   'dependency-group-name': null,
+ *   dependencies: [
+ *     { 'dependency-name': 'lodash', 'dependency-version': '4.17.21' },
+ *     { 'dependency-name': 'react', 'dependency-version': '18.0.0' }
+ *   ]
+ * };
+ * shouldSupersede(oldPr, newPr); // returns false - different dependency sets
+ * ```
+ *
+ * @example
+ * ```ts
+ * // Same group - version changed: SUPERSEDE
+ * const oldPr = {
+ *   'dependency-group-name': 'production',
+ *   dependencies: [{ 'dependency-name': 'lodash', 'dependency-version': '4.17.20' }]
+ * };
+ * const newPr = {
+ *   'dependency-group-name': 'production',
+ *   dependencies: [{ 'dependency-name': 'lodash', 'dependency-version': '4.17.21' }]
+ * };
+ * shouldSupersede(oldPr, newPr); // returns true - same group, version changed
+ * ```
+ */
+export function shouldSupersede(oldPr: DependabotPersistedPr, newPr: DependabotPersistedPr): boolean {
+  // Both PRs mut have the same dependency group name (including both being null/undefined)
+  const oldGroupName = oldPr['dependency-group-name'];
+  const newGroupName = newPr['dependency-group-name'];
+  if ((oldGroupName || undefined) !== (newGroupName || undefined)) {
+    return false;
+  }
+
+  const oldDeps = getDependencyNames(oldPr);
+  const newDeps = getDependencyNames(newPr);
+
+  // Non-grouped PRs must have the same dependency names
+  if (!oldGroupName && !areEqual(oldDeps, newDeps)) {
+    return false;
+  }
+
+  // They're in the same scope - check if any dependency version changed
+  const overlappingDeps = oldDeps.filter((dep) => newDeps.includes(dep));
+  for (const dep of overlappingDeps) {
+    const oldDep = oldPr.dependencies.find((d) => d['dependency-name'] === dep);
+    const newDep = newPr.dependencies.find((d) => d['dependency-name'] === dep);
+    if (oldDep?.['dependency-version'] !== newDep?.['dependency-version']) {
+      return true;
+    }
+  }
+
+  // Same scope but all versions are identical - this is just a rebase
+  return false;
+}

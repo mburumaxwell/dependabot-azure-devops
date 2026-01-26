@@ -4,6 +4,8 @@ import {
   type CreateApiServerAppOptions,
   createApiServerApp,
   type DependabotCredential,
+  type DependabotExistingGroupPr,
+  type DependabotExistingPr,
   type DependabotJobConfig,
   type DependabotRequest,
   type DependabotTokenType,
@@ -28,7 +30,7 @@ export type LocalDependabotServerAddOptions = {
 };
 
 export type AffectedPullRequestIds = {
-  created: number[];
+  created: (DependabotExistingPr | DependabotExistingGroupPr)[];
   updated: number[];
   closed: number[];
 };
@@ -187,7 +189,7 @@ export abstract class LocalDependabotServer {
   allAffectedPrs(id: string): number[] {
     const affected = this.affectedPrs(id);
     if (!affected) return [];
-    return [...affected.created, ...affected.updated, ...affected.closed];
+    return [...affected.created.map((pr) => pr['pr-number']), ...affected.updated, ...affected.closed];
   }
 
   /**
