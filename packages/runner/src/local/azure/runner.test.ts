@@ -112,6 +112,7 @@ describe('AzureLocalJobsRunner', () => {
         ],
         registries: {},
       } as DependabotConfig,
+      command: 'update',
       experiments: DEFAULT_EXPERIMENTS,
     };
 

@@ -104,7 +104,7 @@ type GetOrCreateUpdateJobResult = { ids: string[]; existing: number; created: nu
 async function getOrCreateUpdateJobs(options: GetOrCreateUpdateJobOptions): Promise<GetOrCreateUpdateJobResult> {
   'use step';
 
-  const { organizationId, projectId, repositoryId, trigger, workflowRunId, command } = options;
+  const { organizationId, projectId, repositoryId, trigger, workflowRunId, command = 'update' } = options;
 
   // fetch related entities in parallel
   const [organization, organizationCredential, project, repository] = await Promise.all([

@@ -28,7 +28,7 @@ const schema = z.object({
   repositoryUrl: z.url(),
   gitToken: z.string(),
   githubToken: z.string().optional(),
-  command: DependabotCommandSchema.optional(),
+  command: DependabotCommandSchema.default('update'),
   jobTokenOverride: z.string().optional(),
   credentialsTokenOverride: z.string().optional(),
   port: z.coerce.number().min(1).max(65535).optional(),

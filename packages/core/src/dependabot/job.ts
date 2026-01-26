@@ -160,7 +160,13 @@ export const DependabotPackageManagerSchema = z.enum([
 ]);
 export type DependabotPackageManager = z.infer<typeof DependabotPackageManagerSchema>;
 
-export const DEPENDABOT_COMMANDS = ['graph', 'version', 'recreate'] as const;
+export const DEPENDABOT_COMMANDS = [
+  'update',
+  'version',
+  'recreate',
+  // 'security',
+  'graph',
+] as const;
 export const DependabotCommandSchema = z.enum(DEPENDABOT_COMMANDS);
 export type DependabotCommand = z.infer<typeof DependabotCommandSchema>;
 

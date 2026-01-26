@@ -12,6 +12,7 @@ import type {
 import { setExperiment } from './experiments';
 import type {
   DependabotAllowed,
+  DependabotCommand,
   DependabotCondition,
   DependabotCredential,
   DependabotExistingGroupPr,
@@ -90,17 +91,11 @@ export class DependabotJobBuilder {
   /**
    * Create a dependabot update job that updates nothing, but will discover the dependency list for a package ecosystem
    */
-  public forDependenciesList({
-    id,
-    command,
-  }: {
-    id: string;
-    command: DependabotJobConfig['command'];
-  }): DependabotJobBuilderOutput {
+  public forDependenciesList({ id }: { id: string }): DependabotJobBuilderOutput {
     return {
       job: {
         id: id,
-        command: command,
+        command: 'update',
         'package-manager': this.packageManager,
         'updating-a-pull-request': false,
         dependencies: null,
@@ -112,7 +107,7 @@ export class DependabotJobBuilder {
         'update-subdependencies': false,
         'existing-pull-requests': [],
         'existing-group-pull-requests': [],
-        experiments: this.experiments,
+        experiments: mapExperiments(this.experiments),
         'requirements-update-strategy': null,
         'lockfile-only': false,
         'commit-message-options': {
@@ -140,7 +135,7 @@ export class DependabotJobBuilder {
     securityVulnerabilities,
   }: {
     id: string;
-    command: DependabotJobConfig['command'];
+    command: DependabotCommand;
     dependencyNamesToUpdate?: string[];
     existingPullRequests: (DependabotExistingPr | DependabotExistingGroupPr)[];
     pullRequestToUpdate?: DependabotExistingPr | DependabotExistingGroupPr;

@@ -7,6 +7,7 @@ import {
   parsePullRequestProperties,
 } from '@paklo/core/azure';
 import {
+  type DependabotCommand,
   type DependabotCredential,
   DependabotJobBuilder,
   type DependabotJobConfig,
@@ -139,10 +140,10 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       return await this.performUpdates(
         server,
         updates,
+        command,
         existingPullRequests,
         dependabotApiUrl,
         dependabotApiDockerUrl,
-        command,
       );
     } finally {
       server.stop();
@@ -204,10 +205,10 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
   private async performUpdates(
     server: AzureLocalDependabotServer,
     updates: DependabotUpdate[],
+    command: DependabotCommand,
     existingPullRequests: AzdoPrExtractedWithProperties[],
     dependabotApiUrl: string,
     dependabotApiDockerUrl?: string,
-    command?: DependabotJobConfig['command'],
   ): Promise<RunJobsResult> {
     const {
       options: { url, gitToken, githubToken, experiments, config, dryRun, securityAdvisoriesFile, secretMasker },
@@ -271,7 +272,7 @@ export class AzureLocalJobsRunner extends LocalJobsRunner {
       if (securityUpdatesOnly) {
         // Run an update job to discover all dependencies
         const id = makeRandomJobId();
-        ({ job, credentials } = builder.forDependenciesList({ id, command }));
+        ({ job, credentials } = builder.forDependenciesList({ id }));
         ({ jobToken, credentialsToken } = this.makeTokens());
         server.add({ id, update, job, jobToken, credentialsToken, credentials });
         await runJob({

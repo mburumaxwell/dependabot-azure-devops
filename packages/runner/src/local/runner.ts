@@ -1,4 +1,9 @@
-import type { DependabotConfig, DependabotExperiments, DependabotJobConfig } from '@paklo/core/dependabot';
+import type {
+  DependabotCommand,
+  DependabotConfig,
+  DependabotExperiments,
+  DependabotJobConfig,
+} from '@paklo/core/dependabot';
 import { Keygen } from '@paklo/core/keygen';
 import type { SecretMasker } from '../api-client';
 
@@ -11,9 +16,9 @@ export type LocalJobsRunnerOptions = {
 
   config: DependabotConfig;
   targetUpdateIds?: number[];
+  command: DependabotCommand;
   experiments: DependabotExperiments;
   updaterImage?: string;
-  command?: DependabotJobConfig['command'];
 };
 
 export abstract class LocalJobsRunner {

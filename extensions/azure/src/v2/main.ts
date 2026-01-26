@@ -52,6 +52,7 @@ async function run() {
     // Setup the jobs runner options
     const runnerOptions: AzureLocalJobsRunnerOptions = {
       ...remainingInputs,
+      command: 'update',
       config,
       port: inputs.dependabotApiPort,
       url,
