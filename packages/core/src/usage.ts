@@ -21,6 +21,7 @@ import { DependabotPackageManagerSchema, DependabotSourceProviderSchema } from '
  *   "started": "2025-10-03T14:44:00.191Z",
  *   "duration": 31812,
  *   "success": true,
+ *   "multi-ecosystem-update": true,
  *   "error": {
  *     "message": "An error occurred"
  *   }
@@ -45,6 +46,7 @@ export const UsageTelemetryRequestDataSchema = z.object({
   started: z.coerce.date(),
   duration: z.number().min(0), // in milliseconds
   success: z.boolean(),
+  'multi-ecosystem-update': z.boolean().optional(),
   error: z.object({ message: z.string() }).optional(),
 });
 

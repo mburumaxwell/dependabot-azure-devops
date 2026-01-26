@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import * as yaml from 'js-yaml';
 import { describe, expect, it } from 'vitest';
-import { ZodError } from 'zod';
 
 import {
   BETA_ECOSYSTEMS,
@@ -122,145 +121,30 @@ describe('DependabotScheduleSchema', () => {
 });
 
 describe('Directory validation', () => {
-  it('Should reject directory with glob patterns', async () => {
-    const invalidConfigs = [
-      {
-        version: 2,
-        updates: [
-          { 'package-ecosystem': 'npm', schedule: { interval: 'cron', cronjob: '0 0 * * *' }, directory: '/src/*' },
-        ],
-      },
-      {
-        version: 2,
-        updates: [
-          { 'package-ecosystem': 'npm', schedule: { interval: 'cron', cronjob: '0 0 * * *' }, directory: '/src/app-?' },
-        ],
-      },
-      {
-        version: 2,
-        updates: [
-          { 'package-ecosystem': 'npm', schedule: { interval: 'cron', cronjob: '0 0 * * *' }, directory: '/src/[abc]' },
-        ],
-      },
-      {
-        version: 2,
-        updates: [
-          { 'package-ecosystem': 'npm', schedule: { interval: 'cron', cronjob: '0 0 * * *' }, directory: '/src/{a,b}' },
-        ],
-      },
-    ];
+  it('Should reject glob patterns in directory', async () => {
+    const testCases = ['/src/*', '/src/app-?', '/src/[abc]', '/src/{a,b}'];
 
-    for (const config of invalidConfigs) {
-      await expect(DependabotConfigSchema.parseAsync(config)).rejects.toThrow(
-        "The 'directory' field must not include glob pattern.",
-      );
+    for (const directory of testCases) {
+      await expect(
+        DependabotUpdateSchema.parseAsync({
+          'package-ecosystem': 'npm',
+          schedule: { interval: 'daily' },
+          directory,
+        }),
+      ).rejects.toThrow("The 'directory' field must not include glob pattern.");
     }
   });
 
-  it('Should accept directory without glob patterns', async () => {
-    const validConfig = {
-      version: 2,
-      updates: [
-        {
-          'package-ecosystem': 'npm',
-          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
-          directory: '/src/app',
-        },
-      ],
-    };
+  it('Should accept valid directory paths', async () => {
+    const validPaths = ['/src/app', '/src/app-name', '/src/app_name', '/src/app.name', '/src/app@version'];
 
-    const result = await DependabotConfigSchema.parseAsync(validConfig);
-    expect(result.updates[0]?.directory).toBe('/src/app');
-  });
-
-  it('Should accept valid directory paths with special but non-glob characters', async () => {
-    const validConfig = {
-      version: 2,
-      updates: [
-        {
-          'package-ecosystem': 'npm',
-          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
-          directory: '/src/app-name',
-        },
-        {
-          'package-ecosystem': 'docker',
-          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
-          directory: '/src/app_name',
-        },
-        {
-          'package-ecosystem': 'nuget',
-          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
-          directory: '/src/app.name',
-        },
-        {
-          'package-ecosystem': 'pip',
-          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
-          directory: '/src/app@version',
-        },
-      ],
-    };
-
-    const result = await DependabotConfigSchema.parseAsync(validConfig);
-    expect(result.updates).toHaveLength(4);
-    expect(result.updates[0]?.directory).toBe('/src/app-name');
-    expect(result.updates[1]?.directory).toBe('/src/app_name');
-    expect(result.updates[2]?.directory).toBe('/src/app.name');
-    expect(result.updates[3]?.directory).toBe('/src/app@version');
-  });
-
-  it('Should validate individual DependabotUpdate schema with glob patterns', async () => {
-    const invalidUpdate = {
-      'package-ecosystem': 'npm',
-      schedule: { interval: 'cron', cronjob: '0 0 * * *' },
-      directory: '/src/*',
-    };
-
-    await expect(DependabotUpdateSchema.parseAsync(invalidUpdate)).rejects.toThrow(
-      "The 'directory' field must not include glob pattern.",
-    );
-  });
-
-  it('Should validate individual DependabotUpdate schema without glob patterns', async () => {
-    const validUpdate = {
-      'package-ecosystem': 'npm',
-      schedule: { interval: 'cron', cronjob: '0 0 * * *' },
-      directory: '/src/app',
-    };
-
-    const result = await DependabotUpdateSchema.parseAsync(validUpdate);
-    expect(result.directory).toBe('/src/app');
-  });
-
-  it('Should reject config file with glob patterns in directory', async () => {
-    const configWithGlob = {
-      version: 2,
-      updates: [
-        {
-          'package-ecosystem': 'npm',
-          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
-          directory: '/src/*',
-        },
-        {
-          'package-ecosystem': 'docker',
-          schedule: { interval: 'cron', cronjob: '0 0 * * *' },
-          directory: '/apps/[abc]',
-        },
-      ],
-    };
-
-    try {
-      await DependabotConfigSchema.parseAsync(configWithGlob);
-      expect.fail('Expected validation to fail but it passed');
-    } catch (error) {
-      expect(error).toBeInstanceOf(ZodError);
-      const zodError = error as ZodError;
-      expect(zodError.issues).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            message: "The 'directory' field must not include glob pattern.",
-          }),
-        ]),
-      );
+    for (const directory of validPaths) {
+      const result = await DependabotUpdateSchema.parseAsync({
+        'package-ecosystem': 'npm',
+        schedule: { interval: 'daily' },
+        directory,
+      });
+      expect(result.directory).toBe(directory);
     }
   });
 });
@@ -729,5 +613,94 @@ describe('Validate registries', () => {
     expect(() => validateConfiguration(updates, registries)).toThrow(
       `Referenced registries: 'dummy3' have not been configured in the root of dependabot.yml`,
     );
+  });
+
+  it('Schedule is required when not using multi-ecosystem-group', async () => {
+    const configWithoutSchedule = {
+      version: 2,
+      updates: [{ 'package-ecosystem': 'npm', directory: '/' }],
+    };
+
+    await expect(DependabotConfigSchema.parseAsync(configWithoutSchedule)).rejects.toThrow(
+      "The 'schedule' field is required when 'multi-ecosystem-group' is not specified.",
+    );
+  });
+
+  it('Patterns is required when using multi-ecosystem-group', async () => {
+    const configWithoutPatterns = {
+      version: 2,
+      'multi-ecosystem-groups': {
+        'my-group': { schedule: { interval: 'weekly' } },
+      },
+      updates: [{ 'package-ecosystem': 'npm', directory: '/', 'multi-ecosystem-group': 'my-group' }],
+    };
+
+    await expect(DependabotConfigSchema.parseAsync(configWithoutPatterns)).rejects.toThrow(
+      "The 'patterns' field is required and must contain at least one pattern when 'multi-ecosystem-group' is specified.",
+    );
+  });
+
+  it('Schedule is optional when using multi-ecosystem-group', async () => {
+    const validConfig = {
+      version: 2,
+      'multi-ecosystem-groups': {
+        'my-group': { schedule: { interval: 'weekly' } },
+      },
+      updates: [{ 'package-ecosystem': 'npm', directory: '/', 'multi-ecosystem-group': 'my-group', patterns: ['*'] }],
+    };
+
+    const result = await DependabotConfigSchema.parseAsync(validConfig);
+    expect(result.updates[0]?.schedule).toBeUndefined();
+    expect(result.updates[0]?.['multi-ecosystem-group']).toBe('my-group');
+  });
+});
+
+describe('Multi-ecosystem groups validation', () => {
+  it('Should reject when referencing undefined group', async () => {
+    const config = {
+      version: 2,
+      'multi-ecosystem-groups': {
+        'my-group': { schedule: { interval: 'weekly' } },
+      },
+      updates: [
+        { 'package-ecosystem': 'npm', directory: '/', 'multi-ecosystem-group': 'undefined-group', patterns: ['*'] },
+      ],
+    };
+
+    await expect(DependabotConfigSchema.parseAsync(config)).rejects.toThrow(
+      "Referenced multi-ecosystem groups: 'undefined-group' have not been defined in 'multi-ecosystem-groups'.",
+    );
+  });
+
+  it('Should reject when group is defined but not used', async () => {
+    const config = {
+      version: 2,
+      'multi-ecosystem-groups': {
+        'unused-group': { schedule: { interval: 'weekly' } },
+      },
+      updates: [{ 'package-ecosystem': 'npm', directory: '/', schedule: { interval: 'daily' } }],
+    };
+
+    await expect(DependabotConfigSchema.parseAsync(config)).rejects.toThrow(
+      "Multi-ecosystem groups: 'unused-group' have been defined but are not referenced by any update.",
+    );
+  });
+
+  it('Should allow valid multi-ecosystem group configuration', async () => {
+    const config = {
+      version: 2,
+      'multi-ecosystem-groups': {
+        'my-group': { schedule: { interval: 'weekly' } },
+      },
+      updates: [
+        { 'package-ecosystem': 'npm', directory: '/client', 'multi-ecosystem-group': 'my-group', patterns: ['*'] },
+        { 'package-ecosystem': 'docker', directory: '/server', 'multi-ecosystem-group': 'my-group', patterns: ['*'] },
+      ],
+    };
+
+    const result = await DependabotConfigSchema.parseAsync(config);
+    expect(result.updates).toHaveLength(2);
+    expect(result.updates[0]?.['multi-ecosystem-group']).toBe('my-group');
+    expect(result.updates[1]?.['multi-ecosystem-group']).toBe('my-group');
   });
 });

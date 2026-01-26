@@ -26,7 +26,10 @@ export type RunJobOptions = {
   updaterImage?: string;
   secretMasker: SecretMasker;
   debug: boolean;
-  usage: Pick<UsageTelemetryRequestData, 'trigger' | 'provider' | 'owner' | 'project' | 'package-manager'>;
+  usage: Pick<
+    UsageTelemetryRequestData,
+    'trigger' | 'provider' | 'owner' | 'project' | 'package-manager' | 'multi-ecosystem-update'
+  >;
 };
 export type RunJobResult = { success: true; message?: string } | { success: false; message: string };
 

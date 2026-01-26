@@ -350,6 +350,8 @@ model UpdateJob {
   directories    String[]
   /// Either the original directory or merger of directories.
   directoryKey   String
+  /// Whether this job is a multi-ecosystem update.
+  multiEcosystem Boolean
   workflowRunId  String
   /// [DependabotConfig]
   config         Json

@@ -52,19 +52,19 @@ export class DependabotJobBuilder {
   private readonly credentials: DependabotCredential[];
 
   constructor({
+    experiments,
     source,
     config,
     update,
     systemAccessUser,
     systemAccessToken,
     githubToken,
-    experiments,
     debug,
   }: {
+    experiments: DependabotExperiments;
     source: DependabotSourceInfo;
     config: DependabotConfig;
     update: DependabotUpdate;
-    experiments: DependabotExperiments;
     systemAccessUser?: string;
     systemAccessToken?: string;
     githubToken?: string;
@@ -171,6 +171,16 @@ export class DependabotJobBuilder {
       source.directory = undefined;
     }
 
+    // handle multi-ecosystem groups
+    const multiEcosystemGroupName = this.update['multi-ecosystem-group'];
+    const multiEcosystemUpdate = !!multiEcosystemGroupName;
+    const multiEcosystemGroup = this.config['multi-ecosystem-groups']?.[multiEcosystemGroupName!];
+    if (multiEcosystemUpdate && !multiEcosystemGroup) {
+      throw new Error(
+        `Update is configured to use multi-ecosystem group '${multiEcosystemGroupName}', but no such group exists in the configuration.`,
+      );
+    }
+
     return {
       job: {
         id: id,
@@ -208,12 +218,7 @@ export class DependabotJobBuilder {
         'proxy-log-response-body-on-auth-failure': true,
         'max-updater-run-time': 2700,
         'enable-beta-ecosystems': this.config['enable-beta-ecosystems'] || false,
-        // Updates across ecosystems is still in development
-        // See https://github.com/dependabot/dependabot-core/issues/8126
-        //     https://github.com/dependabot/dependabot-core/pull/12339
-        // It needs to merged in the core repo first before we support it
-        // However, to match current job configs and to prevent surprises, we disable it
-        'multi-ecosystem-update': false,
+        'multi-ecosystem-update': multiEcosystemUpdate,
         'exclude-paths': this.update['exclude-paths'],
       },
       credentials: this.credentials,
