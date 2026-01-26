@@ -11,7 +11,7 @@
 
 - [#2475](https://github.com/mburumaxwell/paklo/pull/2475) [`5bb97c5`](https://github.com/mburumaxwell/paklo/commit/5bb97c509099d201a4a1e3e978016cf0330da237) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Implement PR superseding logic
 
-- [#2472](https://github.com/mburumaxwell/paklo/pull/2472) [`e7ddb99`](https://github.com/mburumaxwell/paklo/commit/e7ddb996456b6b2758725a230f867c152f588ed0) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Update URL parsing to enhace org extraction and allow repository extract from a repository url directly
+- [#2472](https://github.com/mburumaxwell/paklo/pull/2472) [`e7ddb99`](https://github.com/mburumaxwell/paklo/commit/e7ddb996456b6b2758725a230f867c152f588ed0) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Update URL parsing to enhance org extraction and allow repository extract from a repository url directly
 
 ### Patch Changes
 
