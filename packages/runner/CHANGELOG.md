@@ -1,5 +1,21 @@
 # @paklo/runner
 
+## 0.10.0
+
+### Minor Changes
+
+- [#2474](https://github.com/mburumaxwell/paklo/pull/2474) [`13e7685`](https://github.com/mburumaxwell/paklo/commit/13e7685f7807620fc1896a56e6cd495360bab807) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Support new PR property format
+  Add `pr-number` field to job schema while maintaining backward compatibility with legacy storage format. Reference [dependabot/cli#516](https://github.com/dependabot/cli/pull/516) and [dependabot/cli#527](https://github.com/dependabot/cli/pull/527)
+
+- [#2475](https://github.com/mburumaxwell/paklo/pull/2475) [`5bb97c5`](https://github.com/mburumaxwell/paklo/commit/5bb97c509099d201a4a1e3e978016cf0330da237) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Implement PR superseding logic
+
+### Patch Changes
+
+- [`942f6b0`](https://github.com/mburumaxwell/paklo/commit/942f6b0a4ad73ee32a8fed4dd64476e4f8a9fcf4) Thanks [@mburumaxwell](https://github.com/mburumaxwell)! - Update logic for dependabot commands, set default to update
+
+- Updated dependencies [[`942f6b0`](https://github.com/mburumaxwell/paklo/commit/942f6b0a4ad73ee32a8fed4dd64476e4f8a9fcf4), [`13e7685`](https://github.com/mburumaxwell/paklo/commit/13e7685f7807620fc1896a56e6cd495360bab807), [`5bb97c5`](https://github.com/mburumaxwell/paklo/commit/5bb97c509099d201a4a1e3e978016cf0330da237), [`6219b9f`](https://github.com/mburumaxwell/paklo/commit/6219b9f15c982dc8ff124cc0a9e81d54769533ec), [`e7ddb99`](https://github.com/mburumaxwell/paklo/commit/e7ddb996456b6b2758725a230f867c152f588ed0), [`bc56968`](https://github.com/mburumaxwell/paklo/commit/bc569687bdbe54234e08533069e62b38225c86fa)]:
+  - @paklo/core@0.13.0
+
 ## 0.9.1
 
 ### Patch Changes
