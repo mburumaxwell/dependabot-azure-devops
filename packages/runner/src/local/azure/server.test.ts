@@ -437,7 +437,10 @@ describe('AzureLocalDependabotServer', () => {
       if (!server['affectedPullRequestIds'].get('1')) {
         server['affectedPullRequestIds'].set('1', { created: [], updated: [], closed: [] });
       }
-      server['affectedPullRequestIds'].get('1')!.created.push(11);
+      server['affectedPullRequestIds'].get('1')!.created.push({
+        'pr-number': 11,
+        dependencies: [],
+      });
 
       vi.mocked(authorClient.addCommentThread).mockResolvedValue(1);
 

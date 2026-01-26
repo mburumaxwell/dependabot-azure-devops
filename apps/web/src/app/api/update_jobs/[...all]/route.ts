@@ -12,6 +12,7 @@ import {
   getPullRequestCloseReason,
   getPullRequestDescription,
   makeDirectoryKey,
+  shouldSupersede,
 } from '@paklo/core/dependabot';
 import { toNextJsHandler } from '@paklo/core/hono';
 import { resumeHook } from 'workflow/api';
@@ -254,6 +255,22 @@ async function handlePrRequests(options: HandlePrRequestsOptions): Promise<boole
             data: dependencies,
           },
         });
+
+        // check if any existing pull requests are now superseded by this new pull request
+        for (const existingPr of existingPullRequests) {
+          if (shouldSupersede(dependencies, existingPr.data)) {
+            logger.info(
+              `Detected that existing PR #${existingPr.providerId} is superseded by new PR #${newPullRequestId}`,
+            );
+            await authorClient.abandonPullRequest({
+              project: project.name,
+              repository: repository.name,
+              pullRequestId: existingPr.providerId,
+              comment: `Superseded by #${newPullRequestId}`,
+              deleteSourceBranch: true,
+            });
+          }
+        }
 
         return true;
       }

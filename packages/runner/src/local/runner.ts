@@ -1,9 +1,4 @@
-import type {
-  DependabotCommand,
-  DependabotConfig,
-  DependabotExperiments,
-  DependabotJobConfig,
-} from '@paklo/core/dependabot';
+import type { DependabotCommand, DependabotConfig, DependabotExperiments } from '@paklo/core/dependabot';
 import { Keygen } from '@paklo/core/keygen';
 import type { SecretMasker } from '../api-client';
 
