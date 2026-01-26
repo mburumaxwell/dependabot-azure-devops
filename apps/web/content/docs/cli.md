@@ -43,10 +43,9 @@ First, validate your `dependabot.yml` file:
 
 ```bash
 paklo validate \
-  --organization-url https://dev.azure.com/my-org \
-  --project my-project \
-  --repository my-repo \
-  --git-token $AZDO_TOKEN
+  --provider azure \
+  --repository-url https://dev.azure.com/my-org/my-project/_git/my-repo \
+  --git-token $GIT_ACCESS_TOKEN
 ```
 
 ### 2. Run Updates
@@ -55,10 +54,9 @@ Execute dependency updates:
 
 ```bash
 paklo run \
-  --organization-url https://dev.azure.com/my-org \
-  --project my-project \
-  --repository my-repo \
-  --git-token $AZDO_TOKEN \
+  --provider azure \
+  --repository-url https://dev.azure.com/my-org/my-project/_git/my-repo \
+  --git-token $GIT_ACCESS_TOKEN \
   --github-token $GITHUB_TOKEN
 ```
 
@@ -82,19 +80,17 @@ paklo validate [options]
 
 **Required Options:**
 
-- `--organization-url <URL>` - Azure DevOps organization URL (e.g., `https://dev.azure.com/my-org`)
-- `--project <PROJECT>` - Project name or ID
-- `--repository <REPOSITORY>` - Repository name or ID
-- `--git-token <TOKEN>` - Azure DevOps Personal Access Token
+- `--provider <PROVIDER>` - Repository provider (currently only `azure` is supported)
+- `--repository-url <URL>` - Repository URL (e.g., `https://dev.azure.com/my-org/project/_git/repo`)
+- `--git-token <GIT_TOKEN>` - Git provider access token
 
 **Example:**
 
 ```bash
 paklo validate \
-  --organization-url https://dev.azure.com/contoso \
-  --project contoso-project \
-  --repository web-app \
-  --git-token $AZDO_PAT
+  --provider azure \
+  --repository-url https://dev.azure.com/my-org/my-project/_git/my-repo \
+  --git-token $GIT_ACCESS_TOKEN
 ```
 
 ### run
@@ -107,10 +103,9 @@ paklo run [options]
 
 **Required Options:**
 
-- `--organization-url <URL>` - Azure DevOps organization URL
-- `--project <PROJECT>` - Project name or ID
-- `--repository <REPOSITORY>` - Repository name or ID
-- `--git-token <TOKEN>` - Azure DevOps Personal Access Token
+- `--provider <PROVIDER>` - Repository provider (currently only `azure` is supported)
+- `--repository-url <URL>` - Repository URL
+- `--git-token <GIT_TOKEN>` - Git provider access token
 
 **Optional Options:**
 
@@ -139,10 +134,9 @@ paklo run [options]
 
 ```bash
 paklo run \
-  --organization-url https://dev.azure.com/contoso \
-  --project contoso-project \
-  --repository web-app \
-  --git-token $AZDO_PAT \
+  --provider azure \
+  --repository-url https://dev.azure.com/my-org/my-project/_git/my-repo \
+  --git-token $GIT_ACCESS_TOKEN \
   --github-token $GITHUB_TOKEN \
   --auto-approve \
   --set-auto-complete \

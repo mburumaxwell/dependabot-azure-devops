@@ -33,10 +33,9 @@ Use the `--experiments` option:
 
 ```bash
 paklo run \
-  --organization-url https://dev.azure.com/my-org \
-  --project my-project \
-  --repository my-repo \
-  --git-token $GIT_TOKEN \
+  --provider azure
+  --repository-url https://dev.azure.com/my-org/my-project/_git/my-repo \
+  --git-token $GIT_ACCESS_TOKEN \
   --experiments "tidy=true,vendor=true,goprivate=*"
 ```
 

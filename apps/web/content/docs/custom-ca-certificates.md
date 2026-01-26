@@ -57,10 +57,9 @@ export CUSTOM_CA_PATH=/etc/ssl/certs/company-ca.crt
 
 # Run Paklo CLI
 paklo run \
-  --organization-url https://dev.azure.com/my-org \
-  --project my-project \
-  --repository my-repo \
-  --git-token $GIT_TOKEN \
+  --provider azure
+  --repository-url https://dev.azure.com/my-org/my-project/_git/my-repo \
+  --git-token $GIT_ACCESS_TOKEN \
   --debug
 ```
 
@@ -77,10 +76,9 @@ export CUSTOM_CA_PATH=/etc/ssl/certs/company-root-ca.crt
 
 # Run Paklo
 paklo run \
-  --organization-url https://dev.azure.com/my-org \
-  --project my-project \
-  --repository my-repo \
-  --git-token $GIT_TOKEN
+  --provider azure
+  --repository-url https://dev.azure.com/my-org/my-project/_git/my-repo \
+  --git-token $GIT_ACCESS_TOKEN
 ```
 
 ### Example: Corporate Proxy with SSL Inspection
@@ -95,7 +93,7 @@ export NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/proxy-ca.crt
 export https_proxy=http://proxy.company.com:8080
 export http_proxy=http://proxy.company.com:8080
 
-paklo run --organization-url https://dev.azure.com/my-org ...
+paklo run --provider azure --repository-url https://dev.azure.com/my-org/my-project/_git/my-repo ...
 ```
 
 ## Usage with Azure DevOps Extension
