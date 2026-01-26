@@ -24,9 +24,8 @@ import { z } from 'zod';
 import { type HandlerOptions, handlerOptions } from './base';
 
 const schema = z.object({
-  organizationUrl: z.string(),
-  project: z.string(),
-  repository: z.string(),
+  provider: z.enum(['azure']),
+  repositoryUrl: z.url(),
   gitToken: z.string(),
   githubToken: z.string().optional(),
   command: DependabotCommandSchema.optional(),
@@ -51,11 +50,10 @@ const schema = z.object({
 type Options = z.infer<typeof schema>;
 
 async function handler({ options, error }: HandlerOptions<Options>) {
-  let { organizationUrl } = options;
   const {
+    provider,
+    repositoryUrl,
     gitToken,
-    project,
-    repository,
     authorName,
     authorEmail,
     experiments: rawExperiments,
@@ -64,6 +62,11 @@ async function handler({ options, error }: HandlerOptions<Options>) {
     inspect,
     ...remainingOptions
   } = options;
+
+  if (provider !== 'azure') {
+    error(`Unsupported provider: '${provider}'. Currently only 'azure' is supported.`);
+    return;
+  }
 
   // Convert experiments from comma separated key value pairs to a record
   // If no experiments are defined, use the default experiments
@@ -90,8 +93,7 @@ async function handler({ options, error }: HandlerOptions<Options>) {
   }
 
   // extract url parts
-  if (!organizationUrl.endsWith('/')) organizationUrl = `${organizationUrl}/`; // without trailing slash the extraction fails
-  const url = extractRepositoryUrl({ organizationUrl, project, repository });
+  const url = extractRepositoryUrl({ repositoryUrl });
 
   // prepare to find variables from env or by asking user for input
   const variables = new Map<string, string>();
@@ -162,12 +164,15 @@ async function handler({ options, error }: HandlerOptions<Options>) {
 
 export const command = new Command('run')
   .description('Run dependabot updates for a given repository.')
-  .requiredOption(
-    '--organization-url <ORGANIZATION-URL>',
-    'URL of the organization e.g. https://dev.azure.com/my-org or https://my-org.visualstudio.com or http://my-org.com:8443/tfs',
+  .addOption(
+    new Option('--provider <PROVIDER>', "Repository provider. Currently only ('azure') Azure DevOps is supported.")
+      .choices(['azure'])
+      .makeOptionMandatory(),
   )
-  .requiredOption('--project <PROJECT>', 'Name or ID of the project')
-  .requiredOption('--repository <REPOSITORY>', 'Name or ID of the repository')
+  .requiredOption(
+    '--repository-url <REPOSITORY-URL>',
+    'Full URL of the Azure DevOps repository. Examples: https://dev.azure.com/my-org/project/_git/repo, https://my-org.visualstudio.com/project/_git/repo, http://my-org.com:8443/tfs/org/project/_git/repo',
+  )
   .requiredOption('--git-token <GIT-TOKEN>', 'Token to use for authenticating access to the git repository.')
   .option(
     '--github-token <GITHUB-TOKEN>',

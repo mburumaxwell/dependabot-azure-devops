@@ -1,25 +1,26 @@
 import { extractRepositoryUrl, getDependabotConfig } from '@paklo/core/azure';
 import type { DependabotConfig } from '@paklo/core/dependabot';
 import { logger } from '@paklo/core/logger';
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import { z } from 'zod';
 import { type HandlerOptions, handlerOptions } from './base';
 
 const schema = z.object({
-  organizationUrl: z.string(),
-  project: z.string(),
-  repository: z.string(),
+  provider: z.enum(['azure']),
+  repositoryUrl: z.url(),
   gitToken: z.string(),
 });
 type Options = z.infer<typeof schema>;
 
 async function handler({ options, error }: HandlerOptions<Options>) {
-  let { organizationUrl } = options;
-  const { gitToken, project, repository } = options;
+  const { provider, repositoryUrl, gitToken } = options;
+  if (provider !== 'azure') {
+    error(`Unsupported provider: '${provider}'. Currently only 'azure' is supported.`);
+    return;
+  }
 
   // extract url parts
-  if (!organizationUrl.endsWith('/')) organizationUrl = `${organizationUrl}/`; // without trailing slash the extraction fails
-  const url = extractRepositoryUrl({ organizationUrl, project, repository });
+  const url = extractRepositoryUrl({ repositoryUrl });
 
   // prepare to find variables by asking user for input
   const variables = new Set<string>();
@@ -53,12 +54,15 @@ async function handler({ options, error }: HandlerOptions<Options>) {
 
 export const command = new Command('validate')
   .description('Validate a dependabot configuration file.')
-  .requiredOption(
-    '--organization-url <ORGANIZATION-URL>',
-    'URL of the organization e.g. https://dev.azure.com/my-org or https://my-org.visualstudio.com or http://my-org.com:8443/tfs',
+  .addOption(
+    new Option('--provider <PROVIDER>', "Repository provider. Currently only ('azure') Azure DevOps is supported.")
+      .choices(['azure'])
+      .makeOptionMandatory(),
   )
-  .requiredOption('--project <PROJECT>', 'Name or ID of the project')
-  .requiredOption('--repository <REPOSITORY>', 'Name or ID of the repository')
+  .requiredOption(
+    '--repository-url <REPOSITORY-URL>',
+    'Full URL of the Azure DevOps repository. Examples: https://dev.azure.com/my-org/project/_git/repo, https://my-org.visualstudio.com/project/_git/repo, https://my-org.com:8443/tfs/org/project/_git/repo',
+  )
   .requiredOption('--git-token <GIT-TOKEN>', 'Token to use for authenticating access to the git repository.')
   .action(
     async (...args) =>
