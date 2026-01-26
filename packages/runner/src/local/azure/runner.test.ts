@@ -47,18 +47,18 @@ class TestableAzureLocalJobsRunner extends AzureLocalJobsRunner {
   public async testPerformUpdates(
     server: any,
     updates: DependabotUpdate[],
+    command: any,
     existingPullRequests: AzdoPrExtractedWithProperties[],
     dependabotApiUrl: string,
     dependabotApiDockerUrl?: string,
-    command?: any,
   ): Promise<any> {
     return (this as any).performUpdates(
       server,
       updates,
+      command,
       existingPullRequests,
       dependabotApiUrl,
       dependabotApiDockerUrl,
-      command,
     );
   }
 }
@@ -230,10 +230,10 @@ describe('AzureLocalJobsRunner', () => {
       const result = await jobsRunner.testPerformUpdates(
         mockServer,
         options.config.updates,
+        'update',
         [],
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        undefined,
       );
 
       expect(result).toHaveLength(1);
@@ -267,10 +267,10 @@ describe('AzureLocalJobsRunner', () => {
       const result = await jobsRunner.testPerformUpdates(
         mockServer,
         options.config.updates,
+        'update',
         existingPRs,
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        undefined,
       );
 
       expect(result).toHaveLength(1);
@@ -308,10 +308,10 @@ describe('AzureLocalJobsRunner', () => {
       const result = await jobsRunner.testPerformUpdates(
         mockServer,
         options.config.updates,
+        'update',
         [],
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        undefined,
       );
 
       expect(result).toEqual([]);
@@ -340,10 +340,10 @@ describe('AzureLocalJobsRunner', () => {
       const result = await jobsRunner.testPerformUpdates(
         mockServer,
         options.config.updates,
+        'update',
         existingPRs,
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        undefined,
       );
 
       expect(result).toHaveLength(1);
@@ -361,10 +361,10 @@ describe('AzureLocalJobsRunner', () => {
       const result = await jobsRunner.testPerformUpdates(
         mockServer,
         options.config.updates,
+        'update',
         [],
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        undefined,
       );
 
       expect(result).toHaveLength(1);
@@ -381,10 +381,10 @@ describe('AzureLocalJobsRunner', () => {
       const result = await jobsRunner.testPerformUpdates(
         mockServer,
         options.config.updates,
+        'update',
         [],
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        undefined,
       );
 
       expect(result).toHaveLength(1);
@@ -420,10 +420,10 @@ describe('AzureLocalJobsRunner', () => {
       const result = await jobsRunner.testPerformUpdates(
         mockServer,
         options.config.updates,
+        'update',
         [],
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        undefined,
       );
 
       expect(result).toEqual([]);
@@ -451,10 +451,10 @@ describe('AzureLocalJobsRunner', () => {
       const result = await jobsRunner.testPerformUpdates(
         mockServer,
         options.config.updates,
+        'update',
         existingPRs,
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        undefined,
       );
 
       expect(result).toHaveLength(1);
@@ -489,10 +489,10 @@ describe('AzureLocalJobsRunner', () => {
       const result = await jobsRunner.testPerformUpdates(
         mockServer,
         options.config.updates,
+        'update',
         [],
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        undefined,
       );
 
       expect(result).toHaveLength(2);
@@ -527,10 +527,10 @@ describe('AzureLocalJobsRunner', () => {
       const result = await jobsRunner.testPerformUpdates(
         mockServer,
         options.config.updates,
+        'update',
         [],
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        undefined,
       );
 
       expect(result).toEqual([]);
@@ -560,10 +560,10 @@ describe('AzureLocalJobsRunner', () => {
       const result = await jobsRunner.testPerformUpdates(
         mockServer,
         options.config.updates,
+        'update',
         [],
         'http://localhost:3000/api',
         'http://localhost:3000/api',
-        undefined,
       );
 
       expect(result).toHaveLength(2);
