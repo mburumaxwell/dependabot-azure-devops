@@ -1,3 +1,6 @@
 [submodule "dependabot-action"]
 	path = dependabot-action
 	url = https://github.com/github/dependabot-action.git
+[submodule "dependabot-cli"]
+	path = dependabot-cli
+	url = https://github.com/dependabot/cli.git
