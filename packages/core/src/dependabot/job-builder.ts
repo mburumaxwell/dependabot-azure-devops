@@ -164,6 +164,13 @@ export class DependabotJobBuilder {
       vulnerabilities = securityVulnerabilities;
     }
 
+    // for graph commands the directories must have a value
+    const source = { ...this.source }; // clone
+    if (command === 'graph' && !source.directories) {
+      source.directories = [this.update.directory!];
+      source.directory = undefined;
+    }
+
     return {
       job: {
         id: id,
@@ -177,7 +184,7 @@ export class DependabotJobBuilder {
         'ignore-conditions': mapIgnoreConditionsFromDependabotConfigToJobConfig(this.update.ignore),
         'security-updates-only': securityOnlyUpdate,
         'security-advisories': mapSecurityAdvisories(vulnerabilities),
-        source: this.source,
+        source,
         'update-subdependencies': false,
         'existing-pull-requests': existingPullRequests.filter((pr) => !('dependency-group-name' in pr)),
         'existing-group-pull-requests': existingPullRequests.filter((pr) => 'dependency-group-name' in pr),
