@@ -6,7 +6,10 @@ name: Update container manifest
 on:
   # Not using `pull_request` here to get around the limitations of accessing secrets
   # in a pull_request event triggered by a bot.
-  # pull_request:
+  # Security: pull_request_target is safe here because:
+  # 1. Only runs for dependabot[bot] actor (checked in job condition)
+  # 2. Dependabot PRs are trusted (created by GitHub's infrastructure)
+  # 3. Only executes our own maintenance scripts, not arbitrary PR code
   pull_request_target:
 
 permissions:
@@ -83,6 +86,8 @@ jobs:
 
       - name: Rebuild docker/containers.json
         if: needs.dependabot-metadata.outputs.package-ecosystem == 'docker'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           pnpm scripts:update-container-manifest
 
@@ -94,9 +99,6 @@ jobs:
 
           echo "Changes detected in containers.json, creating changeset..."
 
-          # Extract dependency info from PR title (format: "Bump <package> from <old> to <new>")
-          PR_TITLE="${{ github.event.pull_request.title }}"
-
           # Create changeset file with timestamp-based unique name
           CHANGESET_ID="docker-manifest-$(date +%s)"
           cat > ../../.changeset/${CHANGESET_ID}.md << EOF
@@ -104,7 +106,7 @@ jobs:
           "@paklo/runner": patch
           ---
 
-          Updated Docker container manifest for ${PR_TITLE}
+          Updated docker container manifest for ${PR_TITLE}
           EOF
 
           # Stage both files
