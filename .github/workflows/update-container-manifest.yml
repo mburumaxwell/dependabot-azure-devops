@@ -4,7 +4,10 @@
 name: Update container manifest
 
 on:
-  pull_request:
+  # Not using `pull_request` here to get around the limitations of accessing secrets
+  # in a pull_request event triggered by a bot.
+  # pull_request:
+  pull_request_target:
 
 permissions:
   pull-requests: write
