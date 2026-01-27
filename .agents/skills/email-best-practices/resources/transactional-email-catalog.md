@@ -25,7 +25,7 @@ Apps where user accounts and security are core (login systems, identity provider
 - Account update notifications
 
 **Optional:**
-- Welcome email
+- Welcome email (must not be promotional)
 - Account deletion confirmation
 
 ### Newsletter / Content Platform
@@ -35,7 +35,7 @@ Apps focused on content delivery and subscriptions.
 **Essential:**
 - Email verification
 - Password reset
-- Welcome email
+- Welcome email (must not be promotional)
 - Subscription confirmation
 
 **Optional:**
@@ -49,7 +49,7 @@ Apps where users buy products or services.
 **Essential:**
 - Email verification
 - Password reset
-- Welcome email
+- Welcome email (must not be promotional)
 - Order confirmation
 - Shipping notifications
 - Invoice / receipt
@@ -67,7 +67,7 @@ Apps with paid subscription tiers and ongoing billing.
 **Essential:**
 - Email verification
 - Password reset
-- Welcome email
+- Welcome email (must not be promotional)
 - OTP / 2FA codes
 - Security alerts
 - Subscription confirmation
@@ -94,7 +94,7 @@ Apps handling money, payments, or sensitive financial data.
 - Payment failed notices
 
 **Optional:**
-- Welcome email
+- Welcome email (must not be promotional)
 - Compliance notices
 
 ### Social / Community Platform
@@ -104,7 +104,7 @@ Apps focused on user interaction and community features.
 **Essential:**
 - Email verification
 - Password reset
-- Welcome email
+- Welcome email (must not be promotional)
 - Security alerts
 
 **Optional:**
@@ -126,7 +126,7 @@ Apps targeting developers with API access and integrations.
 - Payment failed notices
 
 **Optional:**
-- Welcome email
+- Welcome email (must not be promotional)
 - Usage alerts (approaching limits)
 - Feature change notifications
 
@@ -143,7 +143,7 @@ Apps handling protected health information.
 - Appointment confirmations
 
 **Optional:**
-- Welcome email
+- Welcome email (must not be promotional)
 - Compliance notices
 
 **Note:** Healthcare apps have strict requirements. Emails should contain minimal PHI and link to secure portals for sensitive information.
@@ -235,7 +235,7 @@ Apps handling protected health information.
 
 **When to send:** Immediately after successful account creation and verification.
 
-**Purpose:** Welcome new users and guide them to next steps.
+**Purpose:** Welcome new users and guide them to next steps (must not be promotional).
 
 **Content should include:**
 - Welcome message

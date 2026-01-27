@@ -14,13 +14,13 @@ Understanding the difference between transactional and marketing emails is cruci
 
 ### Transactional Emails
 
-**Definition:** Emails that facilitate or confirm a transaction the user initiated or expects. They're directly related to an action the user took.
+**Definition:** Emails that facilitate or confirm a transaction the user initiated or expects. They're directly related to an action the user took or are legal notices you're required to serve.
 
 **Characteristics:**
 - User-initiated or expected
 - Time-sensitive and actionable
 - Required for the user to complete an action
-- Not promotional in nature
+- Does not include promotional material or offers
 - Can be sent without explicit opt-in (with limitations)
 
 **Examples:**
@@ -30,9 +30,12 @@ Understanding the difference between transactional and marketing emails is cruci
 - OTP/2FA codes
 - Shipping notifications
 
+**Analogy:**
+Think of transactional emails for everything that would leave you with a paper receipt in the real world: invoices, parking ticket, booking confirmation, etc.
+
 ### Marketing Emails
 
-**Definition:** Emails sent for promotional, advertising, or informational purposes that are not directly related to a specific transaction.
+**Definition:** Emails sent for promotional, advertising, or informational purposes that are not directly related to a specific transaction or legal requirement.
 
 **Characteristics:**
 - Promotional or informational content
@@ -43,6 +46,7 @@ Understanding the difference between transactional and marketing emails is cruci
 
 **Examples:**
 - Newsletters
+- Abandoned cart
 - Product announcements
 - Promotional offers
 - Company updates
@@ -97,6 +101,7 @@ Understanding the difference between transactional and marketing emails is cruci
 - Email provides security-related information
 - Email is expected based on user action
 - Content is time-sensitive and actionable
+- You're required to serve a notification for compliance
 
 ### Use Marketing When:
 
@@ -108,16 +113,9 @@ Understanding the difference between transactional and marketing emails is cruci
 
 ## Hybrid Emails: The Gray Area
 
-Some emails mix transactional and marketing content. Be careful:
+Some emails mix transactional and marketing content. This isn't best practice and should be avoided.
 
-**Best practice:** Keep transactional and marketing separate. If you must include marketing in a transactional email:
-- Make transactional content primary
-- Keep marketing content minimal and clearly separated
-- Ensure transactional purpose is clear
-- Check local regulations (some regions prohibit this)
-
-**Example of acceptable hybrid:**
-- Order confirmation (transactional) with a small "You might also like" section (marketing)
+**Best practice:** Keep transactional and marketing separate. 
 
 **Example of problematic hybrid:**
 - Newsletter (marketing) with a small order status update (transactional)
@@ -143,9 +141,9 @@ The catalog includes detailed guidance for:
 
 ## Sending Infrastructure
 
-### Separate Infrastructure
+### Separate subdomains
 
-**Best practice:** Use separate sending infrastructure for transactional and marketing emails.
+**Best practice:** Use separate sending subdomains for transactional and marketing emails.
 
 **Benefits:**
 - Protect transactional deliverability
@@ -154,9 +152,7 @@ The catalog includes detailed guidance for:
 - Easier compliance management
 
 **Implementation:**
-- Use different subdomains (e.g., `mail.app.com` for transactional, `news.app.com` for marketing)
-- Separate email service accounts or API keys
-- Different monitoring and alerting
+- Use different subdomains (e.g., `t.yourdomain.com` for transactional, `m.yourdomain.com` for marketing)
 
 ### Email Service Considerations
 
@@ -167,7 +163,7 @@ Choose an email service that:
 - Provides webhooks for delivery events
 - Supports authentication setup (SPF, DKIM, DMARC)
 
-Services like Resend are designed for transactional emails and provide the infrastructure and tools needed for reliable delivery.
+Services like Resend are designed for transactional emails and provide the infrastructure and tools needed for reliable delivery. They also offer powerful marketing features.
 
 ## Related Topics
 

@@ -1,30 +1,27 @@
 # Email Deliverability
 
-Ensuring emails reach inboxes through proper authentication and sender reputation.
+Maximizing the chances that your emails are delivered successfully to the recipients.
 
 ## Email Authentication
 
-**Required by Gmail/Yahoo** - unauthenticated emails will be rejected or spam-filtered.
+**Required by Gmail/Yahoo/Microsoft** - unauthenticated emails will be rejected or spam-filtered.
 
 ### SPF (Sender Policy Framework)
 
 Specifies which servers can send email for your domain.
 
 ```
-v=spf1 include:_spf.resend.com ~all
+v=spf1 include:amazonses.com ~all
 ```
 
 - Add TXT record to DNS
-- Use `~all` (soft fail) for testing, `-all` (hard fail) for production
-- Keep under 10 DNS lookups
+- Use `~all` (soft fail)
 
 ### DKIM (DomainKeys Identified Mail)
 
 Cryptographic signature proving email authenticity.
 
-- Generate keys (provided by email service)
-- Add public key as TXT record in DNS
-- Use 2048-bit keys, rotate every 6-12 months
+- Your email service will provide you with a TXT record
 
 ### DMARC
 
@@ -36,9 +33,7 @@ v=DMARC1; p=none; rua=mailto:dmarc@yourdomain.com
 
 **Rollout:** `p=none` (monitor) → `p=quarantine; pct=25` → `p=reject`
 
-### BIMI (Optional)
-
-Display brand logo in email clients. Requires DMARC `p=quarantine` or `p=reject`.
+Learn more: https://resend.com/blog/dmarc-policy-modes 
 
 ### Verify Your Setup
 
@@ -72,9 +67,11 @@ New IP/domain? Gradually increase volume:
 
 Start with engaged users. Send consistently. Don't rush.
 
+Learn more: https://resend.com/docs/knowledge-base/warming-up
+
 ### Maintaining Reputation
 
-**Do:** Send to engaged users, keep bounce <2%, complaints <0.1%, remove inactive subscribers
+**Do:** Send to engaged users, keep bounce <4%, complaints <0.1%, remove inactive subscribers.
 
 **Don't:** Send to purchased lists, ignore bounces/complaints, send inconsistent volumes
 
@@ -82,25 +79,25 @@ Start with engaged users. Send consistently. Don't rush.
 
 | Type | Cause | Action |
 |------|-------|--------|
-| Hard bounce | Invalid email, domain doesn't exist | Remove immediately |
-| Soft bounce | Mailbox full, server down | Retry: 1h → 4h → 24h, remove after 3-5 failures |
+| Hard bounce | Permanent failure to deliver | Remove immediately |
+| Soft bounce | Transient failure to deliver | Retry: 1h → 4h → 24h, remove after 3-5 failures |
 
-**Targets:** <2% good, 2-5% acceptable, >5% concerning, >10% critical
+**Targets:** <1% good, 1-3% acceptable, 3-4% concerning, >4% critical
 
 ## Complaint Handling
 
-**Targets:** <0.05% excellent, 0.05-0.1% good, >0.2% critical
+**Targets:** <0.01% excellent, 0.01-0.05% good, >0.05% critical
 
 **Reduce complaints:**
 - Only send to opted-in users
 - Make unsubscribe easy and immediate
 - Use clear sender names and "From" addresses
 
-**Feedback loops:** Set up with Gmail (Postmaster Tools), Yahoo, Microsoft, AOL. Remove complainers immediately.
+**Feedback loops:** Set up with Gmail (Postmaster Tools), Yahoo, Microsoft SNDS. Remove complainers immediately.
 
 ## Infrastructure
 
-**Dedicated sending domain:** Use subdomain (e.g., `mail.yourdomain.com`) to protect main domain reputation.
+**Dedicated sending domain:** Use different subdomains for different sending purposes (e.g., `t.yourdomain.com` for transactional emails and `m.yourdomain.com` for marketing emails). 
 
 **DNS TTL:** Low (300s) during setup, high (3600s+) after stable.
 
@@ -109,10 +106,10 @@ Start with engaged users. Send consistently. Don't rush.
 **Emails going to spam?** Check in order:
 1. Authentication (SPF, DKIM, DMARC)
 2. Sender reputation (blacklists, complaint rates)
-3. Content (spammy words, HTML issues)
+3. Content
 4. Sending patterns (sudden volume spikes)
 
-**Diagnostic tools:** [mail-tester.com](https://mail-tester.com), [mxtoolbox.com](https://mxtoolbox.com), [Google Postmaster Tools](https://postmaster.google.com)
+**Diagnostic tools:** [Google Postmaster Tools](https://postmaster.google.com)
 
 ## Related
 

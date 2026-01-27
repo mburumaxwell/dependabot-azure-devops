@@ -12,7 +12,6 @@ A suppression list prevents sending to addresses that should never receive email
 |--------|--------|-----------------|
 | Hard bounce | Add immediately | No (address invalid) |
 | Complaint (spam) | Add immediately | No (legal requirement) |
-| Unsubscribe | Add immediately | Only if user re-subscribes |
 | Soft bounce (3x) | Add after threshold | Yes, after 30-90 days |
 | Manual removal | Add on request | Only if user requests |
 
@@ -73,11 +72,13 @@ Regular maintenance to keep lists healthy.
 | Review soft bounces | Daily | Suppress after 3 failures |
 | Remove inactive | Monthly | Re-engagement → remove |
 
+Learn more: https://resend.com/docs/knowledge-base/audience-hygiene
+
 ### Re-engagement Campaigns
 
 Before removing inactive subscribers:
 
-1. **Identify inactive:** No opens/clicks in 90-180 days
+1. **Identify inactive:** No opens/clicks in 45-90 days
 2. **Send re-engagement:** "We miss you" or "Still interested?"
 3. **Wait 14-30 days** for response
 4. **Remove non-responders** from active lists
@@ -135,10 +136,9 @@ async function cleanupOldData() {
 
 | Metric | Target | Alert Threshold |
 |--------|--------|-----------------|
-| Bounce rate | <2% | >5% |
-| Complaint rate | <0.1% | >0.2% |
+| Bounce rate | <2% | >2% |
+| Complaint rate | <0.05% | >0.05% |
 | Suppression list growth | Stable | Sudden spike |
-| List churn | <2%/month | >5%/month |
 
 ## Transactional vs Marketing Lists
 

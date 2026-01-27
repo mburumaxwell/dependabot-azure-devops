@@ -16,7 +16,7 @@ Clear, actionable emails that users expect and need—password resets, confirmat
 |---------|--------|
 | Reset your password for [App] | Action required |
 | Your order #12345 has shipped | Update on your order |
-| Your 2FA code: 123456 | Security code |
+| Your 2FA code for [App] | Security code: 12345 |
 | Verify your email for [App] | Verify your email |
 
 Include identifiers when helpful: order numbers, account names, expiration times.
@@ -28,7 +28,7 @@ The text snippet after subject line. Use it to:
 - Add urgency or context
 - Call-to-action preview
 
-Keep under 90-100 characters.
+Keep under 90 characters.
 
 ## Content Structure
 
@@ -43,7 +43,7 @@ Keep under 90-100 characters.
 
 ## Mobile-First Design
 
-60%+ emails opened on mobile.
+60%+ emails are opened on mobile.
 
 - **Layout:** Single column, stack vertically
 - **Buttons:** 44x44px minimum, full-width on mobile

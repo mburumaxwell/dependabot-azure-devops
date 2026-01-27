@@ -43,8 +43,8 @@ Benefits: Verifies deliverability, confirms intent, reduces complaints, required
 
 **Must be:**
 - Prominent in every email
-- One-click (preferred) or simple process
-- Immediate (GDPR) or within 10 days (CAN-SPAM)
+- One-click (preferred)
+- Immediate (GDPR) or within 10 days (CAN-SPAM) (immediate preferred)
 - Free, no login required
 
 **Preference center options:** Frequency (daily/weekly/monthly), content types, complete unsubscribe.
@@ -99,7 +99,7 @@ Benefits: Higher open/click rates, lower unsubscribes, better experience.
 
 **Remove after inactivity:** Send re-engagement campaign first, then remove non-responders
 
-**Monitor:** Bounce rate <2%, complaint rate <0.1%
+**Monitor:** Bounce rate <2%, complaint rate <0.05%
 
 ## Required Elements (All Marketing Emails)
 

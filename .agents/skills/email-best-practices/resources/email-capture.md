@@ -17,7 +17,7 @@ Collecting email addresses responsibly with validation, verification, and proper
 - Don't be too strict (allow unusual but valid formats)
 - Client-side validation ≠ deliverability
 
-### Server-Side (Required)
+### Server-Side (Recommended)
 
 Always validate server-side—client-side can be bypassed.
 
@@ -27,7 +27,9 @@ Always validate server-side—client-side can be bypassed.
 - Domain has MX records
 - Optionally: disposable email detection
 
-## Email Verification
+Recommended tools: https://resend.com/blog/best-email-verification-apis 
+
+## Double opt-in
 
 Confirms address belongs to user and is deliverable.
 
@@ -41,7 +43,7 @@ Confirms address belongs to user and is deliverable.
 
 **Timing:** Send immediately, include expiration (24-48 hours), allow resend after 60 seconds, limit resend attempts (3/hour).
 
-## Single vs Double Opt-In
+### Single vs Double Opt-In
 
 | | Single Opt-In | Double Opt-In |
 |--|---------------|---------------|

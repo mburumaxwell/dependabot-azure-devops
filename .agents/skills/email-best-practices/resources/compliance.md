@@ -8,7 +8,7 @@ Legal requirements for email by jurisdiction. **Not legal advice—consult an at
 |-----|--------|-----------------|---------|
 | CAN-SPAM | US | Opt-out mechanism, physical address | $53k/email |
 | GDPR | EU | Explicit opt-in consent | €20M or 4% revenue |
-| CASL | Canada | Express/implied consent | $10M CAD |
+| CASL | Canada | Express consent, opt-out mechanism | $1M (individual) to $10M (organization) CAD |
 
 ## CAN-SPAM (United States)
 
@@ -37,13 +37,13 @@ Legal requirements for email by jurisdiction. **Not legal advice—consult an at
 ## CASL (Canada)
 
 **Consent types:**
-- **Express consent:** Explicit opt-in (preferred)
+- **Express consent:** Explicit opt-in (ideal)
 - **Implied consent:** Existing business relationship (2 years) or inquiry (6 months)
 
 **Requirements:**
-- Clear sender identification
+- Clear sender identification that will be valid for 60 days after send
 - Unsubscribe functional for 60 days after send
-- Process unsubscribe within 10 business days
+- Process unsubscribe no later than 10 business days
 - Keep consent records 3 years after expiration
 
 ## Other Regions
@@ -63,6 +63,10 @@ Legal requirements for email by jurisdiction. **Not legal advice—consult an at
 | CASL | 10 business days | Must work 60 days after send |
 
 **Universal best practices:** Prominent link, one-click when possible, no login required, free, confirm action.
+
+## Managing preferences vs Unsubscribe from all
+
+Most legistlations require a one-click unsubscribe. `Managing preferences` is a nice-to-have and can lead to lower unsubscribe rate but doesn't replace `Unsubscribe`. If possible, offer both.
 
 ## Consent Management
 

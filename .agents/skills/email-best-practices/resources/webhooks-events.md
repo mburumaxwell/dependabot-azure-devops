@@ -157,6 +157,10 @@ ngrok http 3000
 
 **Verify handling:** Send test events through Resend dashboard or manually trigger each event type.
 
+## Ingest webhooks for data storage
+- [Open source repo](https://github.com/resend/resend-webhooks-ingester)
+- [Why store data](https://resend.com/docs/dashboard/webhooks/how-to-store-webhooks-data)
+
 ## Related
 
 - [List Management](./list-management.md) - What to do with bounce/complaint data
