@@ -1,5 +1,11 @@
 # @paklo/runner
 
+## 0.10.1
+
+### Patch Changes
+
+- [#2453](https://github.com/mburumaxwell/paklo/pull/2453) [`3660ce6`](https://github.com/mburumaxwell/paklo/commit/3660ce6b2d023cd8a6936ba41f28817b48d096e5) Thanks [@dependabot](https://github.com/apps/dependabot)! - Updated Docker container manifest for Bump the dependabot-core-images group across 1 directory with 29 updates
+
 ## 0.10.0
 
 ### Minor Changes
