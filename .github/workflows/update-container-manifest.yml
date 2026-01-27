@@ -1,0 +1,91 @@
+# This workflow is copied/inspired by
+# https://github.com/github/dependabot-action/blob/8c7db1256e8ad995808c2380bfff7b578b54bf16/.github/workflows/dependabot-build.yml
+
+name: Update container manifest
+
+on:
+  pull_request:
+
+permissions:
+  pull-requests: write
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependabot-metadata:
+    name: Dependabot Metadata
+    runs-on: ubuntu-latest
+    # We only want to check the metadata on pull_request events from Dependabot itself,
+    # any subsequent pushes to the PR should just skip this step so we don't go into
+    # a loop on commits created by the `update-files` job
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    # Map the step output to a job output for subsequent jobs
+    outputs:
+      dependency-type: ${{ steps.dependabot-metadata.outputs.dependency-type }}
+      package-ecosystem: ${{ steps.dependabot-metadata.outputs.package-ecosystem }}
+    steps:
+      - name: Fetch dependabot metadata
+        id: dependabot-metadata
+        uses: dependabot/fetch-metadata@v2.5.0
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+  update-files:
+    name: Update Files
+    runs-on: ubuntu-latest
+    needs: [dependabot-metadata]
+    # We only need to update the manifest if the PR relates to Docker
+    if: needs.dependabot-metadata.outputs.package-ecosystem == 'docker'
+    steps:
+      - name: Generate token
+        id: generate_token
+        uses: actions/create-github-app-token@v2.2.1
+        with:
+          app-id: ${{ secrets.GH_APP_ID_RELEASER }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY_RELEASER }}
+
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+          # fixes detached head state on Dependabot PRs
+          ref: ${{ github.event.pull_request.head.ref }}
+          # Check out using the generated token so any pushed changes will trigger check runs
+          token: ${{ steps.generate_token.outputs.token }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Setup turborepo caching
+        uses: rharkor/caching-for-turbo@v2.3.11
+
+      - name: Download deps
+        run: pnpm install
+        working-directory: '${{ github.workspace }}/packages/runner'
+
+      # Change git info to match the token
+      - name: Setup git info
+        run: |
+          # Specifying the full email allows the avatar to show up: https://github.com/orgs/community/discussions/26560
+          git config user.name "release-automator-mburumaxwell[bot]"
+          git config user.email "214517399+release-automator-mburumaxwell[bot]@users.noreply.github.com"
+
+      - name: Rebuild docker/containers.json
+        if: needs.dependabot-metadata.outputs.package-ecosystem == 'docker'
+        run: |
+          pnpm scripts:update-container-manifest
+          git add docker/containers.json
+          git commit -m "[dependabot skip] Update container manifest" || exit 0
+        working-directory: '${{ github.workspace }}/packages/runner'
+
+      - name: Push staged changes
+        run: |
+          git push

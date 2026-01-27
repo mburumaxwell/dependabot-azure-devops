@@ -75,8 +75,9 @@ jobs:
       - name: Setup git info
         if: ${{ github.event_name != 'pull_request' }}
         run: |
-          git config user.name release-automator-mburumaxwell[bot]
-          git config user.email 214517399+release-automator-mburumaxwell[bot]@users.noreply.github.com
+          # Specifying the full email allows the avatar to show up: https://github.com/orgs/community/discussions/26560
+          git config user.name "release-automator-mburumaxwell[bot]"
+          git config user.email "214517399+release-automator-mburumaxwell[bot]@users.noreply.github.com"
 
       - name: Create release PR or Publish
         if: ${{ github.event_name != 'pull_request' }}
