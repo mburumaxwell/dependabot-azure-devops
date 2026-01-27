@@ -21,7 +21,7 @@ export default async function RunPage(props: PageProps<'/dashboard/[org]/runs/[i
   if (!organization || !job) return notFound();
 
   return (
-    <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
+    <div className='mx-auto w-full max-w-5xl space-y-6 p-6'>
       <InfoSection job={job} />
       <LogsSection organization={organization} job={job} />
     </div>

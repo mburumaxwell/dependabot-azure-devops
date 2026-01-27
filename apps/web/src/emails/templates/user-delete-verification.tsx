@@ -36,7 +36,7 @@ export function UserDeleteVerification({
                 </Text>
               </Row>
               <Row>
-                <Text className='text-red-600 font-semibold'>
+                <Text className='font-semibold text-red-600'>
                   ⚠️ Warning: This action cannot be undone. All your data will be permanently deleted.
                 </Text>
               </Row>

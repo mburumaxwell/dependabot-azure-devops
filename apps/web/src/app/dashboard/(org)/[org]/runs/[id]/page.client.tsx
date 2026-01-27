@@ -49,16 +49,16 @@ export function InfoSection({ job }: { job: SlimUpdateJob }) {
   ];
 
   return (
-    <ItemGroup className='flex-none grid md:grid-cols-2 lg:grid-cols-3'>
+    <ItemGroup className='grid flex-none md:grid-cols-2 lg:grid-cols-3'>
       {parts.map(({ label, value, icon: Icon }) => (
         <React.Fragment key={label}>
-          <Item className='p-2 gap-2'>
+          <Item className='gap-2 p-2'>
             <ItemMedia variant='icon'>
               <Icon className='size-4' />
             </ItemMedia>
-            <ItemContent className='gap-0.5 '>
+            <ItemContent className='gap-0.5'>
               <ItemTitle>{label}</ItemTitle>
-              <p className='text-muted-foreground text-sm leading-normal font-normal text-balance'>{value}</p>
+              <p className='text-balance font-normal text-muted-foreground text-sm leading-normal'>{value}</p>
             </ItemContent>
           </Item>
         </React.Fragment>
@@ -130,24 +130,24 @@ export function LogsSection({ organization, job }: { organization: SlimOrganizat
         </Button>
       </ItemActions>
       {loading && (
-        <div className='flex items-center justify-center h-125 w-full rounded-md border bg-muted/50'>
+        <div className='flex h-125 w-full items-center justify-center rounded-md border bg-muted/50'>
           <div className='flex flex-col items-center gap-3'>
             <Spinner className='size-8 text-muted-foreground' />
-            <p className='text-sm text-muted-foreground'>Loading logs...</p>
+            <p className='text-muted-foreground text-sm'>Loading logs...</p>
           </div>
         </div>
       )}
       {error && (
-        <div className='flex items-center justify-center h-125 w-full rounded-md border bg-muted/50'>
+        <div className='flex h-125 w-full items-center justify-center rounded-md border bg-muted/50'>
           <div className='flex flex-col items-center gap-3'>
             <AlertCircle className='size-8 text-muted-foreground' />
-            <p className='text-sm text-muted-foreground'>{error}</p>
+            <p className='text-muted-foreground text-sm'>{error}</p>
           </div>
         </div>
       )}
       {!loading && !error && (
         <ScrollArea className='h-125 w-full border bg-muted/50 p-4'>
-          <pre className='text-xs font-mono leading-relaxed whitespace-pre-wrap'>{logs}</pre>
+          <pre className='whitespace-pre-wrap font-mono text-xs leading-relaxed'>{logs}</pre>
         </ScrollArea>
       )}
     </Item>

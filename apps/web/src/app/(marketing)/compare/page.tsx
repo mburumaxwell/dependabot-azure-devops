@@ -16,7 +16,7 @@ export const metadata = {
 export default function ComparePage() {
   function FeatureTableCell({ value, managed }: { value: boolean | React.ReactNode; managed?: boolean }) {
     if (typeof value === 'boolean') {
-      return value ? <CircleCheck className='size-5 inline' /> : <CircleX className='size-5 text-red-900 inline' />;
+      return value ? <CircleCheck className='inline size-5' /> : <CircleX className='inline size-5 text-red-900' />;
     }
     return <span className={cn('text-sm', !managed && 'text-muted-foreground')}>{value}</span>;
   }
@@ -24,10 +24,10 @@ export default function ComparePage() {
   return (
     <>
       <div className='py-12 lg:py-20'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-          <div className='text-center max-w-3xl mx-auto mb-16'>
-            <h1 className='text-4xl lg:text-5xl font-bold mb-4'>How does Paklo compare?</h1>
-            <p className='text-xl text-muted-foreground'>
+        <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+          <div className='mx-auto mb-16 max-w-3xl text-center'>
+            <h1 className='mb-4 font-bold text-4xl lg:text-5xl'>How does Paklo compare?</h1>
+            <p className='text-muted-foreground text-xl'>
               See how our managed service stacks up against other dependency management solutions
             </p>
           </div>
@@ -36,24 +36,24 @@ export default function ComparePage() {
             <Table className='border-collapse'>
               <TableHeader>
                 <TableRow>
-                  <TableHead className='text-left p-4 font-semibold'>Feature</TableHead>
-                  <TableHead className='text-center p-4 font-semibold bg-brand/20'>
+                  <TableHead className='p-4 text-left font-semibold'>Feature</TableHead>
+                  <TableHead className='bg-brand/20 p-4 text-center font-semibold'>
                     <div className='font-bold'>Paklo Managed</div>
-                    <div className='text-sm font-normal text-muted-foreground'>
+                    <div className='font-normal text-muted-foreground text-sm'>
                       {formatMoney(PRICE_AMOUNT_MONTHLY_MANAGEMENT, { whole: true })}/mo + usage <sup>3</sup>
                     </div>
                   </TableHead>
-                  <TableHead className='text-center p-4 font-semibold'>
+                  <TableHead className='p-4 text-center font-semibold'>
                     <div>Paklo Self-Managed</div>
-                    <div className='text-sm font-normal text-muted-foreground'>Free</div>
+                    <div className='font-normal text-muted-foreground text-sm'>Free</div>
                   </TableHead>
-                  <TableHead className='text-center p-4 font-semibold'>
+                  <TableHead className='p-4 text-center font-semibold'>
                     <div>GitHub Dependabot</div>
-                    <div className='text-sm font-normal text-muted-foreground'>Free on GitHub</div>
+                    <div className='font-normal text-muted-foreground text-sm'>Free on GitHub</div>
                   </TableHead>
-                  <TableHead className='text-center p-4 font-semibold'>
+                  <TableHead className='p-4 text-center font-semibold'>
                     <div>Azure DevOps Advanced Security</div>
-                    <div className='text-sm font-normal text-muted-foreground'>
+                    <div className='font-normal text-muted-foreground text-sm'>
                       {formatMoney(AZDO_ADS_PRICE_AMOUNT_MONTHLY, { whole: true })}/user/mo <sup>2</sup>
                     </div>
                   </TableHead>
@@ -64,16 +64,16 @@ export default function ComparePage() {
                 {comparison.map((feature) => (
                   <TableRow key={feature.name} className='even:bg-muted/50'>
                     <TableCell className='p-4 font-medium'>{feature.name}</TableCell>
-                    <TableCell className='text-center p-4 bg-brand/20'>
+                    <TableCell className='bg-brand/20 p-4 text-center'>
                       <FeatureTableCell value={feature.managed} managed />
                     </TableCell>
-                    <TableCell className='text-center p-4'>
+                    <TableCell className='p-4 text-center'>
                       <FeatureTableCell value={feature.selfManaged} />
                     </TableCell>
-                    <TableCell className='text-center p-4'>
+                    <TableCell className='p-4 text-center'>
                       <FeatureTableCell value={feature.github} />
                     </TableCell>
-                    <TableCell className='text-center p-4'>
+                    <TableCell className='p-4 text-center'>
                       <FeatureTableCell value={feature.azureDevOps} />
                     </TableCell>
                   </TableRow>
@@ -82,7 +82,7 @@ export default function ComparePage() {
             </Table>
           </div>
 
-          <div className='mt-8 text-sm text-muted-foreground flex flex-col gap-1'>
+          <div className='mt-8 flex flex-col gap-1 text-muted-foreground text-sm'>
             <p>
               <sup>1</sup> GitHub Dependabot is free on GitHub.com but limited to GitHub repositories only.
             </p>
@@ -101,8 +101,8 @@ export default function ComparePage() {
         </div>
       </div>
 
-      <div className='py-6 lg:py-10 bg-muted/30'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+      <div className='bg-muted/30 py-6 lg:py-10'>
+        <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           <Item>
             <ItemMedia>
               <CircleCheckBig />
@@ -118,10 +118,10 @@ export default function ComparePage() {
       </div>
 
       <div className='py-12 lg:py-20'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+        <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           <div className='text-center'>
-            <h2 className='text-3xl font-bold mb-4'>Ready to get started?</h2>
-            <p className='text-muted-foreground mb-8'>Start securing your dependencies today with Paklo Managed</p>
+            <h2 className='mb-4 font-bold text-3xl'>Ready to get started?</h2>
+            <p className='mb-8 text-muted-foreground'>Start securing your dependencies today with Paklo Managed</p>
             <Link href='/signup'>
               <Button size='lg' variant='brand'>
                 Get Started Now

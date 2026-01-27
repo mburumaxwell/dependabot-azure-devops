@@ -52,7 +52,7 @@ export default async function ActivityPage(props: PageProps<'/dashboard/[org]'>)
   ]);
 
   return (
-    <div className='p-6 space-y-6'>
+    <div className='space-y-6 p-6'>
       <StatsSection data={statsData} />
       <ChartsSection data={chartData} />
     </div>

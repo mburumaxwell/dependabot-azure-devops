@@ -21,18 +21,18 @@ export function getMetricDirection(value: number) {
 
 export function MetricCard({ title, value, subtitle, trend, direction, unit, icon: Icon, footer }: MetricCardProps) {
   return (
-    <Card className='py-4 gap-4'>
+    <Card className='gap-4 py-4'>
       <CardHeader className='flex flex-row items-center justify-between'>
-        <CardTitle className='text-sm text-muted-foreground font-normal'>{title}</CardTitle>
+        <CardTitle className='font-normal text-muted-foreground text-sm'>{title}</CardTitle>
         {Icon && <Icon className='size-4 text-muted-foreground' />}
       </CardHeader>
       <CardContent className='gap-1'>
         <div className='flex items-baseline gap-2'>
-          <p className='text-2xl font-semibold text-foreground'>{value}</p>
+          <p className='font-semibold text-2xl text-foreground'>{value}</p>
           {trend && direction && (
             <span
               className={cn(
-                'text-xs flex items-center gap-1',
+                'flex items-center gap-1 text-xs',
                 (direction === 'up' && 'text-success') || 'text-destructive',
               )}
             >
@@ -42,7 +42,7 @@ export function MetricCard({ title, value, subtitle, trend, direction, unit, ico
             </span>
           )}
         </div>
-        {subtitle && <p className='text-xs text-muted-foreground'>{subtitle}</p>}
+        {subtitle && <p className='text-muted-foreground text-xs'>{subtitle}</p>}
       </CardContent>
       {footer && <CardFooter> {footer} </CardFooter>}
     </Card>

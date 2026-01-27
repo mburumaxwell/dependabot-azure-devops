@@ -92,7 +92,7 @@ export function Feedback({
       }}
     >
       <div className='flex flex-row items-center gap-2'>
-        <p className='text-sm font-medium pe-2'>How is this guide?</p>
+        <p className='pe-2 font-medium text-sm'>How is this guide?</p>
         <Button
           disabled={previous !== null}
           variant={activeOpinion === 'good' ? 'default' : 'outline'}
@@ -119,7 +119,7 @@ export function Feedback({
               <Handshake />
             </ItemMedia>
             <ItemContent>
-              <ItemTitle className='text-muted-foreground '>Thank you for your feedback!</ItemTitle>
+              <ItemTitle className='text-muted-foreground'>Thank you for your feedback!</ItemTitle>
             </ItemContent>
             <ItemActions>
               {previous.response?.url && (

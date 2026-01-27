@@ -14,7 +14,7 @@ export default async function DashboardHomePage() {
   const organizations = await auth.api.listOrganizations({ headers });
 
   return (
-    <div className='flex items-center justify-center h-full p-6'>
+    <div className='flex h-full items-center justify-center p-6'>
       {organizations.length === 0 ? <NoOrganizationsView /> : <SelectOrganizationView organizations={organizations} />}
     </div>
   );

@@ -136,7 +136,7 @@ export function PrimaryIntegrationSection({ organization }: { organization: Orga
                     </>
                   ) : isTokenSaved ? (
                     <>
-                      <CheckCircle2 className='size-4 mr-2' />
+                      <CheckCircle2 className='mr-2 size-4' />
                       Saved
                     </>
                   ) : (
@@ -227,12 +227,12 @@ export function GitHubSection({
                   {hasToken ? (
                     <>
                       <ShieldCheck className='size-3.5 text-green-600' />
-                      <span className='text-green-600 font-medium'>Token configured</span>
+                      <span className='font-medium text-green-600'>Token configured</span>
                     </>
                   ) : (
                     <>
                       <Shield className='size-3.5 text-muted-foreground' />
-                      <span className='text-muted-foreground font-medium'>Optional - not set</span>
+                      <span className='font-medium text-muted-foreground'>Optional - not set</span>
                     </>
                   )}
                 </div>
@@ -272,7 +272,7 @@ export function GitHubSection({
                     </>
                   ) : isTokenSaved ? (
                     <>
-                      <CheckCircle2 className='size-4 mr-2' />
+                      <CheckCircle2 className='mr-2 size-4' />
                       Saved
                     </>
                   ) : hasToken ? (

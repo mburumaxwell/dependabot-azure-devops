@@ -180,7 +180,7 @@ export function PasskeysSection({ passkeys: initialPasskeys }: { passkeys: Passk
       <Card>
         {passkeys.length === 0 ? null : (
           <CardHeader>
-            <div className='grid grid-cols-1 md:grid-cols-3 items-center justify-center'>
+            <div className='grid grid-cols-1 items-center justify-center md:grid-cols-3'>
               <div className='flex flex-col gap-2 md:col-span-2'>
                 <CardTitle>Passkeys</CardTitle>
                 <CardDescription>Manage your passkeys for secure authentication</CardDescription>
@@ -188,13 +188,13 @@ export function PasskeysSection({ passkeys: initialPasskeys }: { passkeys: Passk
               <Button
                 onClick={handleAddPasskey}
                 disabled={isModifyingPasskeys}
-                className='mt-4 lg:mt-0 lg:justify-self-end md:w-full lg:w-auto'
+                className='mt-4 md:w-full lg:mt-0 lg:w-auto lg:justify-self-end'
               >
                 {isModifyingPasskeys ? (
                   <Spinner />
                 ) : (
                   <>
-                    <Plus className='size-4 mr-2' />
+                    <Plus className='mr-2 size-4' />
                     Add passkey
                   </>
                 )}
@@ -218,7 +218,7 @@ export function PasskeysSection({ passkeys: initialPasskeys }: { passkeys: Passk
                     <Spinner />
                   ) : (
                     <>
-                      <Plus className='size-4 mr-2' />
+                      <Plus className='mr-2 size-4' />
                       Add your first passkey
                     </>
                   )}
@@ -229,8 +229,8 @@ export function PasskeysSection({ passkeys: initialPasskeys }: { passkeys: Passk
             <ItemGroup className='gap-3'>
               {passkeys.map((passkey) => (
                 <Item key={passkey.id} variant='outline'>
-                  <ItemMedia variant='icon' className='bg-primary/10 size-10'>
-                    <Fingerprint className='text-primary size-5' />
+                  <ItemMedia variant='icon' className='size-10 bg-primary/10'>
+                    <Fingerprint className='size-5 text-primary' />
                   </ItemMedia>
                   <ItemContent>
                     <ItemTitle>{passkey.name || 'no name'}</ItemTitle>
@@ -375,8 +375,8 @@ export function SessionsSection({
                   <ItemTitle>
                     {deviceName}
                     {isCurrent && (
-                      <Badge variant='secondary' className='text-xs ml-2'>
-                        <Check className='size-3 mr-1' />
+                      <Badge variant='secondary' className='ml-2 text-xs'>
+                        <Check className='mr-1 size-3' />
                         Current
                       </Badge>
                     )}
@@ -497,11 +497,11 @@ export function OrganizationsSection({ organizations: initialOrganizations }: { 
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align='end'>
                         <DropdownMenuItem onClick={() => router.push(`/dashboard/${org.slug}`)}>
-                          <Home className='size-4 mr-2' />
+                          <Home className='mr-2 size-4' />
                           Home
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => router.push(`/dashboard/${org.slug}/settings`)}>
-                          <Settings className='size-4 mr-2' />
+                          <Settings className='mr-2 size-4' />
                           Settings
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -509,7 +509,7 @@ export function OrganizationsSection({ organizations: initialOrganizations }: { 
                           className='text-destructive focus:text-destructive'
                           onClick={() => setOrgToLeave(org)}
                         >
-                          <LogOut className='size-4 mr-2' />
+                          <LogOut className='mr-2 size-4' />
                           Leave
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -540,7 +540,7 @@ export function OrganizationsSection({ organizations: initialOrganizations }: { 
                 organization.
               </p>
               <div className='space-y-2 pt-2'>
-                <Label htmlFor='leave-feedback' className='text-sm font-normal text-foreground'>
+                <Label htmlFor='leave-feedback' className='font-normal text-foreground text-sm'>
                   Help us improve (optional)
                 </Label>
                 <Textarea
@@ -548,7 +548,7 @@ export function OrganizationsSection({ organizations: initialOrganizations }: { 
                   value={leaveFeedback}
                   onChange={(e) => setLeaveFeedback(e.target.value)}
                   placeholder='Why are you leaving? Your feedback helps us improve...'
-                  className='w-full min-h-20 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none'
+                  className='min-h-20 w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                   disabled={isLeavingOrg}
                 />
               </div>
@@ -607,12 +607,12 @@ export function DangerSection({ hasOrganizations }: { hasOrganizations: boolean 
           <CardDescription>Irreversible actions for your account</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className='grid grid-cols-1 md:grid-cols-3 items-start justify-between py-4'>
+          <div className='grid grid-cols-1 items-start justify-between py-4 md:grid-cols-3'>
             <div className='space-y-1 md:col-span-2'>
               <p className='font-medium'>Delete account</p>
-              <p className='text-sm text-muted-foreground'>Permanently delete your account and all associated data</p>
+              <p className='text-muted-foreground text-sm'>Permanently delete your account and all associated data</p>
               {hasOrganizations && (
-                <p className='text-xs text-destructive mt-1'>
+                <p className='mt-1 text-destructive text-xs'>
                   You need to leave or delete all organizations before closing your account.
                 </p>
               )}
@@ -639,7 +639,7 @@ export function DangerSection({ hasOrganizations }: { hasOrganizations: boolean 
                 our servers.
               </p>
               <div className='space-y-2 pt-2'>
-                <Label htmlFor='delete-feedback' className='text-sm font-normal text-foreground'>
+                <Label htmlFor='delete-feedback' className='font-normal text-foreground text-sm'>
                   Help us improve (optional)
                 </Label>
                 <textarea
@@ -647,7 +647,7 @@ export function DangerSection({ hasOrganizations }: { hasOrganizations: boolean 
                   value={deleteFeedback}
                   onChange={(e) => setDeleteFeedback(e.target.value)}
                   placeholder='Why are you leaving? Your feedback helps us improve...'
-                  className='w-full min-h-20 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none'
+                  className='min-h-20 w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                   disabled={isDeletingAccount}
                 />
               </div>

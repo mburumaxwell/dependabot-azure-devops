@@ -40,9 +40,9 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
 
   return (
     <DocsPage toc={doc.data.toc} full={doc.data.full} tableOfContent={{ style: 'clerk' }}>
-      <h1 className='text-3xl font-semibold'>{doc.data.title}</h1>
-      <p className='text-lg text-fd-muted-foreground mb-2'>{doc.data.description}</p>
-      <div className='flex flex-row flex-wrap gap-2 items-center'>
+      <h1 className='font-semibold text-3xl'>{doc.data.title}</h1>
+      <p className='mb-2 text-fd-muted-foreground text-lg'>{doc.data.description}</p>
+      <div className='flex flex-row flex-wrap items-center gap-2'>
         <CopyMarkdownButton url={rawUrl} />
         <EditOnGitHub href={`${config.github.repo_url}/blob/main/apps/web/content/docs/${doc.path}`} />
       </div>

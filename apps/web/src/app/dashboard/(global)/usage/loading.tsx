@@ -25,7 +25,7 @@ export default function Loading() {
           </Card>
 
           {/* Metrics Skeleton */}
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4'>
+          <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5'>
             {[...Array(5)]
               .map((_, i) => i)
               .map((v) => (

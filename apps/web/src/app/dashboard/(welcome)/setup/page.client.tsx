@@ -248,7 +248,7 @@ export function CreateOrganizationPage() {
                   </div>
                   {slugError && <FieldError>{slugError}</FieldError>}
                   {slugVerified && (
-                    <p className='text-sm text-green-600 flex items-center gap-1'>
+                    <p className='flex items-center gap-1 text-green-600 text-sm'>
                       <CheckCircle2 className='size-4' />
                       Slug is available
                     </p>
@@ -298,7 +298,7 @@ export function CreateOrganizationPage() {
                         </div>
                         <div className='text-center'>
                           <div className='font-semibold'>{provider.name}</div>
-                          <div className='text-sm text-muted-foreground'>{provider.vendor}</div>
+                          <div className='text-muted-foreground text-sm'>{provider.vendor}</div>
                         </div>
                         {data.type === provider.type && (
                           <div className='absolute top-3 right-3'>

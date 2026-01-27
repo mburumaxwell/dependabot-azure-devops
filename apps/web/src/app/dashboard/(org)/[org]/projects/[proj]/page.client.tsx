@@ -87,23 +87,23 @@ export function RepositoriesView({
   }
 
   return (
-    <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
-      <div className='grid gap-4 grid-cols-1 md:grid-cols-3 items-center justify-center'>
+    <div className='mx-auto w-full max-w-5xl space-y-6 p-6'>
+      <div className='grid grid-cols-1 items-center justify-center gap-4 md:grid-cols-3'>
         <div className='md:col-span-2'>
-          <h1 className='text-3xl font-semibold mb-2'>Project: {project.name}</h1>
+          <h1 className='mb-2 font-semibold text-3xl'>Project: {project.name}</h1>
           <p className='text-muted-foreground text-sm'>
             <a href={project.url} target='_blank' rel='noopener noreferrer' className='underline underline-offset-4'>
               {project.url}
             </a>
             {project.synchronizedAt && (
-              <span className='flex items-center gap-1 mt-1'>
+              <span className='mt-1 flex items-center gap-1'>
                 <Calendar className='size-3' />
                 Last synchronized: <TimeAgo value={project.synchronizedAt} />
               </span>
             )}
           </p>
         </div>
-        <ButtonGroup className='mt-4 md:w-full lg:mt-0 lg:justify-self-end lg:w-auto'>
+        <ButtonGroup className='mt-4 md:w-full lg:mt-0 lg:w-auto lg:justify-self-end'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant='outline' size='icon' aria-label='More Options'>
@@ -189,13 +189,13 @@ export function RepositoriesView({
         </ButtonGroup>
       </div>
 
-      <div className='border rounded-lg overflow-hidden'>
+      <div className='overflow-hidden rounded-lg border'>
         <Table>
           <TableHeader>
             <TableRow className='hover:bg-transparent'>
               <TableHead className='font-semibold'>Repository Name</TableHead>
-              <TableHead className='font-semibold w-32 text-right'>Last Updated</TableHead>
-              <TableHead className='font-semibold w-24 text-right'>Sync Status</TableHead>
+              <TableHead className='w-32 text-right font-semibold'>Last Updated</TableHead>
+              <TableHead className='w-24 text-right font-semibold'>Sync Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

@@ -14,7 +14,7 @@ export async function generateMetadata(props: PageProps<'/dashboard/[org]/adviso
 // TODO: implement this page
 export default async function AdvisoriesPage(props: PageProps<'/dashboard/[org]/advisories'>) {
   return (
-    <div className='h-full flex flex-col gap-2 items-center justify-center'>
+    <div className='flex h-full flex-col items-center justify-center gap-2'>
       <Image src={wipImage} alt='Work In Progress' width={128} height={128} />
       <p className='text-muted-foreground'>This feature is currently under development.</p>
       <p className='text-muted-foreground'>Please check back in a couple of days!</p>

@@ -25,6 +25,7 @@
     "rules": {
       "nursery": {
         "noUndeclaredEnvVars": "error"
+        // "useSortedClasses": "warn"
       }
     },
     "domains": {

@@ -57,17 +57,17 @@ export function RepositoryView({
   );
 
   return (
-    <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
-      <div className='grid gap-4 grid-cols-1 md:grid-cols-3 items-center justify-center'>
+    <div className='mx-auto w-full max-w-5xl space-y-6 p-6'>
+      <div className='grid grid-cols-1 items-center justify-center gap-4 md:grid-cols-3'>
         <div className='md:col-span-2'>
-          <h1 className='text-2xl font-semibold mb-2'>Repository: {repository.name}</h1>
+          <h1 className='mb-2 font-semibold text-2xl'>Repository: {repository.name}</h1>
           <p className='text-muted-foreground text-sm'>
-            <a href={repository.url} target='_blank' rel='noreferrer' className='hover:underline underline-offset-4'>
+            <a href={repository.url} target='_blank' rel='noreferrer' className='underline-offset-4 hover:underline'>
               {repository.slug}
             </a>
           </p>
         </div>
-        <Button className='mt-4 md:w-full lg:mt-0 lg:justify-self-end lg:w-auto' asChild>
+        <Button className='mt-4 md:w-full lg:mt-0 lg:w-auto lg:justify-self-end' asChild>
           <Link href={`/dashboard/${organization.slug}/projects/${project.id}/repos/${repository.id}/sbom`}>
             <Download className='mr-2 size-4' />
             Export SBOM
@@ -75,16 +75,16 @@ export function RepositoryView({
         </Button>
       </div>
       <Tabs defaultValue='updates'>
-        <TabsList className='w-full mb-2'>
+        <TabsList className='mb-2 w-full'>
           <TabsTrigger value='dependencies'>Dependencies</TabsTrigger>
           <TabsTrigger value='updates'>Updates</TabsTrigger>
         </TabsList>
         <TabsContent value='dependencies'>
           <Card>
-            <CardContent className='flex items-center justify-center min-h-100'>
-              <div className='text-center space-y-2'>
-                <p className='text-muted-foreground text-lg'>Coming Soon</p>
-                <p className='text-sm text-muted-foreground'>Dependency visualization will be available soon</p>
+            <CardContent className='flex min-h-100 items-center justify-center'>
+              <div className='space-y-2 text-center'>
+                <p className='text-lg text-muted-foreground'>Coming Soon</p>
+                <p className='text-muted-foreground text-sm'>Dependency visualization will be available soon</p>
               </div>
             </CardContent>
           </Card>
@@ -99,9 +99,9 @@ export function RepositoryView({
                 <ItemContent>
                   <ItemTitle>
                     {update.files.length ? (
-                      <div className='flex flex-row gap-2 items-center'>
+                      <div className='flex flex-row items-center gap-2'>
                         <a
-                          className='hover:underline hover:cursor-pointer underline-offset-4'
+                          className='underline-offset-4 hover:cursor-pointer hover:underline'
                           href={fileLinks.get(update.files[0]!)}
                           target='_blank'
                           rel='noreferrer'
@@ -116,7 +116,7 @@ export function RepositoryView({
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
-                              <DropdownMenuLabel className='text-xs font-light'>Monitored files</DropdownMenuLabel>
+                              <DropdownMenuLabel className='font-light text-xs'>Monitored files</DropdownMenuLabel>
                               {update.files.slice(1).map((file) => (
                                 <DropdownMenuItem key={file} asChild>
                                   <a href={fileLinks.get(file)} target='_blank' rel='noreferrer'>
@@ -141,7 +141,7 @@ export function RepositoryView({
                     )}
                   <Link
                     href={`/dashboard/${organization.slug}/projects/${project.id}/repos/${repository.id}/updates/${update.id}/jobs`}
-                    className='hover:underline underline-offset-4 text-blue-500'
+                    className='text-blue-500 underline-offset-4 hover:underline'
                   >
                     Recent update jobs
                   </Link>

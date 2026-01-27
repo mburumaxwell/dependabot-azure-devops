@@ -129,19 +129,19 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
             </div>
             <span className='sr-only'>Paklo</span>
           </Link>
-          <h1 className='text-xl font-bold'>Welcome to Paklo Dashboard</h1>
+          <h1 className='font-bold text-xl'>Welcome to Paklo Dashboard</h1>
           <FieldDescription>
             Don&apos;t have an account? <Link href='/signup'>Sign up</Link>
           </FieldDescription>
         </div>
-        <Field className='grid gap-4 sm:grid-cols-1 text-center'>
+        <Field className='grid gap-4 text-center sm:grid-cols-1'>
           <Button
             variant='outline'
             type='button'
             size='lg'
             onClick={handlePasskeyLogin}
             disabled={isLoading}
-            className='h-12 gap-2 flex relative'
+            className='relative flex h-12 gap-2'
           >
             {isLoading ? (
               <Spinner className='size-5' />
@@ -157,7 +157,7 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
         </Field>
         <FieldSeparator>OR</FieldSeparator>
         {magicLinkSent ? (
-          <div className='text-center space-y-4'>
+          <div className='space-y-4 text-center'>
             <div className='space-y-4 text-center'>
               <div className='flex justify-center'>
                 <div className='rounded-full bg-primary/10 p-3'>
@@ -200,7 +200,7 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
                 variant='secondary'
                 disabled={isLoading || !email}
                 size='lg'
-                className='gap-2 flex relative'
+                className='relative flex gap-2'
               >
                 {isLoading ? (
                   <Spinner className='size-5' />
@@ -220,12 +220,12 @@ export function LoginForm({ className, redirectTo, ...props }: LoginFormProps) {
           <>
             <FieldSeparator>OR</FieldSeparator>
             <Field className='grid gap-4 sm:grid-cols-2'>
-              <Button variant='outline' type='button' disabled className='gap-2 flex relative'>
+              <Button variant='outline' type='button' disabled className='relative flex gap-2'>
                 <AppleLogo className='size-4' />
                 <span>Continue with Apple</span>
                 {isMounted && authClient.isLastUsedLoginMethod('apple') && <LastUsedIndicator />}
               </Button>
-              <Button variant='outline' type='button' disabled className='gap-2 flex relative'>
+              <Button variant='outline' type='button' disabled className='relative flex gap-2'>
                 <GoogleLogo className='size-4' />
                 <span>Continue with Google</span>
                 {isMounted && authClient.isLastUsedLoginMethod('google') && <LastUsedIndicator />}

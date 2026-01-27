@@ -77,10 +77,10 @@ export function ConnectProjectsView({ organization, projects }: ProjectViewProps
             <CardDescription>Projects from your {orgTypeInfo.name} organization</CardDescription>
           </div>
           <div className='text-right'>
-            <p className='text-sm font-medium'>
+            <p className='font-medium text-sm'>
               {totalCount} of {projects.length} projects
             </p>
-            <p className='text-xs text-muted-foreground'>
+            <p className='text-muted-foreground text-xs'>
               {projects.length - totalCount} project{projects.length - totalCount !== 1 ? 's' : ''} available
             </p>
           </div>
@@ -89,21 +89,21 @@ export function ConnectProjectsView({ organization, projects }: ProjectViewProps
       <CardContent className='space-y-4'>
         <div className='space-y-3'>
           {projects.map((project) => (
-            <div key={project.providerId} className='flex items-center justify-between p-4 border rounded-lg'>
-              <div className='flex items-center gap-3 flex-1'>
+            <div key={project.providerId} className='flex items-center justify-between rounded-lg border p-4'>
+              <div className='flex flex-1 items-center gap-3'>
                 <Checkbox
                   id={project.providerId}
                   checked={project.connected || selectedProjects.has(project.providerId)}
                   disabled={project.connected}
                   onCheckedChange={() => handleToggleProject(project.providerId)}
                 />
-                <Label htmlFor={project.providerId} className='flex items-center gap-3 flex-1 cursor-pointer'>
+                <Label htmlFor={project.providerId} className='flex flex-1 cursor-pointer items-center gap-3'>
                   <div className='flex size-10 items-center justify-center rounded-lg bg-muted'>
                     <FolderGit2 className='size-5' />
                   </div>
                   <div>
                     <p className='font-medium'>{project.name}</p>
-                    <p className='text-sm text-muted-foreground'>{project.url}</p>
+                    <p className='text-muted-foreground text-sm'>{project.url}</p>
                   </div>
                 </Label>
               </div>

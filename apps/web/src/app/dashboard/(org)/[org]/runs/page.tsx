@@ -73,9 +73,9 @@ export default async function RunsPage(props: PageProps<'/dashboard/[org]/runs'>
   });
 
   return (
-    <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
+    <div className='mx-auto w-full max-w-5xl space-y-6 p-6'>
       <div>
-        <h1 className='text-3xl font-semibold mb-2'>Update Jobs</h1>
+        <h1 className='mb-2 font-semibold text-3xl'>Update Jobs</h1>
         <p className='text-muted-foreground'>Monitor and track dependency update jobs across your repositories</p>
       </div>
       <RunsView organization={organization} projects={projects} jobs={jobs} />

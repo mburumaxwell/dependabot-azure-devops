@@ -153,7 +153,7 @@ export function MembersSection({
         <CardContent>
           <FieldGroup>
             <Field>
-              <div className='grid grid-cols-1 md:grid-cols-6 gap-2'>
+              <div className='grid grid-cols-1 gap-2 md:grid-cols-6'>
                 <Input
                   placeholder='chris.johnson@contoso.com'
                   type='email'
@@ -189,7 +189,7 @@ export function MembersSection({
                     </>
                   ) : (
                     <>
-                      <Plus className='size-4 mr-2' />
+                      <Plus className='mr-2 size-4' />
                       Send invite
                     </>
                   )}
@@ -244,7 +244,7 @@ export function MembersSection({
                     >
                       {loadingStates[`resend-${invite.id}`] ? (
                         <>
-                          <Spinner className='size-3 mr-1' />
+                          <Spinner className='mr-1 size-3' />
                           Resending...
                         </>
                       ) : (
@@ -259,7 +259,7 @@ export function MembersSection({
                     >
                       {loadingStates[`revoke-${invite.id}`] ? (
                         <>
-                          <Spinner className='size-3 mr-1' />
+                          <Spinner className='mr-1 size-3' />
                           Revoking...
                         </>
                       ) : (
@@ -294,7 +294,7 @@ export function MembersSection({
                 <ItemContent>
                   <ItemTitle>
                     {member.user.name}
-                    <Badge variant='secondary' className='text-xs ml-2'>
+                    <Badge variant='secondary' className='ml-2 text-xs'>
                       <span className='capitalize'>{member.role}</span>
                     </Badge>
                   </ItemTitle>
@@ -308,10 +308,10 @@ export function MembersSection({
                         onValueChange={(value) => handleChangeRole(member, value as MemberRole)}
                         disabled={loadingStates[`role-${member.id}`] || loadingStates[`remove-${member.id}`]}
                       >
-                        <SelectTrigger className='w-30 h-9'>
+                        <SelectTrigger className='h-9 w-30'>
                           {loadingStates[`role-${member.id}`] ? (
                             <div className='flex items-center'>
-                              <Spinner className='size-3 mr-2' />
+                              <Spinner className='mr-2 size-3' />
                               <span className='text-xs'>Updating...</span>
                             </div>
                           ) : (
@@ -372,16 +372,16 @@ export function DangerSection({ organizationId }: { organizationId: string }) {
         <CardDescription>Irreversible actions for your organization</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='grid grid-cols-1 md:grid-cols-3 items-start justify-between'>
+        <div className='grid grid-cols-1 items-start justify-between md:grid-cols-3'>
           <div className='space-y-1 md:col-span-2'>
             <p className='font-medium'>Delete this organization</p>
-            <p className='text-sm text-muted-foreground'>
+            <p className='text-muted-foreground text-sm'>
               This action cannot be undone. All projects, data, and team members will be removed.
             </p>
           </div>
           <AlertDialog>
             <AlertDialogTrigger asChild disabled={isDeletingOrg}>
-              <Button variant='destructive' className='mt-4 lg:mt-0 lg:justify-self-end md:w-full lg:w-auto'>
+              <Button variant='destructive' className='mt-4 md:w-full lg:mt-0 lg:w-auto lg:justify-self-end'>
                 {isDeletingOrg ? (
                   <>
                     <Spinner className='mr-2' />

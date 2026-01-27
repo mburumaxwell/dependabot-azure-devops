@@ -97,11 +97,11 @@ export function UpdateJobsView({
   }
 
   return (
-    <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
+    <div className='mx-auto w-full max-w-5xl space-y-6 p-6'>
       <div>
-        <h1 className='text-2xl font-semibold mb-2'>Repository: {repository.name}</h1>
+        <h1 className='mb-2 font-semibold text-2xl'>Repository: {repository.name}</h1>
         <p className='text-muted-foreground text-sm'>
-          <a href={repository.url} target='_blank' rel='noreferrer' className='hover:underline underline-offset-4'>
+          <a href={repository.url} target='_blank' rel='noreferrer' className='underline-offset-4 hover:underline'>
             {repository.slug}
           </a>
         </p>
@@ -115,9 +115,9 @@ export function UpdateJobsView({
           <ItemContent>
             <ItemTitle>
               {update.files.length ? (
-                <div className='flex flex-row gap-2 items-center'>
+                <div className='flex flex-row items-center gap-2'>
                   <a
-                    className='hover:underline hover:cursor-pointer underline-offset-4'
+                    className='underline-offset-4 hover:cursor-pointer hover:underline'
                     href={fileLinks.get(update.files[0]!)}
                     target='_blank'
                     rel='noreferrer'
@@ -132,7 +132,7 @@ export function UpdateJobsView({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuLabel className='text-xs font-light'>Monitored files</DropdownMenuLabel>
+                        <DropdownMenuLabel className='font-light text-xs'>Monitored files</DropdownMenuLabel>
                         {update.files.slice(1).map((file) => (
                           <DropdownMenuItem key={file} asChild>
                             <a href={fileLinks.get(file)} target='_blank' rel='noreferrer'>
@@ -162,7 +162,7 @@ export function UpdateJobsView({
         </Item>
       </ItemGroup>
 
-      <ItemGroup className='bg-muted/50 rounded-md'>
+      <ItemGroup className='rounded-md bg-muted/50'>
         <Item>
           <ItemContent>
             <ItemTitle>Recent Jobs</ItemTitle>
@@ -183,7 +183,7 @@ export function UpdateJobsView({
                     // TODO: improve this UI
                     <>
                       Failed with {(job.errors.length || 0) > 1 ? 'errors' : 'an error'}:{' '}
-                      <ul className='list-disc list-inside'>
+                      <ul className='list-inside list-disc'>
                         {job.errors.map((error, index) => (
                           // biome-ignore lint/suspicious/noArrayIndexKey: no other id available
                           <li key={index}>
@@ -196,7 +196,7 @@ export function UpdateJobsView({
                   )}
                 </ItemDescription>
                 {job.status !== 'running' && job.status !== 'scheduled' && (
-                  <div className='flex flex-row gap-2 h-5 items-center'>
+                  <div className='flex h-5 flex-row items-center gap-2'>
                     {job.affectedPrIds.length === 0 && <>No PRs Affected</>}
                     {job.affectedPrIds.length > 0 && (
                       <>
@@ -205,7 +205,7 @@ export function UpdateJobsView({
                           href={prLinks.get(job.affectedPrIds[0]!)}
                           target='_blank'
                           rel='noreferrer'
-                          className='hover:underline underline-offset-4 text-blue-500'
+                          className='text-blue-500 underline-offset-4 hover:underline'
                         >
                           #{job.affectedPrIds[0]!}
                         </a>
@@ -220,7 +220,7 @@ export function UpdateJobsView({
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent>
-                                <DropdownMenuLabel className='text-xs font-light'>PRs Affected</DropdownMenuLabel>
+                                <DropdownMenuLabel className='font-light text-xs'>PRs Affected</DropdownMenuLabel>
                                 {job.affectedPrIds.slice(1).map((prId) => (
                                   <DropdownMenuItem key={prId} asChild>
                                     <a href={prLinks.get(prId)} target='_blank' rel='noreferrer'>
@@ -239,7 +239,7 @@ export function UpdateJobsView({
                     <Separator orientation='vertical' />
                     <Link
                       href={`/dashboard/${organization.slug}/runs/${job.id}`}
-                      className='hover:underline underline-offset-4 text-blue-500'
+                      className='text-blue-500 underline-offset-4 hover:underline'
                     >
                       view logs
                     </Link>

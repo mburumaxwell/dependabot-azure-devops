@@ -5,7 +5,7 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTi
 
 export function BillingNotConfiguredView({ slug }: { slug: string }) {
   return (
-    <div className='p-6 w-full max-w-5xl mx-auto space-y-6 min-h-screen flex'>
+    <div className='mx-auto flex min-h-screen w-full max-w-5xl space-y-6 p-6'>
       <Empty>
         <EmptyHeader>
           <EmptyMedia variant='icon'>

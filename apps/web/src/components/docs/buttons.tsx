@@ -40,7 +40,7 @@ export function CopyMarkdownButton({ url, className, ...props }: CopyMarkdownBut
       disabled={isLoading}
       size='sm'
       variant='outline'
-      className={cn('text-xs gap-2', className)}
+      className={cn('gap-2 text-xs', className)}
       onClick={onClick}
       {...props}
     >
@@ -53,7 +53,7 @@ export function CopyMarkdownButton({ url, className, ...props }: CopyMarkdownBut
 export function EditOnGitHub({ className, ...props }: React.ComponentPropsWithoutRef<'a'>) {
   return (
     <a target='_blank' rel='noreferrer noopener' {...props}>
-      <Button size='sm' variant='outline' className={cn('text-xs gap-2 not-prose', className)}>
+      <Button size='sm' variant='outline' className={cn('not-prose gap-2 text-xs', className)}>
         <Edit />
         Edit on GitHub
       </Button>

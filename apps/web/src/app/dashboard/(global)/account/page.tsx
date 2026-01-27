@@ -17,9 +17,9 @@ export default async function AccountPage() {
   const passkeys = await auth.api.listPasskeys({ headers });
 
   return (
-    <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
+    <div className='mx-auto w-full max-w-5xl space-y-6 p-6'>
       <div>
-        <h1 className='text-3xl font-semibold mb-2'>Account Settings</h1>
+        <h1 className='mb-2 font-semibold text-3xl'>Account Settings</h1>
         <p className='text-muted-foreground'>Manage your account preferences and security settings</p>
       </div>
 

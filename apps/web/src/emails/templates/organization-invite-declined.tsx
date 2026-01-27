@@ -20,7 +20,7 @@ export function OrganizationInviteDeclined({
           <Container className='mx-auto my-10 max-w-[465px] p-5'>
             <Section>
               <Row>
-                <Text className='text-[24px] font-bold text-black mb-4'>Invitation Declined</Text>
+                <Text className='mb-4 font-bold text-[24px] text-black'>Invitation Declined</Text>
               </Row>
               <Row>
                 <Text>
@@ -28,7 +28,7 @@ export function OrganizationInviteDeclined({
                 </Text>
               </Row>
               <Row>
-                <Text className='text-[14px] text-[#666666] mt-4'>
+                <Text className='mt-4 text-[#666666] text-[14px]'>
                   You can send another invitation at any time if needed.
                 </Text>
               </Row>

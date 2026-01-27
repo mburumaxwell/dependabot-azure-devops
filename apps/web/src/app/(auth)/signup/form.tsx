@@ -56,14 +56,14 @@ export function SignupForm({ className, redirectTo, ...props }: SignupFormProps)
             </div>
             <span className='sr-only'>Paklo</span>
           </Link>
-          <h1 className='text-xl font-bold'>Welcome to Paklo Dashboard</h1>
+          <h1 className='font-bold text-xl'>Welcome to Paklo Dashboard</h1>
           <FieldDescription>
             Already have an account? <Link href='/login'>Login</Link>
           </FieldDescription>
         </div>
       </FieldGroup>
       {magicLinkSent ? (
-        <div className='text-center space-y-4'>
+        <div className='space-y-4 text-center'>
           <div className='space-y-4 text-center'>
             <div className='flex justify-center'>
               <div className='rounded-full bg-primary/10 p-3'>

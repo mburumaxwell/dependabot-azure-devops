@@ -25,20 +25,20 @@ function Header() {
   ];
 
   return (
-    <nav className='border-b border-border/40 backdrop-blur-sm sticky top-0 z-50 bg-background/80'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <div className='flex items-center justify-between h-16'>
+    <nav className='sticky top-0 z-50 border-border/40 border-b bg-background/80 backdrop-blur-sm'>
+      <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+        <div className='flex h-16 items-center justify-between'>
           <div className='flex items-center gap-8'>
-            <Link href='/' className='text-xl font-semibold flex align-middle gap-2'>
+            <Link href='/' className='flex gap-2 align-middle font-semibold text-xl'>
               <PakloLogo className='size-6' />
               Paklo
             </Link>
-            <div className='hidden md:flex items-center gap-6'>
+            <div className='hidden items-center gap-6 md:flex'>
               {links.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className='text-sm text-muted-foreground hover:text-foreground transition-colors'
+                  className='text-muted-foreground text-sm transition-colors hover:text-foreground'
                 >
                   {link.name}
                 </Link>
@@ -46,7 +46,7 @@ function Header() {
             </div>
           </div>
           <MobileMenuSheet links={links} />
-          <div className='hidden md:flex items-center gap-4'>
+          <div className='hidden items-center gap-4 md:flex'>
             <Link href='/login'>
               <Button variant='ghost' size='sm'>
                 Log in
@@ -101,11 +101,11 @@ async function Footer() {
   }
 
   return (
-    <footer className='border-t border-border/40 py-8 bg-muted/10'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <div className='grid md:grid-cols-3 md:gap-8 mb-4'>
-          <div className='space-y-4 flex flex-col items-start order-last md:order-first'>
-            <Link href='/' className='flex align-middle gap-2 invisible md:visible'>
+    <footer className='border-border/40 border-t bg-muted/10 py-8'>
+      <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+        <div className='mb-4 grid md:grid-cols-3 md:gap-8'>
+          <div className='order-last flex flex-col items-start space-y-4 md:order-first'>
+            <Link href='/' className='invisible flex gap-2 align-middle md:visible'>
               <PakloLogo className='size-6' />
               Paklo
             </Link>
@@ -116,7 +116,7 @@ async function Footer() {
                   href={link.href}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='mr-4 last:mr-0 hover:text-foreground transition-colors'
+                  className='mr-4 transition-colors last:mr-0 hover:text-foreground'
                 >
                   <span className='sr-only'>{link.name}</span>
                   <link.icon className='size-4' />
@@ -125,16 +125,16 @@ async function Footer() {
             </div>
             <ThemeToggle />
             <Separator className='mt-2' />
-            <p className='text-sm text-muted-foreground'>&copy; {await getCurrentYear()} Paklo. All rights reserved.</p>
+            <p className='text-muted-foreground text-sm'>&copy; {await getCurrentYear()} Paklo. All rights reserved.</p>
           </div>
-          <div className='grid grid-cols-2 gap-8 md:col-span-2 order-first md:order-last'>
+          <div className='order-first grid grid-cols-2 gap-8 md:order-last md:col-span-2'>
             {columns.map((column) => (
               <div key={column.name}>
-                <h3 className='font-semibold mb-3'>{column.name}</h3>
-                <ul className='space-y-3 text-sm text-muted-foreground'>
+                <h3 className='mb-3 font-semibold'>{column.name}</h3>
+                <ul className='space-y-3 text-muted-foreground text-sm'>
                   {column.links.map((link) => (
                     <li key={link.name}>
-                      <Link href={link.href} className='hover:text-foreground transition-colors'>
+                      <Link href={link.href} className='transition-colors hover:text-foreground'>
                         {link.name}
                       </Link>
                     </li>

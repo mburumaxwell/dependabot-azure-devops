@@ -67,7 +67,7 @@ export default function RunsView({
           <div className='flex flex-wrap gap-3'>
             <Select value={timeRange} onValueChange={(value) => updateFilters({ timeRange: value })}>
               <SelectTrigger className='w-45'>
-                <Calendar className='size-4 mr-2' />
+                <Calendar className='mr-2 size-4' />
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -169,9 +169,9 @@ export default function RunsView({
           <TableBody>
             {jobs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className='text-center py-12'>
+                <TableCell colSpan={4} className='py-12 text-center'>
                   <div className='space-y-2'>
-                    <Funnel className='size-8 text-muted-foreground mx-auto' />
+                    <Funnel className='mx-auto size-8 text-muted-foreground' />
                     <p className='text-muted-foreground'>No jobs found matching your filters</p>
                   </div>
                 </TableCell>
@@ -186,7 +186,7 @@ export default function RunsView({
                   <TableCell className='text-medium'>
                     <div className='flex items-center gap-2'>
                       <EcosystemIcon ecosystem={job.ecosystem} className='size-5' />
-                      <span className='text-wrap wrap-break-word'>{job.repositorySlug}</span>
+                      <span className='wrap-break-word text-wrap'>{job.repositorySlug}</span>
                     </div>
                   </TableCell>
                   <TableCell>

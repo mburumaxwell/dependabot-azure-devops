@@ -80,7 +80,7 @@ export function InviteAcceptView({ invitationId }: { invitationId: string }) {
         </CardHeader>
         {(status === 'success' || status === 'error') && (
           <CardContent className='text-center'>
-            <p className='text-sm text-muted-foreground'>
+            <p className='text-muted-foreground text-sm'>
               Redirecting in {countdown} second{countdown !== 1 ? 's' : ''}...
             </p>
           </CardContent>

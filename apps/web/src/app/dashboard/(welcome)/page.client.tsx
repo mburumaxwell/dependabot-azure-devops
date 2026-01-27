@@ -15,16 +15,16 @@ import { getOrganizationTypeInfo } from '@/lib/organizations';
 
 export function NoOrganizationsView() {
   return (
-    <Card className='max-w-md w-full'>
-      <CardHeader className='text-center pb-4'>
-        <div className='mx-auto mb-4 size-12 rounded-full flex items-center justify-center'>
+    <Card className='w-full max-w-md'>
+      <CardHeader className='pb-4 text-center'>
+        <div className='mx-auto mb-4 flex size-12 items-center justify-center rounded-full'>
           <PakloLogo className='size-6' />
         </div>
         <CardTitle className='text-2xl'>Welcome to your dashboard</CardTitle>
         <CardDescription className='text-base'>Get started by creating your first organization</CardDescription>
       </CardHeader>
       <CardContent className='space-y-4'>
-        <p className='text-sm text-muted-foreground text-center'>
+        <p className='text-center text-muted-foreground text-sm'>
           Organizations help you manage your projects, team members, and integrations all in one place.
         </p>
         <Link href='/dashboard/setup'>
@@ -53,9 +53,9 @@ export function SelectOrganizationView({ organizations }: { organizations: Organ
   }
 
   return (
-    <Card className='max-w-md w-full'>
+    <Card className='w-full max-w-md'>
       <CardHeader className='text-center'>
-        <div className='mx-auto mb-4 size-12 rounded-full flex items-center justify-center'>
+        <div className='mx-auto mb-4 flex size-12 items-center justify-center rounded-full'>
           <PakloLogo className='size-6' />
         </div>
         <CardTitle className='text-xl'>Choose your organization</CardTitle>
@@ -89,7 +89,7 @@ export function SelectOrganizationView({ organizations }: { organizations: Organ
             'Continue to Dashboard'
           )}
         </Button>
-        <p className='text-xs text-muted-foreground text-center'>You can change this at any time in your sidebar.</p>
+        <p className='text-center text-muted-foreground text-xs'>You can change this at any time in your sidebar.</p>
         <Separator />
         <Link href='/dashboard/setup'>
           <Button variant='outline' className='w-full bg-transparent'>

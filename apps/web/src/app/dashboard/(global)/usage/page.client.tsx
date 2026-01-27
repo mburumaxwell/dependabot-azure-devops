@@ -71,8 +71,8 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
-          <h1 className='text-3xl font-semibold text-foreground'>Usage Telemetry</h1>
-          <p className='text-sm text-muted-foreground mt-1'>Monitor and analyze pipeline execution metrics</p>
+          <h1 className='font-semibold text-3xl text-foreground'>Usage Telemetry</h1>
+          <p className='mt-1 text-muted-foreground text-sm'>Monitor and analyze pipeline execution metrics</p>
         </div>
       </div>
 
@@ -85,7 +85,7 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
           <div className='flex flex-wrap gap-3'>
             <Select value={timeRange} onValueChange={(value) => updateFilters({ timeRange: value })}>
               <SelectTrigger className='w-45'>
-                <Calendar className='size-4 mr-2' />
+                <Calendar className='mr-2 size-4' />
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -150,7 +150,7 @@ export function TelemetryDashboard({ telemetries }: TelemetryDashboardProps) {
       </Item>
 
       {/* Key Metrics */}
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4'>
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5'>
         <MetricCard
           title='Total Runs'
           value={metrics.totalRuns.toLocaleString()}
@@ -255,8 +255,8 @@ function RunsChart({ telemetries, timeRange }: RunsChartProps) {
     <Card className='p-6'>
       <div className='flex flex-col gap-4'>
         <div>
-          <h3 className='text-lg font-semibold text-foreground'>Pipeline Runs</h3>
-          <p className='text-sm text-muted-foreground'>Total executions over time</p>
+          <h3 className='font-semibold text-foreground text-lg'>Pipeline Runs</h3>
+          <p className='text-muted-foreground text-sm'>Total executions over time</p>
         </div>
         <ChartContainer config={chartConfig} className='h-50 w-full'>
           <LineChart data={chartData}>
@@ -309,8 +309,8 @@ function RegionChart({ telemetries }: RegionChartProps) {
     <Card className='p-6'>
       <div className='flex flex-col gap-4'>
         <div>
-          <h3 className='text-lg font-semibold text-foreground'>Region Usage</h3>
-          <p className='text-sm text-muted-foreground'>Distribution by region</p>
+          <h3 className='font-semibold text-foreground text-lg'>Region Usage</h3>
+          <p className='text-muted-foreground text-sm'>Distribution by region</p>
         </div>
         <ChartContainer config={chartConfig} className='h-50 w-full'>
           <BarChart data={chartData}>
@@ -365,8 +365,8 @@ function PackageManagerChart({ telemetries }: PackageManagerChartProps) {
     <Card className='p-6'>
       <div className='flex flex-col gap-4'>
         <div>
-          <h3 className='text-lg font-semibold text-foreground'>Package Manager Usage</h3>
-          <p className='text-sm text-muted-foreground'>Distribution by package manager</p>
+          <h3 className='font-semibold text-foreground text-lg'>Package Manager Usage</h3>
+          <p className='text-muted-foreground text-sm'>Distribution by package manager</p>
         </div>
         <ChartContainer config={chartConfig} className='h-50 w-full'>
           <BarChart data={chartData}>

@@ -40,9 +40,9 @@ export default async function BillingPage(props: PageProps<'/dashboard/[org]/set
   });
 
   return (
-    <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
+    <div className='mx-auto w-full max-w-5xl space-y-6 p-6'>
       <div>
-        <h1 className='text-3xl font-semibold mb-2'>Billing</h1>
+        <h1 className='mb-2 font-semibold text-3xl'>Billing</h1>
         <p className='text-muted-foreground'>Manage your billing settings and payment methods</p>
       </div>
 

@@ -20,18 +20,18 @@ export function MobileMenuSheet({ links }: { links: HeaderLink[] }) {
         </Button>
       </SheetTrigger>
       <SheetContent side='right' className='w-64 p-4'>
-        <div className='flex flex-col gap-6 mt-8'>
+        <div className='mt-8 flex flex-col gap-6'>
           {links.map((link) => (
             <Link
               key={link.name}
               href={link.href}
-              className='text-sm text-muted-foreground hover:text-foreground transition-colors'
+              className='text-muted-foreground text-sm transition-colors hover:text-foreground'
               onClick={() => setOpen(false)}
             >
               {link.name}
             </Link>
           ))}
-          <div className='border-t border-border pt-6 flex flex-col gap-3'>
+          <div className='flex flex-col gap-3 border-border border-t pt-6'>
             <Link href='/login' onClick={() => setOpen(false)}>
               <Button variant='ghost' size='sm' className='w-full justify-start'>
                 Log in

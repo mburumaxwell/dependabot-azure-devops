@@ -153,7 +153,7 @@ export function SecretsView({ organization, secrets: initialSecrets }: SecretsVi
   return (
     <>
       {secrets.length === 0 ? (
-        <div className='p-6 w-full max-w-5xl mx-auto min-h-screen flex'>
+        <div className='mx-auto flex min-h-screen w-full max-w-5xl p-6'>
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant='icon'>
@@ -178,10 +178,10 @@ export function SecretsView({ organization, secrets: initialSecrets }: SecretsVi
           </Empty>
         </div>
       ) : (
-        <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
-          <div className='grid gap-4 grid-cols-1 md:grid-cols-3 items-center justify-center'>
+        <div className='mx-auto w-full max-w-5xl space-y-6 p-6'>
+          <div className='grid grid-cols-1 items-center justify-center gap-4 md:grid-cols-3'>
             <div className='md:col-span-2'>
-              <h1 className='text-3xl font-semibold mb-2'>Organization Secrets</h1>
+              <h1 className='mb-2 font-semibold text-3xl'>Organization Secrets</h1>
               <p className='text-muted-foreground'>
                 Manage organization secrets that can be used in your workflows. Values are securely stored and cannot be
                 read back except during job runs.
@@ -189,7 +189,7 @@ export function SecretsView({ organization, secrets: initialSecrets }: SecretsVi
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button onClick={handleAddSecret} className='mt-4 md:w-full lg:mt-0 lg:justify-self-end lg:w-auto'>
+                <Button onClick={handleAddSecret} className='mt-4 md:w-full lg:mt-0 lg:w-auto lg:justify-self-end'>
                   <Plus className='size-4' />
                   Add Secret
                 </Button>
@@ -197,19 +197,19 @@ export function SecretsView({ organization, secrets: initialSecrets }: SecretsVi
             </Dialog>
           </div>
 
-          <div className='border rounded-lg overflow-hidden'>
+          <div className='overflow-hidden rounded-lg border'>
             <Table>
               <TableHeader>
                 <TableRow className='hover:bg-transparent'>
                   <TableHead className='font-semibold'>Secret Name</TableHead>
-                  <TableHead className='font-semibold w-32'>Last Updated</TableHead>
-                  <TableHead className='font-semibold w-24 text-right'>Actions</TableHead>
+                  <TableHead className='w-32 font-semibold'>Last Updated</TableHead>
+                  <TableHead className='w-24 text-right font-semibold'>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {secrets.map((secret) => (
                   <TableRow key={secret.id} className='group'>
-                    <TableCell className='font-mono font-medium'>
+                    <TableCell className='font-medium font-mono'>
                       <div className='flex items-center gap-2'>
                         {secret.name}
                         {secret.description && (
@@ -231,7 +231,7 @@ export function SecretsView({ organization, secrets: initialSecrets }: SecretsVi
                           variant='ghost'
                           size='sm'
                           onClick={() => handleEditSecret(secret)}
-                          className='size-8 p-0 opacity-60 group-hover:opacity-100 transition-opacity cursor-pointer'
+                          className='size-8 cursor-pointer p-0 opacity-60 transition-opacity group-hover:opacity-100'
                         >
                           <Pencil className='size-4' />
                           <span className='sr-only'>Edit secret</span>
@@ -241,7 +241,7 @@ export function SecretsView({ organization, secrets: initialSecrets }: SecretsVi
                             <Button
                               variant='ghost'
                               size='sm'
-                              className='size-8 p-0 opacity-60 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-destructive'
+                              className='size-8 cursor-pointer p-0 opacity-60 transition-opacity hover:text-destructive group-hover:opacity-100'
                             >
                               <Trash2 className='size-4' />
                               <span className='sr-only'>Delete secret</span>
@@ -324,7 +324,7 @@ export function SecretsView({ organization, secrets: initialSecrets }: SecretsVi
                         placeholder={editingSecret ? 'Enter new value...' : 'Enter secret value...'}
                         value={secretValue}
                         onChange={(e) => setSecretValue(e.target.value)}
-                        className='font-mono text-sm min-h-20'
+                        className='min-h-20 font-mono text-sm'
                       />
                     ) : (
                       <InputGroupInput

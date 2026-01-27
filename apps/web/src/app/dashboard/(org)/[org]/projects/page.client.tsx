@@ -28,7 +28,7 @@ export function ProjectsView({
   return (
     <>
       {projects.length === 0 ? (
-        <div className='p-6 w-full max-w-5xl mx-auto space-y-6 min-h-screen flex'>
+        <div className='mx-auto flex min-h-screen w-full max-w-5xl space-y-6 p-6'>
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant='icon'>
@@ -47,15 +47,15 @@ export function ProjectsView({
           </Empty>
         </div>
       ) : (
-        <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
-          <div className='grid gap-4 grid-cols-1 md:grid-cols-3 items-center justify-center'>
+        <div className='mx-auto w-full max-w-5xl space-y-6 p-6'>
+          <div className='grid grid-cols-1 items-center justify-center gap-4 md:grid-cols-3'>
             <div className='md:col-span-2'>
-              <h1 className='text-3xl font-semibold mb-2'>Projects</h1>
+              <h1 className='mb-2 font-semibold text-3xl'>Projects</h1>
               <p className='text-muted-foreground'>
                 Manage and monitor your connected projects. Keep track of synchronization status and recent activity.
               </p>
             </div>
-            <Button onClick={handleConnectProjects} className='mt-4 md:w-full lg:mt-0 lg:justify-self-end lg:w-auto'>
+            <Button onClick={handleConnectProjects} className='mt-4 md:w-full lg:mt-0 lg:w-auto lg:justify-self-end'>
               Connect Projects
             </Button>
           </div>

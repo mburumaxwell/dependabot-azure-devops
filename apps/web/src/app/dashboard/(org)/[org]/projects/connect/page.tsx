@@ -24,10 +24,10 @@ export default async function ProjectConnectPage(props: PageProps<'/dashboard/[o
   const projects = await listAvailableProjects(organization);
 
   return (
-    <div className='p-6 w-full max-w-5xl mx-auto space-y-6'>
+    <div className='mx-auto w-full max-w-5xl space-y-6 p-6'>
       <div className='flex items-center gap-4'>
         <div>
-          <h1 className='text-3xl font-semibold mb-2'>Connect Projects</h1>
+          <h1 className='mb-2 font-semibold text-3xl'>Connect Projects</h1>
           <p className='text-muted-foreground'>Select projects from your integration provider to connect</p>
         </div>
       </div>

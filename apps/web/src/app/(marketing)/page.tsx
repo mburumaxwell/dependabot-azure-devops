@@ -19,22 +19,22 @@ export default async function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className='relative py-12 lg:py-20 overflow-hidden'>
+      <section className='relative overflow-hidden py-12 lg:py-20'>
         <div className='absolute inset-0 bg-grid-white/[0.02] bg-size-[50px_50px]' />
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative'>
-          <div className='text-center max-w-4xl mx-auto'>
-            <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm mb-6'>
+        <div className='relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+          <div className='mx-auto max-w-4xl text-center'>
+            <div className='mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-primary text-sm'>
               <Shield className='size-4' />
               Trusted by {numify(installations)}+ engineering teams
             </div>
-            <h1 className='text-4xl lg:text-6xl font-bold mb-6 text-balance'>
+            <h1 className='mb-6 text-balance font-bold text-4xl lg:text-6xl'>
               Secure your dependencies, <span className='text-primary'>ship with confidence</span>
             </h1>
-            <p className='text-xl text-muted-foreground mb-8 max-w-2xl lg:max-w-3xl mx-auto text-balance'>
+            <p className='mx-auto mb-8 max-w-2xl text-balance text-muted-foreground text-xl lg:max-w-3xl'>
               Automated vulnerability scanning and dependency management for modern development teams. Keep your code
               secure without slowing down.
             </p>
-            <div className='flex flex-col sm:flex-row items-center justify-center gap-4'>
+            <div className='flex flex-col items-center justify-center gap-4 sm:flex-row'>
               <Link href='/compare'>
                 <Button size='lg' variant='outline' className='w-full sm:w-auto'>
                   Compare
@@ -49,31 +49,31 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className='mt-16 relative'>
-            <div className='absolute inset-0 bg-linear-to-t from-background via-transparent to-transparent z-10' />
+          <div className='relative mt-16'>
+            <div className='absolute inset-0 z-10 bg-linear-to-t from-background via-transparent to-transparent' />
             <Card className='overflow-hidden border-2'>
               <CardContent className='p-0'>
-                <div className='bg-muted/50 p-8 grid grid-cols-1 md:grid-cols-3 gap-6'>
+                <div className='grid grid-cols-1 gap-6 bg-muted/50 p-8 md:grid-cols-3'>
                   <div className='space-y-3'>
-                    <div className='flex items-center gap-2 text-sm font-medium'>
+                    <div className='flex items-center gap-2 font-medium text-sm'>
                       <div className='size-3 rounded-full bg-red-500' />
                       Critical: 2
                     </div>
-                    <div className='flex items-center gap-2 text-sm font-medium'>
+                    <div className='flex items-center gap-2 font-medium text-sm'>
                       <div className='size-3 rounded-full bg-orange-500' />
                       High: 5
                     </div>
-                    <div className='flex items-center gap-2 text-sm font-medium'>
+                    <div className='flex items-center gap-2 font-medium text-sm'>
                       <div className='size-3 rounded-full bg-yellow-500' />
                       Medium: 12
                     </div>
                   </div>
-                  <div className='md:col-span-2 space-y-2'>
-                    <div className='bg-background rounded p-3 border text-sm'>
-                      <span className='text-red-500 font-mono'>CVE-2024-12345</span> detected in react-dom@18.2.0
+                  <div className='space-y-2 md:col-span-2'>
+                    <div className='rounded border bg-background p-3 text-sm'>
+                      <span className='font-mono text-red-500'>CVE-2024-12345</span> detected in react-dom@18.2.0
                     </div>
-                    <div className='bg-background rounded p-3 border text-sm opacity-60'>
-                      <span className='text-orange-500 font-mono'>CVE-2024-54321</span> detected in axios@1.4.0
+                    <div className='rounded border bg-background p-3 text-sm opacity-60'>
+                      <span className='font-mono text-orange-500'>CVE-2024-54321</span> detected in axios@1.4.0
                     </div>
                   </div>
                 </div>
@@ -84,7 +84,7 @@ export default async function HomePage() {
       </section>
 
       <section className='py-12 lg:py-20'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+        <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           <React.Suspense fallback={<StatsSectionSkeleton />}>
             <StatsSection installations={installations} />
           </React.Suspense>
@@ -92,19 +92,19 @@ export default async function HomePage() {
       </section>
 
       {/* Features */}
-      <section id='features' className='py-12 lg:py-20 bg-muted/30'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-          <div className='text-center max-w-3xl mx-auto mb-16'>
-            <h2 className='text-3xl lg:text-4xl font-bold mb-4'>Everything you need to stay secure</h2>
-            <p className='text-xl text-muted-foreground'>
+      <section id='features' className='bg-muted/30 py-12 lg:py-20'>
+        <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+          <div className='mx-auto mb-16 max-w-3xl text-center'>
+            <h2 className='mb-4 font-bold text-3xl lg:text-4xl'>Everything you need to stay secure</h2>
+            <p className='text-muted-foreground text-xl'>
               Comprehensive security monitoring and automated updates for your entire stack
             </p>
           </div>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+          <div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'>
             {features.map(({ icon: Icon, ...feature }) => (
               <Item key={feature.title} variant='outline' className='p-6'>
-                <ItemMedia variant='image' className='bg-primary/10 rounded-lg'>
+                <ItemMedia variant='image' className='rounded-lg bg-primary/10'>
                   <Icon />
                 </ItemMedia>
                 <ItemContent>
@@ -119,31 +119,31 @@ export default async function HomePage() {
 
       {/* Pricing */}
       <section id='pricing' className='py-12 lg:py-20'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-          <div className='text-center max-w-3xl mx-auto mb-16'>
-            <h2 className='text-3xl lg:text-4xl font-bold mb-4'>Simple, transparent pricing</h2>
-            <p className='text-xl text-muted-foreground'>Choose the option that works best for you</p>
+        <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+          <div className='mx-auto mb-16 max-w-3xl text-center'>
+            <h2 className='mb-4 font-bold text-3xl lg:text-4xl'>Simple, transparent pricing</h2>
+            <p className='text-muted-foreground text-xl'>Choose the option that works best for you</p>
           </div>
 
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto'>
+          <div className='mx-auto grid max-w-4xl grid-cols-1 gap-8 lg:grid-cols-2'>
             <Card>
               <CardContent className='p-8'>
                 <div className='mb-6'>
-                  <h3 className='font-bold mb-2'>Self-Managed</h3>
-                  <div className='flex items-baseline gap-2 mb-4'>
+                  <h3 className='mb-2 font-bold'>Self-Managed</h3>
+                  <div className='mb-4 flex items-baseline gap-2'>
                     <span className='text-2xl'>Free Forever</span>
                   </div>
-                  <p className='text-sm text-muted-foreground'>Install and run the extension yourself</p>
+                  <p className='text-muted-foreground text-sm'>Install and run the extension yourself</p>
                 </div>
                 <a href={extensions.azure.url} target='_blank' rel='noopener noreferrer'>
-                  <Button variant='outline' className='w-full mb-6 bg-transparent'>
+                  <Button variant='outline' className='mb-6 w-full bg-transparent'>
                     Get Extension
                   </Button>
                 </a>
                 <ul className='space-y-3'>
                   {pricing.free.features.map((feature) => (
                     <li key={feature} className='flex items-start gap-2'>
-                      <Check className='size-5 text-primary shrink-0 mt-0.5' />
+                      <Check className='mt-0.5 size-5 shrink-0 text-primary' />
                       <span className='text-sm'>{feature}</span>
                     </li>
                   ))}
@@ -151,28 +151,28 @@ export default async function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className='border-brand border-2 relative overflow-visible'>
+            <Card className='relative overflow-visible border-2 border-brand'>
               <Badge variant='brand' className='absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-3'>
                 Recommended
               </Badge>
               <CardContent className='p-8'>
                 <div className='mb-6'>
-                  <h3 className='font-bold mb-2'>Managed</h3>
-                  <div className='flex items-baseline gap-2 mb-4'>
+                  <h3 className='mb-2 font-bold'>Managed</h3>
+                  <div className='mb-4 flex items-baseline gap-2'>
                     <span className='text-2xl'>{pricing.paid.monthly}</span>
                     <span className='text-muted-foreground'>/organization/month</span>
                   </div>
-                  <p className='text-sm text-muted-foreground'>Fully managed cloud service</p>
+                  <p className='text-muted-foreground text-sm'>Fully managed cloud service</p>
                 </div>
                 <Link href='/signup'>
-                  <Button variant='brand' className='w-full mb-6'>
+                  <Button variant='brand' className='mb-6 w-full'>
                     Get Started
                   </Button>
                 </Link>
                 <ul className='space-y-3'>
                   {pricing.paid.features.map((feature) => (
                     <li key={feature} className='flex items-start gap-2'>
-                      <Check className='size-5 text-primary shrink-0 mt-0.5' />
+                      <Check className='mt-0.5 size-5 shrink-0 text-primary' />
                       <span className='text-sm'>{feature}</span>
                     </li>
                   ))}
@@ -184,11 +184,11 @@ export default async function HomePage() {
       </section>
 
       {/* FAQs */}
-      <section id='faqs' className='py-12 lg:py-20 bg-muted/30'>
-        <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'>
-          <div className='text-center mb-16'>
-            <h2 className='text-3xl lg:text-4xl font-bold mb-4'>Frequently Asked Questions</h2>
-            <p className='text-xl text-muted-foreground'>Everything you need to know about Paklo</p>
+      <section id='faqs' className='bg-muted/30 py-12 lg:py-20'>
+        <div className='mx-auto max-w-4xl px-4 sm:px-6 lg:px-8'>
+          <div className='mb-16 text-center'>
+            <h2 className='mb-4 font-bold text-3xl lg:text-4xl'>Frequently Asked Questions</h2>
+            <p className='text-muted-foreground text-xl'>Everything you need to know about Paklo</p>
           </div>
 
           <Accordion type='single' collapsible className='space-y-2'>
@@ -196,7 +196,7 @@ export default async function HomePage() {
               <AccordionItem
                 key={faq.question}
                 value={faq.question}
-                className='bg-background rounded-lg border px-6 last:border-b'
+                className='rounded-lg border bg-background px-6 last:border-b'
               >
                 <AccordionTrigger className='text-left underline-offset-4'>{faq.question}</AccordionTrigger>
                 <AccordionContent>{faq.answer}</AccordionContent>
@@ -218,12 +218,12 @@ async function StatsSection({ installations }: { installations: number }) {
   ];
 
   return (
-    <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+    <div className='grid grid-cols-1 gap-8 md:grid-cols-3'>
       {stats.map((stat) => (
         <div key={stat.name} className='text-center'>
           <p className='mb-2'>
-            <span className='text-3xl font-semibold tracking-tight'>{stat.value}</span>
-            {stat.unit ? <span className='text-sm ml-2'>{stat.unit}</span> : null}
+            <span className='font-semibold text-3xl tracking-tight'>{stat.value}</span>
+            {stat.unit ? <span className='ml-2 text-sm'>{stat.unit}</span> : null}
           </p>
           <p className='text-lg text-muted-foreground'>{stat.name}</p>
         </div>
@@ -234,13 +234,13 @@ async function StatsSection({ installations }: { installations: number }) {
 
 async function StatsSectionSkeleton() {
   return (
-    <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+    <div className='grid grid-cols-1 gap-8 md:grid-cols-3'>
       {[1, 2, 3].map((stat) => (
         <div key={stat} className='text-center'>
           {/* <div className='mb-2 h-8 w-24 mx-auto bg-muted animate-pulse rounded' /> */}
-          <Skeleton className='mb-2 h-8 w-24 mx-auto' />
+          <Skeleton className='mx-auto mb-2 h-8 w-24' />
           {/* <div className='h-5 w-32 mx-auto bg-muted animate-pulse rounded' /> */}
-          <Skeleton className='h-5 w-32 mx-auto' />
+          <Skeleton className='mx-auto h-5 w-32' />
         </div>
       ))}
     </div>
