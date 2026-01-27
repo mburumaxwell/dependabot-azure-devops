@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { WorkInProgressPage } from '@/components/work-in-progress-page';
+import Image from 'next/image';
+import wipImage from './work-in-progress.png';
 
 export async function generateMetadata(props: PageProps<'/dashboard/[org]/advisories'>): Promise<Metadata> {
   const { org } = await props.params;
@@ -12,5 +13,11 @@ export async function generateMetadata(props: PageProps<'/dashboard/[org]/adviso
 
 // TODO: implement this page
 export default async function AdvisoriesPage(props: PageProps<'/dashboard/[org]/advisories'>) {
-  return <WorkInProgressPage />;
+  return (
+    <div className='h-full flex flex-col gap-2 items-center justify-center'>
+      <Image src={wipImage} alt='Work In Progress' width={128} height={128} />
+      <p className='text-muted-foreground'>This feature is currently under development.</p>
+      <p className='text-muted-foreground'>Please check back in a couple of days!</p>
+    </div>
+  );
 }
