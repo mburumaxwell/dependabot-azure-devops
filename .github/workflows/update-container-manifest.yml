@@ -82,8 +82,31 @@ jobs:
         if: needs.dependabot-metadata.outputs.package-ecosystem == 'docker'
         run: |
           pnpm scripts:update-container-manifest
-          git add docker/containers.json
-          git commit -m "[dependabot skip] Update container manifest" || exit 0
+
+          # Check if containers.json actually changed
+          if git diff --exit-code docker/containers.json > /dev/null; then
+            echo "No changes to containers.json"
+            exit 0
+          fi
+
+          echo "Changes detected in containers.json, creating changeset..."
+
+          # Extract dependency info from PR title (format: "Bump <package> from <old> to <new>")
+          PR_TITLE="${{ github.event.pull_request.title }}"
+
+          # Create changeset file with timestamp-based unique name
+          CHANGESET_ID="docker-manifest-$(date +%s)"
+          cat > ../../.changeset/${CHANGESET_ID}.md << EOF
+          ---
+          "@paklo/runner": patch
+          ---
+
+          Updated Docker container manifest for ${PR_TITLE}
+          EOF
+
+          # Stage both files
+          git add docker/containers.json ../../.changeset/${CHANGESET_ID}.md
+          git commit -m "[dependabot skip] Update container manifest and changeset"
         working-directory: '${{ github.workspace }}/packages/runner'
 
       - name: Push staged changes
